@@ -10,5 +10,8 @@ function EffectGiveFlashlight:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    inventory:AddItem("Base.HandTorch")
+    local item = inventory:AddItem("Base.HandTorch")
+    if item then
+        ChaosPlayer.SayLineNewItem(player, item)
+    end
 end

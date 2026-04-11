@@ -333,3 +333,41 @@ function ChaosUtils.AdjustVisibleZombiesForNPCs()
         end
     end
 end
+
+---@param item InventoryItem
+---@return string
+function ChaosUtils.GetShortTextureIconName(item)
+    if not item then return "" end
+    local textureIcon = item:getIcon()
+    if not textureIcon then return "" end
+    local textureIconName = textureIcon:getName()
+    if not textureIconName then return "" end
+    return string.sub(textureIconName, 6, -1)
+end
+
+---@param item string
+---@return string
+function ChaosUtils.GetShortTextureIconNameByString(item)
+    if not item then return "" end
+    local item = instanceItem(item)
+    if not item then return "" end
+    return ChaosUtils.GetShortTextureIconName(item)
+end
+
+---@param item InventoryItem
+---@return string
+function ChaosUtils.GetImgCodeByItemTexture(item)
+    if not item then return "" end
+    local shortTextureIconName = ChaosUtils.GetShortTextureIconName(item)
+    if not shortTextureIconName then return "" end
+    return string.format("[img=%s]", shortTextureIconName)
+end
+
+---@param item string
+---@return string
+function ChaosUtils.GetImgCodeByItemTextureByString(item)
+    if not item then return "" end
+    local item = instanceItem(item)
+    if not item then return "" end
+    return ChaosUtils.GetImgCodeByItemTexture(item)
+end

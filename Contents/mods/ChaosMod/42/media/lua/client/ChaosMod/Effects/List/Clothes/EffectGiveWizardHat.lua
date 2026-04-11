@@ -30,4 +30,6 @@ function EffectGiveWizardHat:OnStart()
     player:onWornItemsChanged()
     player:resetModelNextFrame()
     triggerEvent("OnClothingUpdated", player)
+
+    ChaosPlayer.SayLineNewItem(player, wizardHat)
 end

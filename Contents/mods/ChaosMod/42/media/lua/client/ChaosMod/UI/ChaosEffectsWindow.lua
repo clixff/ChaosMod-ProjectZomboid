@@ -1,10 +1,12 @@
 require "ISUI/ISCollapsableWindow"
 require "ISUI/ISScrollingListBox"
 require "ISUI/ISButton"
+require "ISUI/ISTextEntryBox"
 
 ---@class ChaosEffectsWindow : ISCollapsableWindow
 ---@field effects table<string, ChaosEffectDataEntry>
 ---@field selectedEffect ChaosEffectDataEntry | nil
+---@field searchText string
 ChaosEffectsWindow = ISCollapsableWindow:derive("ChaosEffectsWindow")
 
 ---@param x number
@@ -23,6 +25,7 @@ function ChaosEffectsWindow:new(x, y, w, h)
 
     o.effects = {}
     o.selectedEffect = nil
+    o.searchText = ""
 
     return o
 end
@@ -36,11 +39,23 @@ function ChaosEffectsWindow:createChildren()
 
     local pad = ChaosUIManager.GetScaledWidth(10)
     local btnH = ChaosUIManager.GetScaledWidth(28)
-    local listY = ChaosUIManager.GetScaledWidth(30)
     local listW = self.width - pad * 2
-    local listH = self.height - listY - pad - btnH - ChaosUIManager.GetScaledWidth(8)
+
+    -- Search bar
+    local searchBarY = ChaosUIManager.GetScaledWidth(30)
+    local searchBarH = ChaosUIManager.GetScaledWidth(22)
+    self.searchBox = ISTextEntryBox:new("", pad, searchBarY, listW, searchBarH)
+    self.searchBox.font = UIFont.NewSmall
+    self.searchBox:initialise()
+    self.searchBox:instantiate()
+    self.searchBox:setClearButton(true)
+    self.searchBox.onTextChange = ChaosEffectsWindow.onSearchTextChange
+    self.searchBox.target = self
+    self:addChild(self.searchBox)
 
     -- Scroll list
+    local listY = searchBarY + searchBarH + ChaosUIManager.GetScaledWidth(4)
+    local listH = self.height - listY - pad - btnH - ChaosUIManager.GetScaledWidth(8)
     self.list = ISScrollingListBox:new(pad, listY, listW, listH)
     self.list:initialise()
     self.list:instantiate()
@@ -62,6 +77,16 @@ function ChaosEffectsWindow:createChildren()
     self:fillWithEffects()
 end
 
+function ChaosEffectsWindow.onSearchTextChange(box)
+    if not box then
+        return
+    end
+    if box:getInternalText() ~= box.target.searchText then
+        box.target.searchText = box:getInternalText()
+        box.target:fillWithEffects()
+    end
+end
+
 -- Called by ISScrollingListBox when you click an item.
 -- In vanilla usage, listbox calls: onmousedown(target, clickedItemData, listbox)
 --- @param target ChaosEffectDataEntry
@@ -75,14 +100,28 @@ end
 
 function ChaosEffectsWindow:fillWithEffects()
     self.list:clear()
+
+    local needle = nil
+    if self.searchText and self.searchText ~= "" then
+        needle = string.lower(self.searchText)
+    end
+
     local firstEffectId = ""
     local i = 0
     for _, effectData in pairs(ChaosEffectsRegistry.effects) do
-        i = i + 1
-        local effectLineString = string.format("%d. %s", i, effectData.name)
-        self.list:addItem(effectLineString, effectData)
-        if firstEffectId == "" then
-            firstEffectId = effectData.id
+        local matches = true
+        if needle then
+            local nameMatch = string.find(string.lower(effectData.name), needle, 1, true)
+            local idMatch = string.find(string.lower(effectData.id), needle, 1, true)
+            matches = (nameMatch or idMatch) and true or false
+        end
+        if matches then
+            i = i + 1
+            local effectLineString = string.format("%d. %s", i, effectData.name)
+            self.list:addItem(effectLineString, effectData)
+            if firstEffectId == "" then
+                firstEffectId = effectData.id
+            end
         end
     end
 

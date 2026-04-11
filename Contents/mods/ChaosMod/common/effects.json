@@ -202,12 +202,11 @@
             "withDuration": false
         },
         {
-            "id": "spawn_animal",
-            "name": "Spawn Animal",
+            "id": "spawn_random_animal",
+            "name": "Spawn Random Animal",
             "enabled": true,
             "chance": 10,
-            "withDuration": true,
-            "duration": 60
+            "withDuration": false
         },
         {
             "id": "give_baseball_bat",
@@ -1242,6 +1241,97 @@
             "enabled": true,
             "chance": 10,
             "withDuration": false
+        },
+        {
+            "id": "destroy_nearby_fridges",
+            "name": "Destroy Nearby Fridges",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "remove_player_drinks",
+            "name": "Remove Player Drinks",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "drop_item_in_hand",
+            "name": "Drop Item In Hand",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "spawn_cow",
+            "name": "Spawn Cow",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "spawn_chicken",
+            "name": "Spawn Chicken",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "increase_hunger_level",
+            "name": "Increase Hunger Level",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "decrease_hunger_level",
+            "name": "Decrease Hunger Level",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "panic_mode",
+            "name": "Panic Mode",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "panic_mode"
+            ]
+        },
+        {
+            "id": "food_is_poisoned",
+            "name": "Food Is Poisoned",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "food_is_poisoned"
+            ]
+        },
+        {
+            "id": "give_metal_armor",
+            "name": "Give Metal Armor",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "zombies_low_render_distance",
+            "name": "Zombies Low Render Distance",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 90,
+            "disable_effects": [
+                "zombies_low_render_distance",
+                "invisible_characters",
+                "wallhack"
+            ]
         }
     ]
 }

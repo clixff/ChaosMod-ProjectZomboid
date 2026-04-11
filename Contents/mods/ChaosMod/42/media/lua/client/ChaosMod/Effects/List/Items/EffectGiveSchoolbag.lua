@@ -24,4 +24,6 @@ function EffectGiveSchoolbag:OnStart()
     player:onWornItemsChanged()
     player:resetModelNextFrame()
     triggerEvent("OnClothingUpdated", player)
+
+    ChaosPlayer.SayLineNewItemByString(player, "Base.Bag_Schoolbag")
 end

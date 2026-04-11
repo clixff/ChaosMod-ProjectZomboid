@@ -118,21 +118,6 @@ function ChaosHUD:prerender()
     -- for i, fontName in pairs(fontsTest) do
     --     self:drawText(fontName, -200, 0 + (i * 40), 1, 1, 1, 1, UIFont[fontName])
     -- end
-
-    local player = getPlayer()
-    if player then
-        local actionState = player:getActionStateName()
-        self:drawText(actionState, 0, 250, 1, 1, 1, 1, UIFont.NewLarge)
-
-        local var1 = player:getVariableBoolean("ClimbFenceStarted")
-        local var2 = player:getVariableBoolean("ClimbFenceFinished")
-
-        local var1str = var1 and "true" or "false"
-        local var2str = var2 and "true" or "false"
-
-        local str = string.format("ClimbFenceStarted: %s, ClimbFenceFinished: %s", var1str, var2str)
-        self:drawText(str, 0, 270, 1, 1, 1, 1, UIFont.NewLarge)
-    end
 end
 
 function ChaosHUD:OnMainButtonClick()

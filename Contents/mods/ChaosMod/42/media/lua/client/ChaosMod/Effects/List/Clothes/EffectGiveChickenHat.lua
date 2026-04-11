@@ -30,4 +30,6 @@ function EffectGiveChickenHat:OnStart()
     player:onWornItemsChanged()
     player:resetModelNextFrame()
     triggerEvent("OnClothingUpdated", player)
+
+    ChaosPlayer.SayLineNewItem(player, chickenHat)
 end

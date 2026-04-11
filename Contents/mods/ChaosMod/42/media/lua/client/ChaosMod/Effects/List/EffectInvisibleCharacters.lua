@@ -1,29 +1,27 @@
 ---@class EffectInvisibleCharacters : ChaosEffectBase
 EffectInvisibleCharacters = ChaosEffectBase:derive("EffectInvisibleCharacters", "invisible_characters")
 
+---@param character IsoGameCharacter
+local function handleCharacterUpdate(character)
+    if not character then return end
+    if character:isSceneCulled() then return end
+    character:setTargetAlpha(0)
+end
+
 function EffectInvisibleCharacters:OnStart()
     ChaosEffectBase:OnStart()
+    Events.OnPlayerUpdate.Add(handleCharacterUpdate)
+    Events.OnZombieUpdate.Add(handleCharacterUpdate)
 end
 
 ---@param deltaMs integer
 function EffectInvisibleCharacters:OnTick(deltaMs)
     ChaosEffectBase:OnTick(deltaMs)
+end
 
-    local cell = getCell()
-    local zombies = cell:getZombieList()
-    local player = getPlayer()
-    if player then
-        player:setAlpha(0)
-    end
+function EffectInvisibleCharacters:OnEnd()
+    ChaosEffectBase:OnEnd()
 
-    if not zombies then return end
-
-    for i = 0, zombies:size() - 1 do
-        local zombie = zombies:get(i)
-        if zombie then
-            if zombie:isSceneCulled() == false then
-                zombie:setAlpha(0)
-            end
-        end
-    end
+    Events.OnPlayerUpdate.Remove(handleCharacterUpdate)
+    Events.OnZombieUpdate.Remove(handleCharacterUpdate)
 end

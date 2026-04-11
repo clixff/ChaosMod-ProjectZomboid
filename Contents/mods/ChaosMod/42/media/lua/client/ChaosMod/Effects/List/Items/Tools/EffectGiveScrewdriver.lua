@@ -10,5 +10,8 @@ function EffectGiveScrewdriver:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    inventory:AddItem("Base.Screwdriver")
+    local item = inventory:AddItem("Base.Screwdriver")
+    if item then
+        ChaosPlayer.SayLineNewItem(player, item)
+    end
 end

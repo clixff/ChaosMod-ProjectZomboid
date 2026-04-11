@@ -10,9 +10,15 @@ function EffectGiveBatteries:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    local amount = ZombRand(1, 4 + 1)
+    local amount = math.floor(ZombRand(1, 4 + 1))
+    ---@type InventoryItem?
+    local item = nil
 
     for i = 1, amount do
-        inventory:AddItem("Base.Battery")
+        item = inventory:AddItem("Base.Battery")
+    end
+
+    if item then
+        ChaosPlayer.SayLineNewItem(player, item, amount)
     end
 end

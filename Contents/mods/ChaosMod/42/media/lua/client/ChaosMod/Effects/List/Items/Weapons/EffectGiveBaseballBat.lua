@@ -1,8 +1,8 @@
-EffectGiveSledgehammer = ChaosEffectBase:derive("EffectGiveSledgehammer", "give_sledgehammer")
+EffectGiveBaseballBat = ChaosEffectBase:derive("EffectGiveBaseballBat", "give_baseball_bat")
 
-function EffectGiveSledgehammer:OnStart()
+function EffectGiveBaseballBat:OnStart()
     ChaosEffectBase:OnStart()
-    print("[EffectGiveSledgehammer] OnStart " .. tostring(self.effectId))
+    print("[EffectGiveBaseballBat] OnStart " .. tostring(self.effectId))
     local player = getPlayer()
     if not player then return end
 
@@ -10,7 +10,8 @@ function EffectGiveSledgehammer:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    local newItem = inventory:AddItem("Base.Sledgehammer")
+    local newItem = inventory:AddItem("Base.BaseballBat")
+
 
     if newItem then
         ChaosPlayer.EquipWeapon(player, newItem)

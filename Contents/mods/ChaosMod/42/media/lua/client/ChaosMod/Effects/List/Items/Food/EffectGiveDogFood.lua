@@ -10,9 +10,11 @@ function EffectGiveDogFood:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    local amount = ZombRand(1, 2 + 1)
+    local amount = math.floor(ZombRand(1, 2 + 1))
+
+    ChaosPlayer.SayLineNewItemByString(player, "Base.Dogfood", amount)
 
     for i = 1, amount do
-        inventory:AddItem("Base.Dogfood")
+        local item = inventory:AddItem("Base.Dogfood")
     end
 end

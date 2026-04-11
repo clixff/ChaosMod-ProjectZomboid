@@ -16,14 +16,14 @@ function EffectDuplicateItems:OnStart()
     ChaosPlayer.RecursiveInventoryLookup(inventory, false, false, function(oldItem)
         local fullType = oldItem:getFullType()
         if fullType then
-            local oldFluid = oldItem:getFluidContainer()
+            local oldFluid = oldItem:getFluidContainerFromSelfOrWorldItem()
             local x = ZombRandFloat(0.15, 0.85)
             local y = ZombRandFloat(0.15, 0.85)
             local newItem = square:AddWorldInventoryItem(fullType, x, y, 0.0)
             if newItem then
                 newItem:copyConditionStatesFrom(oldItem)
                 newItem:CopyModData(oldItem:getModData())
-                local newFluid = newItem:getFluidContainer()
+                local newFluid = newItem:getFluidContainerFromSelfOrWorldItem()
 
                 if newFluid and oldFluid then
                     newFluid:copyFluidsFrom(oldFluid)

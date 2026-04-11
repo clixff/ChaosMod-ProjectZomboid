@@ -10,5 +10,8 @@ function EffectGiveSaw:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    inventory:AddItem("Base.Saw")
+    local item = inventory:AddItem("Base.Saw")
+    if item then
+        ChaosPlayer.SayLineNewItem(player, item)
+    end
 end

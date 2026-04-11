@@ -243,6 +243,22 @@ end
 
 ---@param player IsoPlayer
 ---@param item InventoryItem
+function ChaosPlayer.EquipWeapon(player, item)
+    if not player then return end
+    if not item then return end
+
+    local primary = player:getPrimaryHandItem()
+    local secondary = player:getSecondaryHandItem()
+
+    if primary or secondary then
+        return
+    end
+
+    player:setPrimaryHandItem(item)
+end
+
+---@param player IsoPlayer
+---@param item InventoryItem
 ---@param amount integer?
 function ChaosPlayer.SayLineNewItem(player, item, amount)
     if not player then return end
@@ -251,15 +267,10 @@ function ChaosPlayer.SayLineNewItem(player, item, amount)
     local itemDisplayName = item:getDisplayName()
     if not itemDisplayName then return end
 
-    local textureIcon = item:getIcon()
-    local textureIconName = textureIcon:getName()
-    print("[ChaosPlayer] Texture icon name: " .. textureIconName)
+    local imgCode = ChaosUtils.GetImgCodeByItemTexture(item)
+    if not imgCode then return end
 
-    local shortTextureIconName = string.sub(textureIconName, 6, -1)
-
-    print("[ChaosPlayer] Short texture icon name: " .. shortTextureIconName)
-
-    local str = string.format("[img=%s] New item: %s", shortTextureIconName, itemDisplayName)
+    local str = string.format("%s New item: %s", imgCode, itemDisplayName)
 
     if amount and amount > 1 then
         str = str .. string.format(" (x%d)", amount)
@@ -267,7 +278,48 @@ function ChaosPlayer.SayLineNewItem(player, item, amount)
 
     player:addLineChatElement(
         str,
-        1.0, 0.4, 0.8,
+        0.0, 1.0, 0.0,
+        UIFont.Dialogue,
+        30.0,
+        "default",
+        true,
+        true,
+        true,
+        false,
+        false,
+        true
+    )
+end
+
+---@param player IsoPlayer
+---@param item string
+---@param amount integer?
+function ChaosPlayer.SayLineNewItemByString(player, item, amount)
+    if not player then return end
+    if not item then return end
+
+    local item = instanceItem(item)
+    if item then
+        ChaosPlayer.SayLineNewItem(player, item, amount)
+    end
+end
+
+---@param player IsoPlayer
+---@param text string
+---@param colorR number?
+---@param colorG number?
+---@param colorB number?
+function ChaosPlayer.SayLine(player, text, colorR, colorG, colorB)
+    if not player then return end
+    if not text then return end
+
+    if not colorR then colorR = 1.0 end
+    if not colorG then colorG = 1.0 end
+    if not colorB then colorB = 1.0 end
+
+    player:addLineChatElement(
+        text,
+        colorR, colorG, colorB,
         UIFont.Dialogue,
         30.0,
         "default",

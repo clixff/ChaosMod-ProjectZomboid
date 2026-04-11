@@ -59,12 +59,11 @@ function EffectRemoveRandomItem:OnStart()
 
             local itemDisplayName = randomItem.item:getDisplayName()
 
-            local textureIcon = randomItem.item:getIcon()
-            local textureIconName = textureIcon:getName()
+            local imgCode = ChaosUtils.GetImgCodeByItemTexture(randomItem.item)
 
-            -- player:SayDebug(1, "Removed " .. itemDisplayName)
-            player:setHaloNote(string.format("[img=%s] Removed %s", textureIconName, itemDisplayName), 255.0, 0.0, 0.0,
-                800.0)
+            local str = string.format("%s Removed %s", imgCode, itemDisplayName)
+
+            ChaosPlayer.SayLine(player, str, 1.0, 0.3, 0.3)
         end
     end
 end

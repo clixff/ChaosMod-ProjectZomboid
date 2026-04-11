@@ -17,5 +17,18 @@ function EffectRemovePlayerFood:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    ChaosPlayer.RecursiveInventoryLookup(inventory, true, true, handleItemRemove)
+    local removedCount = 0
+
+    ChaosPlayer.RecursiveInventoryLookup(inventory, true, true, function(item)
+        if not item then return end
+        if not item:isFood() then return end
+        item:Remove()
+        removedCount = removedCount + 1
+    end)
+
+
+    local imgCode = ChaosUtils.GetImgCodeByItemTextureByString("Base.Bread")
+
+    local str = string.format("%s Food removed: %d", imgCode, removedCount)
+    ChaosPlayer.SayLine(player, str, 1.0, 0.3, 0.3)
 end

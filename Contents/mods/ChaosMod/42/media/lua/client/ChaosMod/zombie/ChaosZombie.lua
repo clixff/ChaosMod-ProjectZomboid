@@ -144,16 +144,16 @@ end
 function ChaosZombie.CopyCharacterVisualsAndClothes(character, zombie)
     if not character or not zombie then return end
 
-    local previousReanimatedPlayer = false
+    -- local previousReanimatedPlayer = false
 
     if instanceof(character, "IsoZombie") then
         ---@type IsoZombie
         local zombieCharacter = character
-        previousReanimatedPlayer = zombieCharacter:isReanimatedPlayer()
-        zombieCharacter:setReanimatedPlayer(true)
+        -- previousReanimatedPlayer = zombieCharacter:isReanimatedPlayer()
+        -- zombieCharacter:setReanimatedPlayer(true)
     end
 
-    zombie:setReanimatedPlayer(true)
+    -- zombie:setReanimatedPlayer(true)
     zombie:setFemaleEtc(character:isFemale())
 
     -- Copy body / face / hair / skin visual
@@ -163,6 +163,7 @@ function ChaosZombie.CopyCharacterVisualsAndClothes(character, zombie)
         zombieVisual:copyFrom(playerVisual)
     end
 
+
     -- Keep descriptor visual in sync
     local playerDesc = character:getDescriptor()
     local zombieDesc = zombie:getDescriptor()
@@ -171,6 +172,19 @@ function ChaosZombie.CopyCharacterVisualsAndClothes(character, zombie)
         local zombieDescVisual = zombieDesc:getHumanVisual()
         if playerDescVisual and zombieDescVisual then
             zombieDescVisual:copyFrom(playerDescVisual)
+        end
+    end
+
+    -- BUG 1 FIX: vanilla zombies store clothes in itemVisuals, not wornItems.
+    -- setReanimatedPlayer(true) makes getItemVisuals() read from wornItems (empty!),
+    -- so we must convert BEFORE touching setReanimatedPlayer on the source.
+    if instanceof(character, "IsoZombie") then
+        ---@type IsoZombie
+        local characterAsZombie = character
+        if not characterAsZombie:isReanimatedPlayer() then
+            local srcWorn = characterAsZombie:getWornItems()
+            local srcVisuals = characterAsZombie:getItemVisuals() -- returns itemVisuals while NOT reanimated
+            srcWorn:setFromItemVisuals(srcVisuals)                -- converts visual → actual WornItem objects
         end
     end
 
@@ -234,8 +248,10 @@ function ChaosZombie.CopyCharacterVisualsAndClothes(character, zombie)
     if instanceof(character, "IsoZombie") then
         ---@type IsoZombie
         local zombieCharacter = character
-        zombieCharacter:setReanimatedPlayer(previousReanimatedPlayer)
+        -- zombieCharacter:setReanimatedPlayer(previousReanimatedPlayer)
     end
+
+    zombie:setReanimatedPlayer(true)
 end
 
 ---@param x number

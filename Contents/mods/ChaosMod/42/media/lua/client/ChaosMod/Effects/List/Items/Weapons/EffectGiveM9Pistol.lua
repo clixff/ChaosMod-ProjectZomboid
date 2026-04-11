@@ -17,5 +17,8 @@ function EffectGiveM9Pistol:OnStart()
     handWeapon:setCurrentAmmoCount(handWeapon:getMaxAmmo() - 1)
     handWeapon:setRoundChambered(true)
 
-    ChaosPlayer.SayLineNewItem(player, item, 1)
+    if (item) then
+        ChaosPlayer.EquipWeapon(player, item)
+        ChaosPlayer.SayLineNewItem(player, item, 1)
+    end
 end

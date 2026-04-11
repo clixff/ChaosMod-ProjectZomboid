@@ -21,5 +21,8 @@ function EffectGiveRandomMap:OnStart()
     local randomMap = maps[randomIndex]
     if not randomMap then return end
 
-    inventory:AddItem(randomMap)
+    local item = inventory:AddItem(randomMap)
+    if item then
+        ChaosPlayer.SayLineNewItem(player, item)
+    end
 end
