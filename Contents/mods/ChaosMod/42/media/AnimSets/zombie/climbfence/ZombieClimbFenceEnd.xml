@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+	<m_Name>ZombieClimbFenceEnd</m_Name>
+	<m_Priority>4</m_Priority>
+	<m_AnimName>Bob_VaultOver_End</m_AnimName>
+	<m_Looped>false</m_Looped>
+	<m_BlendTime>0.05</m_BlendTime>
+	<m_SpeedScale>1.04</m_SpeedScale>
+	<m_Conditions>
+		<m_Name>ChaosNPC</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
+	</m_Conditions>
+	<m_Conditions>
+		<m_Name>ClimbFenceStarted</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_Value>true</m_Value>
+	</m_Conditions>
+	<m_Conditions>
+		<m_Name>ClimbFenceFinished</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_Value>false</m_Value>
+	</m_Conditions>
+	<m_Events>
+		<m_EventName>SetVariable</m_EventName>
+		<m_TimePc>0.7</m_TimePc>
+		<m_ParameterValue>ClimbFenceFinished=true</m_ParameterValue>
+	</m_Events>
+	<m_Events>
+		<m_EventName>PlaySound</m_EventName>
+		<m_TimePc>0.28</m_TimePc>
+		<m_ParameterValue>LandLight</m_ParameterValue>
+	</m_Events>
+	<m_Events>
+		<m_EventName>PlayerVoiceSound</m_EventName>
+		<m_Time>Start</m_Time>
+		<m_ParameterValue>JumpHigh</m_ParameterValue>
+	</m_Events>
+	<m_Transitions>
+		<m_Target>ZombieClimbFenceStart</m_Target>
+		<m_blendInTime>0.05</m_blendInTime>
+	</m_Transitions>
+	<m_Transitions>
+		<m_Target>Idle</m_Target>
+		<m_blendInTime>0.05</m_blendInTime>
+	</m_Transitions>
+</animNode>

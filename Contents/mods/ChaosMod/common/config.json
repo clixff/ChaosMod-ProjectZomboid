@@ -1,0 +1,16 @@
+{
+    "effects_enabled": true,
+    "effects_interval": 45,
+    "ui_sounds_enabled": true,
+    "streamer_mode": {
+        "streamer_mode_enabled": true,
+        "voting_enabled": false,
+        "type": "twitch",
+        "voting_duration": 25,
+        "use_localhost_ip": true,
+        "advanced_voting_numbers": false,
+        "use_zombie_nicknames": true,
+        "say_killed_zombie_name": true,
+        "zombie_nicknames_buffer": 150
+    }
+}

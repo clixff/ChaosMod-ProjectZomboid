@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+	<m_Name>ZombieIdleBat</m_Name>
+	<m_AnimName>Bob_IdleBat</m_AnimName>
+	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
+	<m_SpeedScale>0.24</m_SpeedScale>
+	<m_BlendTime>0.20</m_BlendTime>
+	<m_Conditions>
+		<m_Name>ChaosNPC</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
+	</m_Conditions>
+	<m_Conditions>
+		<m_Name>Chaos2HandsWeapon</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
+	</m_Conditions>
+</animNode>
