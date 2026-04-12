@@ -34,6 +34,29 @@ end
 
 ---@param square IsoGridSquare
 ---@param spriteName string
+---@return IsoMannequin?
+function ChaosProps.SpawnMannequin(square, spriteName)
+    local sprite = getSprite(spriteName)
+    if not sprite then return nil end
+    local man = IsoMannequin.new(getCell(), square, sprite)
+    square:AddSpecialObject(man)
+    return man
+end
+
+---@param man IsoMannequin
+---@param fullType string
+---@return InventoryItem?
+function ChaosProps.AddClothingToMannequin(man, fullType)
+    local container = man:getContainer()
+    if not container then return nil end
+    local item = container:AddItem(fullType)
+    if not item then return nil end
+    man:wearItem(item, nil)
+    return item
+end
+
+---@param square IsoGridSquare
+---@param spriteName string
 ---@return IsoObject?
 function ChaosProps.SpawnProp(square, spriteName)
     local obj = IsoThumpable.new(getCell(), square, spriteName, true, {})

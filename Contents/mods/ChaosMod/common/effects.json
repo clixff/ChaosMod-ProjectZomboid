@@ -1332,6 +1332,103 @@
                 "invisible_characters",
                 "wallhack"
             ]
+        },
+        {
+            "id": "break_all_items",
+            "name": "Break All Items",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "pop_tires_vehicles_nearby",
+            "name": "Pop Tires Vehicles Nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "make_player_unhappy",
+            "name": "Make Player Unhappy",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "temporary_night",
+            "name": "Temporary Night",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 90,
+            "disable_effects": [
+                "temporary_night"
+            ]
+        },
+        {
+            "id": "zombies_move_to_random_point",
+            "name": "Zombies Move To Random Point",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "zombies_move_to_specific_point",
+            "name": "Zombies Move To Specific Point",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "replace_food_with_maggots",
+            "name": "Replace Food With Maggots",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "give_stone_age_kit",
+            "name": "Give Stone Age Kit",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "spawn_explosion_chicken",
+            "name": "Spawn Explosion Chicken",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 20
+        },
+        {
+            "id": "player_cant_exit_car",
+            "name": "Player Can't Exit Car",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 80
+        },
+        {
+            "id": "spawn_mannequin",
+            "name": "Spawn Mannequin",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "add_random_negative_effect",
+            "name": "Random Negative Effect",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
+        },
+        {
+            "id": "spawn_lootbox",
+            "name": "Spawn Lootbox",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false
         }
     ]
 }

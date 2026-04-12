@@ -237,6 +237,37 @@ function ChaosUtils.SetClimateFloatOverride(climateManager, climateType, overrid
     end
 end
 
+---@param x number
+---@param y number
+---@param z integer
+---@param minRadius integer
+---@param maxRadius integer
+---@param maxTries integer | nil
+---@return IsoGridSquare | nil
+function ChaosUtils.GetRandomSquareAroundPosition(x, y, z, minRadius, maxRadius, maxTries)
+    local cell = getCell()
+    if not cell then return nil end
+
+    maxTries = maxTries or 50
+    local minSq = minRadius * minRadius
+    local maxSq = maxRadius * maxRadius
+
+    for _ = 1, maxTries do
+        local dx = ZombRand(-maxRadius, maxRadius + 1)
+        local dy = ZombRand(-maxRadius, maxRadius + 1)
+        local distSq = dx * dx + dy * dy
+
+        if distSq >= minSq and distSq <= maxSq then
+            local sq = cell:getGridSquare(x + dx, y + dy, z)
+            if sq and sq:isSolidFloor() then
+                return sq
+            end
+        end
+    end
+
+    return nil
+end
+
 ---@param a number
 ---@param b number
 ---@param t number
