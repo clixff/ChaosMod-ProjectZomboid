@@ -136,6 +136,19 @@ function ChaosNPCUtils.GetNearestNPC(square)
     return nearestNPC
 end
 
+---@param tag string
+---@return ChaosNPC[]
+function ChaosNPCUtils.GetNPCsWithTag(tag)
+    local result = {}
+    for i = 0, ChaosNPCUtils.npcList:size() - 1 do
+        local npc = ChaosNPCUtils.npcList:get(i)
+        if npc and npc.zombie and npc:HasTag(tag) then
+            table.insert(result, npc)
+        end
+    end
+    return result
+end
+
 ---@param zombie IsoZombie
 function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
     -- print("OnZombieUpdateFor Non NPC: " .. tostring(zombie))

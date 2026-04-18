@@ -1,7 +1,7 @@
----@class EffectSpawnFollowers : ChaosEffectBase
-EffectSpawnFollowers = ChaosEffectBase:derive("EffectSpawnFollowers", "spawn_followers")
+---@class EffectFanClub : ChaosEffectBase
+EffectFanClub = ChaosEffectBase:derive("EffectFanClub", "fan_club")
 
-function EffectSpawnFollowers:OnStart()
+function EffectFanClub:OnStart()
     ChaosEffectBase:OnStart()
     local player = getPlayer()
     if not player then return end
@@ -19,6 +19,7 @@ function EffectSpawnFollowers:OnStart()
                 local npc = ChaosNPC:new(zombie)
                 npc:initializeHuman()
                 npc.npcGroup = ChaosNPCGroupID.FOLLOWERS
+                npc:AddTag("adoring_fan")
             end
         end
     end

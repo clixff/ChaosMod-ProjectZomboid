@@ -24,6 +24,7 @@
 ---@field spawnTimeMs integer -- Time in ms when NPC was spawned
 ---@field debugLastTimePathfindMs integer -- DEBUG: Last time pathfind was updated
 ---@field attackLastTimeMs integer -- Last time NPC attacked
+---@field tags table<string, boolean> -- Set of tags on this NPC
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 
@@ -103,6 +104,7 @@ function ChaosNPC:new(zombie)
     o.spawnTimeMs = getTimestampMs()
     o.debugLastTimePathfindMs = 0
     o.attackLastTimeMs = 0
+    o.tags = {}
     return o
 end
 
@@ -130,6 +132,7 @@ function ChaosNPC:initializeHuman()
 
     self.spawnTimeMs = ChaosMod.lastTimeTickMs
     self.zombie:setVariable("Chaos2HandsWeapon", false)
+    self.zombie:setVariable("ChaosSneak", false)
 
     self:DisableZombieVoice()
 
@@ -354,6 +357,7 @@ function ChaosNPC:update(deltaMs)
         self:HandleCollisions()
     end
 
+    self:UpdateSneakAnim()
     self:VehiclesTick()
 
     --- Debug
@@ -493,6 +497,30 @@ function ChaosNPC.SetTargetInner(npc, target)
     npc:setTarget(target)
 end
 
+function ChaosNPC:UpdateSneakAnim()
+    if not self.zombie then return end
+    local followTarget = self:GetFollowTarget()
+    local isSneak = false
+    if followTarget and self.enemy == nil then
+        local player = getPlayer()
+        if player and player:isSneaking() then
+            isSneak = true
+        end
+    end
+    self.zombie:setVariable("ChaosSneak", isSneak)
+end
+
+---@param tag string
+function ChaosNPC:AddTag(tag)
+    self.tags[tag] = true
+end
+
+---@param tag string
+---@return boolean
+function ChaosNPC:HasTag(tag)
+    return self.tags[tag] == true
+end
+
 ---@return IsoGameCharacter?
 function ChaosNPC:GetFollowTarget()
     local rel = ChaosNPCRelations.GetRelation(self.npcGroup, ChaosNPCGroupID.PLAYER)
@@ -519,6 +547,16 @@ function ChaosNPC:UpdateNextEnemyTarget()
     local newEnemy = ChaosNPCUtils.FindNewTargetForNPC(self)
     if newEnemy then
         self:SetAsTargetEnemy(newEnemy)
+        return
+    end
+
+    -- Fallback: if this group attacks players, always target the player regardless of distance
+    local playerRel = ChaosNPCRelations.GetRelation(self.npcGroup, ChaosNPCGroupID.PLAYER)
+    if playerRel == ChaosNPCRelationType.ATTACK then
+        local player = getPlayer()
+        if player then
+            self:SetAsTargetEnemy(player)
+        end
     end
 end
 
@@ -559,7 +597,7 @@ function ChaosNPC:OnZombieDead()
     end
 
     local isFollowGroup = self.npcGroup == ChaosNPCGroupID.COMPANIONS or
-                          self.npcGroup == ChaosNPCGroupID.FOLLOWERS
+        self.npcGroup == ChaosNPCGroupID.FOLLOWERS
     if isFollowGroup and self.zombie then
         self.zombie:playSound("deathcrash")
         local player = getPlayer()
@@ -1283,7 +1321,6 @@ function ChaosNPC:UnstuckNPC()
             local playerX = playerSquare:getX()
             local playerY = playerSquare:getY()
             zombie:setTurnAlertedValues(playerX, playerY)
-            self:SayDebug("Unstuck NPC")
         end
     end
 
@@ -1364,8 +1401,6 @@ function ChaosNPC:OnZombieDamagedNPC(otherZombie)
     if otherZombie == self.enemy then return end
     if self.isAttacking then return end
 
-    self:SayDebug("OnZombieDamagedNPC")
-
     local attackerGroup = ChaosNPCRelations.GetNPCGroupByCharacter(otherZombie)
     local rel = ChaosNPCRelations.GetRelation(self.npcGroup, attackerGroup)
     if rel == ChaosNPCRelationType.IGNORE then return end
@@ -1431,7 +1466,6 @@ function ChaosNPC:VehiclesTick()
 
 
         moveTargetVehicle:enter(seat, self.zombie)
-        self:SayDebug("Entering vehicle")
         self.zombie:setGodMod(true, true)
         print("[ChaosNPC] Entering vehicle")
         return

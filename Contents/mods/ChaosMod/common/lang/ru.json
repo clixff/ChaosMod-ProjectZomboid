@@ -177,7 +177,8 @@
         "spawn_mannequin": "Заспавнить манекен",
         "add_random_negative_effect": "Случайный негативный эффект",
         "spawn_lootbox": "Заспавнить лутбокс",
-        "math_captcha": "Математическая капча"
+        "math_captcha": "Математическая капча",
+        "fan_club": "Фан-клуб"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
@@ -204,6 +205,7 @@
         "new_weight": "Новый вес: %s",
         "no_vehicles_nearby": "Поблизости нет транспорта",
         "items_removed": "%s Удалено предметов: %d",
-        "no_sleep_location": "Я не помню, где я последний раз спал..."
+        "no_sleep_location": "Я не помню, где я последний раз спал...",
+        "killed_zombie": "Убил %s"
     }
 }

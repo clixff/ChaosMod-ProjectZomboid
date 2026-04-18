@@ -13,12 +13,6 @@
             "withDuration": false
         },
         {
-            "id": "spawn_npc",
-            "enabled": true,
-            "chance": 10,
-            "withDuration": false
-        },
-        {
             "id": "spawn_friendly_npc",
             "enabled": true,
             "chance": 10,
@@ -1261,7 +1255,12 @@
             "duration": 25
         },
         {
-            "id": "spawn_followers",
+            "id": "fan_club",
+            "enabled": true,
+            "chance": 10
+        },
+        {
+            "id": "spawn_adoring_fan",
             "enabled": true,
             "chance": 10
         }

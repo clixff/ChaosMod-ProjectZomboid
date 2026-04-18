@@ -132,9 +132,24 @@ function ChaosZombie.OnZombieDead(zombie)
     -- If setting for saying killed zombie name is enabled
     if ChaosConfig.IsKilledZombieNameEnabled() then
         local name, color = ChaosNicknames.ensureZombieNicknameAndColor(zombie)
-        if name then
-            local stringToSay = string.format("Killed %s", name)
-            killer:Say(stringToSay)
+        if name and instanceof(killer, "IsoPlayer") then
+            local stringToSay = string.format(ChaosLocalization.GetString("misc", "killed_zombie"), name)
+            ChaosPlayer.SayLineByColor(killer, stringToSay, ChaosPlayerChatColors.removedItem)
+        end
+    end
+
+    -- Adoring fans react when player kills any zombie
+    if instanceof(killer, "IsoPlayer") then
+        local adoringFans = ChaosNPCUtils.GetNPCsWithTag("adoring_fan")
+        if adoringFans and #adoringFans > 0 then
+            ---@type string[]
+            local phrases = { "Wow!", "Cool!", "Amazing!", "Incredible!", "Awesome!" }
+            for _, fan in ipairs(adoringFans) do
+                local phrase = phrases[math.floor(ZombRand(#phrases) + 1)]
+                if phrase then
+                    fan:SayDebug(phrase)
+                end
+            end
         end
     end
 end

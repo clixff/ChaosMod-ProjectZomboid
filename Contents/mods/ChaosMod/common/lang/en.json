@@ -177,7 +177,9 @@
         "spawn_mannequin": "Spawn Mannequin",
         "add_random_negative_effect": "Random Negative Effect",
         "spawn_lootbox": "Spawn Lootbox",
-        "math_captcha": "Math Captcha"
+        "math_captcha": "Math Captcha",
+        "fan_club": "Fan Club",
+        "spawn_adoring_fan": "Spawn Adoring Fan"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -205,6 +207,6 @@
         "no_vehicles_nearby": "No vehicles nearby",
         "items_removed": "%s Removed %d items",
         "no_sleep_location": "I don't remember where I last slept...",
-        "spawn_followers": "Spawn Followers"
+        "killed_zombie": "Killed %s"
     }
 }

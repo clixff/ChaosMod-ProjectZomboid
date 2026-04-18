@@ -18,6 +18,11 @@
         <m_Type>BOOL</m_Type>
         <m_BoolValue>true</m_BoolValue>
     </m_Conditions>
+    <m_Conditions>
+        <m_Name>ChaosSneak</m_Name>
+        <m_Type>BOOL</m_Type>
+        <m_BoolValue>false</m_BoolValue>
+    </m_Conditions>
     <m_Events>
         <m_EventName>Footstep</m_EventName>
         <m_TimePc>0.2</m_TimePc>
