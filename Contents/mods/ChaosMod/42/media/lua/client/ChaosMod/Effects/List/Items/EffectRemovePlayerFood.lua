@@ -29,6 +29,6 @@ function EffectRemovePlayerFood:OnStart()
 
     local imgCode = ChaosUtils.GetImgCodeByItemTextureByString("Base.Bread")
 
-    local str = string.format("%s Food removed: %d", imgCode, removedCount)
-    ChaosPlayer.SayLine(player, str, 1.0, 0.3, 0.3)
+    local str = string.format(ChaosLocalization.GetString("misc", "food_removed"), imgCode, removedCount)
+    ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
 end

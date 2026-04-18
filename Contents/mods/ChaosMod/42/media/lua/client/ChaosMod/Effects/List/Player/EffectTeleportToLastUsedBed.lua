@@ -10,7 +10,7 @@ function EffectTeleportToLastUsedBed:OnStart()
 
     local loc = ChaosUtils.sleepWorldLocation
     if not loc then
-        player:Say("I don't remember where I last slept...")
+        player:Say(ChaosLocalization.GetString("misc", "no_sleep_location"))
         return
     end
 

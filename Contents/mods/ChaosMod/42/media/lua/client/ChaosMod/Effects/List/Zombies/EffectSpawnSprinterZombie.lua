@@ -1,4 +1,4 @@
-EffectSpawnSprinterZombie = ChaosEffectBase:derive("EffectSpawnSprinterZombie", "spawn_sprinter_zombie")
+EffectSpawnSprinterZombie = ChaosEffectBase:derive("EffectSpawnSprinterZombie", "spawn_sprinter_zombie_random_radius")
 
 function EffectSpawnSprinterZombie:OnStart()
     ChaosEffectBase:OnStart()
@@ -6,7 +6,7 @@ function EffectSpawnSprinterZombie:OnStart()
     local player = getPlayer()
     if not player then return end
 
-    local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 6, 10, 50, true, true, false)
+    local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 20, 50, 50, true, true, false)
     if not randomSquare then return end
 
     local x = randomSquare:getX()
@@ -17,9 +17,4 @@ function EffectSpawnSprinterZombie:OnStart()
     if not zombie then
         return
     end
-
-    -- zombie:setSpeedMod(2.0)
-    -- zombie:setWalkType("ZombieWalk2")
-    zombie:doZombieSpeed(1)
-    zombie:setSpeedMod(0.1)
 end

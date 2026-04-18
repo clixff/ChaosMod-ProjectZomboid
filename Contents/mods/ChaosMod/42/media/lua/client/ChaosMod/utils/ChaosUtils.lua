@@ -448,8 +448,5 @@ function ChaosUtils.RemoveRandomItem(player)
 
     inventory:Remove(randomItem.item)
 
-    local itemDisplayName = randomItem.item:getDisplayName()
-    local imgCode = ChaosUtils.GetImgCodeByItemTexture(randomItem.item)
-    local str = string.format("%s Removed %s", imgCode, itemDisplayName)
-    ChaosPlayer.SayLine(player, str, 1.0, 0.3, 0.3)
+    ChaosPlayer.SayLineRemovedItem(player, randomItem.item)
 end

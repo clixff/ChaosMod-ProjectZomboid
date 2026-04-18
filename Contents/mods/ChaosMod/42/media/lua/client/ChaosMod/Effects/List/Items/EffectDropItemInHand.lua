@@ -10,7 +10,7 @@ function EffectDropItemInHand:OnStart()
     local secondary = player:getSecondaryHandItem()
 
     if not primary and not secondary then
-        ChaosPlayer.SayLine(player, "Nothing in hands to drop", 1.0, 0.5, 0.0)
+        ChaosPlayer.SayLine(player, ChaosLocalization.GetString("misc", "nothing_in_hands"), 1.0, 0.5, 0.0)
         return
     end
 
@@ -19,7 +19,7 @@ function EffectDropItemInHand:OnStart()
     if primary then
         local name = primary:getDisplayName()
         local imgCode = ChaosUtils.GetImgCodeByItemTexture(primary)
-        local str = string.format("%s Dropped %s", imgCode, name)
-        ChaosPlayer.SayLine(player, str, 1.0, 0.3, 0.3)
+        local str = string.format(ChaosLocalization.GetString("misc", "dropped_item"), imgCode, name)
+        ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
     end
 end

@@ -45,7 +45,7 @@ function ChaosHUD:createChildren()
     local secondButtonX = buttonWidth + ChaosUIManager.GetScaledWidth(10)
     local secondButtonY = ChaosUIManager.GetScaledHeight(50)
 
-    self.secondBtn = ISButton:new(secondButtonX, secondButtonY, secondButtonWidth, secondButtonHeight, "Select Effect",
+    self.secondBtn = ISButton:new(secondButtonX, secondButtonY, secondButtonWidth, secondButtonHeight, ChaosLocalization.GetString("core", "select_effect"),
         self,
         ChaosHUD.OnSecondButtonClick)
     self.secondBtn:initialise()
@@ -132,15 +132,20 @@ end
 ---@param enabled boolean
 function ChaosHUD:OnModStatusChanged(enabled)
     if enabled then
-        self.btn:setTitle("Stop ChaosMod")
+        self.btn:setTitle(ChaosLocalization.GetString("core", "stop_mod"))
         self.btn:enableCancelColor()
     else
-        self.btn:setTitle("Start ChaosMod")
+        self.btn:setTitle(ChaosLocalization.GetString("core", "start_mod"))
         self.btn:enableAcceptColor()
     end
 
     local buttonWidth = ChaosUIManager.GetScaledWidth(120)
     self.btn:setWidthToTitle(buttonWidth)
+end
+
+function ChaosHUD:OnLanguageLoaded()
+    self.secondBtn:setTitle(ChaosLocalization.GetString("core", "select_effect"))
+    self:OnModStatusChanged(ChaosMod.enabled)
 end
 
 function ChaosHUD:OnSecondButtonClick()

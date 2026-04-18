@@ -2,6 +2,14 @@
 ---@field hitStunLastTimeMs? integer
 ChaosPlayer = ChaosPlayer or {}
 
+
+
+ChaosPlayerChatColors = ChaosPlayerChatColors or {
+    newItem = { r = 0.0, g = 1.0, b = 0.0 },
+    removedItem = { r = 1.0, g = 0.3, b = 0.3 },
+    line = { r = 1.0, g = 1.0, b = 1.0 },
+}
+
 ---@param player IsoPlayer
 ---@param dropHandItems boolean
 function ChaosPlayer.DropAllItemsOnGround(player, dropHandItems)
@@ -270,7 +278,7 @@ function ChaosPlayer.SayLineNewItem(player, item, amount)
     local imgCode = ChaosUtils.GetImgCodeByItemTexture(item)
     if not imgCode then return end
 
-    local str = string.format("%s New item: %s", imgCode, itemDisplayName)
+    local str = string.format(ChaosLocalization.GetString("misc", "new_item"), imgCode, itemDisplayName)
 
     if amount and amount > 1 then
         str = str .. string.format(" (x%d)", amount)
@@ -279,6 +287,35 @@ function ChaosPlayer.SayLineNewItem(player, item, amount)
     player:addLineChatElement(
         str,
         0.0, 1.0, 0.0,
+        UIFont.Dialogue,
+        30.0,
+        "default",
+        true,
+        true,
+        true,
+        false,
+        false,
+        true
+    )
+end
+
+---@param player IsoPlayer
+---@param item InventoryItem
+function ChaosPlayer.SayLineRemovedItem(player, item)
+    if not player then return end
+    if not item then return end
+
+    local itemDisplayName = item:getDisplayName()
+    if not itemDisplayName then return end
+
+    local imgCode = ChaosUtils.GetImgCodeByItemTexture(item)
+    if not imgCode then return end
+
+    local str = string.format(ChaosLocalization.GetString("misc", "removed_item"), imgCode, itemDisplayName)
+
+    player:addLineChatElement(
+        str,
+        ChaosPlayerChatColors.removedItem.r, ChaosPlayerChatColors.removedItem.g, ChaosPlayerChatColors.removedItem.b,
         UIFont.Dialogue,
         30.0,
         "default",
@@ -330,4 +367,15 @@ function ChaosPlayer.SayLine(player, text, colorR, colorG, colorB)
         false,
         true
     )
+end
+
+---@param player IsoPlayer
+---@param text string
+---@param color table<string, number> -- table with r, g, b values
+function ChaosPlayer.SayLineByColor(player, text, color)
+    if not player then return end
+    if not text then return end
+    if not color then return end
+
+    ChaosPlayer.SayLine(player, text, color.r, color.g, color.b)
 end

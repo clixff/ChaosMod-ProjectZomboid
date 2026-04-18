@@ -20,7 +20,7 @@ function ChaosEffectsWindow:new(x, y, w, h)
     setmetatable(o, self)
     self.__index = self
 
-    o.title = "Chaos Effects"
+    o.title = ChaosLocalization.GetString("core", "effects")
     o.resizable = false
 
     o.effects = {}

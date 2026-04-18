@@ -82,5 +82,5 @@ function EffectDestroyNearbyFridges:OnStart()
     end
 
     print("[EffectDestroyNearbyFridges] Destroyed " .. tostring(count) .. " fridges")
-    player:Say("Destroyed " .. tostring(count) .. " fridges")
+    ChaosPlayer.SayLineByColor(player, string.format(ChaosLocalization.GetString("misc", "fridges_destroyed"), count), ChaosPlayerChatColors.removedItem)
 end

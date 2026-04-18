@@ -59,7 +59,7 @@ function EffectAddRandomNegativeEffect:OnStart()
         str = "Wetness"
     end
 
-    ChaosPlayer.SayLine(player, "Negative effect: " .. str, 1.0, 0.3, 0.3)
+    ChaosPlayer.SayLineByColor(player, string.format(ChaosLocalization.GetString("misc", "negative_effect"), str), ChaosPlayerChatColors.removedItem)
 end
 
 function EffectAddRandomNegativeEffect:OnEnd()

@@ -24,6 +24,7 @@ function EffectRemovePlayerGloves:OnStart()
         local item = itemsList:get(i)
         if item then
             if item:IsClothing() and item:getBodyLocation() == ItemBodyLocation.HANDS then
+                ChaosPlayer.SayLineRemovedItem(player, item)
                 pcall(function() inventory:Remove(item) end)
                 pcall(function() item:removeFromWorld() end)
 

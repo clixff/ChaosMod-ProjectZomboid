@@ -40,14 +40,14 @@ function EffectMathCaptcha.applyWrongAnswer()
 
     player:setKnockedDown(true)
 
-    ChaosPlayer.SayLine(player, "Wrong answer", 1.0, 0.3, 0.3)
+    ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "wrong_answer"), ChaosPlayerChatColors.removedItem)
 end
 
 function EffectMathCaptcha.applyCorrectAnswer()
     print("[EffectMathCaptcha] Correct answer")
     local player = getPlayer()
     if not player then return end
-    ChaosPlayer.SayLine(player, "Correct answer", 0.0, 1.0, 0.0)
+    ChaosPlayer.SayLine(player, ChaosLocalization.GetString("misc", "correct_answer"), 0.0, 1.0, 0.0)
 end
 
 function EffectMathCaptcha:OnEnd()

@@ -14,6 +14,7 @@ function EffectRemoveShoes:OnStart()
     print("[EffectRemoveShoes] Shoes: " .. tostring(shoes))
 
     if shoes then
+        ChaosPlayer.SayLineRemovedItem(player, shoes)
         playerInventory:Remove(shoes)
         pcall(function() shoes:removeFromWorld() end)
 

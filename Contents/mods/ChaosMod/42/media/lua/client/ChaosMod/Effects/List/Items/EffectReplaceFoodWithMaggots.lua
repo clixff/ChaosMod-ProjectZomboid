@@ -19,8 +19,8 @@ function EffectReplaceFoodWithMaggots:OnStart()
     end)
 
     local imgCode = ChaosUtils.GetImgCodeByItemTextureByString("Base.Bread")
-    local str = string.format("%s Removed %d items", imgCode, removedCount)
-    ChaosPlayer.SayLine(player, str, 1.0, 0.3, 0.3)
+    local str = string.format(ChaosLocalization.GetString("misc", "items_removed"), imgCode, removedCount)
+    ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
 
     if removedCount > 0 then
         ---@type InventoryItem?

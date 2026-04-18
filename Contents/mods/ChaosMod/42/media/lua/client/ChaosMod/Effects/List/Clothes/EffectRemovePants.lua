@@ -20,6 +20,7 @@ function EffectRemovePants:OnStart()
         local item = wornItems:getItem(tag)
 
         if item then
+            ChaosPlayer.SayLineRemovedItem(player, item)
             ---@diagnostic disable-next-line: param-type-mismatch
             pcall(function() wornItems:setItem(tag, nil) end)
             playerInventory:Remove(item)

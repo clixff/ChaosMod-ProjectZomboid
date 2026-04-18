@@ -28,6 +28,9 @@ function ChaosMod.StartMod()
     ChaosUtils.updateModId()
     -- Load config.json file from disk
     ChaosConfig.LoadConfigFromDisk()
+    -- Reload localization files for configured language
+    ChaosLocalization.ReloadLanguages()
+    ChaosUIManager.hud:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
     -- Clear position history so it starts fresh from this session
@@ -110,6 +113,9 @@ function ChaosMod.OnGameStart()
     ChaosUtils.updateModId()
     -- Load config.json file from disk
     ChaosConfig.LoadConfigFromDisk()
+    -- Reload localization files for configured language
+    ChaosLocalization.ReloadLanguages()
+    ChaosUIManager.hud:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
 

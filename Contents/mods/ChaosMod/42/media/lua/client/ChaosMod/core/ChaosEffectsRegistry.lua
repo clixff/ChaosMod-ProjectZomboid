@@ -83,7 +83,7 @@ function ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
     ---@type ChaosEffectDataEntry
     local newEffectData = {
         id = effectId,
-        name = effectJsonData.name or "",
+        name = ChaosLocalization.GetString("effects", effectId),
         enabled = effectJsonData.enabled or false,
         chance = effectJsonData.chance or 0,
         withDuration = effectJsonData.withDuration or false,

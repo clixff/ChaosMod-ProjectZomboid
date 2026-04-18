@@ -47,5 +47,5 @@ function EffectAddRandomSkillEXP:OnStart()
 
     addXpNoMultiplier(player, randomSkillEXP, xpAmount)
 
-    player:Say(string.format("%s: +%.0f XP of Skill", randomSkillEXP:getName(), xpAmount))
+    player:Say(string.format(ChaosLocalization.GetString("misc", "skill_xp_gained"), randomSkillEXP:getName(), xpAmount))
 end

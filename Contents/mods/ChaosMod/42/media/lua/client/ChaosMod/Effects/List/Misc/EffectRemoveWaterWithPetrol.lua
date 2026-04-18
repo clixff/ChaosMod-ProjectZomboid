@@ -40,5 +40,7 @@ function EffectReplaceWaterWithPetrol:OnStart()
         end
     end)
 
-    player:Say(string.format("Replaced %d water containers with petrol", count))
+    local imgCode = ChaosUtils.GetImgCodeByItemTextureByString("Base.WaterBottle")
+    local str = string.format(ChaosLocalization.GetString("misc", "water_replaced_with_petrol"), imgCode, count)
+    ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
 end

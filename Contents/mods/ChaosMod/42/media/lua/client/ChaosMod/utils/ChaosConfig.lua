@@ -10,11 +10,13 @@
 ---@field use_zombie_nicknames boolean
 
 ---@class ChaosConfig
+---@field lang string -- Language code (e.g. "en", "fr")
 ---@field effects_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
 ---@field effects_interval number
 ---@field ui_sounds_enabled boolean
 ---@field streamer_mode ChaosConfigStreamerMode
 ChaosConfig = ChaosConfig or {
+    lang = "en",
     effects_enabled = true,
     effects_interval = 45,
     ui_sounds_enabled = true,
@@ -37,6 +39,10 @@ function ChaosConfig.LoadConfigFromDisk()
     if not configData then
         print("[ChaosConfig] Failed to load config from disk")
         return
+    end
+
+    if type(configData.lang) == "string" and configData.lang ~= "" then
+        ChaosConfig.lang = configData.lang
     end
 
     if type(configData.effects_enabled) == "boolean" then

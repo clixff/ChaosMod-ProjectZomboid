@@ -2,56 +2,48 @@
     "effects": [
         {
             "id": "spawn_zombie_nearby",
-            "name": "Spawn Zombie Nearby",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "effect_shout",
-            "name": "Shout",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_npc",
-            "name": "Spawn NPC",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_friendly_npc",
-            "name": "Spawn Friendly NPC",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "turn_power_on",
-            "name": "Turn Power On",
             "enabled": true,
             "chance": 1,
             "withDuration": false
         },
         {
             "id": "turn_power_off",
-            "name": "Turn Power Off",
             "enabled": true,
             "chance": 1,
             "withDuration": false
         },
         {
             "id": "spawn_vehicle_nearby",
-            "name": "Spawn Vehicle Nearby",
             "enabled": true,
             "chance": 1,
             "withDuration": false
         },
         {
             "id": "enable_fog",
-            "name": "Enable Fog",
             "enabled": true,
             "chance": 1,
             "withDuration": true,
@@ -62,7 +54,6 @@
         },
         {
             "id": "enable_rain",
-            "name": "Enable Rain",
             "enabled": true,
             "chance": 1,
             "withDuration": true,
@@ -74,7 +65,6 @@
         },
         {
             "id": "enable_snow",
-            "name": "Enable Snow",
             "enabled": true,
             "chance": 1,
             "withDuration": true,
@@ -85,22 +75,19 @@
             ]
         },
         {
-            "id": "spawn_sprinter_zombie",
-            "name": "Spawn Sprinter Zombie",
+            "id": "spawn_sprinter_zombie_random_radius",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_david_the_gnome",
-            "name": "Spawn David the Gnome",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "look_behind_you",
-            "name": "Look Behind You",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -111,28 +98,24 @@
         },
         {
             "id": "remove_shoes",
-            "name": "Remove Player Shoes",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_pants",
-            "name": "Remove Player Pants",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "set_random_outfit",
-            "name": "Set Random Outfit",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "cant_stop_shouting",
-            "name": "Can't Stop Shouting",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -143,21 +126,18 @@
         },
         {
             "id": "turn_water_on",
-            "name": "Turn Water On",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "turn_water_off",
-            "name": "Turn Water Off",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "player_have_vehicle_keys",
-            "name": "Player Have All Car Keys",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -165,14 +145,12 @@
         },
         {
             "id": "refill_car_fuel",
-            "name": "Refuel Current Vehicle",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "force_zoom_in",
-            "name": "Force Zoom In",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -184,7 +162,6 @@
         },
         {
             "id": "force_zoom_out",
-            "name": "Force Zoom Out",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -196,42 +173,36 @@
         },
         {
             "id": "spawn_barricade_kit",
-            "name": "Spawn Barricade Kit",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_random_animal",
-            "name": "Spawn Random Animal",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_baseball_bat",
-            "name": "Give Baseball Bat",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_helicopter",
-            "name": "Spawn Hostile Helicopter",
             "enabled": true,
             "chance": 5,
             "withDuration": false
         },
         {
             "id": "remove_player_watch",
-            "name": "Remove Player's Watch",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "invisible_characters",
-            "name": "Invisible Characters",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -242,7 +213,6 @@
         },
         {
             "id": "time_rewind",
-            "name": "Time Rewind",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -253,133 +223,114 @@
         },
         {
             "id": "give_batteries",
-            "name": "Give Batteries",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_chips",
-            "name": "Give Crisps",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_flashlight",
-            "name": "Give Flashlight",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "discharge_batteries",
-            "name": "Discharge Batteries",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_random_map",
-            "name": "Give Random Map",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "repair_player_weapons",
-            "name": "Repair Player Weapons",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "break_player_weapons",
-            "name": "Break Weapons In Hands",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spoil_player_food",
-            "name": "Spoil Player Food",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_player_clone_zombie",
-            "name": "Spawn Zombie Twin",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "launch_player_up",
-            "name": "Launch Player Up",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "launch_everyone_up",
-            "name": "Launch Everyone Up",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "launch_zombies_up",
-            "name": "Launch Zombies Up",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "reanimate_zombies",
-            "name": "Reanimate Zombies",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "smash_nearby_windows",
-            "name": "Break Nearby Windows",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "set_day_time_morning",
-            "name": "Set Time To Morning",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "set_day_time_night",
-            "name": "Set Time To Night",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "kill_nearby_zombies",
-            "name": "Kill Nearby Zombies",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "set_zombies_on_fire",
-            "name": "Set Zombies On Fire",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "effect_insanity",
-            "name": "Insanity",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -390,7 +341,6 @@
         },
         {
             "id": "spinning_vehicles",
-            "name": "Spinning Vehicles",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -401,7 +351,6 @@
         },
         {
             "id": "flying_cars",
-            "name": "Insane Traffic",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -413,42 +362,36 @@
         },
         {
             "id": "zombies_are_coming",
-            "name": "Zombies Are Coming",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "teleport_in_small_radius",
-            "name": "Teleport In Small Radius",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "replace_zombies_with_chickens",
-            "name": "Replace Zombies With Chickens",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "set_random_vehicle_colors",
-            "name": "Set Random Vehicle Colors",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "teleport_to_random_vehicle",
-            "name": "Teleport To Random Vehicle",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "wallhack",
-            "name": "Wallhack",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -459,7 +402,6 @@
         },
         {
             "id": "jumping_cars",
-            "name": "Jumping Cars",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -470,7 +412,6 @@
         },
         {
             "id": "1hp_zombies",
-            "name": "1 HP Zombies",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -481,7 +422,6 @@
         },
         {
             "id": "zombies_explode_on_damage",
-            "name": "Zombies Explode On Damage",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -492,70 +432,60 @@
         },
         {
             "id": "cure_player_virus",
-            "name": "Cure Player Infection",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "effect_doppelganger",
-            "name": "Doppelganger",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_sledgehammer",
-            "name": "Give Sledgehammer",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "replace_zombies_with_props",
-            "name": "Replace Zombies With Props",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_griefer_santa",
-            "name": "Spawn Griefer Santa",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_angry_policeman",
-            "name": "Spawn Angry Policeman",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_griefer_wizard",
-            "name": "Spawn Griefer Wizard",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_friendly_prisoner",
-            "name": "Spawn Friendly Prisoner",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_griefer_knight",
-            "name": "Spawn Griefer Knight",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "filter_red",
-            "name": "Filter Red Vision",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -566,7 +496,6 @@
         },
         {
             "id": "filter_mexico",
-            "name": "Filter Mexico",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -577,7 +506,6 @@
         },
         {
             "id": "filter_fallout3",
-            "name": "Filter Fallout 3",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -588,7 +516,6 @@
         },
         {
             "id": "black_and_white",
-            "name": "Black And White",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -599,42 +526,36 @@
         },
         {
             "id": "remove_random_item",
-            "name": "Remove Random Item",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_vehicle_doors",
-            "name": "Remove Vehicle Doors",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_random_wheel",
-            "name": "Remove Random Wheel",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_car_fuel",
-            "name": "Remove Car Fuel",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "random_tire_popping",
-            "name": "Random Tire Popping",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "disable_sprint_and_jump",
-            "name": "Disable Sprint And Jump",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -645,14 +566,12 @@
         },
         {
             "id": "set_random_car_fuel",
-            "name": "Set Random Car Fuel",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "zombies_cant_see_you",
-            "name": "Zombies Can't See You",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -663,21 +582,18 @@
         },
         {
             "id": "remove_player_gloves",
-            "name": "Remove Player Gloves",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_wizard_hat",
-            "name": "Give Wizard Hat",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "player_god_mod",
-            "name": "Player God Mod",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -689,7 +605,6 @@
         },
         {
             "id": "player_cant_open_doors",
-            "name": "Player Can't Open Doors",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -700,35 +615,30 @@
         },
         {
             "id": "damage_car_engine",
-            "name": "Damage Car Engine",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_player_food",
-            "name": "Remove Player Food",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_dog_food",
-            "name": "Give Dog Food",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "player_want_to_sleep",
-            "name": "Player Want To Sleep",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "make_player_drunk",
-            "name": "Make Player Drunk",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -739,42 +649,36 @@
         },
         {
             "id": "player_is_hungry",
-            "name": "Player Is Hungry",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "add_permanent_asthma",
-            "name": "Add Permanent Asthma",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_chicken_hat",
-            "name": "Give Chicken Hat",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "player_gain_weight",
-            "name": "Player Gain Weight",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "player_lose_weight",
-            "name": "Player Lose Weight",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "blurry_vision",
-            "name": "Blurry Vision",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -785,133 +689,114 @@
         },
         {
             "id": "add_cigarrete_addiction",
-            "name": "Add Cigarette Addiction",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "heal_player",
-            "name": "Heal Player",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "set_pirate_outfit",
-            "name": "Set Pirate Outfit",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "ragdoll_player",
-            "name": "Ragdoll Player",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "random_zombie_friend",
-            "name": "Make Nearest Zombie A Friend",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "zombies_ragdoll",
-            "name": "Zombies Ragdoll",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_player_clothes",
-            "name": "Remove Player Clothes",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "stop_rain",
-            "name": "Stop Rain",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_petrol_can",
-            "name": "Spawn Petrol Can",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_screwdriver",
-            "name": "Give Screwdriver",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_hammer",
-            "name": "Give Hammer",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_saw",
-            "name": "Give Saw",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_few_zombies",
-            "name": "Spawn Few Zombies",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_generator",
-            "name": "Spawn Generator",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_player_weapons",
-            "name": "Remove Player Weapons",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_schoolbag",
-            "name": "Give Schoolbag",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_random_tool",
-            "name": "Give Random Tool",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_random_item",
-            "name": "Give Random Item",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "honk_vehicles_nearby",
-            "name": "Honk Vehicles Nearby",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -922,7 +807,6 @@
         },
         {
             "id": "disable_vehicle_engine",
-            "name": "Disable Vehicle Engine",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -933,14 +817,12 @@
         },
         {
             "id": "exit_current_vehicle",
-            "name": "Exit Current Vehicle",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "vehicle_magnet_field",
-            "name": "Vehicle Magnet Field",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -951,105 +833,90 @@
         },
         {
             "id": "remove_player_ammo",
-            "name": "Remove Player Ammo",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_ammo",
-            "name": "Spawn Ammo",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_bandages",
-            "name": "Remove Bandages",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_bandages",
-            "name": "Give Bandages",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_random_medical_item",
-            "name": "Give Random Medical Item",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_random_skill_book",
-            "name": "Give Random Skill Book",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "add_random_skill_exp",
-            "name": "Add Random Skill XP",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_pack_of_beer_cans",
-            "name": "Spawn Pack of Beer Cans",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_pack_of_hotdogs",
-            "name": "Give Pack of Hotdogs",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_m9_pistol",
-            "name": "Give M9 Pistol",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_shotgun",
-            "name": "Give Shotgun",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_m16_rifle",
-            "name": "Give M16 Rifle",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_random_skill_vhs",
-            "name": "Give Random Skill VHS",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_fishing_kit",
-            "name": "Spawn Fishing Kit",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "boots_with_mines",
-            "name": "Boots With Mines",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1061,7 +928,6 @@
         },
         {
             "id": "minefield",
-            "name": "Minefield",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1073,14 +939,12 @@
         },
         {
             "id": "spawn_random_tire",
-            "name": "Spawn Random Tire",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "mirror_damage",
-            "name": "Mirror Damage",
             "enabled": true,
             "chance": 10,
             "duration": 60,
@@ -1091,7 +955,6 @@
         },
         {
             "id": "zombie_drop_food",
-            "name": "Zombie Drop Food",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1102,7 +965,6 @@
         },
         {
             "id": "zombie_drop_random_items",
-            "name": "Zombie Drop Random Items",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1113,7 +975,6 @@
         },
         {
             "id": "effect_lags",
-            "name": "Lags",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1124,21 +985,18 @@
         },
         {
             "id": "give_random_skill_book_set",
-            "name": "Give Random Skill Book Set",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_random_food",
-            "name": "Give Random Food",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "enable_disable_minimap",
-            "name": "Enable / Disable Minimap",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1149,28 +1007,24 @@
         },
         {
             "id": "nearby_zombies_are_naked",
-            "name": "Nearby Zombies Are Naked",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "replace_water_with_petrol",
-            "name": "Replace Water With Petrol",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "duplicate_items",
-            "name": "Duplicate Items",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "player_cant_sleep",
-            "name": "Player Can't Sleep",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1182,14 +1036,12 @@
         },
         {
             "id": "teleport_to_last_used_bed",
-            "name": "Teleport To Last Used Bed",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "explode_on_sleep",
-            "name": "Explode On Sleep",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1201,7 +1053,6 @@
         },
         {
             "id": "shake_camera",
-            "name": "Shake Camera",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1212,21 +1063,18 @@
         },
         {
             "id": "set_random_hairstyle",
-            "name": "Set Random Hairstyle",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_water_bottle",
-            "name": "Give Water Bottle",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "disable_sounds",
-            "name": "Disable Sounds",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1237,63 +1085,54 @@
         },
         {
             "id": "clone_zombies",
-            "name": "Clone Zombies",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "destroy_nearby_fridges",
-            "name": "Destroy Nearby Fridges",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "remove_player_drinks",
-            "name": "Remove Player Drinks",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "drop_item_in_hand",
-            "name": "Drop Item In Hand",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_cow",
-            "name": "Spawn Cow",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_chicken",
-            "name": "Spawn Chicken",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "increase_hunger_level",
-            "name": "Increase Hunger Level",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "decrease_hunger_level",
-            "name": "Decrease Hunger Level",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "panic_mode",
-            "name": "Panic Mode",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1304,7 +1143,6 @@
         },
         {
             "id": "food_is_poisoned",
-            "name": "Food Is Poisoned",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1315,14 +1153,12 @@
         },
         {
             "id": "give_metal_armor",
-            "name": "Give Metal Armor",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "zombies_low_render_distance",
-            "name": "Zombies Low Render Distance",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1335,28 +1171,24 @@
         },
         {
             "id": "break_all_items",
-            "name": "Break All Items",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "pop_tires_vehicles_nearby",
-            "name": "Pop Tires Vehicles Nearby",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "make_player_unhappy",
-            "name": "Make Player Unhappy",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "temporary_night",
-            "name": "Temporary Night",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1367,35 +1199,30 @@
         },
         {
             "id": "zombies_move_to_random_point",
-            "name": "Zombies Move To Random Point",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "zombies_move_to_specific_point",
-            "name": "Zombies Move To Specific Point",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "replace_food_with_maggots",
-            "name": "Replace Food With Maggots",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "give_stone_age_kit",
-            "name": "Give Stone Age Kit",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_explosion_chicken",
-            "name": "Spawn Explosion Chicken",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1403,7 +1230,6 @@
         },
         {
             "id": "player_cant_exit_car",
-            "name": "Player Can't Exit Car",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -1411,28 +1237,24 @@
         },
         {
             "id": "spawn_mannequin",
-            "name": "Spawn Mannequin",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "add_random_negative_effect",
-            "name": "Random Negative Effect",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "spawn_lootbox",
-            "name": "Spawn Lootbox",
             "enabled": true,
             "chance": 10,
             "withDuration": false
         },
         {
             "id": "math_captcha",
-            "name": "Math Captcha",
             "enabled": true,
             "chance": 10,
             "withDuration": true,

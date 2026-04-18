@@ -43,7 +43,7 @@ function EffectRemovePlayerDrinks:OnStart()
 
     local imgCode = ChaosUtils.GetImgCodeByItemTextureByString("Base.WaterBottle")
 
-    local str = string.format("%s Drinks removed: %d", imgCode, removedCount)
+    local str = string.format(ChaosLocalization.GetString("misc", "drinks_removed"), imgCode, removedCount)
 
-    ChaosPlayer.SayLine(player, str, 1.0, 0.3, 0.3)
+    ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
 end

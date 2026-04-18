@@ -12,5 +12,5 @@ function EffectPlayerGainWeight:OnStart()
     nutrition:setWeight(weight)
     nutrition:applyTraitFromWeight()
 
-    player:Say("New weight: " .. ChaosUtils.FormatWeight(weight))
+    player:Say(string.format(ChaosLocalization.GetString("misc", "new_weight"), ChaosUtils.FormatWeight(weight)))
 end

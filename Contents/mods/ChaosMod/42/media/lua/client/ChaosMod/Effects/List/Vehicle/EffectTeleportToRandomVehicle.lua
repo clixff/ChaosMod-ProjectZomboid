@@ -23,5 +23,5 @@ function EffectTeleportToRandomVehicle:OnStart()
         end
     end
 
-    player:Say("No vehicles nearby")
+    player:Say(ChaosLocalization.GetString("misc", "no_vehicles_nearby"))
 end

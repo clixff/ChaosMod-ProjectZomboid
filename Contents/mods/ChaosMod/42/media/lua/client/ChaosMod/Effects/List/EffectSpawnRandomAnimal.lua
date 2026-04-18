@@ -19,7 +19,7 @@ function EffectSpawnRandomAnimal:OnStart()
 
         local breedName = getText("IGUI_Breed_" .. animal:getData():getBreed():getName())
 
-        local str = string.format("Spawned %s %s", breedName, displayName)
+        local str = string.format(ChaosLocalization.GetString("misc", "spawned_animal"), breedName, displayName)
         ChaosPlayer.SayLine(player, str, 0.05, 0.333, 1.0)
     end
 end

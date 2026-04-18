@@ -30,6 +30,7 @@ function EffectRemovePlayerWatch:OnStart()
     ChaosPlayer.RecursiveInventoryLookup(inventory, true, true, function(item)
         if not item then return end
         if string.find(item:getFullType(), watchSubstring, 1, true) then
+            ChaosPlayer.SayLineRemovedItem(player, item)
             pcall(function() item:Remove() end)
         end
     end)
