@@ -1429,6 +1429,14 @@
             "enabled": true,
             "chance": 10,
             "withDuration": false
+        },
+        {
+            "id": "math_captcha",
+            "name": "Math Captcha",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 25
         }
     ]
 }

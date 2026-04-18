@@ -51,6 +51,7 @@ function ChaosProps.AddClothingToMannequin(man, fullType)
     if not container then return nil end
     local item = container:AddItem(fullType)
     if not item then return nil end
+    ---@diagnostic disable-next-line: param-type-mismatch
     man:wearItem(item, nil)
     return item
 end

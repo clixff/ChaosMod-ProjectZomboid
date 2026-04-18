@@ -402,3 +402,54 @@ function ChaosUtils.GetImgCodeByItemTextureByString(item)
     if not item then return "" end
     return ChaosUtils.GetImgCodeByItemTexture(item)
 end
+
+---@param container ItemContainer
+---@param out table<integer, { item: InventoryItem }>
+local function _collectItemsFromContainer(container, out)
+    if not container then return end
+    if not container.getItems then return end
+    local items = container:getItems()
+    if not items then return end
+    for i = 0, items:size() - 1 do
+        local item = items:get(i)
+        if item then
+            if item:IsInventoryContainer() then
+                ---@type InventoryContainer
+                local inner = item
+                if inner then
+                    _collectItemsFromContainer(inner:getInventory(), out)
+                end
+            else
+                table.insert(out, { item = item })
+            end
+        end
+    end
+end
+
+---@param player IsoPlayer
+function ChaosUtils.RemoveRandomItem(player)
+    if not player then return end
+    local inventory = player:getInventory()
+    if not inventory then return end
+
+    local allItems = {}
+    _collectItemsFromContainer(inventory, allItems)
+
+    if #allItems == 0 then return end
+
+    local randomIndex = math.floor(ZombRand(1, #allItems + 1))
+    local randomItem = allItems[randomIndex]
+    if not randomItem then return end
+
+    local worn = player:getWornItems()
+    if worn and worn:contains(randomItem.item) then
+        player:removeWornItem(randomItem.item)
+    end
+
+    inventory:Remove(randomItem.item)
+
+    local itemDisplayName = randomItem.item:getDisplayName()
+    local imgCode = ChaosUtils.GetImgCodeByItemTexture(randomItem.item)
+    local str = string.format("%s Removed %s", imgCode, itemDisplayName)
+    ChaosPlayer.SayLine(player, str, 1.0, 0.3, 0.3)
+end
