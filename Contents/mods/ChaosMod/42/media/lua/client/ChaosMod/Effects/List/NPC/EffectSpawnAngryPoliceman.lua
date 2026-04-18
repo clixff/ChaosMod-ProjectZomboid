@@ -29,7 +29,7 @@ function EffectSpawnAngryPoliceman:OnStart()
     local npc = ChaosNPC:new(zombie)
     npc:initializeHuman()
 
-    npc.npcGroup = ChaosNPCGroup.OUTLAW
+    npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
     ChaosZombie.RemoveAllWeapons(zombie)
     npc:SetWeapon("Base.Nightstick")

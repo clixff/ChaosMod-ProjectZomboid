@@ -29,7 +29,7 @@ function EffectSpawnGrieferWizard:OnStart()
     local npc = ChaosNPC:new(zombie)
     npc:initializeHuman()
 
-    npc.npcGroup = ChaosNPCGroup.OUTLAW
+    npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
     npc:SetWeapon("Base.Sledgehammer")
 end

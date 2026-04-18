@@ -13,11 +13,11 @@ function EffectRandomZombieFriend:OnStart()
     local npc = ChaosNPC:new(nearestZombie)
     npc:initializeHuman()
 
-    npc.npcGroup = ChaosNPCGroup.PLAYERS
+    npc.npcGroup = ChaosNPCGroupID.COMPANIONS
 
     local nickname = ChaosNicknames.ensureZombieNicknameAndColor(nearestZombie)
 
     if nickname then
-        player:Say(string.format("%s is your friend now", nickname))
+        player:Say(string.format(ChaosLocalization.GetString("misc", "npc_friend"), nickname))
     end
 end

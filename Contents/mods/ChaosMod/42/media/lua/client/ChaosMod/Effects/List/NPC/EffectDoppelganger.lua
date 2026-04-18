@@ -33,7 +33,7 @@ function EffectDoppelganger:OnStart()
 
     ChaosZombie.CopyCharacterVisualsAndClothes(player, zombie)
 
-    npc.npcGroup = ChaosNPCGroup.OUTLAW
+    npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
     -- npc:SetWeapon("Base.PipeWrench")
     npc:SetWeapon("Base.RollingPin")

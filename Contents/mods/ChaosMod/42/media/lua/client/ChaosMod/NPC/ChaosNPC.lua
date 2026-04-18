@@ -5,7 +5,7 @@
 ---@field moveTargetLocation? IsoGridSquare
 ---@field lastCachedTargetMoveLocation? IsoGridSquare
 ---@field enemy? IsoGameCharacter -- Current character target to attack
----@field npcGroup integer -- ID of NPC group
+---@field npcGroup integer -- ID of NPC group (see ChaosNPCGroupID)
 ---@field moving boolean -- If NPC is moving in this frame
 ---@field isAttacking boolean -- If NPC is currently attacking enemy or object
 ---@field attackAnimTimeMs integer -- Current ms time since start of attack
@@ -27,9 +27,6 @@
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 
-ChaosNPCGroup = ChaosNPCGroup or {}
-ChaosNPCGroup.OUTLAW = 0
-ChaosNPCGroup.PLAYERS = 1
 
 CHAOS_NPC_MAX_PATHFIND_UPDATE_MS = 1000
 CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS = 2500
@@ -90,7 +87,7 @@ function ChaosNPC:new(zombie)
     o.moveTargetLocation = nil
     o.lastCachedTargetMoveLocation = nil
     o.enemy = nil
-    o.npcGroup = ChaosNPCGroup.OUTLAW
+    o.npcGroup = ChaosNPCGroupID.RAIDERS
     o.moving = false
     o.isAttacking = false
     o.attackAnimTimeMs = 0
@@ -243,7 +240,17 @@ function ChaosNPC:update(deltaMs)
         print("[ChaosNPC] Found new enemy: " .. tostring(self.enemy))
     end
 
-    -- Force move target character to enemy
+    -- Force move target character to enemy, unless follow priority overrides
+    if self.enemy then
+        local followTarget = self:GetFollowTarget()
+        if followTarget then
+            local enemyDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), self.enemy:getX(), self.enemy:getY())
+            if enemyDist > CHAOS_NPC_FOLLOW_PRIORITY_DIST then
+                self.enemy = nil
+            end
+        end
+    end
+
     if self.enemy then
         self.moveTargetCharacter = self.enemy
     end
@@ -485,6 +492,15 @@ function ChaosNPC.SetTargetInner(npc, target)
     npc:setTarget(target)
 end
 
+---@return IsoGameCharacter?
+function ChaosNPC:GetFollowTarget()
+    local rel = ChaosNPCRelations.GetRelation(self.npcGroup, ChaosNPCGroupID.PLAYER)
+    if rel == ChaosNPCRelationType.FOLLOW then
+        return getPlayer()
+    end
+    return nil
+end
+
 -- Find new enemy target to attack
 function ChaosNPC:UpdateNextEnemyTarget()
     if not self.zombie then
@@ -499,27 +515,9 @@ function ChaosNPC:UpdateNextEnemyTarget()
 
     print("[ChaosNPC] Enemy update for group: " .. tostring(self.npcGroup))
 
-    -- If NPC is hostile to player, find new enemy in friendly NPC array or set to player
-    if self.npcGroup == ChaosNPCGroup.OUTLAW then
-        local player = getPlayer()
-        if not player then
-            return
-        end
-
-        local foundEnemy = ChaosNPCUtils.FindNewTargetForNPC(self)
-        if not foundEnemy then
-            self:SetAsTargetEnemy(player)
-            return
-        end
-
-        self:SetAsTargetEnemy(foundEnemy)
-        return
-    elseif self.npcGroup == ChaosNPCGroup.PLAYERS then
-        -- If NPC is friendly to player, find new enemy in zombies/hostile NPC array
-        local newEnemy = ChaosNPCUtils.FindNewTargetForNPC(self)
-        if newEnemy then
-            self:SetAsTargetEnemy(newEnemy)
-        end
+    local newEnemy = ChaosNPCUtils.FindNewTargetForNPC(self)
+    if newEnemy then
+        self:SetAsTargetEnemy(newEnemy)
     end
 end
 
@@ -542,21 +540,10 @@ function ChaosNPC:UpdateNextTargetMoveCharacter()
     local zombie = self.zombie
     if zombie:isDead() then return end
 
-
-    -- Follow player
-    if self.npcGroup == ChaosNPCGroup.PLAYERS then
-        local player = getPlayer()
-        if not player then
-            return
-        end
-
+    local followTarget = self:GetFollowTarget()
+    if followTarget then
         self.enemy = nil
-
-        self:MoveToCharacter(player)
-    elseif self.npcGroup == ChaosNPCGroup.OUTLAW then
-        if self.enemy then
-            self:MoveToCharacter(self.enemy)
-        end
+        self:MoveToCharacter(followTarget)
     end
 end
 
@@ -570,13 +557,15 @@ function ChaosNPC:OnZombieDead()
         end
     end
 
-    if self.npcGroup == ChaosNPCGroup.PLAYERS and self.zombie then
+    local isFollowGroup = self.npcGroup == ChaosNPCGroupID.COMPANIONS or
+                          self.npcGroup == ChaosNPCGroupID.FOLLOWERS
+    if isFollowGroup and self.zombie then
         self.zombie:playSound("deathcrash")
         local player = getPlayer()
         if player then
             local name = ChaosNicknames.ensureZombieNicknameAndColor(self.zombie)
             if name then
-                player:Say(string.format("%s died", name))
+                player:Say(string.format(ChaosLocalization.GetString("misc", "npc_died"), name))
             end
         end
     end
@@ -1064,7 +1053,7 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
     --     lowFence, hoppable, highFence, tallHoppable, isDoor, isThumpable, isWindow)
     -- print(debugString)
 
-    local isHostileToPlayer = self.npcGroup == ChaosNPCGroup.OUTLAW
+    local isHostileToPlayer = ChaosNPCRelations.CanNPCDestroyObjects(self)
 
     --- == Handle Window Collision ==
     if instanceof(object, "IsoWindow") then
@@ -1354,29 +1343,9 @@ function ChaosNPC:IsEnemyToNPC(otherZombie)
     if zombie:isDead() then return false end
     if otherZombie:isDead() then return false end
 
-    local modData = otherZombie:getModData()
-    if not modData then return false end
-
-    local isOtherZombieNPC = modData[CHAOS_NPC_MOD_DATA_KEY] and true or false
-    ---@type ChaosNPC?
-    local otherZombieNPC = isOtherZombieNPC and ChaosNPCUtils.GetNPCFromZombie(otherZombie) or nil
-
-    -- If the other zombie is an NPC, check if it is from a different NPC group
-    if otherZombieNPC then
-        return otherZombieNPC.npcGroup ~= self.npcGroup
-    else
-        -- All NPC from players group are enemies to infected zombies
-        if self.npcGroup == ChaosNPCGroup.PLAYERS then
-            return true
-        else
-            -- For other NPC groups, check if the last zombie that attacked this NPC is the same as the other zombie we are checking against
-            if self.lastZombieThatAttackedNPC then
-                return self.lastZombieThatAttackedNPC ~= otherZombie
-            end
-
-            return false
-        end
-    end
+    local otherGroup = ChaosNPCRelations.GetNPCGroupByCharacter(otherZombie)
+    local rel = ChaosNPCRelations.GetRelation(self.npcGroup, otherGroup)
+    return rel == ChaosNPCRelationType.ATTACK
 end
 
 ---@param otherZombie IsoZombie
@@ -1394,21 +1363,12 @@ function ChaosNPC:OnZombieDamagedNPC(otherZombie)
 
     self:SayDebug("OnZombieDamagedNPC")
 
-    local isNPC = ChaosNPCUtils.IsNPC(otherZombie)
-    if isNPC then
-        local otherNPC = ChaosNPCUtils.GetNPCFromZombie(otherZombie)
-        if not otherNPC then return end
-        local otherNPCGroup = otherNPC.npcGroup
-        local canSetEnemy = true
-        if otherNPCGroup == ChaosNPCGroup.PLAYERS and self.npcGroup == ChaosNPCGroup.PLAYERS then
-            canSetEnemy = false
-        end
+    local attackerGroup = ChaosNPCRelations.GetNPCGroupByCharacter(otherZombie)
+    local rel = ChaosNPCRelations.GetRelation(self.npcGroup, attackerGroup)
+    if rel == ChaosNPCRelationType.IGNORE then return end
 
-        if canSetEnemy then
-            self:SetAsTargetEnemy(otherZombie)
-        end
-    else
-        print("[ChaosNPC] Zombie attacked NPC, setting as enemy")
+    if rel == ChaosNPCRelationType.ATTACK then
+        print("[ChaosNPC] Attacked by enemy, setting as enemy target")
         self:SetAsTargetEnemy(otherZombie)
     end
 end

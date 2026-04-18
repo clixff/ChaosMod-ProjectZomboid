@@ -19,11 +19,10 @@ function ChaosNPCUtils.FindNewTargetForNPC(npc)
 
     local allZombies = cell:getZombieList()
 
-    local maxDistZombie = 5.0
-    local maxDistNPC = 5.0
+    local maxDist = 5.0
 
-    ---@type IsoZombie?
-    local nearestZombie = nil
+    ---@type IsoGameCharacter?
+    local nearestTarget = nil
     ---@type number
     local nearestDist = 0
 
@@ -31,16 +30,15 @@ function ChaosNPCUtils.FindNewTargetForNPC(npc)
         local otherZombie = allZombies:get(i)
         if otherZombie then
             if otherZombie:isAlive() and otherZombie ~= zombie then
-                local isNPC = ChaosNPCUtils.IsNPC(otherZombie)
                 local dist = ChaosUtils.distTo(x1, y1, otherZombie:getX(), otherZombie:getY())
                 local z2 = otherZombie:getZ()
-                local maxDist = isNPC and maxDistNPC or maxDistZombie
 
-                if dist <= maxDist and z1 == z2 then -- Only check if zombies are on the same level
-                    if npc:IsEnemyToNPC(otherZombie) then
-                        ---@diagnostic disable-next-line: invert-if
-                        if not nearestZombie or dist < nearestDist then
-                            nearestZombie = otherZombie
+                if dist <= maxDist and z1 == z2 then
+                    local otherGroup = ChaosNPCRelations.GetNPCGroupByCharacter(otherZombie)
+                    local rel = ChaosNPCRelations.GetRelation(npc.npcGroup, otherGroup)
+                    if rel == ChaosNPCRelationType.ATTACK then
+                        if not nearestTarget or dist < nearestDist then
+                            nearestTarget = otherZombie
                             nearestDist = dist
                         end
                     end
@@ -49,7 +47,21 @@ function ChaosNPCUtils.FindNewTargetForNPC(npc)
         end
     end
 
-    return nearestZombie
+    -- Check player as potential target
+    local player = getPlayer()
+    if player then
+        local playerRel = ChaosNPCRelations.GetRelation(npc.npcGroup, ChaosNPCGroupID.PLAYER)
+        if playerRel == ChaosNPCRelationType.ATTACK then
+            local dist = ChaosUtils.distTo(x1, y1, player:getX(), player:getY())
+            if dist <= maxDist and z1 == player:getZ() then
+                if not nearestTarget or dist < nearestDist then
+                    nearestTarget = player
+                end
+            end
+        end
+    end
+
+    return nearestTarget
 end
 
 ---@param zombie IsoZombie

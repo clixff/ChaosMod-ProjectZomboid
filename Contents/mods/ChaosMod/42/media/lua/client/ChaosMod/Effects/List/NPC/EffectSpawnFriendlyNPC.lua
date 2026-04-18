@@ -30,5 +30,5 @@ function EffectSpawnFriendlyNPC:OnStart()
     local npc = ChaosNPC:new(zombie)
     npc:initializeHuman()
 
-    npc.npcGroup = ChaosNPCGroup.PLAYERS
+    npc.npcGroup = ChaosNPCGroupID.COMPANIONS
 end

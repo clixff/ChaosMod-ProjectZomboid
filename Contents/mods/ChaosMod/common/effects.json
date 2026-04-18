@@ -1259,6 +1259,11 @@
             "chance": 10,
             "withDuration": true,
             "duration": 25
+        },
+        {
+            "id": "spawn_followers",
+            "enabled": true,
+            "chance": 10
         }
     ]
 }

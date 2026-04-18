@@ -30,7 +30,7 @@ function EffectSpawnNPC:OnStart()
     local npc = ChaosNPC:new(zombie)
     npc:initializeHuman()
 
-    npc.npcGroup = ChaosNPCGroup.OUTLAW
+    npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
     -- npc:SetWeapon("Base.PipeWrench")
     npc:SetWeapon("Base.BaseballBat")
