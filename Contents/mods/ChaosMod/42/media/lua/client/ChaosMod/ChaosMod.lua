@@ -185,6 +185,7 @@ function ChaosMod.OnTick()
         ChaosUtils.AdjustVisibleZombiesForNPCs()
         ChaosUtils.TrackPlayerPosition(deltaMs)
         ChaosUtils.sleepHandleTick()
+        ChaosNPCUtils.OnTick(deltaMs)
     end
 end
 

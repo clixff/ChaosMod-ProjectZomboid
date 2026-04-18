@@ -1,8 +1,27 @@
 ---@class ChaosNPCUtils
 ---@field npcList ArrayList<ChaosNPC>
+---@field cleanupAccumMs integer
 ChaosNPCUtils = ChaosNPCUtils or {
     npcList = ArrayList:new(),
+    cleanupAccumMs = 0,
 }
+
+local CLEANUP_INTERVAL_MS = 5000
+
+---@param deltaMs integer
+function ChaosNPCUtils.OnTick(deltaMs)
+    ChaosNPCUtils.cleanupAccumMs = ChaosNPCUtils.cleanupAccumMs + deltaMs
+    if ChaosNPCUtils.cleanupAccumMs < CLEANUP_INTERVAL_MS then return end
+    ChaosNPCUtils.cleanupAccumMs = 0
+
+    local list = ChaosNPCUtils.npcList
+    for i = list:size() - 1, 0, -1 do
+        local npc = list:get(i)
+        if not npc or not npc.zombie or npc.zombie:isDead() then
+            list:remove(i)
+        end
+    end
+end
 
 
 ---@param npc ChaosNPC

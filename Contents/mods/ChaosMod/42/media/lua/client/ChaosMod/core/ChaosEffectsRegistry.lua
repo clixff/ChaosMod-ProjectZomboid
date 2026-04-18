@@ -43,11 +43,9 @@ function ChaosEffectsRegistry.Initialize()
     for _, _effectJsonData in ipairs(effectsData.effects) do
         ---@type ChaosEffectJsonData
         local effectJsonData = _effectJsonData
-        print("[ChaosEffectsRegistry] Effect JSON Data: " .. tostring(effectJsonData))
 
         local newEffectData = ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
         if newEffectData then
-            print("[ChaosEffectsRegistry] Adding effect data for ID: " .. tostring(newEffectData.id))
             ChaosEffectsRegistry.effects[newEffectData.id] = newEffectData
             if newEffectData.enabled then
                 enabledEffects = enabledEffects + 1

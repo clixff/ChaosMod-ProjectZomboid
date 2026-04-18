@@ -131,6 +131,8 @@ function ChaosNPC:initializeHuman()
     self.spawnTimeMs = ChaosMod.lastTimeTickMs
     self.zombie:setVariable("Chaos2HandsWeapon", false)
 
+    self:DisableZombieVoice()
+
     ChaosNPCUtils.npcList:add(self)
 end
 
@@ -352,7 +354,6 @@ function ChaosNPC:update(deltaMs)
         self:HandleCollisions()
     end
 
-    self:DisableZombieVoice()
     self:VehiclesTick()
 
     --- Debug
@@ -1297,11 +1298,13 @@ function ChaosNPC:DisableZombieVoice()
     local zombie = self.zombie
 
     local isFemale = zombie:isFemale()
+    local prefix = isFemale and "VoiceFemale" or "VoiceMale"
 
     local descriptor = zombie:getDescriptor()
     if not descriptor then return end
 
-    descriptor:setVoicePrefix(isFemale and "VoiceFemale" or "VoiceMale")
+    descriptor:setVoicePrefix(prefix)
+    zombie:setHurtSound(prefix .. "Hurt")
 end
 
 ---@param weaponFullType string
