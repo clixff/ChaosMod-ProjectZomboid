@@ -6,34 +6,43 @@ require "ISUI/ISButton"
 ---@field btn ISButton
 ChaosHUD = ISPanel:derive("ChaosHUD")
 
+local BAR_R = 159 / 255
+local BAR_G = 33 / 255
+local BAR_B = 31 / 255
+
 function ChaosHUD:initialise()
     ISPanel.initialise(self)
     self.text = "Test String"
 end
 
 function ChaosHUD:new()
-    local panelWidth = ChaosUIManager.GetScaledWidth(500)
-    local panelHeight = ChaosUIManager.GetScaledWidth(300)
-    local panelX = ChaosUIManager.GetScaledWidth(1300)
-    local panelY = ChaosUIManager.GetScaledHeight(50)
+    local panelWidth = ChaosUIManager.GetScaledWidth(1920 * 0.2)
+    local panelHeight = ChaosUIManager.GetScaledWidth(100)
+    local panelX = 0
+    local panelY = ChaosUIManager.cachedHeight - panelHeight
     local o = ISPanel:new(panelX, panelY, panelWidth, panelHeight)
     setmetatable(o, self)
     self.__index = self
 
-    o.backgroundColor = { r = 0, g = 0, b = 0, a = 0.5 }
-    o.borderColor = { r = 1, g = 1, b = 1, a = 1 }
+    o.backgroundColor = { r = 0, g = 0, b = 0, a = 0.0 }
+    o.borderColor = { r = 0, g = 0, b = 0, a = 0 }
     o.anchorLeft = true
-    o.anchorTop = true
+    o.anchorBottom = true
 
     return o
 end
 
 function ChaosHUD:createChildren()
-    -- Button belongs to THIS instance (self)
-    local buttonWidth = ChaosUIManager.GetScaledWidth(120)
+    local panelHeight = ChaosUIManager.GetScaledWidth(100)
+    local barHeight = ChaosUIManager.GetScaledWidth(22)
     local buttonHeight = ChaosUIManager.GetScaledWidth(25)
+    local buttonMargin = ChaosUIManager.GetScaledWidth(6)
+    -- Buttons sit above the progress bar, inside the panel
+    local buttonY = panelHeight - barHeight - buttonMargin - buttonHeight
+
+    local buttonWidth = ChaosUIManager.GetScaledWidth(120)
     local buttonX = ChaosUIManager.GetScaledWidth(10)
-    local buttonY = ChaosUIManager.GetScaledHeight(50)
+
     self.btn = ISButton:new(buttonX, buttonY, buttonWidth, buttonHeight, "Button", self, ChaosHUD.OnMainButtonClick)
     self.btn:initialise()
     self.btn:instantiate()
@@ -41,11 +50,10 @@ function ChaosHUD:createChildren()
     self:OnModStatusChanged(ChaosMod.enabled)
 
     local secondButtonWidth = ChaosUIManager.GetScaledWidth(100)
-    local secondButtonHeight = ChaosUIManager.GetScaledWidth(25)
-    local secondButtonX = buttonWidth + ChaosUIManager.GetScaledWidth(10)
-    local secondButtonY = ChaosUIManager.GetScaledHeight(50)
+    local secondButtonX = buttonX + buttonWidth + ChaosUIManager.GetScaledWidth(6)
 
-    self.secondBtn = ISButton:new(secondButtonX, secondButtonY, secondButtonWidth, secondButtonHeight, ChaosLocalization.GetString("core", "select_effect"),
+    self.secondBtn = ISButton:new(secondButtonX, buttonY, secondButtonWidth, buttonHeight,
+        ChaosLocalization.GetString("core", "select_effect"),
         self,
         ChaosHUD.OnSecondButtonClick)
     self.secondBtn:initialise()
@@ -61,63 +69,76 @@ end
 function ChaosHUD:prerender()
     ISPanel.prerender(self)
 
-    -- Draw text
-    self:drawText(self.text, 0, 0, 1, 1, 1, 1, UIFont.Large)
+    local barMaxWidth = getCore():getScreenWidth()
+    local panelHeight = ChaosUIManager.GetScaledWidth(100)
+    local barHeight = ChaosUIManager.GetScaledWidth(22)
+    local barY = panelHeight - barHeight
+    local effectRectHeight = ChaosUIManager.GetScaledWidth(36)
+    local effectMargin = ChaosUIManager.GetScaledWidth(4)
+    local effectMarginLeft = ChaosUIManager.GetScaledWidth(12)
+    local textPadH = ChaosUIManager.GetScaledWidth(16)
+    local effectRectMinWidth = ChaosUIManager.GetScaledWidth(160)
 
-    -- Draw active effects name
-    local effectHeight = ChaosUIManager.GetScaledWidth(20)
-    local baseEffectY = ChaosUIManager.GetScaledHeight(200);
-    for i, effect in ipairs(ChaosEffectsManager.activeEffects) do
+    -- Effects Progress Bar — at the bottom of the panel
+    if ChaosMod.enabled and ChaosConfig.IsEffectsEnabled() and not ChaosConfig.hide_progress_bar then
+        local timerMax = ChaosEffectsManager.globalTimerMaxMs
+        local fgWidth = 0
+        if timerMax > 0 then
+            fgWidth = math.floor(barMaxWidth * (ChaosEffectsManager.globalTimerMs / timerMax))
+        end
+        -- Red on left (elapsed)
+        if fgWidth > 0 then
+            self:drawRect(0, barY, fgWidth, barHeight, 0.9, BAR_R, BAR_G, BAR_B)
+        end
+        -- Gray on right (remaining)
+        local bgWidth = barMaxWidth - fgWidth
+        if bgWidth > 0 then
+            self:drawRect(fgWidth, barY, bgWidth, barHeight, 0.7, 0.1, 0.1, 0.1)
+        end
+
+        -- Countdown text: shows time remaining (timerMax -> 0)
+        local remainingMs = (timerMax > 0) and (timerMax - ChaosEffectsManager.globalTimerMs) or 0
+        local timerText = string.format("%.1fs", remainingMs / 1000)
+        local timerFontHeight = getTextManager():getFontHeight(UIFont.Large)
+        local timerTextY = barY + math.floor((barHeight - timerFontHeight) / 2)
+        self:drawText(timerText, ChaosUIManager.GetScaledWidth(8), timerTextY, 1, 1, 1, 1, UIFont.Large)
+    end
+
+    self:renderActiveEffects(effectRectHeight, effectMargin, effectMarginLeft, textPadH, effectRectMinWidth)
+end
+
+function ChaosHUD:renderActiveEffects(effectRectHeight, effectMargin, effectMarginLeft, textPadH, effectRectMinWidth)
+    local fontHeight = getTextManager():getFontHeight(UIFont.NewLarge)
+    local textVertOffset = math.floor((effectRectHeight - fontHeight) / 2)
+
+    local activeEffects = ChaosEffectsManager.activeEffects
+    for pos = 1, #activeEffects do
+        local effect = activeEffects[#activeEffects - pos + 1]
         local effectString = tostring(effect.effectName)
         if effect.withDuration then
             local msToEnd = effect.maxTicks - effect.ticksActiveTime
             local secondsToEnd = msToEnd / 1000
             effectString = string.format("%s (%.1fs)", effectString, secondsToEnd)
         end
-        self:drawText(effectString, 0, baseEffectY + (i * effectHeight), 1, 1, 1, 1, UIFont.NewLarge)
+
+        local textWidth = getTextManager():MeasureStringX(UIFont.NewLarge, effectString)
+        local rectWidth = math.max(textWidth + textPadH * 2, effectRectMinWidth)
+        local rectX = effectMarginLeft
+        -- pos=1 (newest) just above panel, higher pos goes further up
+        local rectY = -((effectRectHeight + effectMargin) * pos)
+
+        self:drawRect(rectX, rectY, rectWidth, effectRectHeight, 0.7, 0.1, 0.1, 0.1)
+
+        if effect.withDuration and effect.maxTicks > 0 then
+            local progress = 1 - (effect.ticksActiveTime / effect.maxTicks)
+            local fgWidth = math.floor(rectWidth * progress)
+            if fgWidth > 0 then
+                self:drawRect(rectX, rectY, fgWidth, effectRectHeight, 1, BAR_R, BAR_G, BAR_B)
+            end
+        end
+
+        self:drawText(effectString, rectX + textPadH, rectY + textVertOffset, 1, 1, 1, 1, UIFont.NewLarge)
     end
-
-    -- local fontsTest = {
-    --     "Small",
-    --     "Medium",
-    --     "Large",
-    --     "Massive",
-    --     "MainMenu1",
-    --     "MainMenu2",
-    --     "Cred1",
-    --     "Cred2",
-    --     "NewSmall",
-    --     "NewMedium",
-    --     "NewLarge",
-    --     "Code",
-    --     "CodeSmall",
-    --     "CodeMedium",
-    --     "CodeLarge",
-    --     "MediumNew",
-    --     "AutoNormSmall",
-    --     "AutoNormMedium",
-    --     "AutoNormLarge",
-    --     "Dialogue",
-    --     "Intro",
-    --     "Handwritten",
-    --     "DebugConsole",
-    --     "Title",
-    --     "SdfRegular",
-    --     "SdfBold",
-    --     "SdfItalic",
-    --     "SdfBoldItalic",
-    --     "SdfOldRegular",
-    --     "SdfOldBold",
-    --     "SdfOldItalic",
-    --     "SdfOldBoldItalic",
-    --     "SdfRobertoSans",
-    --     "SdfCaveat",
-    -- }
-
-    -- local i = 0
-    -- for i, fontName in pairs(fontsTest) do
-    --     self:drawText(fontName, -200, 0 + (i * 40), 1, 1, 1, 1, UIFont[fontName])
-    -- end
 end
 
 function ChaosHUD:OnMainButtonClick()
@@ -144,7 +165,10 @@ function ChaosHUD:OnModStatusChanged(enabled)
 end
 
 function ChaosHUD:OnLanguageLoaded()
+    -- Update text of select_effect button
     self.secondBtn:setTitle(ChaosLocalization.GetString("core", "select_effect"))
+    self.secondBtn:setWidthToTitle(ChaosUIManager.GetScaledWidth(100))
+    -- Update width of main button
     self:OnModStatusChanged(ChaosMod.enabled)
 end
 

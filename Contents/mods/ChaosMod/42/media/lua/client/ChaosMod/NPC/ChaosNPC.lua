@@ -25,6 +25,8 @@
 ---@field debugLastTimePathfindMs integer -- DEBUG: Last time pathfind was updated
 ---@field attackLastTimeMs integer -- Last time NPC attacked
 ---@field tags table<string, boolean> -- Set of tags on this NPC
+---@field endurance number -- Current endurance level (0-100)
+---@field canRun boolean -- Whether NPC is currently allowed to start running
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 
@@ -35,6 +37,16 @@ CHAOS_NPC_MOD_DATA_KEY = "is_npc"
 CHAOS_NPC_MOD_DATA_KEY_2 = "ChaosNPC"
 local TIME_TO_ENABLE_AI_AFTER_SPAWN_MS = 3500
 local ATTACK_TIMEOUT_MS = 2500
+
+local ENDURANCE_MAX = 100.0
+local ENDURANCE_RUN_DRAIN_PER_SEC = 20.0
+local ENDURANCE_ATTACK_DRAIN_HANDS = 7.0
+local ENDURANCE_ATTACK_DRAIN_ONE_HAND = 10.0
+local ENDURANCE_ATTACK_DRAIN_TWO_HAND = 20.0
+local ENDURANCE_IDLE_REGEN_PER_SEC = 15.0
+local ENDURANCE_WALK_REGEN_PER_SEC = 5.0
+local ENDURANCE_ATTACK_REGEN_PER_SEC = 10.0
+local ENDURANCE_RUN_THRESHOLD = 20.0
 
 CHAOS_NPC_ATTACK_ANIMS = {
     HANDS = {
@@ -105,6 +117,8 @@ function ChaosNPC:new(zombie)
     o.debugLastTimePathfindMs = 0
     o.attackLastTimeMs = 0
     o.tags = {}
+    o.endurance = ENDURANCE_MAX
+    o.canRun = true
     return o
 end
 
@@ -140,6 +154,40 @@ function ChaosNPC:initializeHuman()
 end
 
 ---@param deltaMs integer
+function ChaosNPC:UpdateEndurance(deltaMs)
+    local deltaSeconds = deltaMs / 1000.0
+    local isRunning = self.moving and self.walkType == "Run"
+
+    if isRunning then
+        self.endurance = math.max(0, self.endurance - ENDURANCE_RUN_DRAIN_PER_SEC * deltaSeconds)
+    elseif self.isAttacking then
+        local pastHalfway = self.attackAnimWindowMs > 0 and
+            self.attackAnimTimeMs >= self.attackAnimWindowMs * 0.5
+        if pastHalfway then
+            self.endurance = math.min(ENDURANCE_MAX, self.endurance + ENDURANCE_ATTACK_REGEN_PER_SEC * deltaSeconds)
+        end
+    elseif not self.moving then
+        self.endurance = math.min(ENDURANCE_MAX, self.endurance + ENDURANCE_IDLE_REGEN_PER_SEC * deltaSeconds)
+    elseif self.walkType == "Walk" then
+        self.endurance = math.min(ENDURANCE_MAX, self.endurance + ENDURANCE_WALK_REGEN_PER_SEC * deltaSeconds)
+    end
+
+    if isRunning then
+        -- allow continuing to run until endurance hits 0
+        if self.endurance <= 0 then
+            self.canRun = false
+        end
+    else
+        -- not running: only re-enable run when endurance recovers past threshold
+        self.canRun = self.endurance >= ENDURANCE_RUN_THRESHOLD
+    end
+
+    if not self.canRun and isRunning then
+        self.walkType = "Walk"
+    end
+end
+
+---@param deltaMs integer
 function ChaosNPC:update(deltaMs)
     if not self.zombie then
         return
@@ -152,6 +200,8 @@ function ChaosNPC:update(deltaMs)
         self:OnZombieDead()
         return
     end
+
+    self:UpdateEndurance(deltaMs)
 
     local timestampMs = ChaosMod.lastTimeTickMs
 
@@ -385,6 +435,7 @@ function ChaosNPC:update(deltaMs)
     --     enemyString, moveTargetCharacterString, upddatePathfindingString, moveResultCache, isNearbyString, dist,
     --     bumpTypeString, isAttackingString, self.attackAnimTimeMs, self.walkType, self.pathfindUpdateMs,
     --     attackDist, lastTimePathfindMs, twohandWeapon)
+    -- local debugString = string.format("%.2f", self.endurance)
     -- zombie:addLineChatElement(debugString, 1.0, 1.0, 1.0)
 end
 
@@ -455,7 +506,7 @@ function ChaosNPC:MoveToCharacter(character)
     local dist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), x, y)
 
     if dist >= 6.5 or dist <= 3.0 then
-        self.walkType = "Run"
+        self.walkType = self.canRun and "Run" or "Walk"
     else
         self.walkType = "Walk"
     end
@@ -618,6 +669,8 @@ function ChaosNPC:OnZombieDead()
     self.isAttacking = false
     self.attackAnimTimeMs = 0
     self.attackAnimWindowMs = 0
+    self.endurance = ENDURANCE_MAX
+    self.canRun = true
 
     local index = ChaosNPCUtils.npcList:indexOf(self)
     if index ~= -1 then
@@ -1214,14 +1267,34 @@ function ChaosNPC:GetNextAttackWindowMs()
     return 500
 end
 
+---@return number
+function ChaosNPC:GetAttackEnduranceCost()
+    if not self.weaponItemCached then
+        return ENDURANCE_ATTACK_DRAIN_HANDS
+    end
+    if self.weaponItemCached:getFullType() == "Base.BareHands" then
+        return ENDURANCE_ATTACK_DRAIN_HANDS
+    end
+    local weaponType = WeaponType.getWeaponType(self.weaponItemCached)
+    if weaponType == WeaponType.TWO_HANDED or weaponType == WeaponType.HEAVY then
+        return ENDURANCE_ATTACK_DRAIN_TWO_HAND
+    elseif weaponType == WeaponType.ONE_HANDED then
+        return ENDURANCE_ATTACK_DRAIN_ONE_HAND
+    end
+    return ENDURANCE_ATTACK_DRAIN_HANDS
+end
+
 function ChaosNPC:StartAttackAnimation()
     if not self.zombie then return end
     local zombie = self.zombie
 
+    if self.endurance < self:GetAttackEnduranceCost() then
+        return
+    end
+
     self.isAttacking = true
     self.attackAnimTimeMs = 0
     self.attackAnimWindowMs = self:GetNextAttackWindowMs()
-
 
     if not self.weaponItemCached then
         return
@@ -1230,19 +1303,25 @@ function ChaosNPC:StartAttackAnimation()
     ---@type table<integer, string>
     local animsTable = CHAOS_NPC_ATTACK_ANIMS.HANDS
     local groundAttackName = CHAOS_NPC_ATTACK_GROUND.HANDS
+    local attackEnduranceDrain = ENDURANCE_ATTACK_DRAIN_HANDS
 
     local weaponType = WeaponType.getWeaponType(self.weaponItemCached)
 
     if self.weaponItemCached:getFullType() == "Base.BareHands" then
         animsTable = CHAOS_NPC_ATTACK_ANIMS.HANDS
         groundAttackName = CHAOS_NPC_ATTACK_GROUND.HANDS
+        attackEnduranceDrain = ENDURANCE_ATTACK_DRAIN_HANDS
     elseif weaponType == WeaponType.ONE_HANDED then
         animsTable = CHAOS_NPC_ATTACK_ANIMS.ONE_HAND
         groundAttackName = CHAOS_NPC_ATTACK_GROUND.ONE_HAND
+        attackEnduranceDrain = ENDURANCE_ATTACK_DRAIN_ONE_HAND
     elseif weaponType == WeaponType.TWO_HANDED or weaponType == WeaponType.HEAVY then
         animsTable = CHAOS_NPC_ATTACK_ANIMS.TWO_HAND
         groundAttackName = CHAOS_NPC_ATTACK_GROUND.TWO_HAND
+        attackEnduranceDrain = ENDURANCE_ATTACK_DRAIN_TWO_HAND
     end
+
+    self.endurance = math.max(0, self.endurance - attackEnduranceDrain)
 
 
     local randomIndex = ZombRand(#animsTable)
@@ -1417,7 +1496,10 @@ function ChaosNPC:SayDebug(message)
     local zombie = self.zombie
     if not zombie:isAlive() then return end
 
-    zombie:SayDebug(1, message)
+    print("[ChaosNPC] Saying debug message: " .. tostring(message))
+
+    -- zombie:setHaloNote(message, 300)
+    zombie:SayDebug(2, message)
 end
 
 ---@return boolean

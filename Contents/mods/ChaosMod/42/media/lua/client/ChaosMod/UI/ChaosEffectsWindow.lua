@@ -98,6 +98,8 @@ function ChaosEffectsWindow:onListMouseDown(target, item)
     print("[ChaosMod] Item: " .. tostring(item))
 end
 
+local RANDOM_EFFECT_ITEM = { id = "__random__", name = "Random Effect" }
+
 function ChaosEffectsWindow:fillWithEffects()
     self.list:clear()
 
@@ -106,8 +108,14 @@ function ChaosEffectsWindow:fillWithEffects()
         needle = string.lower(self.searchText)
     end
 
-    local firstEffectId = ""
+    local firstItem = nil
     local i = 0
+
+    if not needle then
+        self.list:addItem("0. " .. RANDOM_EFFECT_ITEM.name, RANDOM_EFFECT_ITEM)
+        firstItem = RANDOM_EFFECT_ITEM
+    end
+
     for _, effectData in pairs(ChaosEffectsRegistry.effects) do
         local matches = true
         if needle then
@@ -119,26 +127,27 @@ function ChaosEffectsWindow:fillWithEffects()
             i = i + 1
             local effectLineString = string.format("%d. %s", i, effectData.name)
             self.list:addItem(effectLineString, effectData)
-            if firstEffectId == "" then
-                firstEffectId = effectData.id
+            if not firstItem then
+                firstItem = effectData
             end
         end
     end
 
-    if firstEffectId == "" then
-        self.selectedEffect = nil
-    else
-        self.selectedEffect = ChaosEffectsRegistry.effects[firstEffectId]
-    end
+    self.selectedEffect = firstItem
 end
 
 function ChaosEffectsWindow:onActivateClicked()
-    print("[ChaosMod] Selected effect activated: " .. tostring(self.selectedEffect))
-    if self.selectedEffect then
-        print("[ChaosMod] Activate selected effect: " .. self.selectedEffect.id)
+    if not self.selectedEffect then return end
 
-        ChaosEffectsManager.StartEffect(self.selectedEffect.id)
+    if self.selectedEffect == RANDOM_EFFECT_ITEM then
+        local picked = ChaosEffectsRegistry.GetRandomEffects(1, "default")
+        if picked[1] then
+            ChaosEffectsManager.StartEffect(picked[1])
+        end
+        return
     end
+
+    ChaosEffectsManager.StartEffect(self.selectedEffect.id)
 end
 
 --- @param target ChaosEffectDataEntry

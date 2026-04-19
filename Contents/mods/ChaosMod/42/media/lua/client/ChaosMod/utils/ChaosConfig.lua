@@ -8,17 +8,22 @@
 ---@field say_killed_zombie_name boolean
 ---@field zombie_nicknames_buffer number
 ---@field use_zombie_nicknames boolean
+---@field enable_donate boolean
+---@field donate_providers table<integer, string>
+---@field paid_base_price number
 
 ---@class ChaosConfig
 ---@field lang string -- Language code (e.g. "en", "fr")
 ---@field effects_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
 ---@field effects_interval number
+---@field hide_progress_bar boolean
 ---@field ui_sounds_enabled boolean
 ---@field streamer_mode ChaosConfigStreamerMode
 ChaosConfig = ChaosConfig or {
     lang = "en",
     effects_enabled = true,
     effects_interval = 45,
+    hide_progress_bar = false,
     ui_sounds_enabled = true,
     streamer_mode = {
         streamer_mode_enabled = false,
@@ -30,6 +35,9 @@ ChaosConfig = ChaosConfig or {
         say_killed_zombie_name = true,
         zombie_nicknames_buffer = 150,
         use_zombie_nicknames = true,
+        enable_donate = false,
+        donate_providers = {},
+        paid_base_price = 5,
     }
 }
 
@@ -51,6 +59,10 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.effects_interval) == "number" then
         ChaosConfig.effects_interval = configData.effects_interval
+    end
+
+    if type(configData.hide_progress_bar) == "boolean" then
+        ChaosConfig.hide_progress_bar = configData.hide_progress_bar
     end
 
     if type(configData.ui_sounds_enabled) == "boolean" then
@@ -97,6 +109,18 @@ function ChaosConfig.LoadConfigFromDisk()
         -- If should use zombie nicknames
         if type(configData.streamer_mode.use_zombie_nicknames) == "boolean" then
             ChaosConfig.streamer_mode.use_zombie_nicknames = configData.streamer_mode.use_zombie_nicknames
+        end
+        -- If donate is enabled
+        if type(configData.streamer_mode.enable_donate) == "boolean" then
+            ChaosConfig.streamer_mode.enable_donate = configData.streamer_mode.enable_donate
+        end
+        -- Donate providers list
+        if type(configData.streamer_mode.donate_providers) == "table" then
+            ChaosConfig.streamer_mode.donate_providers = configData.streamer_mode.donate_providers
+        end
+        -- Base price for paid effects
+        if type(configData.streamer_mode.paid_base_price) == "number" then
+            ChaosConfig.streamer_mode.paid_base_price = configData.streamer_mode.paid_base_price
         end
     end
 

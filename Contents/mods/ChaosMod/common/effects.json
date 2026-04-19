@@ -4,37 +4,49 @@
             "id": "spawn_zombie_nearby",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "effect_shout",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_friendly_npc",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "turn_power_on",
             "enabled": true,
             "chance": 1,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "turn_power_off",
             "enabled": true,
             "chance": 1,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_vehicle_nearby",
             "enabled": true,
             "chance": 1,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "enable_fog",
@@ -44,7 +56,9 @@
             "duration": 15,
             "disable_effects": [
                 "enable_fog"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "enable_rain",
@@ -55,7 +69,9 @@
             "disable_effects": [
                 "enable_snow",
                 "enable_rain"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "enable_snow",
@@ -66,19 +82,25 @@
             "disable_effects": [
                 "enable_rain",
                 "enable_snow"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_sprinter_zombie_random_radius",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_david_the_gnome",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "look_behind_you",
@@ -88,25 +110,33 @@
             "duration": 25,
             "disable_effects": [
                 "look_behind_you"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_shoes",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_pants",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "set_random_outfit",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "cant_stop_shouting",
@@ -116,32 +146,42 @@
             "duration": 25,
             "disable_effects": [
                 "cant_stop_shouting"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "turn_water_on",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "turn_water_off",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_have_vehicle_keys",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
-            "duration": 45
+            "duration": 45,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "refill_car_fuel",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "force_zoom_in",
@@ -152,7 +192,9 @@
             "disable_effects": [
                 "force_zoom_in",
                 "force_zoom_out"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "force_zoom_out",
@@ -163,37 +205,49 @@
             "disable_effects": [
                 "force_zoom_in",
                 "force_zoom_out"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_barricade_kit",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_random_animal",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_baseball_bat",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_helicopter",
             "enabled": true,
             "chance": 5,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_player_watch",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "invisible_characters",
@@ -203,7 +257,9 @@
             "duration": 60,
             "disable_effects": [
                 "invisible_characters"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "time_rewind",
@@ -213,115 +269,153 @@
             "duration": 5,
             "disable_effects": [
                 "time_rewind"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_batteries",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_chips",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_flashlight",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "discharge_batteries",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_random_map",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "repair_player_weapons",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "break_player_weapons",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spoil_player_food",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_player_clone_zombie",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "launch_player_up",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "launch_everyone_up",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "launch_zombies_up",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "reanimate_zombies",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "smash_nearby_windows",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "set_day_time_morning",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "set_day_time_night",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "kill_nearby_zombies",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "set_zombies_on_fire",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "effect_insanity",
@@ -331,7 +425,9 @@
             "duration": 45,
             "disable_effects": [
                 "effect_insanity"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spinning_vehicles",
@@ -341,7 +437,9 @@
             "duration": 60,
             "disable_effects": [
                 "spinning_vehicles"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "flying_cars",
@@ -352,37 +450,49 @@
             "disable_effects": [
                 "flying_cars",
                 "player_god_mod"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombies_are_coming",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "teleport_in_small_radius",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "replace_zombies_with_chickens",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "set_random_vehicle_colors",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "teleport_to_random_vehicle",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "wallhack",
@@ -392,7 +502,9 @@
             "duration": 60,
             "disable_effects": [
                 "wallhack"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "jumping_cars",
@@ -402,7 +514,9 @@
             "duration": 30,
             "disable_effects": [
                 "jumping_cars"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "1hp_zombies",
@@ -412,7 +526,9 @@
             "duration": 60,
             "disable_effects": [
                 "1hp_zombies"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombies_explode_on_damage",
@@ -422,61 +538,81 @@
             "duration": 45,
             "disable_effects": [
                 "zombies_explode_on_damage"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "cure_player_virus",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "effect_doppelganger",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_sledgehammer",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "replace_zombies_with_props",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_griefer_santa",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_angry_policeman",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_griefer_wizard",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_friendly_prisoner",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_griefer_knight",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "filter_red",
@@ -486,7 +622,9 @@
             "duration": 60,
             "disable_effects": [
                 "filter_red"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "filter_mexico",
@@ -496,7 +634,9 @@
             "duration": 60,
             "disable_effects": [
                 "filter_mexico"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "filter_fallout3",
@@ -506,7 +646,9 @@
             "duration": 60,
             "disable_effects": [
                 "filter_fallout3"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "black_and_white",
@@ -516,37 +658,49 @@
             "duration": 180,
             "disable_effects": [
                 "black_and_white"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_random_item",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_vehicle_doors",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_random_wheel",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_car_fuel",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "random_tire_popping",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "disable_sprint_and_jump",
@@ -556,13 +710,17 @@
             "duration": 35,
             "disable_effects": [
                 "disable_sprint_and_jump"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "set_random_car_fuel",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombies_cant_see_you",
@@ -572,19 +730,25 @@
             "duration": 120,
             "disable_effects": [
                 "zombies_cant_see_you"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_player_gloves",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_wizard_hat",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_god_mod",
@@ -595,7 +759,9 @@
             "disable_effects": [
                 "player_god_mod",
                 "flying_cars"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_cant_open_doors",
@@ -605,31 +771,41 @@
             "duration": 60,
             "disable_effects": [
                 "player_cant_open_doors"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "damage_car_engine",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_player_food",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_dog_food",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_want_to_sleep",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "make_player_drunk",
@@ -639,37 +815,49 @@
             "duration": 45,
             "disable_effects": [
                 "make_player_drunk"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_is_hungry",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "add_permanent_asthma",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_chicken_hat",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_gain_weight",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_lose_weight",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "blurry_vision",
@@ -679,115 +867,153 @@
             "duration": 60,
             "disable_effects": [
                 "blurry_vision"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "add_cigarrete_addiction",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "heal_player",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "set_pirate_outfit",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "ragdoll_player",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "random_zombie_friend",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombies_ragdoll",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_player_clothes",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "stop_rain",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_petrol_can",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_screwdriver",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_hammer",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_saw",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_few_zombies",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_generator",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_player_weapons",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_schoolbag",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_random_tool",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_random_item",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "honk_vehicles_nearby",
@@ -797,7 +1023,9 @@
             "duration": 10,
             "disable_effects": [
                 "honk_vehicles_nearby"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "disable_vehicle_engine",
@@ -807,13 +1035,17 @@
             "duration": 50,
             "disable_effects": [
                 "disable_vehicle_engine"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "exit_current_vehicle",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "vehicle_magnet_field",
@@ -823,91 +1055,121 @@
             "duration": 30,
             "disable_effects": [
                 "vehicle_magnet_field"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_player_ammo",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_ammo",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_bandages",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_bandages",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_random_medical_item",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_random_skill_book",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "add_random_skill_exp",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_pack_of_beer_cans",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_pack_of_hotdogs",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_m9_pistol",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_shotgun",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_m16_rifle",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_random_skill_vhs",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_fishing_kit",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "boots_with_mines",
@@ -918,7 +1180,9 @@
             "disable_effects": [
                 "boots_with_mines",
                 "minefield"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "minefield",
@@ -929,13 +1193,17 @@
             "disable_effects": [
                 "minefield",
                 "boots_with_mines"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_random_tire",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "mirror_damage",
@@ -945,7 +1213,9 @@
             "withDuration": true,
             "disable_effects": [
                 "mirror_damage"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombie_drop_food",
@@ -955,7 +1225,9 @@
             "duration": 80,
             "disable_effects": [
                 "zombie_drop_food"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombie_drop_random_items",
@@ -965,7 +1237,9 @@
             "duration": 80,
             "disable_effects": [
                 "zombie_drop_random_items"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "effect_lags",
@@ -975,19 +1249,25 @@
             "duration": 60,
             "disable_effects": [
                 "effect_lags"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_random_skill_book_set",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_random_food",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "enable_disable_minimap",
@@ -997,25 +1277,33 @@
             "duration": 30,
             "disable_effects": [
                 "enable_disable_minimap"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "nearby_zombies_are_naked",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "replace_water_with_petrol",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "duplicate_items",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_cant_sleep",
@@ -1026,13 +1314,17 @@
             "disable_effects": [
                 "player_cant_sleep",
                 "explode_on_sleep"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "teleport_to_last_used_bed",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "explode_on_sleep",
@@ -1043,7 +1335,9 @@
             "disable_effects": [
                 "explode_on_sleep",
                 "player_cant_sleep"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "shake_camera",
@@ -1053,19 +1347,25 @@
             "duration": 60,
             "disable_effects": [
                 "shake_camera"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "set_random_hairstyle",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_water_bottle",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "disable_sounds",
@@ -1075,55 +1375,73 @@
             "duration": 120,
             "disable_effects": [
                 "disable_sounds"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "clone_zombies",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "destroy_nearby_fridges",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "remove_player_drinks",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "drop_item_in_hand",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_cow",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_chicken",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "increase_hunger_level",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "decrease_hunger_level",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "panic_mode",
@@ -1133,7 +1451,9 @@
             "duration": 60,
             "disable_effects": [
                 "panic_mode"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "food_is_poisoned",
@@ -1143,13 +1463,17 @@
             "duration": 60,
             "disable_effects": [
                 "food_is_poisoned"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_metal_armor",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombies_low_render_distance",
@@ -1161,25 +1485,33 @@
                 "zombies_low_render_distance",
                 "invisible_characters",
                 "wallhack"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "break_all_items",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "pop_tires_vehicles_nearby",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "make_player_unhappy",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "temporary_night",
@@ -1189,80 +1521,106 @@
             "duration": 90,
             "disable_effects": [
                 "temporary_night"
-            ]
+            ],
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombies_move_to_random_point",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "zombies_move_to_specific_point",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "replace_food_with_maggots",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "give_stone_age_kit",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_explosion_chicken",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
-            "duration": 20
+            "duration": 20,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "player_cant_exit_car",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
-            "duration": 80
+            "duration": 80,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_mannequin",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "add_random_negative_effect",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_lootbox",
             "enabled": true,
             "chance": 10,
-            "withDuration": false
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "math_captcha",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
-            "duration": 25
+            "duration": 25,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "fan_club",
             "enabled": true,
-            "chance": 10
+            "chance": 10,
+            "enabled_donate": true,
+            "price": 1
         },
         {
             "id": "spawn_adoring_fan",
             "enabled": true,
-            "chance": 10
+            "chance": 10,
+            "enabled_donate": true,
+            "price": 1
         }
     ]
 }

@@ -178,11 +178,12 @@
         "add_random_negative_effect": "Случайный негативный эффект",
         "spawn_lootbox": "Заспавнить лутбокс",
         "math_captcha": "Математическая капча",
-        "fan_club": "Фан-клуб"
+        "fan_club": "Фан-клуб",
+        "spawn_adoring_fan": "Заспавнить поклонника"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
-        "stop_mod": "Остановка ChaosMod",
+        "stop_mod": "Остановить ChaosMod",
         "select_effect": "Выбрать эффект",
         "effects": "Эффекты"
     },

@@ -1,8 +1,25 @@
 ---@class ChaosEffectsManager
 ---@field activeEffects table<integer, ChaosEffectBase>
+---@field globalTimerMs number -- current elapsed ms, counts 0 → globalTimerMaxMs
+---@field globalTimerMaxMs number -- effects_interval in ms
 ChaosEffectsManager = ChaosEffectsManager or {
-    activeEffects = {}
+    activeEffects = {},
+    globalTimerMs = 0,
+    globalTimerMaxMs = 0,
 }
+
+function ChaosEffectsManager.StartGlobalTimer()
+    ChaosEffectsManager.globalTimerMaxMs = math.floor(ChaosConfig.effects_interval * 1000)
+    ChaosEffectsManager.globalTimerMs = 0
+end
+
+function ChaosEffectsManager.ClearGlobalTimer()
+    ChaosEffectsManager.globalTimerMs = 0
+    ChaosEffectsManager.globalTimerMaxMs = 0
+end
+
+function ChaosEffectsManager.OnGlobalEffectsTimerEnd()
+end
 
 ---@param effectId string
 ---@return ChaosEffectBase | nil
@@ -50,6 +67,14 @@ end
 
 ---@param deltaMs integer
 function ChaosEffectsManager.OnTick(deltaMs)
+    if ChaosMod.enabled and ChaosConfig.IsEffectsEnabled() then
+        ChaosEffectsManager.globalTimerMs = ChaosEffectsManager.globalTimerMs + deltaMs
+        if ChaosEffectsManager.globalTimerMs >= ChaosEffectsManager.globalTimerMaxMs then
+            ChaosEffectsManager.OnGlobalEffectsTimerEnd()
+            ChaosEffectsManager.globalTimerMs = 0
+        end
+    end
+
     -- Backward loop to avoid issues with removing items from the table while iterating
     for i = #ChaosEffectsManager.activeEffects, 1, -1 do
         local shouldRemove = false

@@ -2,6 +2,7 @@
     "lang": "en",
     "effects_enabled": true,
     "effects_interval": 45,
+    "hide_progress_bar": false,
     "ui_sounds_enabled": true,
     "streamer_mode": {
         "streamer_mode_enabled": true,
@@ -12,6 +13,9 @@
         "advanced_voting_numbers": false,
         "use_zombie_nicknames": true,
         "say_killed_zombie_name": true,
-        "zombie_nicknames_buffer": 150
+        "zombie_nicknames_buffer": 150,
+        "enable_donate": false,
+        "donate_providers": [],
+        "paid_base_price": 5
     }
 }
