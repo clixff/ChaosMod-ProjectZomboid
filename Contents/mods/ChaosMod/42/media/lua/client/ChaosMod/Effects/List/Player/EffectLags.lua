@@ -66,14 +66,11 @@ function EffectLags:OnTick(deltaMs)
             print("[EffectLags] Rubber-band! Teleporting back to position from ~3s ago")
             local vehicle = player:getVehicle()
             if vehicle then
-                vehicle:setX(best.x)
-                vehicle:setY(best.y)
-                vehicle:setZ(best.z)
-            else
-                player:setX(best.x)
-                player:setY(best.y)
-                player:setZ(best.z)
+                ChaosVehicle.ExitVehicle(player)
             end
+            player:setX(best.x)
+            player:setY(best.y)
+            player:setZ(best.z)
         end
     end
 end

@@ -770,7 +770,8 @@
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
-                "player_cant_open_doors"
+                "player_cant_open_doors",
+                "player_can_open_any_door"
             ],
             "enabled_donate": true,
             "price": 1
@@ -1619,6 +1620,42 @@
             "id": "spawn_adoring_fan",
             "enabled": true,
             "chance": 10,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "one_in_one_out",
+            "enabled": true,
+            "chance": 10,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "move_furniture",
+            "enabled": true,
+            "chance": 10,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "player_can_open_any_door",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "player_cant_open_doors",
+                "player_can_open_any_door"
+            ],
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spawn_robber",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 30,
             "enabled_donate": true,
             "price": 1
         }

@@ -141,7 +141,6 @@ function ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
         return nil
     end
     local effectClass = ChaosEffectsClassMap[effectId]
-    print("[ChaosEffectsRegistry] Effect class: " .. tostring(effectClass))
     if not effectClass then
         print("[ChaosEffectsRegistry] Effect class not found for ID: " .. tostring(effectId))
         return nil

@@ -10,9 +10,12 @@ function EffectGiveChips:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    local amount = ZombRand(1, 2 + 1)
+    local amount = math.floor(ZombRand(1, 2 + 1))
 
     for i = 1, amount do
-        inventory:AddItem("Base.Crisps")
+        local item = inventory:AddItem("Base.Crisps")
+        if item and i == 1 then
+            ChaosPlayer.SayLineNewItem(player, item, amount)
+        end
     end
 end

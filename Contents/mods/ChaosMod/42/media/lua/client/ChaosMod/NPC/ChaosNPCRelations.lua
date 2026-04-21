@@ -118,3 +118,7 @@ ChaosNPCRelations.SetRelation(ChaosNPCGroupID.COMPANIONS, ChaosNPCGroupID.RAIDER
 
 -- Relations for FOLLOWERS group
 ChaosNPCRelations.SetRelation(ChaosNPCGroupID.FOLLOWERS, ChaosNPCGroupID.PLAYER, ChaosNPCRelationType.FOLLOW)
+
+-- ROBBER group: ignores everyone, just wanders
+ChaosNPCGroupID.ROBBER = 4
+ChaosNPCRelations.CreateGroup("ROBBER", ChaosNPCRelationType.IGNORE, false, ChaosNPCGroupID.ROBBER)

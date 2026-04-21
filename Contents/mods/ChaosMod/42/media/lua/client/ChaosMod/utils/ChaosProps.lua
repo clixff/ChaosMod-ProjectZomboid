@@ -56,6 +56,63 @@ function ChaosProps.AddClothingToMannequin(man, fullType)
     return item
 end
 
+---@param obj IsoObject
+---@return string | nil
+function ChaosProps.GetFurnitureType(obj)
+    if not obj then return nil end
+    local props = obj:getProperties()
+    local container = obj:getContainer()
+    local ctype = container and container:getType() or nil
+    if props then
+        if props:has("SinkType") and obj:hasWater() then
+            return "sink"
+        end
+        if props:has("bed") then
+            return "bed"
+        end
+        if props:has("chairN") or props:has("chairS") or props:has("chairE") or props:has("chairW") then
+            return "chair"
+        end
+        if props:has("CustomName") then
+            local custom = props:get("CustomName")
+            if custom and string.find(custom, "Toilet") then
+                return "toilet"
+            end
+        end
+    end
+    if ctype then
+        if ctype == "fridge" or ctype == "freezer" then return "fridge" end
+        if ctype == "stove" or ctype == "toaster" or ctype == "coffeemaker" then return "stove" end
+        if ctype == "shelves" or ctype == "metal_shelves" then return "shelving" end
+        if ctype == "counter" then return "counter" end
+        if ctype == "sidetable" or ctype == "dresser" or ctype == "wardrobe" then return "container" end
+    end
+    if obj:isTableSurface() or (props and props:isTable()) then
+        return "table"
+    end
+    if props and (props:has(IsoFlagType.shelfS) or props:has(IsoFlagType.shelfE)) then
+        return "shelving"
+    end
+    local name = obj:getName()
+    if name then
+        local lower = string.lower(name)
+        if string.find(lower, "sofa", 1, true) or string.find(lower, "couch", 1, true) then
+            return "sofa"
+        end
+    end
+    local sprite = obj:getSprite()
+    if sprite and sprite:getName() then
+        local lower = string.lower(sprite:getName())
+        if string.find(lower, "sofa", 1, true) or string.find(lower, "couch", 1, true) then
+            return "sofa"
+        end
+        if string.find(lower, "sink", 1, true) then
+            return "sink"
+        end
+    end
+    return nil
+end
+
 ---@param square IsoGridSquare
 ---@param spriteName string
 ---@return IsoObject?

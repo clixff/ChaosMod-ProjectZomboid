@@ -179,7 +179,13 @@
         "spawn_lootbox": "Spawn Lootbox",
         "math_captcha": "Math Captcha",
         "fan_club": "Fan Club",
-        "spawn_adoring_fan": "Spawn Adoring Fan"
+        "spawn_adoring_fan": "Spawn Adoring Fan",
+        "one_in_one_out": "One In, One Out",
+        "move_vehicles_to_random_position": "Move Vehicles To Random Position",
+        "move_furniture": "Move Furniture",
+        "player_can_open_any_door": "Player Can Open Any Door",
+        "heal_and_set_hp_to_1": "Heal And Set HP To 1",
+        "spawn_robber": "Spawn Robber"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -207,6 +213,7 @@
         "no_vehicles_nearby": "No vehicles nearby",
         "items_removed": "%s Removed %d items",
         "no_sleep_location": "I don't remember where I last slept...",
-        "killed_zombie": "Killed %s"
+        "killed_zombie": "Killed %s",
+        "robber_steals_item": "%s Robber steals item: %s"
     }
 }

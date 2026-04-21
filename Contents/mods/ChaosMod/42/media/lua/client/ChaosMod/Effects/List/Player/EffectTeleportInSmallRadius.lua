@@ -13,7 +13,5 @@ function EffectTeleportInSmallRadius:OnStart()
     local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, 0, 50, 100, 100, true, true, false)
     if not randomSquare then return end
 
-    player:setX(randomSquare:getX())
-    player:setY(randomSquare:getY())
-    player:setZ(randomSquare:getZ())
+    player:teleportTo(randomSquare:getX(), randomSquare:getY(), randomSquare:getZ())
 end

@@ -317,6 +317,13 @@ function ChaosNPC:update(deltaMs)
         shouldUpdatePathfind = true
     end
 
+    -- Wander behavior for item_robber tagged NPCs
+    if not self.moveTargetCharacter and not self.isAttacking and self:HasTag("item_robber") then
+        if not self.moving then
+            self:UpdateWanderTarget()
+        end
+    end
+
     local isNearby = false
 
     local dist = 0.0
@@ -395,6 +402,8 @@ function ChaosNPC:update(deltaMs)
             print("[ChaosNPC] Finished moving with result: " .. tostring(moveResult))
             if isNearby then
                 self:StopMoving(true, "nearby_finished")
+            elseif not self.moveTargetCharacter and self:HasTag("item_robber") then
+                self:StopMoving(true, "wander_reached")
             end
             self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
         elseif moveResult == BehaviorResult.Working then
@@ -579,6 +588,76 @@ function ChaosNPC:GetFollowTarget()
         return getPlayer()
     end
     return nil
+end
+
+---@param square IsoGridSquare
+function ChaosNPC:MoveToLocation(square)
+    if not self.zombie or not square then return end
+    local zombie = self.zombie
+    if zombie:getVehicle() then return end
+
+    local actionState = zombie:getActionStateName()
+    local allowActionState = actionState == "walktoward" or actionState == "idle" or
+        actionState == "pathfinding" or actionState == "run"
+    if not allowActionState then
+        self:StopMoving(true, "not_allowed_action_state")
+        return
+    end
+
+    self.moveTargetCharacter = nil
+    self.moveTargetLocation = square
+
+    local x = square:getX()
+    local y = square:getY()
+    local z = square:getZ()
+
+    zombie:getPathFindBehavior2():reset()
+    zombie:getPathFindBehavior2():cancel()
+    ---@diagnostic disable-next-line: param-type-mismatch
+    zombie:setPath2(nil)
+
+    zombie:getPathFindBehavior2():pathToLocation(x, y, z)
+    self.pathfindUpdateMs = 0
+    self.moving = true
+    self.walkType = self.canRun and "Run" or "Walk"
+    self.debugLastTimePathfindMs = ChaosMod.lastTimeTickMs
+end
+
+function ChaosNPC:UpdateWanderTarget()
+    if not self.zombie then return end
+    local x = math.floor(self.zombie:getX())
+    local y = math.floor(self.zombie:getY())
+    local z = math.floor(self.zombie:getZ())
+    for _ = 1, 20 do
+        local dx = ZombRand(5, 16) * (ZombRand(2) == 0 and 1 or -1)
+        local dy = ZombRand(5, 16) * (ZombRand(2) == 0 and 1 or -1)
+        local sq = getSquare(x + dx, y + dy, z)
+        if sq then
+            self:MoveToLocation(sq)
+            return
+        end
+    end
+end
+
+function ChaosNPC:Destroy()
+    if not self.zombie then return end
+    local md = self.zombie:getModData()
+    if md then
+        md[CHAOS_NPC_MOD_DATA_KEY] = nil
+        md[CHAOS_NPC_MOD_DATA_KEY_2] = nil
+    end
+    self.zombie:removeFromWorld()
+    self.zombie:removeFromSquare()
+    self.zombie = nil
+    self.enemy = nil
+    self.moveTargetCharacter = nil
+    self.moveTargetLocation = nil
+    self.moving = false
+    self.isAttacking = false
+    local index = ChaosNPCUtils.npcList:indexOf(self)
+    if index ~= -1 then
+        ChaosNPCUtils.npcList:remove(index)
+    end
 end
 
 -- Find new enemy target to attack
