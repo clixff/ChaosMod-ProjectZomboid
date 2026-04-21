@@ -7,7 +7,7 @@ function EffectSetRandomOutfit:OnStart()
     local player = getPlayer()
     if not player then return end
 
-    ChaosPlayer.DropAllItemsOnGround(player, false)
+    ChaosPlayer.DropAllItemsOnGround(player, true)
     player:dressInRandomOutfit()
 
     player:resetModelNextFrame()

@@ -274,7 +274,6 @@ function ChaosNPC:update(deltaMs)
                 self:StopMoving(true, "enemy_dead")
             end
             self.enemy = nil
-            print("[ChaosNPC] Enemy is dead, clearing enemy")
         end
     end
 
@@ -292,7 +291,6 @@ function ChaosNPC:update(deltaMs)
     -- If has no enemy target, try to find new enemy
     if shouldFindNewEnemy and canFindNewEnemyThisFrame then
         self:UpdateNextEnemyTarget()
-        print("[ChaosNPC] Found new enemy: " .. tostring(self.enemy))
     end
 
     -- Force move target character to enemy, unless follow priority overrides
@@ -312,7 +310,6 @@ function ChaosNPC:update(deltaMs)
 
     -- If has no target character to follow, find new move target
     if not self.moveTargetCharacter and not self.isAttacking then
-        print("[ChaosNPC] No target character, finding new target character")
         self:UpdateNextTargetMoveCharacter()
         shouldUpdatePathfind = true
     end
@@ -394,12 +391,10 @@ function ChaosNPC:update(deltaMs)
         elseif moveResult == BehaviorResult.Succeeded then
             moveResultCache = 1
         elseif moveResult == BehaviorResult.Failed then
-            print("[ChaosNPC] Failed to move")
             moveResultCache = 2
         end
 
         if moveResult == BehaviorResult.Succeeded or moveResult == BehaviorResult.Failed then
-            print("[ChaosNPC] Finished moving with result: " .. tostring(moveResult))
             if isNearby then
                 self:StopMoving(true, "nearby_finished")
             elseif not self.moveTargetCharacter and self:HasTag("item_robber") then
@@ -466,8 +461,6 @@ function ChaosNPC:MoveToCharacter(character)
         actionState == "run"
 
     if not allowActionState then
-        print("[ChaosNPC] Move with not allowed action state: " ..
-            tostring(actionState) .. " action state: " .. tostring(actionState))
         self:StopMoving(true, "not_allowed_action_state")
         return
     end
@@ -488,11 +481,6 @@ function ChaosNPC:MoveToCharacter(character)
     local x = self.moveTargetLocation:getX()
     local y = self.moveTargetLocation:getY()
     local z = self.moveTargetLocation:getZ()
-
-
-    print("[ChaosNPC] Moving to character: " .. tostring(character) .. " (same: " .. tostring(sameCharacter) .. ")")
-    print("[ChaosNPC] Moving to location: " .. tostring(x) .. ", " .. tostring(y) .. ", " .. tostring(z))
-
 
     if sameCharacter == false then
         zombie:getPathFindBehavior2():reset()
@@ -534,8 +522,6 @@ function ChaosNPC:StopMoving(force, reason)
     if not self.zombie then
         return
     end
-
-    print("[ChaosNPC] Stopping moving. Force: " .. tostring(force) .. " (reason: " .. tostring(reason) .. ")")
 
     local zombie = self.zombie
     zombie:getPathFindBehavior2():reset()
@@ -672,8 +658,6 @@ function ChaosNPC:UpdateNextEnemyTarget()
         return
     end
 
-    print("[ChaosNPC] Enemy update for group: " .. tostring(self.npcGroup))
-
     local newEnemy = ChaosNPCUtils.FindNewTargetForNPC(self)
     if newEnemy then
         self:SetAsTargetEnemy(newEnemy)
@@ -780,8 +764,6 @@ function ChaosNPC:StartAttackEnemy()
     local lineTrace = self:LineTraceToEnemy()
     local resultString = tostring(lineTrace)
 
-    print("[ChaosNPC] Line trace: " .. tostring(resultString))
-
     -- Something is in the way, don't attack
     if lineTrace ~= "Clear" then
         self.hasBlockingCollisionToTargetThisFrame = true
@@ -799,7 +781,6 @@ function ChaosNPC:StartAttackEnemy()
     if not self.enemy:isZombie() then
         ---@diagnostic disable-next-line: invert-if
         if ChaosPlayer.IsPlayerKnockedDown(self.enemy) then
-            print("[ChaosNPC] Player is knocked down or getting up, skipping attack")
             return
         end
     end
@@ -829,7 +810,6 @@ function ChaosNPC:OnAttackTick(deltaMs)
         self.attackObjectTarget = nil
         self.attackObjectType = nil
         self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
-        print("[ChaosNPC] Attack anim name mismatch/end, stopping attack")
         return
     end
 
@@ -863,7 +843,6 @@ function ChaosNPC:OnAttackObjectHit()
         if not window:IsOpen() and not window:isSmashed() then
             -- Break this window
             window:smashWindow()
-            print("[ChaosNPC] Window smashed")
         end
     elseif self.attackObjectType == "door" then
         ---@type IsoDoor | IsoThumpable
@@ -872,16 +851,12 @@ function ChaosNPC:OnAttackObjectHit()
         if not self.weaponItemCached then return end
 
         local health = door:getHealth()
-        print("Door damage: " .. tostring(self.weaponItemCached:getDoorDamage()))
         local damage = 10
         local oldHealth = health
         health = health - damage
         if health <= 0 then
             health = 0
         end
-
-        print(string.format("[ChaosNPC] Door health [old] %d [new] %d", oldHealth, health))
-
 
         local square = door:getSquare()
         if not square then return end
@@ -896,7 +871,6 @@ function ChaosNPC:OnAttackObjectHit()
                 square:playSound(soundFile)
             end
             door:destroy()
-            print("[ChaosNPC] Door destroyed")
         else
             door:setHealth(health)
             local soundFile = self.weaponItemCached:getDoorHitSound()
@@ -940,7 +914,6 @@ function ChaosNPC:OnTryAttackEnemyHit()
     if not self.enemy:isZombie() then
         ---@diagnostic disable-next-line: invert-if
         if ChaosPlayer.IsPlayerKnockedDown(self.enemy) then
-            print("[ChaosNPC] Player is knocked down or getting up, skipping attack")
             return
         end
     end
@@ -949,8 +922,6 @@ function ChaosNPC:OnTryAttackEnemyHit()
     if zombie:CanSee(self.enemy) == false then
         return
     end
-
-    print("[ChaosNPC] Attack hit")
     self:OnAttackEnemyHit()
 end
 
@@ -984,9 +955,6 @@ function ChaosNPC:OnAttackEnemyHit()
     if damage <= 0.1 then
         damage = 0.1
     end
-
-    print(string.format("[ChaosNPC] Damage [min] %0.2f [max] %0.2f [damage] %0.2f", minDamage, maxDamage, damage))
-
 
     local enemyVehicle = enemy:getVehicle()
     local canAttackInVehicle = false
@@ -1053,8 +1021,6 @@ function ChaosNPC:OnAttackEnemyHit()
 
         local bodyDamage = enemy:getBodyDamage()
         local health = bodyDamage:getOverallBodyHealth()
-
-        print(string.format("[ChaosNPC] Health [before] %d [after] %d", health, health - damage))
 
         enemy:setAttackedBy(zombie)
 
@@ -1144,8 +1110,6 @@ function ChaosNPC:HandleCollisions()
     local forwardX = zombie:getForwardDirectionX()
     local forwardY = zombie:getForwardDirectionY()
 
-    print("[ChaosNPC] Forward direction: " .. tostring(forwardX) .. ", " .. tostring(forwardY))
-
     ---@type table<integer, {x: integer, y: integer, z: integer}>
     local squaresToCheck = {}
     table.insert(squaresToCheck, {
@@ -1159,26 +1123,16 @@ function ChaosNPC:HandleCollisions()
         z = z1,
     })
 
-    print("[ChaosNPC] Squares to check: " ..
-        tostring(squaresToCheck[1].x) .. ", " .. tostring(squaresToCheck[1].y))
-    print("[ChaosNPC] Squares to check: " ..
-        tostring(squaresToCheck[2].x) .. ", " .. tostring(squaresToCheck[2].y))
-
     local cell = getCell()
-
-    print("[ChaosNPC] Collision detected")
-
     for _, coord in ipairs(squaresToCheck) do
         local square = cell:getGridSquare(coord.x, coord.y, coord.z)
         if square then
             local objectsList = square:getObjects()
-            print("[ChaosNPC] Objects list size: " .. tostring(objectsList:size()))
 
             for i = 0, objectsList:size() - 1 do
                 local object = objectsList:get(i)
                 if object then
                     local result = self:HandleCollisionWithObject(zombie, object)
-                    print("Result for object: " .. tostring(object) .. " is " .. tostring(result))
                     if result then
                         return
                     end
@@ -1199,31 +1153,6 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
 
     if not objectProperties then return false end
 
-    print("[ChaosNPC] Handling collision with object: " .. tostring(object))
-    local lowFence = objectProperties:get("FenceTypeLow") or "N/A"
-    local hoppable = object:isHoppable() and "1" or "0"
-    local highFence = objectProperties:get("FenceTypeHigh") or "N/A"
-    local tallHoppable = object:isTallHoppable() and "1" or "0"
-    local isDoor = instanceof(object, "IsoDoor") and "1" or "0"
-    local isThumpable = instanceof(object, "IsoThumpable") and "1" or "0"
-    local isWindow = instanceof(object, "IsoWindow") and "1" or "0"
-
-    print("[ChaosNPC] Object properties: " .. tostring(objectProperties))
-    print("[ChaosNPC] Object type: " .. tostring(objectType))
-    print("[ChaosNPC] Low fence: " .. tostring(lowFence))
-    print("[ChaosNPC] Hoppable: " .. tostring(hoppable))
-    print("[ChaosNPC] High fence: " .. tostring(highFence))
-    print("[ChaosNPC] Tall hoppable: " .. tostring(tallHoppable))
-    print("[ChaosNPC] Is door: " .. tostring(isDoor))
-    print("[ChaosNPC] Is thumpable: " .. tostring(isThumpable))
-    print("[ChaosNPC] Is window: " .. tostring(isWindow))
-
-    -- local debugString = string.format(
-    --     "[ChaosNPC] [Object type] %s, [low fence] %s, [hoppable] %s, [high fence] %s, [tall hoppable] %s, [door] %s, [thumpable] %s, [window] %s",
-    --     objectType,
-    --     lowFence, hoppable, highFence, tallHoppable, isDoor, isThumpable, isWindow)
-    -- print(debugString)
-
     local isHostileToPlayer = ChaosNPCRelations.CanNPCDestroyObjects(self)
 
     --- == Handle Window Collision ==
@@ -1233,7 +1162,6 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
 
         if zombie:isFacingObject(window, 0.8) == false then
             zombie:faceThisObject(window)
-            print("[ChaosNPC] Facing window")
             return true
         end
 
@@ -1244,14 +1172,12 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
         if not window:IsOpen() and not window:isSmashed() then
             if isHostileToPlayer then
                 -- Destroy this window
-                print("[ChaosNPC] Starting attack on window")
                 self:StartAttackingObject(window, "window")
                 return true
             end
         elseif window:canClimbThrough(zombie) then
             self:StopMoving(true, "clim_window")
             zombie:climbThroughWindow(window)
-            print("[ChaosNPC] Climb through window")
             return true
         end
     elseif instanceof(object, "IsoDoor") or instanceof(object, "IsoThumpable") then
@@ -1295,8 +1221,6 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
                 return false
             end
 
-            print("[ChaosNPC] Starting attack on door")
-
             -- Break this door
             self:StartAttackingObject(door, "door")
             return true
@@ -1304,7 +1228,6 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
     elseif object:isHoppable() then
         if zombie:isFacingObject(object, 0.8) == false then
             zombie:faceThisObject(object)
-            print("[ChaosNPC] Facing fence")
             return true
         end
 
@@ -1313,7 +1236,6 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
         if forwardDir ~= nil then
             self:StopMoving(true, "clim_fence")
             zombie:climbOverFence(forwardDir)
-            print("[ChaosNPC] Climbed over fence: " .. tostring(forwardDir))
             return true
         end
     end
@@ -1406,8 +1328,6 @@ function ChaosNPC:StartAttackAnimation()
     local randomIndex = ZombRand(#animsTable)
     ---@diagnostic disable-next-line: undefined-field
     self.attackAnimName = animsTable[1 + randomIndex]
-    print("[ChaosNPC] Selected attack anim: " .. tostring(self.attackAnimName))
-
     local isAttackingEnemy = self.enemy ~= nil and self.attackObjectTarget == nil
 
 
@@ -1441,7 +1361,6 @@ function ChaosNPC:StartAttackAnimation()
     if self.weaponItemCached then
         if self.weaponItemCached and self.weaponItemCached.getSwingSound then
             weaponSound = self.weaponItemCached:getSwingSound()
-            print("[ChaosNPC] Weapon sound: " .. tostring(weaponSound))
         end
     end
 
@@ -1482,9 +1401,6 @@ function ChaosNPC:UnstuckNPC()
         end
     end
 
-
-    print("[ChaosNPC] Trying to unstuck NPC")
-
     self.unstuckPassed = true
 end
 
@@ -1521,7 +1437,6 @@ function ChaosNPC:SetWeapon(weaponFullType)
         self.weaponItemCached = newWeapon
         self.zombie:setPrimaryHandItem(newWeapon)
         local isTwoHands = newWeapon:isTwoHandWeapon()
-        print("[ChaosNPC] Setting Chaos2HandsWeapon: " .. tostring(isTwoHands))
         self.zombie:setVariable("Chaos2HandsWeapon", isTwoHands)
     end
 end
@@ -1564,7 +1479,6 @@ function ChaosNPC:OnZombieDamagedNPC(otherZombie)
     if rel == ChaosNPCRelationType.IGNORE then return end
 
     if rel == ChaosNPCRelationType.ATTACK then
-        print("[ChaosNPC] Attacked by enemy, setting as enemy target")
         self:SetAsTargetEnemy(otherZombie)
     end
 end
@@ -1574,8 +1488,6 @@ function ChaosNPC:SayDebug(message)
     if not self.zombie then return end
     local zombie = self.zombie
     if not zombie:isAlive() then return end
-
-    print("[ChaosNPC] Saying debug message: " .. tostring(message))
 
     -- zombie:setHaloNote(message, 300)
     zombie:SayDebug(2, message)
@@ -1628,7 +1540,6 @@ function ChaosNPC:VehiclesTick()
 
         moveTargetVehicle:enter(seat, self.zombie)
         self.zombie:setGodMod(true, true)
-        print("[ChaosNPC] Entering vehicle")
         return
     end
 

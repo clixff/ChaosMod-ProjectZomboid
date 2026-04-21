@@ -1,33 +1,5 @@
 EffectAddRandomSkillEXP = ChaosEffectBase:derive("EffectAddRandomSkillEXP", "add_random_skill_exp")
 
----@type table<integer, PerkFactory.Perk>
-local SKILL_EXP_IDS = {
-    Perks.Doctor,
-    Perks.Axe,
-    Perks.Blunt,
-    Perks.Aiming,
-    Perks.Reloading,
-    Perks.Woodwork,
-    Perks.Cooking,
-    Perks.Electricity,
-    Perks.Mechanics,
-    Perks.Tailoring,
-    Perks.Fishing,
-    Perks.PlantScavenging,
-    Perks.Farming,
-    Perks.Sprinting,
-    Perks.Lightfoot,
-    Perks.Sneak,
-    Perks.Blacksmith,
-    Perks.Butchering,
-    Perks.Carpentry,
-    Perks.Carving,
-    Perks.Combat,
-    Perks.Crafting,
-    Perks.Husbandry,
-    Perks.MetalWelding
-}
-
 function EffectAddRandomSkillEXP:OnStart()
     ChaosEffectBase:OnStart()
     print("[EffectAddRandomSkillEXP] OnStart " .. tostring(self.effectId))

@@ -1658,6 +1658,162 @@
             "duration": 30,
             "enabled_donate": true,
             "price": 1
+        },
+        {
+            "id": "random_skill_level_up",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "random_skill_level_lose",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "add_random_wound",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "move_or_get_damage",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 60,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "open_nearby_windows",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "unlock_nearby_doors",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "remove_curtains_nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "remove_barricades_nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "open_doors_nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spawn_item_on_walk",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 20,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spawn_tent",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spawn_campfire",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "enable_stoves_nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "enable_nearby_tvs",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "disable_inventory",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 60,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "restore_endurance",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "zombies_tpose",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 30,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "move_items_between_containers",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "drop_all_items",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
         }
     ]
 }

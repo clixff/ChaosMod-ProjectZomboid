@@ -74,10 +74,10 @@ function ChaosHUD:prerender()
     local barHeight = ChaosUIManager.GetScaledWidth(22)
     local barY = panelHeight - barHeight
     local effectRectHeight = ChaosUIManager.GetScaledWidth(36)
-    local effectMargin = ChaosUIManager.GetScaledWidth(4)
+    local effectMargin = ChaosUIManager.GetScaledWidth(8)
     local effectMarginLeft = ChaosUIManager.GetScaledWidth(12)
     local textPadH = ChaosUIManager.GetScaledWidth(16)
-    local effectRectMinWidth = ChaosUIManager.GetScaledWidth(160)
+    local effectRectMinWidth = ChaosUIManager.GetScaledWidth(200)
 
     -- Effects Progress Bar — at the bottom of the panel
     if ChaosMod.enabled and ChaosConfig.IsEffectsEnabled() and not ChaosConfig.hide_progress_bar then

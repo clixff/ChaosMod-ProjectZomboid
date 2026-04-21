@@ -114,6 +114,22 @@ function ChaosProps.GetFurnitureType(obj)
 end
 
 ---@param square IsoGridSquare
+---@return SCampfireGlobalObject?
+function ChaosProps.SpawnCampfire(square)
+    if not SCampfireSystem or not SCampfireSystem.instance then
+        return nil
+    end
+    local campfire = SCampfireSystem.instance:addCampfire(square)
+    if not campfire then
+        return nil
+    end
+    campfire:setSpriteName("camping_01_6")
+    campfire:syncSprite()
+    campfire:syncIsoObject()
+    return campfire
+end
+
+---@param square IsoGridSquare
 ---@param spriteName string
 ---@return IsoObject?
 function ChaosProps.SpawnProp(square, spriteName)

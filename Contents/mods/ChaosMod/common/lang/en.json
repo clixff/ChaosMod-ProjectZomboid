@@ -185,7 +185,26 @@
         "move_furniture": "Move Furniture",
         "player_can_open_any_door": "Player Can Open Any Door",
         "heal_and_set_hp_to_1": "Heal And Set HP To 1",
-        "spawn_robber": "Spawn Robber"
+        "spawn_robber": "Spawn Robber",
+        "random_skill_level_up": "Random Skill Level Up",
+        "random_skill_level_lose": "Lose Random Skill Level",
+        "add_random_wound": "Add Random Wound",
+        "move_or_get_damage": "Move or Get Damaged",
+        "open_nearby_windows": "Open Nearby Windows",
+        "unlock_nearby_doors": "Unlock Nearby Doors",
+        "remove_curtains_nearby": "Remove Nearby Curtains",
+        "remove_barricades_nearby": "Remove Nearby Barricades",
+        "open_doors_nearby": "Open Nearby Doors",
+        "spawn_item_on_walk": "Spawn Item On Walk",
+        "spawn_tent": "Spawn Tent",
+        "spawn_campfire": "Spawn Campfire",
+        "enable_stoves_nearby": "Turn On Nearby Stoves",
+        "enable_nearby_tvs": "Turn On Nearby TVs",
+        "disable_inventory": "Disable Inventory",
+        "restore_endurance": "Restore Endurance",
+        "zombies_tpose": "Zombies T-Pose",
+        "move_items_between_containers": "Move Items Between Containers",
+        "drop_all_items": "Drop All Items"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -202,6 +221,8 @@
         "npc_friend": "%s is your friend now",
         "npc_died": "%s died",
         "skill_xp_gained": "%s: +%.0f XP of Skill",
+        "skill_level_up": "%s Skill +1",
+        "skill_level_down": "%s Skill -1",
         "fridges_destroyed": "Destroyed %d fridges",
         "water_replaced_with_petrol": "%s Replaced %d water containers with petrol",
         "wrong_answer": "Wrong answer",
@@ -214,6 +235,11 @@
         "items_removed": "%s Removed %d items",
         "no_sleep_location": "I don't remember where I last slept...",
         "killed_zombie": "Killed %s",
-        "robber_steals_item": "%s Robber steals item: %s"
+        "robber_steals_item": "%s Robber steals item: %s",
+        "unlocked_doors": "Unlocked %d doors",
+        "opened_doors": "Opened %d doors",
+        "opened_windows": "Opened %d windows",
+        "removed_barricades": "Removed %d barricades",
+        "removed_curtains": "Removed %d curtains"
     }
 }

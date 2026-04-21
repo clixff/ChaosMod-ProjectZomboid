@@ -6,7 +6,9 @@ ChaosPlayer = ChaosPlayer or {}
 
 ChaosPlayerChatColors = ChaosPlayerChatColors or {
     newItem = { r = 0.0, g = 1.0, b = 0.0 },
+    green = { r = 0.0, g = 1.0, b = 0.0 },
     removedItem = { r = 1.0, g = 0.3, b = 0.3 },
+    red = { r = 1.0, g = 0.3, b = 0.3 },
     line = { r = 1.0, g = 1.0, b = 1.0 },
 }
 
