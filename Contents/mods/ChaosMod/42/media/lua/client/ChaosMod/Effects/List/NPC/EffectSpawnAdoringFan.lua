@@ -9,11 +9,13 @@ function EffectSpawnAdoringFan:OnStart()
     local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 2, 4, 50, true, true, false)
     if not randomSquare then return end
 
-    local newZombies = ChaosZombie.SpawnZombieAt(randomSquare:getX(), randomSquare:getY(), randomSquare:getZ(), 1, "Tourist", 50)
+    local newZombies = ChaosZombie.SpawnZombieAt(randomSquare:getX(), randomSquare:getY(), randomSquare:getZ(), 1,
+        "Tourist", 50)
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
     local npc = ChaosNPC:new(zombie)
+    zombie:dressInRandomOutfit()
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.FOLLOWERS
     npc:AddTag("adoring_fan")

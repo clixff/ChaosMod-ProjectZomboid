@@ -1,5 +1,6 @@
 ---@class EffectTeleportToNearestBasement : ChaosEffectBase
-EffectTeleportToNearestBasement = ChaosEffectBase:derive("EffectTeleportToNearestBasement", "teleport_to_nearest_basement")
+EffectTeleportToNearestBasement = ChaosEffectBase:derive("EffectTeleportToNearestBasement",
+    "teleport_to_nearest_basement")
 
 function EffectTeleportToNearestBasement:OnStart()
     ChaosEffectBase:OnStart()
@@ -12,7 +13,7 @@ function EffectTeleportToNearestBasement:OnStart()
     local cell = getCell()
     local px, py = square:getX(), square:getY()
 
-    local radius = 80
+    local radius = 100
     ---@type IsoGridSquare | nil
     local bestSq = nil
     local bestDistSq = math.huge
@@ -31,11 +32,13 @@ function EffectTeleportToNearestBasement:OnStart()
     end
 
     if not bestSq then
-        ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "no_basement_found"), ChaosPlayerChatColors.red)
+        ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "no_basement_found"),
+            ChaosPlayerChatColors.red)
         print("[EffectTeleportToNearestBasement] No basement found")
         return
     end
 
     ChaosPlayer.TeleportPlayer(player, bestSq)
-    print(string.format("[EffectTeleportToNearestBasement] Teleported to basement at %d, %d, -1", bestSq:getX(), bestSq:getY()))
+    print(string.format("[EffectTeleportToNearestBasement] Teleported to basement at %d, %d, -1", bestSq:getX(),
+        bestSq:getY()))
 end

@@ -65,7 +65,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 15,
+            "duration": 60,
             "disable_effects": [
                 "enable_snow",
                 "enable_rain"
@@ -78,7 +78,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 15,
+            "duration": 120,
             "disable_effects": [
                 "enable_rain",
                 "enable_snow"
@@ -897,23 +897,19 @@
             "price": 1
         },
         {
-            "id": "ragdoll_player",
+            "id": "player_falls",
             "enabled": true,
             "chance": 10,
-            "withDuration": false,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "player_falls"
+            ],
             "enabled_donate": true,
             "price": 1
         },
         {
             "id": "random_zombie_friend",
-            "enabled": true,
-            "chance": 10,
-            "withDuration": false,
-            "enabled_donate": true,
-            "price": 1
-        },
-        {
-            "id": "zombies_ragdoll",
             "enabled": true,
             "chance": 10,
             "withDuration": false,
@@ -1904,6 +1900,131 @@
             "disable_effects": [
                 "freeze_zombies"
             ],
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "reverse_movement",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "reverse_movement"
+            ],
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spoil_food_nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "copy_nearest_zombie_clothes",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spawn_friendly_priest",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "crouch_mode",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 30,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "dry_mouth",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "replace_water_with_bleach",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "hide_player_books",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "hide_random_item",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "dirty_clothes",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "give_nails_box",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spawn_rain_collector",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spawn_barbell",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "give_katana",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "enable_alarm_nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
             "enabled_donate": true,
             "price": 1
         }

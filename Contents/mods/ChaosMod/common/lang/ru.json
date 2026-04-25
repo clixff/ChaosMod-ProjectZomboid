@@ -99,7 +99,7 @@
         "add_cigarette_addiction": "Добавить никотиновую зависимость",
         "heal_player": "Вылечить игрока",
         "set_pirate_outfit": "Одеть в костюм пирата",
-        "ragdoll_player": "Рэгдолл игрока",
+        "player_falls": "Игрок падает",
         "random_zombie_friend": "Сделать ближайшего зомби другом",
         "zombies_ragdoll": "Рэгдолл зомби",
         "remove_player_clothes": "Снять одежду с игрока",
@@ -186,7 +186,22 @@
         "teleport_to_nearest_basement": "Телепортироваться в ближайший подвал",
         "player_drops_random_items": "Игрок роняет случайные предметы",
         "zombies_walk_away": "Зомби уходят прочь",
-        "freeze_zombies": "Заморозить зомби"
+        "freeze_zombies": "Заморозить зомби",
+        "reverse_movement": "Обратное управление",
+        "spoil_food_nearby": "Испортить еду поблизости",
+        "copy_nearest_zombie_clothes": "Скопировать одежду ближайшего зомби",
+        "spawn_friendly_priest": "Заспавнить дружелюбного священника",
+        "crouch_mode": "Режим приседания",
+        "dry_mouth": "Сухость во рту",
+        "replace_water_with_bleach": "Заменить воду отбеливателем",
+        "hide_player_books": "Спрятать книги игрока",
+        "hide_random_item": "Спрятать случайный предмет",
+        "dirty_clothes": "Испачкать одежду",
+        "give_nails_box": "Дать коробку гвоздей",
+        "spawn_rain_collector": "Заспавнить сборщик дождевой воды",
+        "spawn_barbell": "Заспавнить штангу",
+        "give_katana": "Дать катану",
+        "enable_alarm_nearby": "Включить сигнализацию поблизости"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
@@ -215,6 +230,14 @@
         "items_removed": "%s Удалено предметов: %d",
         "no_sleep_location": "Я не помню, где я последний раз спал...",
         "killed_zombie": "Убил %s",
-        "no_basement_found": "Я не могу найти подвал поблизости..."
+        "no_basement_found": "Я не могу найти подвал поблизости...",
+        "food_spoiled": "%s Испорчено %d предметов",
+        "water_replaced_with_bleach": "%s Заменено %d емкостей с водой на отбеливатель",
+        "books_hidden": "Спрятано книг: %d",
+        "item_hidden": "%s Предмет спрятан: %s",
+        "electricity_globally_disabled": "Электричество отключено глобально",
+        "electricity_globally_enabled": "Электричество включено глобально",
+        "water_globally_disabled": "Вода отключена глобально",
+        "water_globally_enabled": "Вода включена глобально"
     }
 }

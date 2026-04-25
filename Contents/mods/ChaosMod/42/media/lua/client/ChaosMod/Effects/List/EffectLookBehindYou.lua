@@ -21,7 +21,18 @@ local MAX_UPDATE_SQUARE_TIMER_MS = 1000
 ---@field respawnObjectTimerMs integer
 ---@field updateSquareTimerMs integer
 ---@field isObjectSpawned boolean
+---@field spawnedObjectCount integer
 EffectLookBehindYou = ChaosEffectBase:derive("EffectLookBehindYou", "look_behind_you")
+
+-- Returns true if the next appearance should be a zombie.
+-- fakeChance starts at 0.5 and drops by 0.1 per spawned fake object,
+-- expressed as ZombRand(0,10) integers: fakeMax = max(0, 5 - count).
+---@param spawnedCount integer
+---@return boolean
+local function shouldSpawnZombie(spawnedCount)
+    local fakeMax = math.max(0, 5 - spawnedCount)
+    return ZombRand(0, 10) >= fakeMax
+end
 
 
 ---@param player IsoPlayer
@@ -83,6 +94,7 @@ function EffectLookBehindYou:OnStart()
     self.status = EffectLookBehindYouStatus.IDLE
     self.updateSquareTimerMs = 0
     self.respawnObjectTimerMs = MAX_RESPAWN_OBJECT_TIMER_MS
+    self.spawnedObjectCount = 0
     print("[EffectLookBehindYou] OnStart" .. tostring(self.effectId))
     local player = getPlayer()
     if not player then return end
@@ -94,15 +106,9 @@ function EffectLookBehindYou:OnStart()
 
     print("[EffectLookBehindYou] Square: " .. tostring(square))
 
-    local roll = ZombRand(0, 5) -- 0-4
-    if roll < 4 then
-        self.isFakeSpawn = true
-        self.status = EffectLookBehindYouStatus.SHOULD_SPAWN_OBJECT_WHEN_LOOKING
-    else
-        self.status = EffectLookBehindYouStatus.SPAWNED_ZOMBIE
-        -- Spawn 1 zombie at the square.
-        spawnZombie(self.squareToSpawnOn)
-    end
+
+    self.isFakeSpawn = true
+    self.status = EffectLookBehindYouStatus.SHOULD_SPAWN_OBJECT_WHEN_LOOKING
 end
 
 ---@param square IsoGridSquare
@@ -142,17 +148,14 @@ function EffectLookBehindYou:OnTick(deltaMs)
         local canActuallySpawnBasedOnTimer = self.respawnObjectTimerMs >= MAX_RESPAWN_OBJECT_TIMER_MS
         -- If we can see it, check if timer is expired
         if canSee and canActuallySpawnBasedOnTimer then
-            -- Roll random number to decide if we should spawn object or zombie
-            local roll = ZombRand(0, 5) -- 0-4
-            if roll < 4 then
-                self.status = EffectLookBehindYouStatus.SHOULD_REMOVE_OBJECT_WHEN_NOT_LOOKING
-            else
+            if shouldSpawnZombie(self.spawnedObjectCount) then
                 self.isFakeSpawn = false
                 self.status = EffectLookBehindYouStatus.SPAWNED_ZOMBIE
                 spawnZombie(self.squareToSpawnOn)
                 return
             end
 
+            self.status = EffectLookBehindYouStatus.SHOULD_REMOVE_OBJECT_WHEN_NOT_LOOKING
 
             -- Spawn the object
             if self.objectSpawned == nil then
@@ -167,6 +170,7 @@ function EffectLookBehindYou:OnTick(deltaMs)
             self.objectSpawned:addToWorld()
             self.squareToSpawnOn:AddTileObject(self.objectSpawned)
             self.isObjectSpawned = true
+            self.spawnedObjectCount = self.spawnedObjectCount + 1
 
             if not self.soundPlayed then
                 ChaosUtils.PlayUISound("ZombieSurprisedPlayer", true)

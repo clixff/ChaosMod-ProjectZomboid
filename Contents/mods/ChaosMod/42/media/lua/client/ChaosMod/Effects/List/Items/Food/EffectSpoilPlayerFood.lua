@@ -1,11 +1,5 @@
 EffectSpoilPlayerFood = ChaosEffectBase:derive("EffectSpoilPlayerFood", "spoil_player_food")
 
----@param item InventoryItem
-local function handleItemSpoil(item)
-    if not item then return end
-    if not item:isFood() then return end
-    item:setAge(9999)
-end
 
 function EffectSpoilPlayerFood:OnStart()
     ChaosEffectBase:OnStart()
@@ -17,5 +11,21 @@ function EffectSpoilPlayerFood:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    ChaosPlayer.RecursiveInventoryLookup(inventory, true, true, handleItemSpoil)
+    local itemsSpoiled = 0
+
+    ChaosPlayer.RecursiveInventoryLookup(inventory, true, true, function(item)
+        if not item then return end
+        if not item:isFood() then return end
+        -- Non-perishable items use huge OffAgeMax values.
+        if item:getOffAgeMax() >= 1000000000 then
+            return
+        end
+        item:setAge(item:getOffAgeMax() + 1)
+        item:updateAge()
+        itemsSpoiled = itemsSpoiled + 1
+    end)
+
+    local imgCode = ChaosUtils.GetImgCodeByItemTextureByString("Base.Bread")
+    local str = string.format(ChaosLocalization.GetString("misc", "food_spoiled"), imgCode, itemsSpoiled)
+    ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
 end

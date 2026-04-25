@@ -131,9 +131,12 @@ end
 
 ---@param square IsoGridSquare
 ---@param spriteName string
+---@param north boolean?
 ---@return IsoObject?
-function ChaosProps.SpawnProp(square, spriteName)
-    local obj = IsoThumpable.new(getCell(), square, spriteName, true, {})
+function ChaosProps.SpawnProp(square, spriteName, north)
+    ---@type boolean
+    north = north == nil and true or north
+    local obj = IsoThumpable.new(getCell(), square, spriteName, north, {})
     if not obj then return nil end
 
     obj:setMaxHealth(100)

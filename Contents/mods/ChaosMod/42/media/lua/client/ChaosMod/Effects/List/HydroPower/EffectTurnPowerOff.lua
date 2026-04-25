@@ -15,4 +15,5 @@ function EffectTurnPowerOff:OnStart()
     print("[EffectTurnPowerOff] Days now: " .. tostring(now))
     getSandboxOptions():set("ElecShutModifier", now)
     getSandboxOptions():toLua()
+    ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "electricity_globally_disabled"), ChaosPlayerChatColors.red)
 end

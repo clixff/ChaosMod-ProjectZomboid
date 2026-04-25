@@ -18,4 +18,5 @@ function EffectTurnWaterOn:OnStart()
     -- SandboxVars.ElecShutModifier = now + 5
     getSandboxOptions():set("WaterShutModifier", now + randomDaysToAdd)
     getSandboxOptions():toLua()
+    ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "water_globally_enabled"), ChaosPlayerChatColors.green)
 end

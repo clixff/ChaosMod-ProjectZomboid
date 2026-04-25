@@ -17,6 +17,7 @@ function EffectFanClub:OnStart()
             local zombie = newZombies:getFirst()
             if zombie then
                 local npc = ChaosNPC:new(zombie)
+                zombie:dressInRandomOutfit()
                 npc:initializeHuman()
                 npc.npcGroup = ChaosNPCGroupID.FOLLOWERS
                 npc:AddTag("adoring_fan")

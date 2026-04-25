@@ -14,4 +14,5 @@ function EffectTurnWaterOff:OnStart()
     print("[EffectTurnWaterOff] Days now: " .. tostring(now))
     getSandboxOptions():set("WaterShutModifier", now)
     getSandboxOptions():toLua()
+    ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "water_globally_disabled"), ChaosPlayerChatColors.red)
 end

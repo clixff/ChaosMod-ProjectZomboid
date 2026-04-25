@@ -19,4 +19,5 @@ function EffectTurnPowerOn:OnStart()
     -- SandboxVars.ElecShutModifier = now + 5
     getSandboxOptions():set("ElecShutModifier", now + randomDaysToAdd)
     getSandboxOptions():toLua()
+    ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "electricity_globally_enabled"), ChaosPlayerChatColors.green)
 end

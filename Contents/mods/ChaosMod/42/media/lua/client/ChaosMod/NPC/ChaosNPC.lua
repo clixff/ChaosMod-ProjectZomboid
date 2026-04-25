@@ -1,3 +1,15 @@
+--[[
+    ChaosNPC — NPC system for Chaos Mod
+    =====================================
+    This NPC system was heavily inspired by the "Bandits NPC" mod:
+    https://steamcommunity.com/workshop/filedetails/?id=3268487204
+
+    Many of the core ideas and implementation approaches used here — including
+    zombie state management, custom animation chains (attack, idle, walk, run),
+    IsoZombie-based human NPC construction, pathfinding heuristics, and
+    per-tick AI update loops — were influenced by that mod.
+]]
+
 ---@class ChaosNPC
 ---@field pathfindUpdateMs integer
 ---@field zombie? IsoZombie -- Inner IsoZombie object of this NPC

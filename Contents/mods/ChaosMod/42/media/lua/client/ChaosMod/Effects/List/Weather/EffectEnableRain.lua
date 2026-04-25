@@ -16,6 +16,14 @@ function EffectEnableRain:OnStart()
     ChaosUtils.SetClimateFloatOverride(cm, ClimateManager.FLOAT_PRECIPITATION_INTENSITY, true, 1.0)
 end
 
+function EffectEnableRain:OnTick(deltaMs)
+    ChaosEffectBase:OnTick(deltaMs)
+    local cm = ClimateManager.getInstance()
+    if not cm then return end
+
+    ChaosUtils.SetClimateFloatOverride(cm, ClimateManager.FLOAT_PRECIPITATION_INTENSITY, true, 1.0)
+end
+
 function EffectEnableRain:OnEnd()
     ChaosEffectBase:OnEnd()
     print("[EffectEnableRain] OnEnd" .. tostring(self.effectId))

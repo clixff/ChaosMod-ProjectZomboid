@@ -28,6 +28,7 @@ function EffectSpawnNPC:OnStart()
     if not zombie then return end
 
     local npc = ChaosNPC:new(zombie)
+    zombie:dressInRandomOutfit()
     npc:initializeHuman()
 
     npc.npcGroup = ChaosNPCGroupID.RAIDERS

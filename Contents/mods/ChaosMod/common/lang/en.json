@@ -99,7 +99,7 @@
         "add_cigarette_addiction": "Add Cigarette Addiction",
         "heal_player": "Heal Player",
         "set_pirate_outfit": "Set Pirate Outfit",
-        "ragdoll_player": "Ragdoll Player",
+        "player_falls": "Player Falls",
         "random_zombie_friend": "Make Nearest Zombie A Friend",
         "zombies_ragdoll": "Zombies Ragdoll",
         "remove_player_clothes": "Remove Player's Clothes",
@@ -214,7 +214,22 @@
         "teleport_to_nearest_basement": "Teleport To Nearest Basement",
         "player_drops_random_items": "Player Drops Random Items",
         "zombies_walk_away": "Zombies Walk Away",
-        "freeze_zombies": "Freeze Zombies"
+        "freeze_zombies": "Freeze Zombies",
+        "reverse_movement": "Reverse Movement",
+        "spoil_food_nearby": "Spoil Food Nearby",
+        "copy_nearest_zombie_clothes": "Copy Nearest Zombie Clothes",
+        "spawn_friendly_priest": "Spawn Friendly Priest",
+        "crouch_mode": "Crouch Mode",
+        "dry_mouth": "Dry Mouth",
+        "replace_water_with_bleach": "Replace Water With Bleach",
+        "hide_player_books": "Hide Player's Books",
+        "hide_random_item": "Hide Random Item",
+        "dirty_clothes": "Dirty Clothes",
+        "give_nails_box": "Give Nails Box",
+        "spawn_rain_collector": "Spawn Rain Collector",
+        "spawn_barbell": "Spawn Barbell",
+        "give_katana": "Give Katana",
+        "enable_alarm_nearby": "Enable Alarm Nearby"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -252,6 +267,14 @@
         "opened_windows": "Opened %d windows",
         "removed_barricades": "Removed %d barricades",
         "removed_curtains": "Removed %d curtains",
-        "no_basement_found": "I can't find a basement nearby..."
+        "no_basement_found": "I can't find a basement nearby...",
+        "food_spoiled": "%s Spoiled %d items",
+        "water_replaced_with_bleach": "%s Replaced %d water containers with bleach",
+        "books_hidden": "Hid books: %d",
+        "item_hidden": "%s Item hidden: %s",
+        "electricity_globally_disabled": "Electricity has been disabled globally",
+        "electricity_globally_enabled": "Electricity has been enabled globally",
+        "water_globally_disabled": "Water has been disabled globally",
+        "water_globally_enabled": "Water has been enabled globally"
     }
 }

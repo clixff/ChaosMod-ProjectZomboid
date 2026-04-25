@@ -16,37 +16,35 @@ ChaosPlayerChatColors = ChaosPlayerChatColors or {
 ---@param dropHandItems boolean
 function ChaosPlayer.DropAllItemsOnGround(player, dropHandItems)
     if not player then return end
+
     local inv = player:getInventory()
-    if not inv then return end
+    local sq = player:getSquare()
+    if not inv or not sq then return end
 
     local items = inv:getItems()
     if not items then return end
 
-    local wornItems = player:getWornItems()
-
-    for i = 0, wornItems:size() - 1 do
-        local item = wornItems:getItemByIndex(i)
-        if item then
-            pcall(function() wornItems:remove(item) end)
-        end
-    end
-
-    -- Copy first
-    ---@type table<integer, InventoryItem>
     local list = {}
     for i = 0, items:size() - 1 do
         list[#list + 1] = items:get(i)
+    end
+
+    for i = #list, 1, -1 do
+        local item = list[i]
+
+        if item then
+            player:removeFromHands(item)
+            player:removeWornItem(item, false)
+        end
     end
 
     if dropHandItems then
         player:dropHandItems()
     end
 
-    local sq = player:getSquare()
-    if not sq then return end
-
-    for _, item in ipairs(list) do
-        if item then
+    for i = 1, #list do
+        local item = list[i]
+        if item and item:getContainer() == inv then
             inv:Remove(item)
             sq:AddWorldInventoryItem(item, 0.5, 0.5, 0.0)
         end
