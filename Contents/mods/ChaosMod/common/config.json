@@ -15,6 +15,7 @@
         "effects_from_bottom_to_top": true
     },
     "ui_sounds_enabled": true,
+    "ignore_effect_chances": false,
     "streamer_mode": {
         "streamer_mode_enabled": true,
         "voting_enabled": false,

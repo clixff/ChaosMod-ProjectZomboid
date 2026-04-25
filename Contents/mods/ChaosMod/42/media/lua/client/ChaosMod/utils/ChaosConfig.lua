@@ -34,6 +34,7 @@
 ---@field hide_progress_bar boolean
 ---@field ui ChaosConfigUI
 ---@field ui_sounds_enabled boolean
+---@field ignore_effect_chances boolean -- If true, all effects have equal chance 1 during selection
 ---@field streamer_mode ChaosConfigStreamerMode
 ChaosConfig = ChaosConfig or {
     lang = "en",
@@ -56,6 +57,7 @@ ChaosConfig = ChaosConfig or {
         effect_progress_text_rgb = { r = 1, g = 1, b = 1 },
     },
     ui_sounds_enabled = true,
+    ignore_effect_chances = false,
     streamer_mode = {
         streamer_mode_enabled = false,
         voting_enabled = false,
@@ -160,6 +162,10 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.ui_sounds_enabled) == "boolean" then
         ChaosConfig.ui_sounds_enabled = configData.ui_sounds_enabled
+    end
+
+    if type(configData.ignore_effect_chances) == "boolean" then
+        ChaosConfig.ignore_effect_chances = configData.ignore_effect_chances
     end
 
     if configData.streamer_mode then

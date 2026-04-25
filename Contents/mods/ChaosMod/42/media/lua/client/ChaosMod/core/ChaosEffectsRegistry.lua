@@ -90,11 +90,13 @@ function ChaosEffectsRegistry.GetRandomEffects(amount, pickType)
     local pool = {}
     local totalWeight = 0
 
+    local ignoreChances = ChaosConfig.ignore_effect_chances == true
     for id, effect in pairs(ChaosEffectsRegistry.effects) do
         local eligible = (pickType == "donate") and effect.enabled_donate or effect.enabled
         if eligible and effect.chance > 0 and not recentEffectsSet[id] then
-            table.insert(pool, { id = id, chance = effect.chance })
-            totalWeight = totalWeight + effect.chance
+            local weight = ignoreChances and 1 or effect.chance
+            table.insert(pool, { id = id, chance = weight })
+            totalWeight = totalWeight + weight
         end
     end
 
