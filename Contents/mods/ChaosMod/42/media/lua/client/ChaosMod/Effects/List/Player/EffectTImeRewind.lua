@@ -23,7 +23,7 @@ function EffectTimeRewind:OnStart()
     -- Distribute teleports evenly across the full effect duration
     -- replayIntervalMs is computed from self.duration since maxTicks isn't set yet
     self.replayIntervalMs = n > 0 and (self.duration * 1000) / n or 0
-    self.replayIndex = n  -- replay from newest → oldest
+    self.replayIndex = n -- replay from newest → oldest
     self.replayTimeMs = 0
 end
 
@@ -42,14 +42,9 @@ function EffectTimeRewind:OnTick(deltaMs)
             if entry then
                 local vehicle = player:getVehicle()
                 if vehicle then
-                    vehicle:setX(entry.x)
-                    vehicle:setY(entry.y)
-                    vehicle:setZ(entry.z)
-                else
-                    player:setX(entry.x)
-                    player:setY(entry.y)
-                    player:setZ(entry.z)
+                    ChaosVehicle.ExitVehicle(player)
                 end
+                player:teleportTo(math.floor(entry.x), math.floor(entry.y), math.floor(entry.z))
             end
         end
 

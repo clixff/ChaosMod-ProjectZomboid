@@ -96,7 +96,7 @@
         "player_gain_weight": "Игрок набирает вес",
         "player_lose_weight": "Игрок теряет вес",
         "blurry_vision": "Размытое зрение",
-        "add_cigarrete_addiction": "Добавить никотиновую зависимость",
+        "add_cigarette_addiction": "Добавить никотиновую зависимость",
         "heal_player": "Вылечить игрока",
         "set_pirate_outfit": "Одеть в костюм пирата",
         "ragdoll_player": "Рэгдолл игрока",
@@ -179,7 +179,14 @@
         "spawn_lootbox": "Заспавнить лутбокс",
         "math_captcha": "Математическая капча",
         "fan_club": "Фан-клуб",
-        "spawn_adoring_fan": "Заспавнить поклонника"
+        "spawn_adoring_fan": "Заспавнить поклонника",
+        "disable_lights_nearby": "Выключить ближайший свет",
+        "enable_lights_nearby": "Включить ближайший свет",
+        "change_floor_plan": "Изменить планировку комнаты",
+        "teleport_to_nearest_basement": "Телепортироваться в ближайший подвал",
+        "player_drops_random_items": "Игрок роняет случайные предметы",
+        "zombies_walk_away": "Зомби уходят прочь",
+        "freeze_zombies": "Заморозить зомби"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
@@ -207,6 +214,7 @@
         "no_vehicles_nearby": "Поблизости нет транспорта",
         "items_removed": "%s Удалено предметов: %d",
         "no_sleep_location": "Я не помню, где я последний раз спал...",
-        "killed_zombie": "Убил %s"
+        "killed_zombie": "Убил %s",
+        "no_basement_found": "Я не могу найти подвал поблизости..."
     }
 }

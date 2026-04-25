@@ -122,3 +122,7 @@ ChaosNPCRelations.SetRelation(ChaosNPCGroupID.FOLLOWERS, ChaosNPCGroupID.PLAYER,
 -- ROBBER group: ignores everyone, just wanders
 ChaosNPCGroupID.ROBBER = 4
 ChaosNPCRelations.CreateGroup("ROBBER", ChaosNPCRelationType.IGNORE, false, ChaosNPCGroupID.ROBBER)
+
+-- STALKER group: ignores everyone, only faces and teleports around the player
+ChaosNPCGroupID.STALKER = 5
+ChaosNPCRelations.CreateGroup("STALKER", ChaosNPCRelationType.IGNORE, false, ChaosNPCGroupID.STALKER)

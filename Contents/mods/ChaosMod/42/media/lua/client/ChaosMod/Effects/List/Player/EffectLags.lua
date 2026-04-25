@@ -68,9 +68,7 @@ function EffectLags:OnTick(deltaMs)
             if vehicle then
                 ChaosVehicle.ExitVehicle(player)
             end
-            player:setX(best.x)
-            player:setY(best.y)
-            player:setZ(best.z)
+            player:teleportTo(best.x, best.y, best.z)
         end
     end
 end

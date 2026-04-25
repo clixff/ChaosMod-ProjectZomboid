@@ -167,7 +167,7 @@
             "price": 1
         },
         {
-            "id": "player_have_vehicle_keys",
+            "id": "player_has_vehicle_keys",
             "enabled": true,
             "chance": 10,
             "withDuration": true,
@@ -873,7 +873,7 @@
             "price": 1
         },
         {
-            "id": "add_cigarrete_addiction",
+            "id": "add_cigarette_addiction",
             "enabled": true,
             "chance": 10,
             "withDuration": false,
@@ -1812,6 +1812,98 @@
             "enabled": true,
             "chance": 10,
             "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "spawn_stalker",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "remove_muscle_fatigue",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "player_says_tips",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "player_says_tips"
+            ],
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "disable_lights_nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "enable_lights_nearby",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "change_floor_plan",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "teleport_to_nearest_basement",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "player_drops_random_items",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "player_drops_random_items"
+            ],
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "zombies_walk_away",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price": 1
+        },
+        {
+            "id": "freeze_zombies",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 80,
+            "disable_effects": [
+                "freeze_zombies"
+            ],
             "enabled_donate": true,
             "price": 1
         }

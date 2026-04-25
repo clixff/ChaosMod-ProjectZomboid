@@ -127,10 +127,10 @@ function ChaosPlayer.TeleportPlayer(player, square)
 
     local playerVehicle = player:getVehicle()
     if playerVehicle then
-        playerVehicle:setX(square:getX())
-        playerVehicle:setY(square:getY())
-        playerVehicle:setZ(square:getZ())
-        return
+        ChaosVehicle.ExitVehicle(player)
+        -- playerVehicle:setX(square:getX())
+        -- playerVehicle:setY(square:getY())
+        -- playerVehicle:setZ(square:getZ())
     end
 
     player:teleportTo(square:getX(), square:getY(), square:getZ())

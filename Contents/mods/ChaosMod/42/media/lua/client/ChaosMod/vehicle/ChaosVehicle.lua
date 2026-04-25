@@ -154,15 +154,16 @@ end
 ---@param radius number
 ---@return ArrayList<BaseVehicle>
 function ChaosVehicle.GetVehiclesNearby(square, radius)
-    if not square then return ArrayList:new() end
+    local nearbyVehicles = ArrayList:new()
+    if not square then
+        return nearbyVehicles
+    end
     local x = square:getX()
     local y = square:getY()
-    local z = square:getZ()
     local vehicles = getCell():getVehicles()
-    ---@type ArrayList<BaseVehicle>
-    local nearbyVehicles = ArrayList:new()
-    for i = 0, vehicles:size() - 1 do
-        local vehicle = vehicles:get(i)
+    local iterator = vehicles:iterator()
+    while iterator:hasNext() do
+        local vehicle = iterator:next()
         if vehicle then
             local vehicleX = vehicle:getX()
             local vehicleY = vehicle:getY()

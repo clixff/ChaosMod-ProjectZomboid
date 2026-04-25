@@ -205,6 +205,7 @@ function ChaosNPC:update(deltaMs)
 
     local timestampMs = ChaosMod.lastTimeTickMs
 
+    self:DisableZombieVoice()
 
     if self.isAttacking then
         self:OnAttackTick(deltaMs)
@@ -413,6 +414,7 @@ function ChaosNPC:update(deltaMs)
 
     self:UpdateSneakAnim()
     self:VehiclesTick()
+    self:UpdateStalker(deltaMs)
 
     --- Debug
     local uselessString = zombie:isUseless() and "1" or "0"
@@ -554,6 +556,41 @@ function ChaosNPC:UpdateSneakAnim()
         end
     end
     self.zombie:setVariable("ChaosSneak", isSneak)
+end
+
+local STALKER_TELEPORT_COOLDOWN_MS = 2000
+local STALKER_MIN_DIST = 10.0
+local STALKER_MAX_DIST = 30.0
+local STALKER_TELEPORT_MIN_RADIUS = 15
+local STALKER_TELEPORT_MAX_RADIUS = 20
+
+function ChaosNPC:UpdateStalker(deltaMs)
+    if not self:HasTag("stalker") then return end
+    local zombie = self.zombie
+    if not zombie then return end
+    local player = getPlayer()
+    if not player then return end
+
+    local actionState = zombie:getActionStateName()
+    if actionState ~= "onground" then
+        pcall(function()
+            zombie:faceThisObject(player)
+        end)
+    end
+
+    self.stalkerTeleportCooldownMs = (self.stalkerTeleportCooldownMs or 0) + deltaMs
+    if self.stalkerTeleportCooldownMs < STALKER_TELEPORT_COOLDOWN_MS then return end
+
+    local dist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), player:getX(), player:getY())
+    if dist < STALKER_MIN_DIST or dist > STALKER_MAX_DIST then
+        local square = ChaosPlayer.GetRandomSquareAroundPlayer(
+            player, 0, STALKER_TELEPORT_MIN_RADIUS, STALKER_TELEPORT_MAX_RADIUS, 20, true, false, false)
+        if square then
+            zombie:teleportTo(square:getX(), square:getY(), square:getZ())
+            self:StopMoving(true, "stalker_teleport")
+            self.stalkerTeleportCooldownMs = 0
+        end
+    end
 end
 
 ---@param tag string

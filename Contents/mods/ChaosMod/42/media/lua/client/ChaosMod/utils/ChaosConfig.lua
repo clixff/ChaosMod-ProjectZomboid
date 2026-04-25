@@ -12,11 +12,27 @@
 ---@field donate_providers table<integer, string>
 ---@field paid_base_price number
 
+---@class ChaosConfigUI
+---@field progress_bar_color string
+---@field progress_bar_opacity number
+---@field progress_bar_text_color string
+---@field progress_bar_height number
+---@field effect_progress_color string
+---@field effect_progress_text_color string
+---@field effects_default_x number
+---@field effects_default_y number
+---@field effects_from_bottom_to_top boolean
+---@field progress_bar_rgb {r: number, g: number, b: number}
+---@field progress_bar_text_rgb {r: number, g: number, b: number}
+---@field effect_progress_rgb {r: number, g: number, b: number}
+---@field effect_progress_text_rgb {r: number, g: number, b: number}
+
 ---@class ChaosConfig
 ---@field lang string -- Language code (e.g. "en", "fr")
 ---@field effects_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
 ---@field effects_interval number
 ---@field hide_progress_bar boolean
+---@field ui ChaosConfigUI
 ---@field ui_sounds_enabled boolean
 ---@field streamer_mode ChaosConfigStreamerMode
 ChaosConfig = ChaosConfig or {
@@ -24,6 +40,21 @@ ChaosConfig = ChaosConfig or {
     effects_enabled = true,
     effects_interval = 45,
     hide_progress_bar = false,
+    ui = {
+        progress_bar_color       = "9f211f",
+        progress_bar_opacity     = 0.9,
+        progress_bar_text_color  = "ffffff",
+        progress_bar_height      = 22,
+        effect_progress_color    = "9f211f",
+        effect_progress_text_color = "ffffff",
+        effects_default_x            = 1620,
+        effects_default_y            = 720,
+        effects_from_bottom_to_top   = true,
+        progress_bar_rgb         = { r = 159/255, g = 33/255, b = 31/255 },
+        progress_bar_text_rgb    = { r = 1, g = 1, b = 1 },
+        effect_progress_rgb      = { r = 159/255, g = 33/255, b = 31/255 },
+        effect_progress_text_rgb = { r = 1, g = 1, b = 1 },
+    },
     ui_sounds_enabled = true,
     streamer_mode = {
         streamer_mode_enabled = false,
@@ -40,6 +71,19 @@ ChaosConfig = ChaosConfig or {
         paid_base_price = 5,
     }
 }
+
+---@param hex string
+---@return {r: number, g: number, b: number} | nil
+function ChaosConfig.HexToRGB(hex)
+    if type(hex) ~= "string" or #hex ~= 6 or not hex:match("^[0-9a-fA-F]+$") then
+        return nil
+    end
+    return {
+        r = (tonumber(hex:sub(1, 2), 16) or 0) / 255,
+        g = (tonumber(hex:sub(3, 4), 16) or 0) / 255,
+        b = (tonumber(hex:sub(5, 6), 16) or 0) / 255,
+    }
+end
 
 function ChaosConfig.LoadConfigFromDisk()
     ---@type ChaosConfig | nil
@@ -63,6 +107,55 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.hide_progress_bar) == "boolean" then
         ChaosConfig.hide_progress_bar = configData.hide_progress_bar
+    end
+
+    if configData.ui then
+        local src = configData.ui
+        local dst = ChaosConfig.ui
+
+        local pbRgb = ChaosConfig.HexToRGB(src.progress_bar_color)
+        if pbRgb then
+            dst.progress_bar_color = src.progress_bar_color
+            dst.progress_bar_rgb = pbRgb
+        end
+
+        if type(src.progress_bar_opacity) == "number" and src.progress_bar_opacity >= 0 and src.progress_bar_opacity <= 1 then
+            dst.progress_bar_opacity = src.progress_bar_opacity
+        end
+
+        local pbtRgb = ChaosConfig.HexToRGB(src.progress_bar_text_color)
+        if pbtRgb then
+            dst.progress_bar_text_color = src.progress_bar_text_color
+            dst.progress_bar_text_rgb = pbtRgb
+        end
+
+        if type(src.progress_bar_height) == "number" and src.progress_bar_height > 0 then
+            dst.progress_bar_height = src.progress_bar_height
+        end
+
+        local epRgb = ChaosConfig.HexToRGB(src.effect_progress_color)
+        if epRgb then
+            dst.effect_progress_color = src.effect_progress_color
+            dst.effect_progress_rgb = epRgb
+        end
+
+        local eptRgb = ChaosConfig.HexToRGB(src.effect_progress_text_color)
+        if eptRgb then
+            dst.effect_progress_text_color = src.effect_progress_text_color
+            dst.effect_progress_text_rgb = eptRgb
+        end
+
+        if type(src.effects_default_x) == "number" and src.effects_default_x >= 0 and src.effects_default_x <= 1920 then
+            dst.effects_default_x = src.effects_default_x
+        end
+
+        if type(src.effects_default_y) == "number" and src.effects_default_y >= 0 and src.effects_default_y <= 1080 then
+            dst.effects_default_y = src.effects_default_y
+        end
+
+        if type(src.effects_from_bottom_to_top) == "boolean" then
+            dst.effects_from_bottom_to_top = src.effects_from_bottom_to_top
+        end
     end
 
     if type(configData.ui_sounds_enabled) == "boolean" then

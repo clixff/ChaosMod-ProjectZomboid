@@ -20,7 +20,6 @@ function EffectGiveShotgun:OnStart()
     handWeapon:setRoundChambered(true)
 
     if (item) then
-        ChaosPlayer.EquipWeapon(player, item)
         ChaosPlayer.SayLineNewItem(player, item, 1)
     end
 end

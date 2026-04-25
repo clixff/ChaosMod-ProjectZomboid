@@ -65,7 +65,7 @@ end
 
 ---@alias ChaosEffectPickType "default" | "donate"
 
-local RECENT_EFFECTS_MAX = 12
+local RECENT_EFFECTS_MAX = 30
 ---@type table<string, boolean>
 local recentEffectsSet = {}
 ---@type string[]

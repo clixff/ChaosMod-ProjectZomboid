@@ -461,6 +461,7 @@ function ChaosUtils.RemoveRandomItem(player)
     local inventory = player:getInventory()
     if not inventory then return end
 
+    ---@type table<integer, { item: InventoryItem }>
     local allItems = {}
     _collectItemsFromContainer(inventory, allItems)
 

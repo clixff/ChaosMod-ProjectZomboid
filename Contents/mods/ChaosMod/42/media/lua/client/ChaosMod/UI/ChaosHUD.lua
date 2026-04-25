@@ -6,9 +6,6 @@ require "ISUI/ISButton"
 ---@field btn ISButton
 ChaosHUD = ISPanel:derive("ChaosHUD")
 
-local BAR_R = 159 / 255
-local BAR_G = 33 / 255
-local BAR_B = 31 / 255
 
 function ChaosHUD:initialise()
     ISPanel.initialise(self)
@@ -34,7 +31,7 @@ end
 
 function ChaosHUD:createChildren()
     local panelHeight = ChaosUIManager.GetScaledWidth(100)
-    local barHeight = ChaosUIManager.GetScaledWidth(22)
+    local barHeight = ChaosUIManager.GetScaledWidth(ChaosConfig.ui.progress_bar_height)
     local buttonHeight = ChaosUIManager.GetScaledWidth(25)
     local buttonMargin = ChaosUIManager.GetScaledWidth(6)
     -- Buttons sit above the progress bar, inside the panel
@@ -71,13 +68,8 @@ function ChaosHUD:prerender()
 
     local barMaxWidth = getCore():getScreenWidth()
     local panelHeight = ChaosUIManager.GetScaledWidth(100)
-    local barHeight = ChaosUIManager.GetScaledWidth(22)
+    local barHeight = ChaosUIManager.GetScaledWidth(ChaosConfig.ui.progress_bar_height)
     local barY = panelHeight - barHeight
-    local effectRectHeight = ChaosUIManager.GetScaledWidth(36)
-    local effectMargin = ChaosUIManager.GetScaledWidth(8)
-    local effectMarginLeft = ChaosUIManager.GetScaledWidth(12)
-    local textPadH = ChaosUIManager.GetScaledWidth(16)
-    local effectRectMinWidth = ChaosUIManager.GetScaledWidth(200)
 
     -- Effects Progress Bar — at the bottom of the panel
     if ChaosMod.enabled and ChaosConfig.IsEffectsEnabled() and not ChaosConfig.hide_progress_bar then
@@ -86,9 +78,11 @@ function ChaosHUD:prerender()
         if timerMax > 0 then
             fgWidth = math.floor(barMaxWidth * (ChaosEffectsManager.globalTimerMs / timerMax))
         end
-        -- Red on left (elapsed)
+        local uiCfg = ChaosConfig.ui
+        -- Colored on left (elapsed)
         if fgWidth > 0 then
-            self:drawRect(0, barY, fgWidth, barHeight, 0.9, BAR_R, BAR_G, BAR_B)
+            local c = uiCfg.progress_bar_rgb
+            self:drawRect(0, barY, fgWidth, barHeight, uiCfg.progress_bar_opacity, c.r, c.g, c.b)
         end
         -- Gray on right (remaining)
         local bgWidth = barMaxWidth - fgWidth
@@ -101,44 +95,10 @@ function ChaosHUD:prerender()
         local timerText = string.format("%.1fs", remainingMs / 1000)
         local timerFontHeight = getTextManager():getFontHeight(UIFont.Large)
         local timerTextY = barY + math.floor((barHeight - timerFontHeight) / 2)
-        self:drawText(timerText, ChaosUIManager.GetScaledWidth(8), timerTextY, 1, 1, 1, 1, UIFont.Large)
+        local tc = uiCfg.progress_bar_text_rgb
+        self:drawText(timerText, ChaosUIManager.GetScaledWidth(8), timerTextY, tc.r, tc.g, tc.b, 1, UIFont.Large)
     end
 
-    self:renderActiveEffects(effectRectHeight, effectMargin, effectMarginLeft, textPadH, effectRectMinWidth)
-end
-
-function ChaosHUD:renderActiveEffects(effectRectHeight, effectMargin, effectMarginLeft, textPadH, effectRectMinWidth)
-    local fontHeight = getTextManager():getFontHeight(UIFont.NewLarge)
-    local textVertOffset = math.floor((effectRectHeight - fontHeight) / 2)
-
-    local activeEffects = ChaosEffectsManager.activeEffects
-    for pos = 1, #activeEffects do
-        local effect = activeEffects[#activeEffects - pos + 1]
-        local effectString = tostring(effect.effectName)
-        if effect.withDuration then
-            local msToEnd = effect.maxTicks - effect.ticksActiveTime
-            local secondsToEnd = msToEnd / 1000
-            effectString = string.format("%s (%.1fs)", effectString, secondsToEnd)
-        end
-
-        local textWidth = getTextManager():MeasureStringX(UIFont.NewLarge, effectString)
-        local rectWidth = math.max(textWidth + textPadH * 2, effectRectMinWidth)
-        local rectX = effectMarginLeft
-        -- pos=1 (newest) just above panel, higher pos goes further up
-        local rectY = -((effectRectHeight + effectMargin) * pos)
-
-        self:drawRect(rectX, rectY, rectWidth, effectRectHeight, 0.7, 0.1, 0.1, 0.1)
-
-        if effect.withDuration and effect.maxTicks > 0 then
-            local progress = 1 - (effect.ticksActiveTime / effect.maxTicks)
-            local fgWidth = math.floor(rectWidth * progress)
-            if fgWidth > 0 then
-                self:drawRect(rectX, rectY, fgWidth, effectRectHeight, 1, BAR_R, BAR_G, BAR_B)
-            end
-        end
-
-        self:drawText(effectString, rectX + textPadH, rectY + textVertOffset, 1, 1, 1, 1, UIFont.NewLarge)
-    end
 end
 
 function ChaosHUD:OnMainButtonClick()

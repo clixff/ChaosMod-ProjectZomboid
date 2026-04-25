@@ -370,6 +370,47 @@ function ChaosZombie.RemoveAllWeapons(character)
     removeAllWeapons(inventory)
 end
 
+---@param zombie IsoZombie
+---@param x number
+---@param y number
+---@param z number
+---@param clearTarget boolean?
+---@param resetPath boolean?
+---@param faceLocation boolean?
+---@param setTurnAlerted boolean?
+function ChaosZombie.MoveToLocation(zombie, x, y, z, clearTarget, resetPath, faceLocation, setTurnAlerted)
+    if not zombie then return end
+    if clearTarget == nil then clearTarget = true end
+    if resetPath == nil then resetPath = true end
+    if faceLocation == nil then faceLocation = false end
+    if setTurnAlerted == nil then setTurnAlerted = true end
+
+    if clearTarget then
+        zombie:clearAggroList()
+        ---@diagnostic disable-next-line: param-type-mismatch
+        zombie:setTarget(nil)
+    end
+
+    if resetPath then
+        zombie:getPathFindBehavior2():reset()
+        zombie:getPathFindBehavior2():cancel()
+        ---@diagnostic disable-next-line: param-type-mismatch
+        zombie:setPath2(nil)
+    end
+
+    if faceLocation then
+        zombie:faceLocation(x, y)
+    end
+
+    local x2, y2, z2 = math.floor(x), math.floor(y), math.floor(z)
+
+    if setTurnAlerted then
+        zombie:setTurnAlertedValues(x2, y2)
+    end
+
+    zombie:getPathFindBehavior2():pathToLocation(x2, y2, z2)
+end
+
 ---@param x number
 ---@param y number
 ---@param skipNPC boolean?

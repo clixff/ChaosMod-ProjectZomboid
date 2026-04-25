@@ -1,7 +1,7 @@
----@class EffectAddCigarreteAddiction : ChaosEffectBase
-EffectAddCigarreteAddiction = ChaosEffectBase:derive("EffectAddCigarreteAddiction", "add_cigarrete_addiction")
+---@class EffectAddCigaretteAddiction : ChaosEffectBase
+EffectAddCigaretteAddiction = ChaosEffectBase:derive("EffectAddCigaretteAddiction", "add_cigarette_addiction")
 
-function EffectAddCigarreteAddiction:OnStart()
+function EffectAddCigaretteAddiction:OnStart()
     ChaosEffectBase:OnStart()
     local player = getPlayer()
     if not player then return end
@@ -15,7 +15,7 @@ function EffectAddCigarreteAddiction:OnStart()
     end
 end
 
-function EffectAddCigarreteAddiction:OnEnd()
+function EffectAddCigaretteAddiction:OnEnd()
     ChaosEffectBase:OnEnd()
     local player = getPlayer()
     if not player then return end

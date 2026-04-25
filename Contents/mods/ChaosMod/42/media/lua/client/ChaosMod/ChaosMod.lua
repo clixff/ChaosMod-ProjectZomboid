@@ -58,6 +58,7 @@ function ChaosMod.StartMod()
     ChaosUIManager:SetMainText(newMainString)
     -- Update UI elements status based on mod enabled flag
     ChaosUIManager.hud:OnModStatusChanged(true)
+    ChaosUIManager:ShowEffectsUI()
     -- Load zombie nicknames from disk first time if enabled
     if ChaosConfig.IsZombieNicknamesEnabled() then
         ChaosNicknames.LoadNicknamesFromDisk()
@@ -76,6 +77,7 @@ function ChaosMod.StopMod()
     ChaosUIManager:SetMainText("ChaosMod disabled")
     -- Update UI elements status based on mod enabled flag
     ChaosUIManager.hud:OnModStatusChanged(false)
+    ChaosUIManager:HideEffectsUI()
 end
 
 ---@param key integer
@@ -159,7 +161,8 @@ function ChaosMod.OnZombieUpdate(zombie)
         if md[CHAOS_NPC_MOD_DATA_KEY] then
             ---@type ChaosNPC
             local npc = md[CHAOS_NPC_MOD_DATA_KEY_2]
-            if npc then
+
+            if npc and getmetatable(npc) == ChaosNPC then
                 local deltaMs = ChaosMod.lastTimeTickMs - npc.lastTimeUpdateMs
                 npc:update(deltaMs)
                 npc.lastTimeUpdateMs = ChaosMod.lastTimeTickMs
@@ -168,6 +171,7 @@ function ChaosMod.OnZombieUpdate(zombie)
                 ---@diagnostic disable-next-line: param-type-mismatch
                 zombie:DoDeath(nil, nil)
                 md[CHAOS_NPC_MOD_DATA_KEY] = nil
+                md[CHAOS_NPC_MOD_DATA_KEY_2] = nil
             end
         end
     end
