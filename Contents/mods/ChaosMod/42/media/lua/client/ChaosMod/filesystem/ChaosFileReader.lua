@@ -44,6 +44,17 @@ function ChaosFileReader.ReadFileArrayFromCacheAllLines(filename)
     return lines
 end
 
+---@param value string | nil -- value to write; defaults to current timestamp
+function ChaosFileReader.WriteSyncFile(value)
+    local writer = getFileWriter("ChaosMod/mod-sync.txt", true, false)
+    if not writer then
+        print("[ChaosMod] Failed to open mod-sync.txt for writing")
+        return
+    end
+    writer:write(value ~= nil and tostring(value) or tostring(getTimestampMs()))
+    writer:close()
+end
+
 ---@param filename string
 ---@return table | nil
 function ChaosFileReader.ReadJsonFile(filename)

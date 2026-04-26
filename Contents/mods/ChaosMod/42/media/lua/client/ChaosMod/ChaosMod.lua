@@ -64,6 +64,10 @@ function ChaosMod.StartMod()
         ChaosNicknames.LoadNicknamesFromDisk()
     end
 
+    if ChaosConfig.streamer_mode and ChaosConfig.streamer_mode.streamer_mode_enabled == true then
+        ChaosFileReader.WriteSyncFile()
+    end
+
     ChaosUtils.PlayUISound("UIPauseMenuEnter")
 end
 
@@ -78,6 +82,7 @@ function ChaosMod.StopMod()
     -- Update UI elements status based on mod enabled flag
     ChaosUIManager.hud:OnModStatusChanged(false)
     ChaosUIManager:HideEffectsUI()
+    ChaosFileReader.WriteSyncFile("0")
 end
 
 ---@param key integer
@@ -103,6 +108,7 @@ end
 function ChaosMod.OnInitWorld()
     print("[ChaosMod] OnInitWorld")
     ChaosMod.mapLoaded = true;
+    ChaosFileReader.WriteSyncFile("0")
 end
 
 ---@param attacker IsoGameCharacter

@@ -1,8 +1,8 @@
 ---@class ChaosConfigStreamerMode
 ---@field streamer_mode_enabled boolean -- if streamer mode is enabled
 ---@field voting_enabled boolean -- If voting is enabled
+---@field voting_mode number
 ---@field type string -- Streamer mode type (twitch or ...)
----@field voting_duration number
 ---@field use_localhost_ip boolean
 ---@field advanced_voting_numbers boolean
 ---@field say_killed_zombie_name boolean
@@ -31,6 +31,7 @@
 ---@field lang string -- Language code (e.g. "en", "fr")
 ---@field effects_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
 ---@field effects_interval number
+---@field vote_start_time number
 ---@field hide_progress_bar boolean
 ---@field ui ChaosConfigUI
 ---@field ui_sounds_enabled boolean
@@ -40,6 +41,7 @@ ChaosConfig = ChaosConfig or {
     lang = "en",
     effects_enabled = true,
     effects_interval = 45,
+    vote_start_time = 15,
     hide_progress_bar = false,
     ui = {
         progress_bar_color       = "9f211f",
@@ -61,8 +63,8 @@ ChaosConfig = ChaosConfig or {
     streamer_mode = {
         streamer_mode_enabled = false,
         voting_enabled = false,
+        voting_mode = 0,
         type = "twitch",
-        voting_duration = 25,
         use_localhost_ip = true,
         advanced_voting_numbers = false,
         say_killed_zombie_name = true,
@@ -71,6 +73,7 @@ ChaosConfig = ChaosConfig or {
         enable_donate = false,
         donate_providers = {},
         paid_base_price = 5,
+        vote_start_time = 15,
     }
 }
 
@@ -105,6 +108,10 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.effects_interval) == "number" then
         ChaosConfig.effects_interval = configData.effects_interval
+    end
+
+    if type(configData.vote_start_time) == "number" then
+        ChaosConfig.vote_start_time = configData.vote_start_time
     end
 
     if type(configData.hide_progress_bar) == "boolean" then
@@ -184,9 +191,9 @@ function ChaosConfig.LoadConfigFromDisk()
             ChaosConfig.streamer_mode.type = configData.streamer_mode.type
         end
 
-        -- Voting duration in seconds
-        if type(configData.streamer_mode.voting_duration) == "number" then
-            ChaosConfig.streamer_mode.voting_duration = configData.streamer_mode.voting_duration
+        -- Voting mode
+        if type(configData.streamer_mode.voting_mode) == "number" then
+            ChaosConfig.streamer_mode.voting_mode = configData.streamer_mode.voting_mode
         end
 
         -- If should use localhost IP for voting

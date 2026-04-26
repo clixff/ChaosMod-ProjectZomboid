@@ -19,6 +19,17 @@ function ChaosEffectsManager.ClearGlobalTimer()
 end
 
 function ChaosEffectsManager.OnGlobalEffectsTimerEnd()
+    if not ChaosConfig.IsEffectsEnabled() then return end
+    local sm = ChaosConfig.streamer_mode
+    if not sm or sm.streamer_mode_enabled == false or sm.voting_enabled == false then
+        local effectIds = ChaosEffectsRegistry.GetRandomEffects(1, "default")
+        if effectIds and effectIds[1] then
+            ChaosEffectsManager.StartEffect(effectIds[1])
+        end
+    end
+    if sm and sm.streamer_mode_enabled == true then
+        ChaosFileReader.WriteSyncFile()
+    end
 end
 
 ---@param effectId string
