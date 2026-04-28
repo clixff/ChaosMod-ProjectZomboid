@@ -1,5 +1,6 @@
 {
     "effects": {
+        "random_effect": "Случайный эффект",
         "spawn_zombie_nearby": "Заспавнить зомби поблизости",
         "effect_shout": "Крикнуть",
         "spawn_npc": "Заспавнить NPC",
@@ -201,13 +202,50 @@
         "spawn_rain_collector": "Заспавнить сборщик дождевой воды",
         "spawn_barbell": "Заспавнить штангу",
         "give_katana": "Дать катану",
-        "enable_alarm_nearby": "Включить сигнализацию поблизости"
+        "enable_alarm_nearby": "Включить сигнализацию поблизости",
+        "player_has_vehicle_keys": "Дать ключи от всех машин",
+        "one_in_one_out": "Один вошёл, один вышел",
+        "move_vehicles_to_random_position": "Переместить транспорт в случайное место",
+        "move_furniture": "Переставить мебель",
+        "player_can_open_any_door": "Игрок может открыть любую дверь",
+        "heal_and_set_hp_to_1": "Вылечить и установить HP на 1",
+        "spawn_robber": "Заспавнить грабителя",
+        "random_skill_level_up": "Случайный навык +1",
+        "random_skill_level_lose": "Случайный навык -1",
+        "add_random_wound": "Добавить случайную рану",
+        "move_or_get_damage": "Двигайся или получи урон",
+        "open_nearby_windows": "Открыть ближайшие окна",
+        "unlock_nearby_doors": "Разблокировать ближайшие двери",
+        "remove_curtains_nearby": "Убрать ближайшие шторы",
+        "remove_barricades_nearby": "Убрать ближайшие баррикады",
+        "open_doors_nearby": "Открыть ближайшие двери",
+        "spawn_item_on_walk": "Предметы появляются при ходьбе",
+        "spawn_tent": "Заспавнить палатку",
+        "spawn_campfire": "Заспавнить костёр",
+        "enable_stoves_nearby": "Включить ближайшие плиты",
+        "enable_nearby_tvs": "Включить ближайшие телевизоры",
+        "disable_inventory": "Отключить инвентарь",
+        "restore_endurance": "Восстановить выносливость",
+        "zombies_tpose": "Зомби в Т-позе",
+        "move_items_between_containers": "Переместить предметы между контейнерами",
+        "drop_all_items": "Выбросить все предметы",
+        "spawn_stalker": "Заспавнить сталкера",
+        "remove_muscle_fatigue": "Убрать мышечную усталость",
+        "player_says_tips": "Игрок говорит случайные советы",
+        "swap_mouse_buttons": "Поменять кнопки мыши местами",
+        "remove_food_nearby": "Удалить еду поблизости",
+        "spawn_vehicle_van": "Заспавнить фургон",
+        "spawn_vehicle_trippy_van": "Заспавнить психоделический фургон",
+        "explode_nearest_zombie": "Взорвать ближайшего зомби",
+        "random_controls": "Случайное управление",
+        "remove_items_from_dead_zombies": "Убрать предметы с трупов зомби"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
         "stop_mod": "Остановить ChaosMod",
         "select_effect": "Выбрать эффект",
-        "effects": "Эффекты"
+        "effects": "Эффекты",
+        "active_effects": "Активные эффекты"
     },
     "misc": {
         "new_item": "%s Новый предмет: %s",
@@ -238,6 +276,18 @@
         "electricity_globally_disabled": "Электричество отключено глобально",
         "electricity_globally_enabled": "Электричество включено глобально",
         "water_globally_disabled": "Вода отключена глобально",
-        "water_globally_enabled": "Вода включена глобально"
+        "water_globally_enabled": "Вода включена глобально",
+        "total_votes": "Всего голосов: %d",
+        "skill_level_up": "%s Навык +1",
+        "skill_level_down": "%s Навык -1",
+        "robber_steals_item": "%s Грабитель крадёт предмет: %s",
+        "unlocked_doors": "Разблокировано дверей: %d",
+        "opened_doors": "Открыто дверей: %d",
+        "opened_windows": "Открыто окон: %d",
+        "removed_barricades": "Убрано баррикад: %d",
+        "removed_curtains": "Убрано штор: %d"
+    },
+    "meta": {
+        "username_activated_effect": "%s активировал %s"
     }
 }

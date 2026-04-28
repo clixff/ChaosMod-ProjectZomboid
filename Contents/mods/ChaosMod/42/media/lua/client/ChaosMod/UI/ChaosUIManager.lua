@@ -61,6 +61,18 @@ function ChaosUIManager:HideEffectsUI()
     if self.chaosEffectsUI then self.chaosEffectsUI:setVisible(false) end
 end
 
+---@param username string
+---@param effectId string
+function ChaosUIManager.onDonateEffectActivated(username, effectId)
+    local effectData = ChaosEffectsRegistry.effects[effectId]
+    if not effectData then return end
+    local fmt = ChaosLocalization.GetString("meta", "username_activated_effect")
+    local msg = string.format(fmt, username, effectData.name)
+    if ChaosUIManager.hud then
+        ChaosUIManager.hud:AddMessage(msg)
+    end
+end
+
 function ChaosUIManager:ToggleEffectsWindow()
     if self.effectsWindow and self.effectsWindow:getIsVisible() then
         self.effectsWindow:setVisible(false)

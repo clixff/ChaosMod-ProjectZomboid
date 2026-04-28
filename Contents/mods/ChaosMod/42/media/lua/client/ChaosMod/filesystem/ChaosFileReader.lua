@@ -44,14 +44,16 @@ function ChaosFileReader.ReadFileArrayFromCacheAllLines(filename)
     return lines
 end
 
----@param value string | nil -- value to write; defaults to current timestamp
-function ChaosFileReader.WriteSyncFile(value)
+---@param line1 string | number -- timestamp or "0"
+---@param iterationIndex integer -- current interval iteration count
+---@param votingActive integer -- 1 if voting is active, 0 otherwise
+function ChaosFileReader.WriteSyncFile(line1, iterationIndex, votingActive)
     local writer = getFileWriter("ChaosMod/mod-sync.txt", true, false)
     if not writer then
         print("[ChaosMod] Failed to open mod-sync.txt for writing")
         return
     end
-    writer:write(value ~= nil and tostring(value) or tostring(getTimestampMs()))
+    writer:write(tostring(line1) .. "\n" .. tostring(iterationIndex) .. "\n" .. tostring(votingActive))
     writer:close()
 end
 

@@ -1,10 +1,13 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
-import { resolve, join } from "path";
+import { resolve, join, dirname } from "path";
 import { logger } from "./utils/logger.ts";
 
-export const STREAMERMODE_ROOT = resolve(import.meta.dir, "..");
-const MOD_FOLDER_FILE = join(STREAMERMODE_ROOT, "mod-folder");
-
+// In compiled Bun executables, import.meta.dir is a virtual bundle path that
+// doesn't exist on disk. Fall back to the directory of the running executable.
+const COMPILED = !existsSync(import.meta.dir);
+export const STREAMERMODE_ROOT = COMPILED
+  ? dirname(process.execPath)
+  : resolve(import.meta.dir, "..");
 const USER_MOD_PATH =
   process.env["USERPROFILE"] || process.env["HOME"]
     ? join(process.env["USERPROFILE"] ?? process.env["HOME"] ?? "", "Zomboid", "Workshop", "ChaosModMain", "Contents", "mods", "ChaosMod")
@@ -19,8 +22,8 @@ const STEAM_SUBPATHS = [
 ];
 const WORKSHOP_SUFFIX = join("steamapps", "workshop", "content", "108600");
 
-function saveModFolder(modPath: string): void {
-  writeFileSync(MOD_FOLDER_FILE, modPath, "utf-8");
+function saveModFolder(dataRoot: string, modPath: string): void {
+  writeFileSync(join(dataRoot, "mod-folder"), modPath, "utf-8");
   logger.debug(`Saved mod folder to mod-folder file: ${modPath}`);
 }
 
@@ -54,27 +57,28 @@ function findInSteam(): string | null {
   return null;
 }
 
-function autoDetectModFolder(): string | null {
+function autoDetectModFolder(dataRoot: string): string | null {
   if (USER_MOD_PATH) {
     logger.debug(`Checking user Zomboid path: ${USER_MOD_PATH}`);
     if (existsSync(USER_MOD_PATH)) {
-      saveModFolder(USER_MOD_PATH);
+      saveModFolder(dataRoot, USER_MOD_PATH);
       return USER_MOD_PATH;
     }
   }
 
   const steamPath = findInSteam();
   if (steamPath) {
-    saveModFolder(steamPath);
+    saveModFolder(dataRoot, steamPath);
     return steamPath;
   }
 
   return null;
 }
 
-export function getModFolder(): string | null {
-  if (existsSync(MOD_FOLDER_FILE)) {
-    const content = readFileSync(MOD_FOLDER_FILE, "utf-8").trim();
+export function getModFolder(dataRoot: string): string | null {
+  const modFolderFile = join(dataRoot, "mod-folder");
+  if (existsSync(modFolderFile)) {
+    const content = readFileSync(modFolderFile, "utf-8").trim();
     logger.debug(`mod-folder file found, contents: "${content}"`);
 
     if (content && existsSync(content)) {
@@ -89,9 +93,9 @@ export function getModFolder(): string | null {
     logger.debug("mod-folder file not found, attempting auto-detection...");
   }
 
-  const detected = autoDetectModFolder();
+  const detected = autoDetectModFolder(dataRoot);
   if (!detected) {
-    logger.warn("Auto-detection failed — mod folder not found. Create a mod-folder file next to the StreamerMode executable.");
+    logger.warn("Auto-detection failed — mod folder not found. Create a mod-folder file in the Lua/ChaosMod folder.");
   }
   return detected;
 }

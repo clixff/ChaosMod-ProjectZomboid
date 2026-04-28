@@ -3,6 +3,7 @@ require "ISUI/ISButton"
 
 ---@class ChaosEffectsUI : ISPanel
 ---@field renderMode string
+---@field anchorRight boolean
 ---@field adornmentsVisible boolean
 ---@field anchorX number
 ---@field anchorY number
@@ -15,22 +16,27 @@ require "ISUI/ISButton"
 ---@field textPadH number
 ---@field margin number
 ---@field btnToggle ISButton
+---@field btnAnchor ISButton
 ChaosEffectsUI = ISPanel:derive("ChaosEffectsUI")
+
+local MIN_WINDOW_W = 280
 
 function ChaosEffectsUI:new()
     local titleBarH  = ChaosUIManager.GetScaledWidth(24)
     local toolbarH   = ChaosUIManager.GetScaledWidth(30)
     local effectRowH = ChaosUIManager.GetScaledWidth(36)
     local effectGap  = ChaosUIManager.GetScaledWidth(4)
-    local windowW    = ChaosUIManager.GetScaledWidth(280)
+    local windowW    = ChaosUIManager.GetScaledWidth(MIN_WINDOW_W)
     local margin     = ChaosUIManager.GetScaledWidth(6)
+    local anchorRight = ChaosConfig.ui.effects_anchor_right
 
-    local anchorX    = ChaosUIManager.GetScaledWidth(ChaosConfig.ui.effects_default_x)
+    -- effects_default_x/y always describe the left edge of the window
+    local defaultX   = ChaosUIManager.GetScaledWidth(ChaosConfig.ui.effects_default_x)
+    local anchorX    = anchorRight and (defaultX + windowW) or defaultX
     local anchorY    = ChaosUIManager.GetScaledHeight(ChaosConfig.ui.effects_default_y)
 
-    -- Initial: bottom_to_top, no adornments, one empty row
     local initH      = effectRowH
-    local initX      = anchorX
+    local initX      = defaultX  -- always the left edge regardless of anchor mode
     local initY      = anchorY - initH
 
     ---@type ChaosEffectsUI
@@ -42,6 +48,7 @@ function ChaosEffectsUI:new()
     o.borderColor       = { r = 0, g = 0, b = 0, a = 0 }
 
     o.renderMode        = ChaosConfig.ui.effects_from_bottom_to_top and "bottom_to_top" or "top_to_bottom"
+    o.anchorRight       = anchorRight
     o.adornmentsVisible = false
     o.anchorX           = anchorX
     o.anchorY           = anchorY
@@ -66,14 +73,23 @@ function ChaosEffectsUI:createChildren()
     local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
     local btnW = ChaosUIManager.GetScaledWidth(50)
     local btnH = self.toolbarH - self.margin * 2
-    local btnX = math.floor((self.windowW - btnW) / 2)
-    self.btnToggle = ISButton:new(btnX, 0, btnW, btnH, "", self, ChaosEffectsUI.onToggleModeClick)
+
+    self.btnToggle = ISButton:new(0, 0, btnW, btnH, "", self, ChaosEffectsUI.onToggleModeClick)
     self.btnToggle:initialise()
     self.btnToggle:instantiate()
     self.btnToggle:setImage(getTexture("media/ui/chaos_icon_up.png"))
     self.btnToggle:forceImageSize(FONT_HGT_SMALL, FONT_HGT_SMALL)
     self.btnToggle:setVisible(false)
     self:addChild(self.btnToggle)
+
+    self.btnAnchor = ISButton:new(0, 0, btnW, btnH, "", self, ChaosEffectsUI.onToggleAnchorClick)
+    self.btnAnchor:initialise()
+    self.btnAnchor:instantiate()
+    local anchorIcon = self.anchorRight and "media/ui/chaos_icon_left.png" or "media/ui/chaos_icon_right.png"
+    self.btnAnchor:setImage(getTexture(anchorIcon))
+    self.btnAnchor:forceImageSize(FONT_HGT_SMALL, FONT_HGT_SMALL)
+    self.btnAnchor:setVisible(false)
+    self:addChild(self.btnAnchor)
 end
 
 function ChaosEffectsUI:getEffectsAreaH()
@@ -84,6 +100,24 @@ function ChaosEffectsUI:getEffectsAreaH()
     return N * self.effectRowH + (N - 1) * self.effectGap
 end
 
+function ChaosEffectsUI:computeWindowW()
+    local minW = ChaosUIManager.GetScaledWidth(MIN_WINDOW_W)
+    local maxTextW = 0
+    local activeEffects = ChaosEffectsManager.activeEffects
+    for i = 1, #activeEffects do
+        local effect = activeEffects[i]
+        local effectString = tostring(effect.effectName)
+        if effect.withDuration then
+            local msToEnd = effect.maxTicks - effect.ticksActiveTime
+            effectString = string.format("%s (%.1fs)", effectString, msToEnd / 1000)
+        end
+        local tw = getTextManager():MeasureStringX(UIFont.NewLarge, effectString)
+        if tw > maxTextW then maxTextW = tw end
+    end
+    local needed = maxTextW + self.textPadH * 2 + self.margin * 2
+    return math.max(minW, needed)
+end
+
 function ChaosEffectsUI:updateAnchorFromPosition()
     local titleH = self.adornmentsVisible and self.titleBarH or 0
     local effectsAreaH = self:getEffectsAreaH()
@@ -92,7 +126,11 @@ function ChaosEffectsUI:updateAnchorFromPosition()
     else
         self.anchorY = self.y + titleH
     end
-    self.anchorX = self.x
+    if self.anchorRight then
+        self.anchorX = self.x + self.windowW
+    else
+        self.anchorX = self.x
+    end
 end
 
 function ChaosEffectsUI:setAdornmentsVisible(visible)
@@ -100,15 +138,19 @@ function ChaosEffectsUI:setAdornmentsVisible(visible)
     if visible then
         self:setY(self.y - self.titleBarH)
         self.btnToggle:setVisible(true)
+        self.btnAnchor:setVisible(true)
     else
         self:setY(self.y + self.titleBarH)
         self.btnToggle:setVisible(false)
+        self.btnAnchor:setVisible(false)
     end
     self.adornmentsVisible = visible
     self:updateAnchorFromPosition()
 end
 
 function ChaosEffectsUI:updateLayout()
+    self.windowW = self:computeWindowW()
+
     local effectsAreaH = self:getEffectsAreaH()
     local titleH       = self.adornmentsVisible and self.titleBarH or 0
     local toolH        = self.adornmentsVisible and self.toolbarH or 0
@@ -118,20 +160,36 @@ function ChaosEffectsUI:updateLayout()
     self:setHeight(totalH)
 
     if not self.dragging then
+        if self.anchorRight then
+            self:setX(self.anchorX - self.windowW)
+        else
+            self:setX(self.anchorX)
+        end
         if self.renderMode == "bottom_to_top" then
             self:setY(self.anchorY - titleH - effectsAreaH)
         else
             self:setY(self.anchorY - titleH)
         end
-        self:setX(self.anchorX)
     end
 
     if self.btnToggle then
-        local btnW = ChaosUIManager.GetScaledWidth(50)
-        self.btnToggle:setY(titleH + effectsAreaH + self.margin)
-        self.btnToggle:setX(math.floor((self.windowW - btnW) / 2))
+        local btnW   = ChaosUIManager.GetScaledWidth(50)
+        local btnGap = ChaosUIManager.GetScaledWidth(4)
+        local btnH   = self.toolbarH - self.margin * 2
+        local btnY   = titleH + effectsAreaH + self.margin
+        local groupX = math.floor((self.windowW - btnW * 2 - btnGap) / 2)
+
+        self.btnToggle:setX(groupX)
+        self.btnToggle:setY(btnY)
         self.btnToggle:setWidth(btnW)
-        self.btnToggle:setHeight(self.toolbarH - self.margin * 2)
+        self.btnToggle:setHeight(btnH)
+
+        if self.btnAnchor then
+            self.btnAnchor:setX(groupX + btnW + btnGap)
+            self.btnAnchor:setY(btnY)
+            self.btnAnchor:setWidth(btnW)
+            self.btnAnchor:setHeight(btnH)
+        end
     end
 end
 
@@ -228,6 +286,16 @@ function ChaosEffectsUI:onToggleModeClick()
     else
         self.renderMode = "bottom_to_top"
         self.btnToggle:setImage(getTexture("media/ui/chaos_icon_up.png"))
+    end
+    self:updateAnchorFromPosition()
+end
+
+function ChaosEffectsUI:onToggleAnchorClick()
+    self.anchorRight = not self.anchorRight
+    if self.anchorRight then
+        self.btnAnchor:setImage(getTexture("media/ui/chaos_icon_left.png"))
+    else
+        self.btnAnchor:setImage(getTexture("media/ui/chaos_icon_right.png"))
     end
     self:updateAnchorFromPosition()
 end

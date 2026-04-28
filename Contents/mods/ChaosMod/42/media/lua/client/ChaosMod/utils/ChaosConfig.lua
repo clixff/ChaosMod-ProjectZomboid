@@ -1,3 +1,7 @@
+---@class DonatePriceGroup
+---@field group integer
+---@field price number
+
 ---@class ChaosConfigStreamerMode
 ---@field streamer_mode_enabled boolean -- if streamer mode is enabled
 ---@field voting_enabled boolean -- If voting is enabled
@@ -10,7 +14,9 @@
 ---@field use_zombie_nicknames boolean
 ---@field enable_donate boolean
 ---@field donate_providers table<integer, string>
----@field paid_base_price number
+---@field donate_price_groups DonatePriceGroup[]
+---@field allow_vote_command boolean
+---@field hide_votes boolean
 
 ---@class ChaosConfigUI
 ---@field progress_bar_color string
@@ -22,10 +28,15 @@
 ---@field effects_default_x number
 ---@field effects_default_y number
 ---@field effects_from_bottom_to_top boolean
+---@field effects_anchor_right boolean
 ---@field progress_bar_rgb {r: number, g: number, b: number}
 ---@field progress_bar_text_rgb {r: number, g: number, b: number}
 ---@field effect_progress_rgb {r: number, g: number, b: number}
 ---@field effect_progress_text_rgb {r: number, g: number, b: number}
+---@field progress_bar_voting_color string -- progress bar color when voting is active
+---@field progress_bar_voting_rgb {r: number, g: number, b: number}
+---@field vote_background_color string
+---@field vote_background_rgb {r: number, g: number, b: number}
 
 ---@class ChaosConfig
 ---@field lang string -- Language code (e.g. "en", "fr")
@@ -33,6 +44,7 @@
 ---@field effects_interval number
 ---@field vote_start_time number
 ---@field hide_progress_bar boolean
+---@field use_voting_progress_bar_color boolean
 ---@field ui ChaosConfigUI
 ---@field ui_sounds_enabled boolean
 ---@field ignore_effect_chances boolean -- If true, all effects have equal chance 1 during selection
@@ -43,6 +55,7 @@ ChaosConfig = ChaosConfig or {
     effects_interval = 45,
     vote_start_time = 15,
     hide_progress_bar = false,
+    use_voting_progress_bar_color = false,
     ui = {
         progress_bar_color       = "9f211f",
         progress_bar_opacity     = 0.9,
@@ -53,10 +66,15 @@ ChaosConfig = ChaosConfig or {
         effects_default_x            = 1620,
         effects_default_y            = 720,
         effects_from_bottom_to_top   = true,
+        effects_anchor_right         = true,
         progress_bar_rgb         = { r = 159/255, g = 33/255, b = 31/255 },
         progress_bar_text_rgb    = { r = 1, g = 1, b = 1 },
         effect_progress_rgb      = { r = 159/255, g = 33/255, b = 31/255 },
         effect_progress_text_rgb = { r = 1, g = 1, b = 1 },
+        progress_bar_voting_color = "11a8cd",
+        progress_bar_voting_rgb  = { r = 17/255, g = 168/255, b = 205/255 },
+        vote_background_color    = "9f211f",
+        vote_background_rgb      = { r = 159/255, g = 33/255, b = 31/255 },
     },
     ui_sounds_enabled = true,
     ignore_effect_chances = false,
@@ -72,8 +90,17 @@ ChaosConfig = ChaosConfig or {
         use_zombie_nicknames = true,
         enable_donate = false,
         donate_providers = {},
-        paid_base_price = 5,
+        donate_price_groups = {
+            { group = 1, price = 1.0 },
+            { group = 2, price = 2.0 },
+            { group = 3, price = 4.0 },
+            { group = 4, price = 5.0 },
+            { group = 5, price = 7.5 },
+            { group = 6, price = 10.0 },
+        },
         vote_start_time = 15,
+        allow_vote_command = true,
+        hide_votes = false,
     }
 }
 
@@ -116,6 +143,10 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.hide_progress_bar) == "boolean" then
         ChaosConfig.hide_progress_bar = configData.hide_progress_bar
+    end
+
+    if type(configData.use_voting_progress_bar_color) == "boolean" then
+        ChaosConfig.use_voting_progress_bar_color = configData.use_voting_progress_bar_color
     end
 
     if configData.ui then
@@ -164,6 +195,22 @@ function ChaosConfig.LoadConfigFromDisk()
 
         if type(src.effects_from_bottom_to_top) == "boolean" then
             dst.effects_from_bottom_to_top = src.effects_from_bottom_to_top
+        end
+
+        if type(src.effects_anchor_right) == "boolean" then
+            dst.effects_anchor_right = src.effects_anchor_right
+        end
+
+        local pbvRgb = ChaosConfig.HexToRGB(src.progress_bar_voting_color)
+        if pbvRgb then
+            dst.progress_bar_voting_color = src.progress_bar_voting_color
+            dst.progress_bar_voting_rgb = pbvRgb
+        end
+
+        local vbRgb = ChaosConfig.HexToRGB(src.vote_background_color)
+        if vbRgb then
+            dst.vote_background_color = src.vote_background_color
+            dst.vote_background_rgb = vbRgb
         end
     end
 
@@ -224,9 +271,25 @@ function ChaosConfig.LoadConfigFromDisk()
         if type(configData.streamer_mode.donate_providers) == "table" then
             ChaosConfig.streamer_mode.donate_providers = configData.streamer_mode.donate_providers
         end
-        -- Base price for paid effects
-        if type(configData.streamer_mode.paid_base_price) == "number" then
-            ChaosConfig.streamer_mode.paid_base_price = configData.streamer_mode.paid_base_price
+        -- If chat vote command (!vote) is allowed
+        if type(configData.streamer_mode.allow_vote_command) == "boolean" then
+            ChaosConfig.streamer_mode.allow_vote_command = configData.streamer_mode.allow_vote_command
+        end
+        -- If vote counts are hidden from viewers
+        if type(configData.streamer_mode.hide_votes) == "boolean" then
+            ChaosConfig.streamer_mode.hide_votes = configData.streamer_mode.hide_votes
+        end
+        -- Donate price groups
+        if type(configData.streamer_mode.donate_price_groups) == "table" then
+            local groups = {}
+            for _, entry in ipairs(configData.streamer_mode.donate_price_groups) do
+                if type(entry) == "table" and type(entry.group) == "number" and type(entry.price) == "number" then
+                    table.insert(groups, { group = entry.group, price = entry.price })
+                end
+            end
+            if #groups > 0 then
+                ChaosConfig.streamer_mode.donate_price_groups = groups
+            end
         end
     end
 

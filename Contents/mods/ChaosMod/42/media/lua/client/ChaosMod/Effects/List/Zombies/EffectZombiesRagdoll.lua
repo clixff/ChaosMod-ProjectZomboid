@@ -17,11 +17,14 @@ function EffectZombiesRagdoll:OnStart()
     ChaosZombie.ForEachZombieInRange(x1, y1, 40, function(zombie)
         if zombie and zombie:isAlive() then
             ChaosVehicle.ExitVehicle(zombie)
-            zombie:clearVariable("BumpFallType")
-            zombie:setBumpStaggered(true)
-            zombie:setBumpType("stagger")
-            zombie:setBumpFall(true)
-            zombie:setBumpFallType("pushedBehind")
+            local attacker = getFakeAttacker()
+            local weapon = instanceItem("Base.Pistol")
+
+
+
+            attacker:setVariable("ZombieHitReaction", "ShotChest")
+            zombie:Hit(weapon, attacker, 0.0, true, 1.0, false)
+            attacker:clearVariable("ZombieHitReaction")
         end
     end, false, nil)
 end

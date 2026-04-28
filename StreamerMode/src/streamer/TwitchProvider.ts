@@ -1,5 +1,3 @@
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
-import { join } from "path";
 import colors from "colors";
 
 export interface StreamerUser {
@@ -51,21 +49,16 @@ export class TwitchProvider {
     return { id: u["id"], login: u["login"], display_name: u["display_name"] };
   }
 
-  loadToken(root: string): string | null {
-    const path = join(root, "oauth-token-twitch");
-    if (!existsSync(path)) return null;
-    const val = readFileSync(path, "utf-8").trim();
+  async loadToken(): Promise<string | null> {
+    const val = await Bun.secrets.get({ service: "chaos-mod-streamer-mode", name: "twitch-oauth-token" });
     return val || null;
   }
 
-  saveToken(root: string, token: string): void {
-    writeFileSync(join(root, "oauth-token-twitch"), token, "utf-8");
+  async saveToken(token: string): Promise<void> {
+    await Bun.secrets.set({ service: "chaos-mod-streamer-mode", name: "twitch-oauth-token", value: token });
   }
 
-  deleteToken(root: string): boolean {
-    const path = join(root, "oauth-token-twitch");
-    if (!existsSync(path)) return false;
-    unlinkSync(path);
-    return true;
+  async deleteToken(): Promise<boolean> {
+    return Bun.secrets.delete({ service: "chaos-mod-streamer-mode", name: "twitch-oauth-token" });
   }
 }

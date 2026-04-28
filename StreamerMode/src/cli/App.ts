@@ -6,7 +6,6 @@ import {
   type CommandCallback,
 } from "./CommandRegistry.ts";
 import { logger } from "../utils/logger.ts";
-import { palette } from "../utils/palette.ts";
 import type { ModConfig } from "../config.ts";
 import { ModSyncWatcher } from "../modSync.ts";
 
@@ -15,6 +14,9 @@ export interface AppOptions {
   luaFolder: string | null;
   config: ModConfig | null;
   effectCount: number;
+  onModEnabled?: () => void;
+  onIterationChanged?: (votingActive: boolean) => void;
+  onVotingActiveChanged?: (votingActive: boolean) => void;
 }
 
 export class App {
@@ -26,6 +28,10 @@ export class App {
   constructor(private readonly options: AppOptions) {
     this.registry = new CommandRegistry();
     this.registerBuiltins();
+  }
+
+  getModSyncWatcher(): ModSyncWatcher | null {
+    return this.modSyncWatcher;
   }
 
   registerCommand(
@@ -40,14 +46,16 @@ export class App {
 
   async start(): Promise<void> {
     logger.info(
-      `${colors.yellow("ChaosMod")} ${colors.cyan("Streamer Mode")} initialized. Loaded ${colors.green(this.options.effectCount.toString())} effects.`,
+      `${colors.yellow("ChaosMod")} ${colors.cyan("Streamer Mode")} initialized. Loaded ${colors.green(this.options.effectCount.toString())} effects. Type ${colors.cyan("help")} for all commands.`,
     );
 
     if (this.options.luaFolder) {
-      this.modSyncWatcher = new ModSyncWatcher(
-        this.options.luaFolder,
-        this.options.config?.effects_interval ?? 45,
-      );
+      this.modSyncWatcher = new ModSyncWatcher(this.options.luaFolder);
+      this.modSyncWatcher.onModEnabled = this.options.onModEnabled ?? null;
+      this.modSyncWatcher.onIterationChanged =
+        this.options.onIterationChanged ?? null;
+      this.modSyncWatcher.onVotingActiveChanged =
+        this.options.onVotingActiveChanged ?? null;
       this.modSyncWatcher.start();
     }
 
@@ -81,16 +89,17 @@ export class App {
     console.warn = wrap(console.warn.bind(console));
     console.error = wrap(console.error.bind(console));
 
-    this.rl.setPrompt(colors.gray("> ") + palette.purple("/"));
+    this.rl.setPrompt(colors.gray("> "));
     this.rl.prompt();
 
     this.rl.on("line", async (input: string) => {
       const trimmed = input.trim();
-      if (trimmed) {
-        const found = await this.registry.dispatch(trimmed);
+      const normalized = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+      if (normalized) {
+        const found = await this.registry.dispatch(normalized);
         if (!found) {
           logger.warn(
-            `Unknown command: ${palette.orange(trimmed)}. Type ${palette.purple("help")} for available commands.`,
+            `Unknown command: ${colors.yellow(normalized)}. Type ${colors.cyan("help")} for available commands.`,
           );
         }
       }

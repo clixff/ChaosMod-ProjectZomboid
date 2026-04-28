@@ -5,6 +5,10 @@ EffectRemovePlayerWeapons = ChaosEffectBase:derive("EffectRemovePlayerWeapons", 
 local function handleItemRemove(item)
     if not item then return end
     if not item:IsWeapon() then return end
+    local player = getPlayer()
+    if not player then return end
+
+    ChaosPlayer.SayLineRemovedItem(player, item)
     item:Remove()
 end
 

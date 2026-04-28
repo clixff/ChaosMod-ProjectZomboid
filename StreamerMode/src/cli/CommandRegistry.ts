@@ -1,5 +1,4 @@
 import colors from "colors";
-import { palette } from "../utils/palette.ts";
 
 export type CommandCallback = (args: string[]) => void | Promise<void>;
 
@@ -26,9 +25,15 @@ export class CommandRegistry {
     synonyms: string[],
     argDefs: ArgDefinition[],
     callback: CommandCallback,
-    description?: string
+    description?: string,
   ): void {
-    const def: CommandDefinition = { name, synonyms, argDefs, callback, description };
+    const def: CommandDefinition = {
+      name,
+      synonyms,
+      argDefs,
+      callback,
+      description,
+    };
     this.uniqueCommands.push(def);
     this.commands.set(name.toLowerCase(), def);
     for (const syn of synonyms) {
@@ -65,16 +70,16 @@ export class CommandRegistry {
       const argsStr = def.argDefs
         .map((a) =>
           a.required
-            ? palette.orange(`<${a.name}>`)
-            : colors.gray(`[${a.name}]`)
+            ? colors.yellow(`<${a.name}>`)
+            : colors.gray(`[${a.name}]`),
         )
         .join(" ");
       const descStr = def.description
         ? colors.gray(` — ${def.description}`)
         : "";
-      const namePart = palette.purple(def.name);
+      const namePart = colors.cyan(def.name);
       console.log(
-        `  ${namePart}${synsStr}${argsStr ? " " + argsStr : ""}${descStr}`
+        `  ${namePart}${synsStr}${argsStr ? " " + argsStr : ""}${descStr}`,
       );
     }
     console.log("");

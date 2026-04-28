@@ -1,0 +1,131 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: transparent;
+  color: white;
+  font-family: "Montserrat", sans-serif;
+}
+
+@keyframes overlayEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes overlayExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.overlay {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: fit-content;
+}
+
+.overlay--entering {
+  animation: overlayEnter 0.35s ease forwards;
+}
+
+.overlay--hiding {
+  animation: overlayExit 0.35s ease forwards;
+}
+
+.total-votes {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 4px rgba(120, 120, 120, 0.9);
+  margin-bottom: 10px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+}
+
+.option {
+  width: 400px;
+  margin-bottom: 6px;
+  transition: opacity 0.4s ease;
+}
+
+.option-bar {
+  position: relative;
+  width: 400px;
+  height: 44px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.option-bar-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 30, 30, 0.6);
+}
+
+.option-bar-fg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transition: width 0.5s ease;
+}
+
+.option-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 10px;
+  gap: 8px;
+}
+
+.option-index {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  min-width: 22px;
+  margin-left: 8px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  flex-shrink: 0;
+}
+
+.option-name {
+  flex: 1;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.option-votes {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  min-width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}

@@ -1,5 +1,6 @@
 {
     "effects": {
+        "random_effect": "Random Effect",
         "spawn_zombie_nearby": "Spawn Zombie Nearby",
         "effect_shout": "Shout",
         "spawn_npc": "Spawn NPC",
@@ -229,7 +230,14 @@
         "spawn_rain_collector": "Spawn Rain Collector",
         "spawn_barbell": "Spawn Barbell",
         "give_katana": "Give Katana",
-        "enable_alarm_nearby": "Enable Alarm Nearby"
+        "enable_alarm_nearby": "Enable Alarm Nearby",
+        "swap_mouse_buttons": "Swap Mouse Buttons",
+        "remove_food_nearby": "Remove Food Nearby",
+        "spawn_vehicle_van": "Spawn Van",
+        "spawn_vehicle_trippy_van": "Spawn Trippy Van",
+        "explode_nearest_zombie": "Explode Nearest Zombie",
+        "random_controls": "Random Controls",
+        "remove_items_from_dead_zombies": "Remove Items From Dead Zombies"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -275,6 +283,10 @@
         "electricity_globally_disabled": "Electricity has been disabled globally",
         "electricity_globally_enabled": "Electricity has been enabled globally",
         "water_globally_disabled": "Water has been disabled globally",
-        "water_globally_enabled": "Water has been enabled globally"
+        "water_globally_enabled": "Water has been enabled globally",
+        "total_votes": "Total votes: %d"
+    },
+    "meta": {
+        "username_activated_effect": "%s activated %s"
     }
 }

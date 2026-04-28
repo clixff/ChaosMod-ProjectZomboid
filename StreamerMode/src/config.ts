@@ -12,6 +12,13 @@ export interface UIConfig {
   effects_default_x: number;
   effects_default_y: number;
   effects_from_bottom_to_top: boolean;
+  progress_bar_voting_color: string;
+  vote_background_color: string;
+}
+
+export interface DonatePriceGroup {
+  group: string;
+  price: number;
 }
 
 export interface StreamerModeConfig {
@@ -26,7 +33,9 @@ export interface StreamerModeConfig {
   zombie_nicknames_buffer: number;
   enable_donate: boolean;
   donate_providers: string[];
-  paid_base_price: number;
+  donate_price_groups: DonatePriceGroup[];
+  allow_vote_command: boolean;
+  hide_votes: boolean;
 }
 
 export interface ModConfig {
@@ -35,6 +44,7 @@ export interface ModConfig {
   effects_interval: number;
   vote_start_time: number;
   hide_progress_bar: boolean;
+  use_voting_progress_bar_color: boolean;
   ui: UIConfig;
   ui_sounds_enabled: boolean;
   ignore_effect_chances: boolean;
@@ -61,6 +71,19 @@ function strArr(val: unknown, def: string[]): string[] {
     ? val.filter((v): v is string => typeof v === "string")
     : def;
 }
+function priceGroupArr(val: unknown, def: DonatePriceGroup[]): DonatePriceGroup[] {
+  if (!Array.isArray(val)) return def;
+  const result: DonatePriceGroup[] = [];
+  for (const item of val) {
+    if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+      const r = item as Record<string, unknown>;
+      if (typeof r["group"] === "string" && typeof r["price"] === "number") {
+        result.push({ group: r["group"], price: r["price"] });
+      }
+    }
+  }
+  return result.length > 0 ? result : def;
+}
 
 const DEFAULT_UI: UIConfig = {
   progress_bar_color: "9f211f",
@@ -72,6 +95,8 @@ const DEFAULT_UI: UIConfig = {
   effects_default_x: 1620,
   effects_default_y: 720,
   effects_from_bottom_to_top: true,
+  progress_bar_voting_color: "11a8cd",
+  vote_background_color: "9f211f",
 };
 
 const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
@@ -86,7 +111,16 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   zombie_nicknames_buffer: 150,
   enable_donate: false,
   donate_providers: [],
-  paid_base_price: 5,
+  donate_price_groups: [
+    { group: "1", price: 1.0 },
+    { group: "2", price: 2.0 },
+    { group: "3", price: 4.0 },
+    { group: "4", price: 5.0 },
+    { group: "5", price: 7.5 },
+    { group: "6", price: 10.0 },
+  ],
+  allow_vote_command: true,
+  hide_votes: false,
 };
 
 const DEFAULT_CONFIG: ModConfig = {
@@ -95,6 +129,7 @@ const DEFAULT_CONFIG: ModConfig = {
   effects_interval: 45,
   vote_start_time: 15,
   hide_progress_bar: false,
+  use_voting_progress_bar_color: false,
   ui: DEFAULT_UI,
   ui_sounds_enabled: true,
   ignore_effect_chances: false,
@@ -113,6 +148,8 @@ function parseUI(raw: Record<string, unknown>): UIConfig {
     effects_default_x: num(raw["effects_default_x"], d.effects_default_x),
     effects_default_y: num(raw["effects_default_y"], d.effects_default_y),
     effects_from_bottom_to_top: bool(raw["effects_from_bottom_to_top"], d.effects_from_bottom_to_top),
+    progress_bar_voting_color: str(raw["progress_bar_voting_color"], d.progress_bar_voting_color),
+    vote_background_color: str(raw["vote_background_color"], d.vote_background_color),
   };
 }
 
@@ -130,7 +167,9 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
     zombie_nicknames_buffer: num(raw["zombie_nicknames_buffer"], d.zombie_nicknames_buffer),
     enable_donate: bool(raw["enable_donate"], d.enable_donate),
     donate_providers: strArr(raw["donate_providers"], d.donate_providers),
-    paid_base_price: num(raw["paid_base_price"], d.paid_base_price),
+    donate_price_groups: priceGroupArr(raw["donate_price_groups"], d.donate_price_groups),
+    allow_vote_command: bool(raw["allow_vote_command"], d.allow_vote_command),
+    hide_votes: bool(raw["hide_votes"], d.hide_votes),
   };
 }
 
@@ -153,7 +192,7 @@ export function loadConfig(modFolder: string): ModConfig {
     return DEFAULT_CONFIG;
   }
 
-  let raw: Record<string, unknown> = {};
+  let raw: Record<string, unknown>;
   try {
     raw = obj(JSON.parse(readFileSync(configPath, "utf-8")));
     logger.debug(`Loaded config from ${configPath}`);
@@ -170,6 +209,7 @@ export function loadConfig(modFolder: string): ModConfig {
     effects_interval: num(raw["effects_interval"], d.effects_interval),
     vote_start_time: num(raw["vote_start_time"], d.vote_start_time),
     hide_progress_bar: bool(raw["hide_progress_bar"], d.hide_progress_bar),
+    use_voting_progress_bar_color: bool(raw["use_voting_progress_bar_color"], d.use_voting_progress_bar_color),
     ui: parseUI(obj(raw["ui"])),
     ui_sounds_enabled: bool(raw["ui_sounds_enabled"], d.ui_sounds_enabled),
     ignore_effect_chances: bool(raw["ignore_effect_chances"], d.ignore_effect_chances),

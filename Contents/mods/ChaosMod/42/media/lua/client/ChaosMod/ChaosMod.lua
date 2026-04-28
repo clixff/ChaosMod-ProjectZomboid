@@ -65,24 +65,33 @@ function ChaosMod.StartMod()
     end
 
     if ChaosConfig.streamer_mode and ChaosConfig.streamer_mode.streamer_mode_enabled == true then
-        ChaosFileReader.WriteSyncFile()
+        local ts = tostring(getTimestampMs())
+        ChaosEffectsManager.iterationIndex = 0
+        ChaosEffectsManager.syncTimestamp = ts
+        ChaosEffectsManager.lastVotingActive = 0
+        ChaosFileReader.WriteSyncFile(ts, 0, 0)
     end
 
+    ChaosUIManager.hud:AddMessage("Chaos Mod started")
     ChaosUtils.PlayUISound("UIPauseMenuEnter")
 end
 
 function ChaosMod.StopMod()
     ChaosEffectsManager.StopAllEffects()
     ChaosEffectsManager.ClearGlobalTimer()
-    -- Set mod enabled flag to false
     ChaosMod.enabled = false;
+    ChaosUIManager.hud:AddMessage("ChaosMod stopped")
     print("[ChaosMod] Mod stopped")
     -- Set main text for UI
     ChaosUIManager:SetMainText("ChaosMod disabled")
     -- Update UI elements status based on mod enabled flag
     ChaosUIManager.hud:OnModStatusChanged(false)
     ChaosUIManager:HideEffectsUI()
-    ChaosFileReader.WriteSyncFile("0")
+    ChaosEffectsManager.iterationIndex = 0
+    ChaosEffectsManager.syncTimestamp = "0"
+    ChaosEffectsManager.lastVotingActive = 0
+    ChaosEffectsManager.pendingVoteReadMs = -1
+    ChaosFileReader.WriteSyncFile("0", 0, 0)
 end
 
 ---@param key integer
@@ -108,7 +117,11 @@ end
 function ChaosMod.OnInitWorld()
     print("[ChaosMod] OnInitWorld")
     ChaosMod.mapLoaded = true;
-    ChaosFileReader.WriteSyncFile("0")
+    ChaosEffectsManager.iterationIndex = 0
+    ChaosEffectsManager.syncTimestamp = "0"
+    ChaosEffectsManager.lastVotingActive = 0
+    ChaosEffectsManager.pendingVoteReadMs = -1
+    ChaosFileReader.WriteSyncFile("0", 0, 0)
 end
 
 ---@param attacker IsoGameCharacter

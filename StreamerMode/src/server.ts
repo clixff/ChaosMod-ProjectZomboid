@@ -1,5 +1,6 @@
 import { logger } from "./utils/logger.ts";
 import type { AnyProvider, StreamerUser } from "./streamer/index.ts";
+import obsHtmlFile from "../frontend/obs/index.html";
 
 const AUTH_CALLBACK_HTML = `<!DOCTYPE html>
 <html lang="en">
@@ -25,16 +26,36 @@ const AUTH_CALLBACK_HTML = `<!DOCTYPE html>
     } else {
       msg.textContent = 'No access token found. Please try again.';
     }
-  <\/script>
+  </script>
 </body>
 </html>`;
+
+export interface VoteOptionStatus {
+  effect_id: string;
+  index: number;
+  effect_name: string;
+  votes: number | undefined;
+}
+
+export interface ModStatus {
+  enabled: boolean;
+  voting_enabled: boolean;
+  iteration_index: number;
+  total_votes: number;
+  total_votes_label: string;
+  vote_background_color: string;
+  last_winner: string | null;
+  vote_options: VoteOptionStatus[];
+  donateEnabled: boolean;
+}
 
 export interface ServerContext {
   host: string;
   port: number;
   provider: AnyProvider | null;
-  streamerModeRoot: string;
-  onLogin: (user: StreamerUser) => void;
+  onLogin: (user: StreamerUser, token: string) => void | Promise<void>;
+  getModStatus: () => ModStatus;
+  getEffectsResponse: () => unknown;
 }
 
 export function startServer(ctx: ServerContext): void {
@@ -72,15 +93,19 @@ export function startServer(ctx: ServerContext): void {
             return new Response("Invalid or expired token", { status: 401 });
           }
 
-          provider.saveToken(ctx.streamerModeRoot, token);
-          ctx.onLogin(user);
+          await provider.saveToken(token);
+          await ctx.onLogin(user, token);
           return new Response(
             `Logged in as ${user.display_name}. You can close this tab.`,
           );
         },
       },
 
-      "/mod/status": new Response("OK"),
+      "/obs": obsHtmlFile,
+      "/obs/": obsHtmlFile,
+
+      "/mod/status": () => Response.json(ctx.getModStatus()),
+      "/mod/effects": () => Response.json(ctx.getEffectsResponse()),
       "/mod/activate-effect": new Response("OK"),
     },
     fetch() {

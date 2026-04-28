@@ -2,7 +2,8 @@ import colors from "colors";
 import { logger } from "../utils/logger.ts";
 
 const CLIENT_ID = "q72hcurbc7rcns1cefr9nqhmixe7b8";
-const EVENTSUB_URL = "wss://eventsub.wss.twitch.tv/ws?keepalive_timeout_seconds=30";
+const EVENTSUB_URL =
+  "wss://eventsub.wss.twitch.tv/ws?keepalive_timeout_seconds=30";
 const RECONNECT_DELAY_MS = 5000;
 
 // Twitch auth-related close codes — do not auto-reconnect on these
@@ -61,6 +62,8 @@ export class TwitchChat {
   private shouldReconnect = false;
   private serverReconnect = false;
 
+  onMessage: ((chat: ChatEvent) => void) | null = null;
+
   constructor(params: TwitchChatParams) {
     this.params = params;
   }
@@ -113,7 +116,11 @@ export class TwitchChat {
     });
   }
 
-  private async handleMessage(ws: WebSocket, event: MessageEvent, initial: boolean): Promise<void> {
+  private async handleMessage(
+    ws: WebSocket,
+    event: MessageEvent,
+    initial: boolean,
+  ): Promise<void> {
     let msg: EventSubMessage;
     try {
       msg = JSON.parse(String(event.data)) as EventSubMessage;
@@ -156,33 +163,38 @@ export class TwitchChat {
       if (msg.metadata?.subscription_type !== "channel.chat.message") return;
       const chat = msg.payload.event;
       if (!chat) return;
-      logger.debug(`${this.coloredName} New chat message: ${chat.chatter_user_name}: ${chat.message.text}`);
-      this.onChatMessage(chat);
+      logger.debug(
+        `${this.coloredName} New chat message: (${chat.color}) ${chat.chatter_user_name}: ${chat.message.text}`,
+      );
+      this.onMessage?.(chat);
       return;
     }
   }
 
   private async createSubscription(sessionId: string): Promise<void> {
-    const res = await fetch("https://api.twitch.tv/helix/eventsub/subscriptions", {
-      method: "POST",
-      headers: {
-        "Client-Id": CLIENT_ID,
-        Authorization: `Bearer ${this.params.accessToken}`,
-        "Content-Type": "application/json",
+    const res = await fetch(
+      "https://api.twitch.tv/helix/eventsub/subscriptions",
+      {
+        method: "POST",
+        headers: {
+          "Client-Id": CLIENT_ID,
+          Authorization: `Bearer ${this.params.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "channel.chat.message",
+          version: "1",
+          condition: {
+            broadcaster_user_id: this.params.broadcasterUserId,
+            user_id: this.params.readerUserId,
+          },
+          transport: {
+            method: "websocket",
+            session_id: sessionId,
+          },
+        }),
       },
-      body: JSON.stringify({
-        type: "channel.chat.message",
-        version: "1",
-        condition: {
-          broadcaster_user_id: this.params.broadcasterUserId,
-          user_id: this.params.readerUserId,
-        },
-        transport: {
-          method: "websocket",
-          session_id: sessionId,
-        },
-      }),
-    });
+    );
 
     if (!res.ok) {
       const json: unknown = await res.json();
@@ -190,8 +202,4 @@ export class TwitchChat {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private onChatMessage(_chat: ChatEvent): void {
-    // placeholder — chat message processing to be implemented
-  }
 }

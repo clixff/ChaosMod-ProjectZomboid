@@ -8,7 +8,7 @@
 ---@field disableEffects table<integer, string>
 ---@field class ChaosEffectBase
 ---@field enabled_donate boolean
----@field price number
+---@field price_group string
 
 ---@class ChaosEffectJsonData
 ---@field id string?
@@ -19,7 +19,7 @@
 ---@field duration number?
 ---@field disable_effects table<integer, string>?
 ---@field enabled_donate boolean?
----@field price number?
+---@field price_group string?
 
 ---@class ChaosEffectsRegistry
 ---@field effects table<string, ChaosEffectDataEntry>
@@ -159,7 +159,7 @@ function ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
         class = effectClass,
         disableEffects = {},
         enabled_donate = effectJsonData.enabled_donate or false,
-        price = effectJsonData.price or 0,
+        price_group = effectJsonData.price_group or "",
     }
 
     -- Push disable_effects from json to new effect data

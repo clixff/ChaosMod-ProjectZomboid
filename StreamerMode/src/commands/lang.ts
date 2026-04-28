@@ -1,10 +1,11 @@
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import type { App } from "../cli/App.ts";
-import { palette } from "../utils/palette.ts";
 import type { ModConfig } from "../config.ts";
 import { saveConfig } from "../config.ts";
 import { logger } from "../utils/logger.ts";
+import { setLang } from "../localization.ts";
+import colors from "colors";
 
 function getAvailableLanguages(modFolder: string): string[] {
   const langDir = join(modFolder, "common", "lang");
@@ -17,19 +18,24 @@ function getAvailableLanguages(modFolder: string): string[] {
 export function registerLangCommand(
   app: App,
   modFolder: string,
-  config: ModConfig
+  config: ModConfig,
 ): void {
   app.registerCommand(
     "lang",
     [],
-    [{ name: "language", description: "Language code to switch to (e.g. en, ru)" }],
+    [
+      {
+        name: "language",
+        description: "Language code to switch to (e.g. en, ru)",
+      },
+    ],
     (args) => {
       const languages = getAvailableLanguages(modFolder);
 
       if (args.length === 0) {
         console.log(
-          `Current language: ${palette.purple(config.lang)}\n` +
-          `Available: ${languages.map((l) => palette.purple(l)).join(", ")}`
+          `Current language: ${colors.cyan(config.lang)}\n` +
+            `Available: ${languages.map((l) => colors.cyan(l)).join(", ")}`,
         );
         return;
       }
@@ -39,16 +45,17 @@ export function registerLangCommand(
 
       if (!languages.includes(target)) {
         logger.warn(
-          `Language ${palette.orange(target)} not found. ` +
-          `Use ${palette.purple("lang")} to see available languages.`
+          `Language ${colors.yellow(target)} not found. ` +
+            `Use ${colors.cyan("lang")} to see available languages.`,
         );
         return;
       }
 
       config.lang = target;
       saveConfig(modFolder, config);
-      logger.info(`Language changed to ${palette.purple(target)}`);
+      setLang(target);
+      logger.info(`Language changed to ${colors.cyan(target)}`);
     },
-    "Print current language or switch to another (e.g. lang ru)"
+    "Print current language or switch to another (e.g. lang ru)",
   );
 }

@@ -1,5 +1,4 @@
 import colors from "colors";
-import { palette } from "./palette.ts";
 
 let debugMode = false;
 
@@ -13,8 +12,8 @@ export function isDebugMode(): boolean {
 
 const prefixes = {
   info: colors.green("[INFO]"),
-  debug: palette.purple("[DEBUG]"),
-  warn: palette.orange("[WARN]"),
+  debug: colors.cyan("[DEBUG]"),
+  warn: colors.yellow("[WARN]"),
   error: colors.red("[ERROR]"),
 };
 

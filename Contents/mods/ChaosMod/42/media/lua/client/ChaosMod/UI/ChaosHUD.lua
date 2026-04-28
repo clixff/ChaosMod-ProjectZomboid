@@ -4,8 +4,11 @@ require "ISUI/ISButton"
 ---@field toasts table<string, string>
 ---@field text string
 ---@field btn ISButton
+---@field messages table<integer, {text: string, expireTime: integer}>
 ChaosHUD = ISPanel:derive("ChaosHUD")
 
+local PANEL_HEIGHT = 100
+local MESSAGE_TIMEOUT_MS = 5000
 
 function ChaosHUD:initialise()
     ISPanel.initialise(self)
@@ -14,9 +17,10 @@ end
 
 function ChaosHUD:new()
     local panelWidth = ChaosUIManager.GetScaledWidth(1920 * 0.2)
-    local panelHeight = ChaosUIManager.GetScaledWidth(100)
+    local panelHeight = ChaosUIManager.GetScaledWidth(PANEL_HEIGHT)
     local panelX = 0
     local panelY = ChaosUIManager.cachedHeight - panelHeight
+    ---@type ChaosHUD
     local o = ISPanel:new(panelX, panelY, panelWidth, panelHeight)
     setmetatable(o, self)
     self.__index = self
@@ -25,16 +29,16 @@ function ChaosHUD:new()
     o.borderColor = { r = 0, g = 0, b = 0, a = 0 }
     o.anchorLeft = true
     o.anchorBottom = true
+    o.messages = {}
 
     return o
 end
 
 function ChaosHUD:createChildren()
-    local panelHeight = ChaosUIManager.GetScaledWidth(100)
+    local panelHeight = ChaosUIManager.GetScaledWidth(PANEL_HEIGHT)
     local barHeight = ChaosUIManager.GetScaledWidth(ChaosConfig.ui.progress_bar_height)
     local buttonHeight = ChaosUIManager.GetScaledWidth(25)
     local buttonMargin = ChaosUIManager.GetScaledWidth(6)
-    -- Buttons sit above the progress bar, inside the panel
     local buttonY = panelHeight - barHeight - buttonMargin - buttonHeight
 
     local buttonWidth = ChaosUIManager.GetScaledWidth(120)
@@ -63,11 +67,21 @@ function ChaosHUD:addText(text)
     self.text = text
 end
 
+---@param text string
+---@param timeoutMs integer?
+function ChaosHUD:AddMessage(text, timeoutMs)
+    if not self.messages then self.messages = {} end
+    table.insert(self.messages, {
+        text = text,
+        expireTime = getTimestampMs() + (timeoutMs or MESSAGE_TIMEOUT_MS),
+    })
+end
+
 function ChaosHUD:prerender()
     ISPanel.prerender(self)
 
     local barMaxWidth = getCore():getScreenWidth()
-    local panelHeight = ChaosUIManager.GetScaledWidth(100)
+    local panelHeight = ChaosUIManager.GetScaledWidth(PANEL_HEIGHT)
     local barHeight = ChaosUIManager.GetScaledWidth(ChaosConfig.ui.progress_bar_height)
     local barY = panelHeight - barHeight
 
@@ -82,6 +96,10 @@ function ChaosHUD:prerender()
         -- Colored on left (elapsed)
         if fgWidth > 0 then
             local c = uiCfg.progress_bar_rgb
+            local sm = ChaosConfig.streamer_mode
+            if ChaosConfig.use_voting_progress_bar_color and sm and sm.streamer_mode_enabled == true and sm.voting_enabled == true and ChaosEffectsManager.lastVotingActive == 1 then
+                c = uiCfg.progress_bar_voting_rgb
+            end
             self:drawRect(0, barY, fgWidth, barHeight, uiCfg.progress_bar_opacity, c.r, c.g, c.b)
         end
         -- Gray on right (remaining)
@@ -99,6 +117,42 @@ function ChaosHUD:prerender()
         self:drawText(timerText, ChaosUIManager.GetScaledWidth(8), timerTextY, tc.r, tc.g, tc.b, 1, UIFont.Large)
     end
 
+    -- Message log above the Enable/Disable button
+    if self.messages and #self.messages > 0 then
+        local now = getTimestampMs()
+        local i = 1
+        while i <= #self.messages do
+            if now >= self.messages[i].expireTime then
+                table.remove(self.messages, i)
+            else
+                i = i + 1
+            end
+        end
+
+        if #self.messages > 0 then
+            local msgFont = UIFont.Medium
+            local msgFontHeight = getTextManager():getFontHeight(msgFont)
+            local msgPadX = ChaosUIManager.GetScaledWidth(12)
+            local msgPadY = ChaosUIManager.GetScaledWidth(6)
+            local msgGap  = ChaosUIManager.GetScaledWidth(4)
+            local msgLineHeight = msgFontHeight + msgPadY * 2
+            local msgX = ChaosUIManager.GetScaledWidth(10)
+
+            local buttonHeight = ChaosUIManager.GetScaledWidth(25)
+            local buttonMargin = ChaosUIManager.GetScaledWidth(6)
+            local buttonY = panelHeight - barHeight - buttonMargin - buttonHeight
+            local msgAreaBottom = buttonY - ChaosUIManager.GetScaledWidth(10)
+
+            for idx = 1, #self.messages do
+                -- idx=1 is oldest (bottom/closest to button), idx=n is newest (top)
+                local msgY = msgAreaBottom - idx * msgLineHeight - (idx - 1) * msgGap
+                local msg = self.messages[idx]
+                local textWidth = getTextManager():MeasureStringX(msgFont, msg.text)
+                self:drawRect(msgX, msgY, textWidth + msgPadX * 2, msgLineHeight, 0.7, 0.15, 0.15, 0.15)
+                self:drawText(msg.text, msgX + msgPadX, msgY + msgPadY, 1, 1, 1, 1, msgFont)
+            end
+        end
+    end
 end
 
 function ChaosHUD:OnMainButtonClick()

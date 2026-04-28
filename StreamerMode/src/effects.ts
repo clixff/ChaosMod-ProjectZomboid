@@ -7,8 +7,9 @@ export interface EffectEntry {
   enabled: boolean;
   chance: number;
   withDuration: boolean;
+  duration?: number;
   enabled_donate: boolean;
-  price: number;
+  price_group: string;
 }
 
 function parseEffect(raw: unknown): EffectEntry | null {
@@ -20,8 +21,13 @@ function parseEffect(raw: unknown): EffectEntry | null {
     enabled: typeof r["enabled"] === "boolean" ? r["enabled"] : true,
     chance: typeof r["chance"] === "number" ? r["chance"] : 50,
     withDuration: typeof r["withDuration"] === "boolean" ? r["withDuration"] : false,
+    duration: typeof r["duration"] === "number" ? r["duration"] : undefined,
     enabled_donate: typeof r["enabled_donate"] === "boolean" ? r["enabled_donate"] : false,
-    price: typeof r["price"] === "number" ? r["price"] : 1,
+    price_group: typeof r["price_group"] === "string"
+      ? r["price_group"]
+      : typeof r["price_group"] === "number"
+        ? String(r["price_group"])
+        : "",
   };
 }
 

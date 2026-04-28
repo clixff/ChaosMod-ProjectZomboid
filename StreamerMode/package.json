@@ -3,14 +3,31 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "compile": "bun build --compile --minify index.ts --outfile dist/ChaosModStreamerApp.exe",
+    "dev": "bun index.ts",
+    "debug": "bun index.ts --debug",
+    "watch": "bun --watch index.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@eslint/js": "^10.0.1",
+    "@types/bun": "latest",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^10.2.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.5.0",
+    "typescript-eslint": "^8.59.0"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
     "colors": "^1.4.0",
-    "open": "^11.0.0"
+    "open": "^11.0.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   }
 }

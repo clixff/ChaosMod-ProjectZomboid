@@ -1,9 +1,10 @@
 {
-    "lang": "en",
+    "lang": "ru",
     "effects_enabled": true,
     "effects_interval": 45,
-    "vote_start_time": 15,
+    "vote_start_time": 10,
     "hide_progress_bar": false,
+    "use_voting_progress_bar_color": false,
     "ui": {
         "progress_bar_color": "9f211f",
         "progress_bar_opacity": 0.9,
@@ -13,7 +14,9 @@
         "effect_progress_text_color": "ffffff",
         "effects_default_x": 1620,
         "effects_default_y": 720,
-        "effects_from_bottom_to_top": true
+        "effects_from_bottom_to_top": true,
+        "progress_bar_voting_color": "3b8eea",
+        "vote_background_color": "9f211f"
     },
     "ui_sounds_enabled": true,
     "ignore_effect_chances": false,
@@ -22,13 +25,64 @@
         "voting_enabled": true,
         "voting_mode": 0,
         "type": "twitch",
-        "use_localhost_ip": true,
+        "use_localhost_ip": false,
         "advanced_voting_numbers": true,
         "use_zombie_nicknames": true,
         "say_killed_zombie_name": true,
         "zombie_nicknames_buffer": 150,
-        "enable_donate": false,
+        "enable_donate": true,
         "donate_providers": [],
-        "paid_base_price": 5
+        "donate_price_groups": [
+            {
+                "group": "positive_1",
+                "price": 1
+            },
+            {
+                "group": "positive_2",
+                "price": 2.5
+            },
+            {
+                "group": "positive_3",
+                "price": 5
+            },
+            {
+                "group": "positive_4",
+                "price": 7.5
+            },
+            {
+                "group": "negative_1",
+                "price": 1
+            },
+            {
+                "group": "negative_2",
+                "price": 2.5
+            },
+            {
+                "group": "negative_3",
+                "price": 5
+            },
+            {
+                "group": "negative_4",
+                "price": 7.5
+            },
+            {
+                "group": "neutral_1",
+                "price": 1
+            },
+            {
+                "group": "neutral_2",
+                "price": 2.5
+            },
+            {
+                "group": "neutral_3",
+                "price": 5
+            },
+            {
+                "group": "neutral_4",
+                "price": 7.5
+            }
+        ],
+        "allow_vote_command": true,
+        "hide_votes": false
     }
 }

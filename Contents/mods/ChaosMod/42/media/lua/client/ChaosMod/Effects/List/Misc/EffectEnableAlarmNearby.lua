@@ -40,7 +40,10 @@ function EffectEnableAlarmNearby:OnStart()
         end
     end
 
-    if not roomDef or not building then return end
+    if not roomDef or not building then
+        ChaosPlayer.SayLine(player, "No building nearby!", 1.0, 0.5, 0.0)
+        return
+    end
 
     building:setAlarmed(true)
     getAmbientStreamManager():doAlarm(roomDef)
