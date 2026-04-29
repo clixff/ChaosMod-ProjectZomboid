@@ -18,6 +18,10 @@ import { NicknamesManager } from "./src/streamer/NicknamesManager.ts";
 import { VotingManager } from "./src/streamer/VotingManager.ts";
 import { startDebugNicknames } from "./src/debugNicknames.ts";
 import { startDebugVotes } from "./src/debugVotes.ts";
+import { ExternalEffectsManager } from "./src/externalEffects.ts";
+import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
+import { DonationManager } from "./src/donations/DonationManager.ts";
+import { registerDonateCommand } from "./src/commands/donate.ts";
 
 function getBestLocalIPv4(): { interfaceName: string; address: string; cidr: string | null; mac: string } | null {
   const ifaces = networkInterfaces();
@@ -171,6 +175,26 @@ async function main(): Promise<void> {
 
   const votingManager = new VotingManager(effects, config, luaFolder);
 
+  const externalEffectsManager = luaFolder ? new ExternalEffectsManager(luaFolder) : null;
+  externalEffectsManager?.start();
+
+  const daProvider = new DonationAlertsProvider();
+  const donationManager = new DonationManager(port);
+  donationManager.addProvider(daProvider);
+
+  // Auto-login donation providers on startup
+  const daUser = await daProvider.start(port);
+  if (daUser) {
+    logger.info(`[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`);
+  } else {
+    const daCreds = await daProvider.loadCredentials();
+    if (daCreds) {
+      logger.info(
+        `${daProvider.coloredName} Not logged in. Type ${colors.cyan("donate login donationalerts")} to authenticate.`,
+      );
+    }
+  }
+
   if (args.includes("--debug-votes")) {
     startDebugVotes(votingManager);
   }
@@ -323,6 +347,23 @@ async function main(): Promise<void> {
         donateEnabled: config?.streamer_mode.enable_donate ?? false,
       };
     },
+    onDonationAlertsCode: async (code) => {
+      const user = await daProvider.handleOAuthCode(code, port);
+      if (user) {
+        logger.info(`[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(user.name)}`);
+      }
+      return user ? { name: user.name } : null;
+    },
+    activateEffect: (nickname, effectId) => {
+      if (!config?.streamer_mode.streamer_mode_enabled || !config?.streamer_mode.enable_donate) {
+        return { success: false, error: "Not available" };
+      }
+      if (!externalEffectsManager) {
+        return { success: false, error: "Lua folder not available" };
+      }
+      externalEffectsManager.add(nickname ?? "", effectId);
+      return { success: true };
+    },
     getEffectsResponse: () => {
       const donateEnabled = config?.streamer_mode.enable_donate ?? false;
       if (!donateEnabled) {
@@ -345,6 +386,8 @@ async function main(): Promise<void> {
   if (modFolder && config) {
     registerLangCommand(app, modFolder, config);
   }
+
+  registerDonateCommand(app, port, daProvider, modFolder, config);
 
   app.registerCommand(
     "login",

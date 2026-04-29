@@ -56,6 +56,8 @@ export interface ServerContext {
   onLogin: (user: StreamerUser, token: string) => void | Promise<void>;
   getModStatus: () => ModStatus;
   getEffectsResponse: () => unknown;
+  activateEffect: (nickname: string | undefined, effectId: string) => { success: boolean; error?: string };
+  onDonationAlertsCode?: (code: string) => Promise<{ name: string } | null>;
 }
 
 export function startServer(ctx: ServerContext): void {
@@ -106,7 +108,40 @@ export function startServer(ctx: ServerContext): void {
 
       "/mod/status": () => Response.json(ctx.getModStatus()),
       "/mod/effects": () => Response.json(ctx.getEffectsResponse()),
-      "/mod/activate-effect": new Response("OK"),
+      "/provider/donationalerts/success/": async (req: Request) => {
+        if (!ctx.onDonationAlertsCode) {
+          return new Response("Donation provider not configured", { status: 503 });
+        }
+        const url = new URL(req.url);
+        const code = url.searchParams.get("code");
+        if (!code) {
+          return new Response("Missing code parameter", { status: 400 });
+        }
+        const user = await ctx.onDonationAlertsCode(code);
+        if (!user) {
+          return new Response("Login failed. Please try again.", {
+            status: 401,
+            headers: { "Content-Type": "text/html; charset=utf-8" },
+          });
+        }
+        return new Response(`Logged in as ${user.name}. You can close this tab.`);
+      },
+
+      "/mod/activate-effect": {
+        GET: (req: Request) => {
+          const url = new URL(req.url);
+          const effectId = url.searchParams.get("effect");
+          if (!effectId) {
+            return new Response("Missing 'effect' query parameter", { status: 400 });
+          }
+          const nickname = url.searchParams.get("nickname") ?? undefined;
+          const result = ctx.activateEffect(nickname, effectId);
+          if (!result.success) {
+            return new Response(result.error ?? "Not available", { status: 403 });
+          }
+          return new Response("OK");
+        },
+      },
     },
     fetch() {
       return new Response("Not Found", { status: 404 });
