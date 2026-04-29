@@ -23,10 +23,21 @@ import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvi
 import { DonationManager } from "./src/donations/DonationManager.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
 
-function getBestLocalIPv4(): { interfaceName: string; address: string; cidr: string | null; mac: string } | null {
+function getBestLocalIPv4(): {
+  interfaceName: string;
+  address: string;
+  cidr: string | null;
+  mac: string;
+} | null {
   const ifaces = networkInterfaces();
-  const badInterfaceName = /loopback|virtual|vmware|vbox|hyper-v|wsl|docker|tailscale|zerotier|vpn/i;
-  const candidates: Array<{ interfaceName: string; address: string; cidr: string | null; mac: string }> = [];
+  const badInterfaceName =
+    /loopback|virtual|vmware|vbox|hyper-v|wsl|docker|tailscale|zerotier|vpn/i;
+  const candidates: Array<{
+    interfaceName: string;
+    address: string;
+    cidr: string | null;
+    mac: string;
+  }> = [];
 
   for (const [name, nets] of Object.entries(ifaces)) {
     if (!nets) continue;
@@ -34,7 +45,12 @@ function getBestLocalIPv4(): { interfaceName: string; address: string; cidr: str
     for (const net of nets) {
       if (net.family !== "IPv4") continue;
       if (net.internal) continue;
-      candidates.push({ interfaceName: name, address: net.address, cidr: net.cidr ?? null, mac: net.mac });
+      candidates.push({
+        interfaceName: name,
+        address: net.address,
+        cidr: net.cidr ?? null,
+        mac: net.mac,
+      });
     }
   }
 
@@ -100,11 +116,12 @@ function applyLoadedConfig(
   modFolder: string,
 ): void {
   targetConfig.lang = nextConfig.lang;
-  targetConfig.effects_enabled = nextConfig.effects_enabled;
+  targetConfig.effects_interval_enabled = nextConfig.effects_interval_enabled;
   targetConfig.effects_interval = nextConfig.effects_interval;
   targetConfig.vote_start_time = nextConfig.vote_start_time;
   targetConfig.hide_progress_bar = nextConfig.hide_progress_bar;
-  targetConfig.use_voting_progress_bar_color = nextConfig.use_voting_progress_bar_color;
+  targetConfig.use_voting_progress_bar_color =
+    nextConfig.use_voting_progress_bar_color;
   targetConfig.ui = nextConfig.ui;
   targetConfig.ui_sounds_enabled = nextConfig.ui_sounds_enabled;
   targetConfig.ignore_effect_chances = nextConfig.ignore_effect_chances;
@@ -175,7 +192,9 @@ async function main(): Promise<void> {
 
   const votingManager = new VotingManager(effects, config, luaFolder);
 
-  const externalEffectsManager = luaFolder ? new ExternalEffectsManager(luaFolder) : null;
+  const externalEffectsManager = luaFolder
+    ? new ExternalEffectsManager(luaFolder)
+    : null;
   externalEffectsManager?.start();
 
   const daProvider = new DonationAlertsProvider();
@@ -185,7 +204,9 @@ async function main(): Promise<void> {
   // Auto-login donation providers on startup
   const daUser = await daProvider.start(port);
   if (daUser) {
-    logger.info(`[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`);
+    logger.info(
+      `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`,
+    );
   } else {
     const daCreds = await daProvider.loadCredentials();
     if (daCreds) {
@@ -294,8 +315,12 @@ async function main(): Promise<void> {
     }
 
     const nextConfig = loadConfig(modFolder);
+    const nextEffects = loadEffects(modFolder);
     applyLoadedConfig(config, nextConfig, modFolder);
-    logger.info(`Config reloaded from ${colors.cyan("config.json")}.`);
+    effects.splice(0, effects.length, ...nextEffects);
+    logger.info(
+      `Reloaded ${colors.cyan("config.json")} and ${colors.cyan("effects.json")} (${colors.cyan(String(effects.length))} effects).`,
+    );
     return true;
   }
 
@@ -350,12 +375,17 @@ async function main(): Promise<void> {
     onDonationAlertsCode: async (code) => {
       const user = await daProvider.handleOAuthCode(code, port);
       if (user) {
-        logger.info(`[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(user.name)}`);
+        logger.info(
+          `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(user.name)}`,
+        );
       }
       return user ? { name: user.name } : null;
     },
     activateEffect: (nickname, effectId) => {
-      if (!config?.streamer_mode.streamer_mode_enabled || !config?.streamer_mode.enable_donate) {
+      if (
+        !config?.streamer_mode.streamer_mode_enabled ||
+        !config?.streamer_mode.enable_donate
+      ) {
         return { success: false, error: "Not available" };
       }
       if (!externalEffectsManager) {
@@ -463,7 +493,9 @@ async function main(): Promise<void> {
         logger.warn("Could not find a local IPv4 address.");
         return;
       }
-      logger.info(`Local IP: ${colors.cyan(result.address)} (${result.interfaceName})`);
+      logger.info(
+        `Local IP: ${colors.cyan(result.address)} (${result.interfaceName})`,
+      );
     },
     "Print your local IPv4 address",
   );
@@ -498,22 +530,31 @@ async function main(): Promise<void> {
       }
       const donateEnabled = config?.streamer_mode.enable_donate ?? false;
       const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
-      const rows: string[] = ["name,id,enabled,chance(percent),duration,price_group,price"];
+      const rows: string[] = [
+        "name,id,enabled,chance(percent),duration,price_group,price",
+      ];
       for (const e of effects) {
         const name = getString("effects", e.id).replace(/,/g, "");
-        const duration = e.withDuration && e.duration != null ? String(e.duration) : "";
-        const group = donateEnabled && e.price_group ? priceGroups.find((g) => g.group === e.price_group) : undefined;
+        const duration =
+          e.withDuration && e.duration != null ? String(e.duration) : "";
+        const group =
+          donateEnabled && e.price_group
+            ? priceGroups.find((g) => g.group === e.price_group)
+            : undefined;
         const priceGroup = donateEnabled ? e.price_group : "";
-        const price = donateEnabled && e.enabled_donate && group ? String(group.price) : "";
-        rows.push([
-          name,
-          e.id,
-          String(e.enabled),
-          String(e.chance),
-          duration,
-          priceGroup,
-          price,
-        ].join(","));
+        const price =
+          donateEnabled && e.enabled_donate && group ? String(group.price) : "";
+        rows.push(
+          [
+            name,
+            e.id,
+            String(e.enabled),
+            String(e.chance),
+            duration,
+            priceGroup,
+            price,
+          ].join(","),
+        );
       }
       const outputPath = join(luaFolder, "export.csv");
       writeFileSync(outputPath, rows.join("\n"), "utf-8");
@@ -529,7 +570,7 @@ async function main(): Promise<void> {
     () => {
       reloadRuntimeConfig();
     },
-    "Reload config from config.json",
+    "Reload config and effects from config.json and effects.json",
   );
 
   app.registerCommand(

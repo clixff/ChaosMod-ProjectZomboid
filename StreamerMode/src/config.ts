@@ -40,7 +40,7 @@ export interface StreamerModeConfig {
 
 export interface ModConfig {
   lang: string;
-  effects_enabled: boolean;
+  effects_interval_enabled: boolean;
   effects_interval: number;
   vote_start_time: number;
   hide_progress_bar: boolean;
@@ -71,7 +71,10 @@ function strArr(val: unknown, def: string[]): string[] {
     ? val.filter((v): v is string => typeof v === "string")
     : def;
 }
-function priceGroupArr(val: unknown, def: DonatePriceGroup[]): DonatePriceGroup[] {
+function priceGroupArr(
+  val: unknown,
+  def: DonatePriceGroup[],
+): DonatePriceGroup[] {
   if (!Array.isArray(val)) return def;
   const result: DonatePriceGroup[] = [];
   for (const item of val) {
@@ -125,7 +128,7 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
 
 const DEFAULT_CONFIG: ModConfig = {
   lang: "en",
-  effects_enabled: true,
+  effects_interval_enabled: true,
   effects_interval: 45,
   vote_start_time: 15,
   hide_progress_bar: false,
@@ -140,34 +143,73 @@ function parseUI(raw: Record<string, unknown>): UIConfig {
   const d = DEFAULT_UI;
   return {
     progress_bar_color: str(raw["progress_bar_color"], d.progress_bar_color),
-    progress_bar_opacity: num(raw["progress_bar_opacity"], d.progress_bar_opacity),
-    progress_bar_text_color: str(raw["progress_bar_text_color"], d.progress_bar_text_color),
+    progress_bar_opacity: num(
+      raw["progress_bar_opacity"],
+      d.progress_bar_opacity,
+    ),
+    progress_bar_text_color: str(
+      raw["progress_bar_text_color"],
+      d.progress_bar_text_color,
+    ),
     progress_bar_height: num(raw["progress_bar_height"], d.progress_bar_height),
-    effect_progress_color: str(raw["effect_progress_color"], d.effect_progress_color),
-    effect_progress_text_color: str(raw["effect_progress_text_color"], d.effect_progress_text_color),
+    effect_progress_color: str(
+      raw["effect_progress_color"],
+      d.effect_progress_color,
+    ),
+    effect_progress_text_color: str(
+      raw["effect_progress_text_color"],
+      d.effect_progress_text_color,
+    ),
     effects_default_x: num(raw["effects_default_x"], d.effects_default_x),
     effects_default_y: num(raw["effects_default_y"], d.effects_default_y),
-    effects_from_bottom_to_top: bool(raw["effects_from_bottom_to_top"], d.effects_from_bottom_to_top),
-    progress_bar_voting_color: str(raw["progress_bar_voting_color"], d.progress_bar_voting_color),
-    vote_background_color: str(raw["vote_background_color"], d.vote_background_color),
+    effects_from_bottom_to_top: bool(
+      raw["effects_from_bottom_to_top"],
+      d.effects_from_bottom_to_top,
+    ),
+    progress_bar_voting_color: str(
+      raw["progress_bar_voting_color"],
+      d.progress_bar_voting_color,
+    ),
+    vote_background_color: str(
+      raw["vote_background_color"],
+      d.vote_background_color,
+    ),
   };
 }
 
 function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
   const d = DEFAULT_STREAMER_MODE;
   return {
-    streamer_mode_enabled: bool(raw["streamer_mode_enabled"], d.streamer_mode_enabled),
+    streamer_mode_enabled: bool(
+      raw["streamer_mode_enabled"],
+      d.streamer_mode_enabled,
+    ),
     voting_enabled: bool(raw["voting_enabled"], d.voting_enabled),
     voting_mode: num(raw["voting_mode"], d.voting_mode),
     type: str(raw["type"], d.type),
     use_localhost_ip: bool(raw["use_localhost_ip"], d.use_localhost_ip),
-    advanced_voting_numbers: bool(raw["advanced_voting_numbers"], d.advanced_voting_numbers),
-    use_zombie_nicknames: bool(raw["use_zombie_nicknames"], d.use_zombie_nicknames),
-    say_killed_zombie_name: bool(raw["say_killed_zombie_name"], d.say_killed_zombie_name),
-    zombie_nicknames_buffer: num(raw["zombie_nicknames_buffer"], d.zombie_nicknames_buffer),
+    advanced_voting_numbers: bool(
+      raw["advanced_voting_numbers"],
+      d.advanced_voting_numbers,
+    ),
+    use_zombie_nicknames: bool(
+      raw["use_zombie_nicknames"],
+      d.use_zombie_nicknames,
+    ),
+    say_killed_zombie_name: bool(
+      raw["say_killed_zombie_name"],
+      d.say_killed_zombie_name,
+    ),
+    zombie_nicknames_buffer: num(
+      raw["zombie_nicknames_buffer"],
+      d.zombie_nicknames_buffer,
+    ),
     enable_donate: bool(raw["enable_donate"], d.enable_donate),
     donate_providers: strArr(raw["donate_providers"], d.donate_providers),
-    donate_price_groups: priceGroupArr(raw["donate_price_groups"], d.donate_price_groups),
+    donate_price_groups: priceGroupArr(
+      raw["donate_price_groups"],
+      d.donate_price_groups,
+    ),
     allow_vote_command: bool(raw["allow_vote_command"], d.allow_vote_command),
     hide_votes: bool(raw["hide_votes"], d.hide_votes),
   };
@@ -205,14 +247,23 @@ export function loadConfig(modFolder: string): ModConfig {
   const d = DEFAULT_CONFIG;
   return {
     lang: str(raw["lang"], d.lang),
-    effects_enabled: bool(raw["effects_enabled"], d.effects_enabled),
+    effects_interval_enabled: bool(
+      raw["effects_interval_enabled"],
+      d.effects_interval_enabled,
+    ),
     effects_interval: num(raw["effects_interval"], d.effects_interval),
     vote_start_time: num(raw["vote_start_time"], d.vote_start_time),
     hide_progress_bar: bool(raw["hide_progress_bar"], d.hide_progress_bar),
-    use_voting_progress_bar_color: bool(raw["use_voting_progress_bar_color"], d.use_voting_progress_bar_color),
+    use_voting_progress_bar_color: bool(
+      raw["use_voting_progress_bar_color"],
+      d.use_voting_progress_bar_color,
+    ),
     ui: parseUI(obj(raw["ui"])),
     ui_sounds_enabled: bool(raw["ui_sounds_enabled"], d.ui_sounds_enabled),
-    ignore_effect_chances: bool(raw["ignore_effect_chances"], d.ignore_effect_chances),
+    ignore_effect_chances: bool(
+      raw["ignore_effect_chances"],
+      d.ignore_effect_chances,
+    ),
     streamer_mode: parseStreamerMode(obj(raw["streamer_mode"])),
   };
 }

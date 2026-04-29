@@ -24,21 +24,24 @@ export class DonationAlertsProvider {
     return `http://localhost:${port}/provider/donationalerts/success/`;
   }
 
-  async loadCredentials(): Promise<{ appId: string; clientSecret: string } | null> {
+  async loadCredentials(): Promise<{ appId: string; clientSecret: string; currency: string | null } | null> {
     const appId = await Bun.secrets.get({ service: SERVICE, name: "donationalerts-app-id" });
     const clientSecret = await Bun.secrets.get({ service: SERVICE, name: "donationalerts-client-secret" });
+    const currency = await Bun.secrets.get({ service: SERVICE, name: "donationalerts-currency" });
     if (!appId || !clientSecret) return null;
-    return { appId, clientSecret };
+    return { appId, clientSecret, currency };
   }
 
-  async saveCredentials(appId: string, clientSecret: string): Promise<void> {
+  async saveCredentials(appId: string, clientSecret: string, currency: string): Promise<void> {
     await Bun.secrets.set({ service: SERVICE, name: "donationalerts-app-id", value: appId });
     await Bun.secrets.set({ service: SERVICE, name: "donationalerts-client-secret", value: clientSecret });
+    await Bun.secrets.set({ service: SERVICE, name: "donationalerts-currency", value: currency });
   }
 
   async deleteCredentials(): Promise<void> {
     await Bun.secrets.delete({ service: SERVICE, name: "donationalerts-app-id" });
     await Bun.secrets.delete({ service: SERVICE, name: "donationalerts-client-secret" });
+    await Bun.secrets.delete({ service: SERVICE, name: "donationalerts-currency" });
   }
 
   async loadTokens(): Promise<{ accessToken: string; refreshToken: string } | null> {
@@ -69,7 +72,7 @@ export class DonationAlertsProvider {
   async handleOAuthCode(code: string, port: number): Promise<DonationAlertsUser | null> {
     const creds = await this.loadCredentials();
     if (!creds) {
-      logger.error(`[DonationAlerts] No credentials stored — run: donate on donationalerts <app_id> <client_secret>`);
+      logger.error(`[DonationAlerts] No credentials stored — run: donate on donationalerts <app_id> <client_secret> <currency>`);
       return null;
     }
 

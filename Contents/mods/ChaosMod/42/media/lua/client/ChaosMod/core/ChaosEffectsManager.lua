@@ -113,14 +113,15 @@ function ChaosEffectsManager.HandleExternalEffectsRead()
     end
 
     for _, entry in ipairs(entries) do
-        ChaosEffectsManager.StartEffect(entry.effectId)
+        ChaosEffectsManager.StartEffect(entry.effectId, entry.nickname)
         ChaosUIManager.onDonateEffectActivated(entry.nickname, entry.effectId)
     end
 end
 
 ---@param effectId string
+---@param effectNickname string | nil
 ---@return ChaosEffectBase | nil
-function ChaosEffectsManager.StartEffect(effectId)
+function ChaosEffectsManager.StartEffect(effectId, effectNickname)
     if not effectId or effectId == "" then
         print("[ChaosEffectsManager] Effect ID is required")
         return
@@ -142,7 +143,8 @@ function ChaosEffectsManager.StartEffect(effectId)
     end
 
     local effectClass = effectData.class
-    local newEffect = effectClass:new(effectId, effectData.name, effectData.duration, effectData.withDuration)
+    local newEffect = effectClass:new(effectId, effectData.name, effectData.duration, effectData.withDuration,
+        effectNickname)
     if not newEffect then return end
 
     newEffect:OnStart()

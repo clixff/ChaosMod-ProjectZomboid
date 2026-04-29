@@ -40,7 +40,7 @@
 
 ---@class ChaosConfig
 ---@field lang string -- Language code (e.g. "en", "fr")
----@field effects_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
+---@field effects_interval_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
 ---@field effects_interval number
 ---@field vote_start_time number
 ---@field hide_progress_bar boolean
@@ -51,30 +51,30 @@
 ---@field streamer_mode ChaosConfigStreamerMode
 ChaosConfig = ChaosConfig or {
     lang = "en",
-    effects_enabled = true,
+    effects_interval_enabled = true,
     effects_interval = 45,
     vote_start_time = 15,
     hide_progress_bar = false,
     use_voting_progress_bar_color = false,
     ui = {
-        progress_bar_color       = "9f211f",
-        progress_bar_opacity     = 0.9,
-        progress_bar_text_color  = "ffffff",
-        progress_bar_height      = 22,
-        effect_progress_color    = "9f211f",
+        progress_bar_color         = "9f211f",
+        progress_bar_opacity       = 0.9,
+        progress_bar_text_color    = "ffffff",
+        progress_bar_height        = 22,
+        effect_progress_color      = "9f211f",
         effect_progress_text_color = "ffffff",
-        effects_default_x            = 1620,
-        effects_default_y            = 720,
-        effects_from_bottom_to_top   = true,
-        effects_anchor_right         = true,
-        progress_bar_rgb         = { r = 159/255, g = 33/255, b = 31/255 },
-        progress_bar_text_rgb    = { r = 1, g = 1, b = 1 },
-        effect_progress_rgb      = { r = 159/255, g = 33/255, b = 31/255 },
-        effect_progress_text_rgb = { r = 1, g = 1, b = 1 },
-        progress_bar_voting_color = "11a8cd",
-        progress_bar_voting_rgb  = { r = 17/255, g = 168/255, b = 205/255 },
-        vote_background_color    = "9f211f",
-        vote_background_rgb      = { r = 159/255, g = 33/255, b = 31/255 },
+        effects_default_x          = 1620,
+        effects_default_y          = 720,
+        effects_from_bottom_to_top = true,
+        effects_anchor_right       = true,
+        progress_bar_rgb           = { r = 159 / 255, g = 33 / 255, b = 31 / 255 },
+        progress_bar_text_rgb      = { r = 1, g = 1, b = 1 },
+        effect_progress_rgb        = { r = 159 / 255, g = 33 / 255, b = 31 / 255 },
+        effect_progress_text_rgb   = { r = 1, g = 1, b = 1 },
+        progress_bar_voting_color  = "11a8cd",
+        progress_bar_voting_rgb    = { r = 17 / 255, g = 168 / 255, b = 205 / 255 },
+        vote_background_color      = "9f211f",
+        vote_background_rgb        = { r = 159 / 255, g = 33 / 255, b = 31 / 255 },
     },
     ui_sounds_enabled = true,
     ignore_effect_chances = false,
@@ -129,8 +129,8 @@ function ChaosConfig.LoadConfigFromDisk()
         ChaosConfig.lang = configData.lang
     end
 
-    if type(configData.effects_enabled) == "boolean" then
-        ChaosConfig.effects_enabled = configData.effects_enabled
+    if type(configData.effects_interval_enabled) == "boolean" then
+        ChaosConfig.effects_interval_enabled = configData.effects_interval_enabled
     end
 
     if type(configData.effects_interval) == "number" then
@@ -293,7 +293,7 @@ function ChaosConfig.LoadConfigFromDisk()
         end
     end
 
-    print("[ChaosMod] Config effects_enabled: " .. tostring(ChaosConfig.effects_enabled))
+    print("[ChaosMod] Config effects_interval_enabled: " .. tostring(ChaosConfig.effects_interval_enabled))
     print("[ChaosMod] Config streamer_mode.streamer_mode_enabled: " ..
         tostring(ChaosConfig.streamer_mode.streamer_mode_enabled))
     print("[ChaosMod] Config streamer_mode.use_zombie_nicknames: " ..
@@ -338,7 +338,7 @@ function ChaosConfig.IsStreamerVotingEnabled()
         return false
     end
 
-    if ChaosConfig.effects_enabled == false then
+    if ChaosConfig.effects_interval_enabled == false then
         return false
     end
 
@@ -351,7 +351,7 @@ end
 
 ---@return boolean
 function ChaosConfig.IsEffectsEnabled()
-    return ChaosConfig.effects_enabled == true
+    return ChaosConfig.effects_interval_enabled == true
 end
 
 ---@return boolean

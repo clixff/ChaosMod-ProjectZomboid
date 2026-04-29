@@ -21,6 +21,23 @@ ChaosEffectsUI = ISPanel:derive("ChaosEffectsUI")
 
 local MIN_WINDOW_W = 280
 
+---@param effect ChaosEffectBase
+---@return string
+local function buildEffectString(effect)
+    local effectString = tostring(effect.effectName)
+    if effect.withDuration then
+        local msToEnd = effect.maxTicks - effect.ticksActiveTime
+        if effect.effectNickname and effect.effectNickname ~= "" then
+            effectString = string.format("%s %.1fs (%s)", effectString, msToEnd / 1000, effect.effectNickname)
+        else
+            effectString = string.format("%s (%.1fs)", effectString, msToEnd / 1000)
+        end
+    elseif effect.effectNickname and effect.effectNickname ~= "" then
+        effectString = string.format("%s (%s)", effectString, effect.effectNickname)
+    end
+    return effectString
+end
+
 function ChaosEffectsUI:new()
     local titleBarH  = ChaosUIManager.GetScaledWidth(24)
     local toolbarH   = ChaosUIManager.GetScaledWidth(30)
@@ -106,11 +123,7 @@ function ChaosEffectsUI:computeWindowW()
     local activeEffects = ChaosEffectsManager.activeEffects
     for i = 1, #activeEffects do
         local effect = activeEffects[i]
-        local effectString = tostring(effect.effectName)
-        if effect.withDuration then
-            local msToEnd = effect.maxTicks - effect.ticksActiveTime
-            effectString = string.format("%s (%.1fs)", effectString, msToEnd / 1000)
-        end
+        local effectString = buildEffectString(effect)
         local tw = getTextManager():MeasureStringX(UIFont.NewLarge, effectString)
         if tw > maxTextW then maxTextW = tw end
     end
@@ -220,11 +233,7 @@ function ChaosEffectsUI:prerender()
         local effect = activeEffects[i]
         local rowY = titleH + (i - 1) * (self.effectRowH + self.effectGap)
 
-        local effectString = tostring(effect.effectName)
-        if effect.withDuration then
-            local msToEnd = effect.maxTicks - effect.ticksActiveTime
-            effectString = string.format("%s (%.1fs)", effectString, msToEnd / 1000)
-        end
+        local effectString = buildEffectString(effect)
 
         self:drawRect(self.margin, rowY, rectW, self.effectRowH, 0.7, 0.1, 0.1, 0.1)
 

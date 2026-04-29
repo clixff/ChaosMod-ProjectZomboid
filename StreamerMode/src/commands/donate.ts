@@ -20,6 +20,7 @@ export function registerDonateCommand(
       { name: "donationalerts" },
       { name: "app_id" },
       { name: "client_secret" },
+      { name: "currency" },
     ],
     async (args) => {
       const subCmd = args[0]?.toLowerCase();
@@ -44,7 +45,7 @@ export function registerDonateCommand(
 
       if (!providerName) {
         logger.warn(
-          `Usage: ${colors.cyan("donate on|off|login donationalerts [app_id client_secret]")}`,
+          `Usage: ${colors.cyan("donate on|off|login donationalerts [app_id client_secret currency]")}`,
         );
         return;
       }
@@ -57,8 +58,9 @@ export function registerDonateCommand(
       if (subCmd === "on") {
         const appId = args[2];
         const clientSecret = args[3];
+        const currency = args[4]?.toUpperCase();
 
-        if (!appId || !clientSecret) {
+        if (!appId || !clientSecret || !currency) {
           logger.info(`To enable DonationAlerts donations:`);
           logger.info(
             `1. Open ${colors.cyan("https://www.donationalerts.com/application/clients")} and create an application.`,
@@ -67,20 +69,28 @@ export function registerDonateCommand(
             `2. Set the redirect URI to: ${colors.cyan(`http://localhost:${port}/provider/donationalerts/success/`)}`,
           );
           logger.info(
-            `3. Run: ${colors.cyan(`donate on donationalerts <app_id> <client_secret>`)}`,
+            `3. Run: ${colors.cyan(`donate on donationalerts <app_id> <client_secret> <currency>`)}`,
+          );
+          logger.info(
+            `   Example: ${colors.cyan(`donate on donationalerts 123456 your_secret RUB`)}`,
           );
           await open("https://www.donationalerts.com/application/clients");
           return;
         }
 
-        await daProvider.saveCredentials(appId, clientSecret);
+        if (!/^[A-Z]{3}$/.test(currency)) {
+          logger.warn(`[DonationAlerts] Currency must be exactly 3 letters, for example ${colors.cyan("RUB")}.`);
+          return;
+        }
+
+        await daProvider.saveCredentials(appId, clientSecret, currency);
         if (config && modFolder) {
           if (!config.streamer_mode.donate_providers.includes("donationalerts")) {
             config.streamer_mode.donate_providers.push("donationalerts");
             saveConfig(modFolder, config);
           }
         }
-        logger.info(`[DonationAlerts] App credentials saved. Opening login...`);
+        logger.info(`[DonationAlerts] App credentials saved with currency ${currency}. Opening login...`);
         const loginUrl = daProvider.getLoginUrl(port, appId);
         await open(loginUrl);
         return;
@@ -104,7 +114,7 @@ export function registerDonateCommand(
         const creds = await daProvider.loadCredentials();
         if (!creds) {
           logger.warn(
-            `[DonationAlerts] No credentials stored. Run: ${colors.cyan("donate on donationalerts <app_id> <client_secret>")}`,
+            `[DonationAlerts] No credentials stored. Run: ${colors.cyan("donate on donationalerts <app_id> <client_secret> <currency>")}`,
           );
           return;
         }
@@ -115,7 +125,7 @@ export function registerDonateCommand(
       }
 
       logger.warn(
-        `Usage: ${colors.cyan("donate on|off|login donationalerts [app_id client_secret]")}`,
+        `Usage: ${colors.cyan("donate on|off|login donationalerts [app_id client_secret currency]")}`,
       );
     },
     "Manage donation provider login",

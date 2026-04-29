@@ -19,7 +19,7 @@ export class DonationManager {
 
   addProvider(provider: DonationAlertsProvider): void {
     provider.onDonation = (donation) => {
-      this.handleDonation(donation).catch((e: unknown) => {
+      this.handleDonation(provider, donation).catch((e: unknown) => {
         const msg = e instanceof Error ? e.message : String(e);
         logger.error(`[DonationManager] Error handling donation: ${msg}`);
       });
@@ -28,11 +28,30 @@ export class DonationManager {
   }
 
   private async handleDonation(
+    provider: DonationAlertsProvider,
     donation: DonationAlertsDonation,
   ): Promise<void> {
     logger.debug(
       `[DonationAlerts] Donation from ${donation.username}: amount=${donation.amount} ${donation.currency} message="${donation.message}"`,
     );
+
+    const creds = await provider.loadCredentials();
+    const configuredCurrency = creds?.currency?.toUpperCase() ?? null;
+    const donationCurrency = donation.currency.toUpperCase();
+
+    if (!configuredCurrency) {
+      logger.warn(
+        `[DonationAlerts] Donation ignored: no configured currency stored for provider.`,
+      );
+      return;
+    }
+
+    if (donationCurrency !== configuredCurrency) {
+      logger.debug(
+        `[DonationAlerts] Donation ignored: currency ${donationCurrency} does not match configured ${configuredCurrency}.`,
+      );
+      return;
+    }
 
     const match = donation.message.match(/#([\w]+)/);
     if (!match) return;
