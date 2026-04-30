@@ -1,0 +1,27 @@
+[h1]Project Zomboid Chaos Mod[/h1]
+
+[b]A single-player chaos mod for Project Zomboid B42 with Twitch integration.[/b]
+
+This mod triggers a random effect every 45 seconds. Effects can be helpful, dangerous, weird, or completely random.
+
+[h2]Examples of effects[/h2]
+
+[list]
+[*]Spawn Zombie Nearby
+[*]Give Random Tool
+[*]Enable Rain
+[*]Spawn Vehicle Nearby
+[*]Turn Power Off
+[/list]
+
+[h2]Twitch Support[/h2]
+
+Viewers can vote for the next effect, and Twitch nicknames can appear above zombies.
+You can read about Twitch Integration on GitHub page of the mod.
+
+[h2]Configuration[/h2]
+You can read about on GitHub page of the mod.
+
+[h2]Links[/h2]
+
+[url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Repository[/url]

@@ -23,7 +23,7 @@ Chaos Mod also supports Twitch integration. Viewers can vote for the next effect
 ### Method 2 — Manual Installation
 
 1. Set Project Zomboid to the **unstable** branch in Steam.
-2. Download the latest release from [GitHub](https://github.com/clixff/project-zomboid-chaos-mod/releases/latest).
+2. Download the latest release from [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
 3. Extract the **ChaosModPZ** folder to:
 
    ```txt
@@ -74,7 +74,7 @@ The option numbers are displayed in OBS.
 ### Twitch Support Installation
 
 1. Launch the game with the mod enabled at least once.
-2. Download the latest release from [GitHub](https://github.com/clixff/project-zomboid-chaos-mod/releases/latest).
+2. Download the latest release from [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
 3. Extract **ZomboidStreamerApp.exe** to any folder.
 4. Launch **ZomboidStreamerApp.exe**.
 5. Type the following command in the terminal:
@@ -395,6 +395,8 @@ StreamerApp will show instructions for setting up the OBS browser source.
 ### Is multiplayer supported?
 
 No. Chaos Mod is designed for single-player only.
+
+## Development
 
 ## Disclaimer
 
