@@ -17,7 +17,7 @@ Chaos Mod also supports Twitch integration. Viewers can vote for the next effect
 ### Method 1 — Steam Workshop
 
 1. Set Project Zomboid to the **unstable** branch in Steam.
-2. Download the mod from the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3716705997).
+2. Download the mod from the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142).
 3. Enable the mod in the game.
 
 ### Method 2 — Manual Installation
@@ -210,7 +210,7 @@ Config file locations:
 ### Steam Workshop Installation
 
 ```txt
-YOUR_STEAM_FOLDER\steamapps\workshop\content\108600\3716705997\mods\ChaosMod\common\config.json
+YOUR_STEAM_FOLDER\steamapps\workshop\content\108600\3717082142\mods\ChaosMod\common\config.json
 ```
 
 ### Manual Installation
@@ -275,7 +275,7 @@ Effects file locations:
 ### Steam Workshop Installation
 
 ```txt
-YOUR_STEAM_FOLDER\steamapps\workshop\content\108600\3716705997\mods\ChaosMod\common\effects.json
+YOUR_STEAM_FOLDER\steamapps\workshop\content\108600\3717082142\mods\ChaosMod\common\effects.json
 ```
 
 ### Manual Installation

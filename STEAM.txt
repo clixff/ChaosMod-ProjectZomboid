@@ -2,7 +2,14 @@
 
 [b]A single-player chaos mod for Project Zomboid B42 with Twitch integration.[/b]
 
-This mod triggers a random effect every 45 seconds. Effects can be helpful, dangerous, weird, or completely random.
+This mod triggers a random effect every 45 seconds. There are currently [b]230+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
+
+[h2]Game Version[/h2]
+
+This mod requires the [b]B42 version[/b] of Project Zomboid.
+To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
+
+Latest tested version: [b]42.17.0[/b]
 
 [h2]Examples of effects[/h2]
 
@@ -17,10 +24,21 @@ This mod triggers a random effect every 45 seconds. Effects can be helpful, dang
 [h2]Twitch Support[/h2]
 
 Viewers can vote for the next effect, and Twitch nicknames can appear above zombies.
-You can read about Twitch Integration on GitHub page of the mod.
+You can read more about Twitch integration on the mod's GitHub page.
+
+[h2]Languages[/h2]
+
+The mod supports [b]9 languages[/b].
+You can read more about supported languages on the mod's GitHub page.
+
+[h2]Multiplayer[/h2]
+
+This mod does [b]not[/b] support multiplayer.
+It is designed for single-player only.
 
 [h2]Configuration[/h2]
-You can read about on GitHub page of the mod.
+
+You can read more about changing the mod's settings on the mod's GitHub page.
 
 [h2]Links[/h2]
 
