@@ -398,6 +398,9 @@ No. Chaos Mod is designed for single-player only.
 
 ## Development
 
+To start make edits in Lua, you will need to install [EmmyLua](https://github.com/EmmyLua/VSCode-EmmyLua) and [Project Zomboid Umbrella](https://github.com/PZ-Umbrella/Umbrella).
+After installing Umbrella, set environment variable _PZ_UMBRELLA_ to the path of the Umbrella folder.
+
 ## Disclaimer
 
 This mod uses the [json.lua](https://github.com/rxi/json.lua) library.
