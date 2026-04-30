@@ -10,7 +10,15 @@ export const STREAMERMODE_ROOT = COMPILED
   : resolve(import.meta.dir, "..");
 const USER_MOD_PATH =
   process.env["USERPROFILE"] || process.env["HOME"]
-    ? join(process.env["USERPROFILE"] ?? process.env["HOME"] ?? "", "Zomboid", "Workshop", "ChaosModMain", "Contents", "mods", "ChaosMod")
+    ? join(
+        process.env["USERPROFILE"] ?? process.env["HOME"] ?? "",
+        "Zomboid",
+        "Workshop",
+        "ChaosModMain",
+        "Contents",
+        "mods",
+        "ChaosMod",
+      )
     : null;
 
 const DRIVES = ["C", "D", "E", "F", "G", "H"];
@@ -25,6 +33,27 @@ const WORKSHOP_SUFFIX = join("steamapps", "workshop", "content", "108600");
 function saveModFolder(dataRoot: string, modPath: string): void {
   writeFileSync(join(dataRoot, "mod-folder"), modPath, "utf-8");
   logger.debug(`Saved mod folder to mod-folder file: ${modPath}`);
+}
+
+export function isValidModFolderPath(modPath: string): boolean {
+  return (
+    existsSync(modPath) &&
+    existsSync(join(modPath, "common")) &&
+    existsSync(join(modPath, "common", "config.json")) &&
+    existsSync(join(modPath, "common", "effects.json"))
+  );
+}
+
+export function persistModFolder(
+  dataRoot: string,
+  modPath: string,
+): string | null {
+  const resolvedPath = resolve(modPath.trim());
+  if (!isValidModFolderPath(resolvedPath)) {
+    return null;
+  }
+  saveModFolder(dataRoot, resolvedPath);
+  return resolvedPath;
 }
 
 function findInSteam(): string | null {
@@ -47,7 +76,7 @@ function findInSteam(): string | null {
       for (const entry of entries) {
         if (!entry.isDirectory()) continue;
         const modPath = join(workshopPath, entry.name, "mods", "ChaosMod");
-        if (existsSync(modPath)) {
+        if (isValidModFolderPath(modPath)) {
           logger.debug(`Found mod in Steam workshop: ${modPath}`);
           return modPath;
         }
@@ -58,18 +87,18 @@ function findInSteam(): string | null {
 }
 
 function autoDetectModFolder(dataRoot: string): string | null {
-  if (USER_MOD_PATH) {
-    logger.debug(`Checking user Zomboid path: ${USER_MOD_PATH}`);
-    if (existsSync(USER_MOD_PATH)) {
-      saveModFolder(dataRoot, USER_MOD_PATH);
-      return USER_MOD_PATH;
-    }
-  }
-
   const steamPath = findInSteam();
   if (steamPath) {
     saveModFolder(dataRoot, steamPath);
     return steamPath;
+  }
+
+  if (USER_MOD_PATH) {
+    logger.debug(`Checking fallback user Zomboid path: ${USER_MOD_PATH}`);
+    if (isValidModFolderPath(USER_MOD_PATH)) {
+      saveModFolder(dataRoot, USER_MOD_PATH);
+      return USER_MOD_PATH;
+    }
   }
 
   return null;
@@ -81,13 +110,15 @@ export function getModFolder(dataRoot: string): string | null {
     const content = readFileSync(modFolderFile, "utf-8").trim();
     logger.debug(`mod-folder file found, contents: "${content}"`);
 
-    if (content && existsSync(content)) {
+    if (content && isValidModFolderPath(content)) {
       logger.debug(`Mod folder resolved: ${content}`);
       return content;
     }
 
     if (content) {
-      logger.warn(`mod-folder file contains a path that does not exist: "${content}"`);
+      logger.warn(
+        `mod-folder file contains an invalid path: "${content}"`,
+      );
     }
   } else {
     logger.debug("mod-folder file not found, attempting auto-detection...");
@@ -95,7 +126,7 @@ export function getModFolder(dataRoot: string): string | null {
 
   const detected = autoDetectModFolder(dataRoot);
   if (!detected) {
-    logger.warn("Auto-detection failed — mod folder not found. Create a mod-folder file in the Lua/ChaosMod folder.");
+    logger.warn("Auto-detection failed — mod folder not found.");
   }
   return detected;
 }

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { copyFileSync, existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { logger } from "./utils/logger.ts";
 
@@ -98,9 +98,24 @@ const DEFAULT_UI: UIConfig = {
   effects_default_x: 1620,
   effects_default_y: 720,
   effects_from_bottom_to_top: true,
-  progress_bar_voting_color: "11a8cd",
+  progress_bar_voting_color: "3b8eea",
   vote_background_color: "9f211f",
 };
+
+const DEFAULT_DONATE_PRICE_GROUPS: DonatePriceGroup[] = [
+  { group: "positive_1", price: 1 },
+  { group: "positive_2", price: 2.5 },
+  { group: "positive_3", price: 5 },
+  { group: "positive_4", price: 7.5 },
+  { group: "negative_1", price: 1 },
+  { group: "negative_2", price: 2.5 },
+  { group: "negative_3", price: 5 },
+  { group: "negative_4", price: 7.5 },
+  { group: "neutral_1", price: 1 },
+  { group: "neutral_2", price: 2.5 },
+  { group: "neutral_3", price: 5 },
+  { group: "neutral_4", price: 7.5 },
+];
 
 const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   streamer_mode_enabled: true,
@@ -114,14 +129,7 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   zombie_nicknames_buffer: 150,
   enable_donate: false,
   donate_providers: [],
-  donate_price_groups: [
-    { group: "1", price: 1.0 },
-    { group: "2", price: 2.0 },
-    { group: "3", price: 4.0 },
-    { group: "4", price: 5.0 },
-    { group: "5", price: 7.5 },
-    { group: "6", price: 10.0 },
-  ],
+  donate_price_groups: DEFAULT_DONATE_PRICE_GROUPS,
   allow_vote_command: true,
   hide_votes: false,
 };
@@ -138,6 +146,34 @@ const DEFAULT_CONFIG: ModConfig = {
   ignore_effect_chances: false,
   streamer_mode: DEFAULT_STREAMER_MODE,
 };
+
+function cloneConfig(config: ModConfig): ModConfig {
+  return JSON.parse(JSON.stringify(config)) as ModConfig;
+}
+
+function isPlainObject(val: unknown): val is Record<string, unknown> {
+  return val !== null && typeof val === "object" && !Array.isArray(val);
+}
+
+function mergeDefaultsPreservingUnknowns(
+  existing: unknown,
+  defaults: unknown,
+): unknown {
+  if (Array.isArray(defaults)) {
+    return JSON.parse(JSON.stringify(defaults));
+  }
+
+  if (isPlainObject(defaults)) {
+    const source = isPlainObject(existing) ? existing : {};
+    const result: Record<string, unknown> = { ...source };
+    for (const [key, value] of Object.entries(defaults)) {
+      result[key] = mergeDefaultsPreservingUnknowns(source[key], value);
+    }
+    return result;
+  }
+
+  return defaults;
+}
 
 function parseUI(raw: Record<string, unknown>): UIConfig {
   const d = DEFAULT_UI;
@@ -218,7 +254,12 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
 export function saveConfig(modFolder: string, config: ModConfig): void {
   const configPath = join(modFolder, "common", "config.json");
   try {
-    writeFileSync(configPath, JSON.stringify(config, null, 4), "utf-8");
+    let existingRaw: Record<string, unknown> = {};
+    if (existsSync(configPath)) {
+      existingRaw = obj(JSON.parse(readFileSync(configPath, "utf-8")));
+    }
+    const merged = mergeDefaultsPreservingUnknowns(existingRaw, config);
+    writeFileSync(configPath, JSON.stringify(merged, null, 4), "utf-8");
     logger.debug(`Config saved to ${configPath}`);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
@@ -231,7 +272,7 @@ export function loadConfig(modFolder: string): ModConfig {
 
   if (!existsSync(configPath)) {
     logger.warn(`config.json not found at ${configPath}, using defaults`);
-    return DEFAULT_CONFIG;
+    return cloneConfig(DEFAULT_CONFIG);
   }
 
   let raw: Record<string, unknown>;
@@ -241,7 +282,7 @@ export function loadConfig(modFolder: string): ModConfig {
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     logger.error(`Failed to parse config.json: ${msg}`);
-    return DEFAULT_CONFIG;
+    return cloneConfig(DEFAULT_CONFIG);
   }
 
   const d = DEFAULT_CONFIG;
@@ -266,4 +307,57 @@ export function loadConfig(modFolder: string): ModConfig {
     ),
     streamer_mode: parseStreamerMode(obj(raw["streamer_mode"])),
   };
+}
+
+export function resetConfigToDefaultsPreservingUnknowns(
+  modFolder: string,
+): ModConfig | null {
+  const configPath = join(modFolder, "common", "config.json");
+  const backupPath = join(modFolder, "common", "config_backup.json");
+
+  let existingRaw: Record<string, unknown> = {};
+  if (existsSync(configPath)) {
+    try {
+      existingRaw = obj(JSON.parse(readFileSync(configPath, "utf-8")));
+      copyFileSync(configPath, backupPath);
+      logger.debug(`Config backup saved to ${backupPath}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`Failed to backup config.json: ${msg}`);
+      return null;
+    }
+  } else {
+    try {
+      writeFileSync(
+        backupPath,
+        JSON.stringify(cloneConfig(DEFAULT_CONFIG), null, 4),
+        "utf-8",
+      );
+      logger.debug(`Config backup saved to ${backupPath}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`Failed to create config_backup.json: ${msg}`);
+      return null;
+    }
+  }
+
+  const merged = mergeDefaultsPreservingUnknowns(
+    existingRaw,
+    cloneConfig(DEFAULT_CONFIG),
+  );
+  if (!isPlainObject(merged)) {
+    logger.error("Failed to build default config payload.");
+    return null;
+  }
+
+  try {
+    writeFileSync(configPath, JSON.stringify(merged, null, 4), "utf-8");
+    logger.debug(`Default config saved to ${configPath}`);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.error(`Failed to save default config.json: ${msg}`);
+    return null;
+  }
+
+  return loadConfig(modFolder);
 }

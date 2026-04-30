@@ -3,11 +3,23 @@ import open from "open";
 import { writeFileSync } from "fs";
 import { join } from "path";
 import { networkInterfaces } from "os";
+import { spawnSync } from "child_process";
+import readline from "readline/promises";
+import { stdin as input, stdout as output } from "process";
 import { App } from "./src/cli/App.ts";
 import { logger, setDebugMode } from "./src/utils/logger.ts";
-import { getModFolder, STREAMERMODE_ROOT } from "./src/modFolder.ts";
+import {
+  getModFolder,
+  isValidModFolderPath,
+  persistModFolder,
+  STREAMERMODE_ROOT,
+} from "./src/modFolder.ts";
 import { setupLuaFolder } from "./src/luaFolder.ts";
-import { loadConfig, saveConfig } from "./src/config.ts";
+import {
+  loadConfig,
+  resetConfigToDefaultsPreservingUnknowns,
+  saveConfig,
+} from "./src/config.ts";
 import { registerLangCommand } from "./src/commands/lang.ts";
 import { loadEffects } from "./src/effects.ts";
 import { startServer } from "./src/server.ts";
@@ -22,6 +34,7 @@ import { ExternalEffectsManager } from "./src/externalEffects.ts";
 import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
 import { DonationManager } from "./src/donations/DonationManager.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
+import type { EffectEntry } from "./src/effects.ts";
 
 function getBestLocalIPv4(): {
   interfaceName: string;
@@ -63,8 +76,36 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "0.1.0";
+const VERSION = "1.0.1";
 const DEFAULT_PORT = 3959;
+
+type EffectResponseEntry = EffectEntry & {
+  price_group: string;
+  price_result: number | null;
+};
+
+function buildEffectResponseEntry(
+  effect: EffectEntry,
+  priceGroups: Array<{ group: string; price: number }>,
+): EffectResponseEntry {
+  if (!effect.enabled_donate) {
+    return {
+      ...effect,
+      price_group: "",
+      price_result: null,
+    };
+  }
+
+  const group = effect.price_group
+    ? priceGroups.find((entry) => entry.group === effect.price_group)
+    : undefined;
+
+  return {
+    ...effect,
+    price_group: effect.price_group,
+    price_result: group ? group.price : null,
+  };
+}
 
 const KNOWN_ARGS_EXACT = new Set([
   "--version",
@@ -73,6 +114,7 @@ const KNOWN_ARGS_EXACT = new Set([
   "--debug-votes",
 ]);
 const KNOWN_ARGS_PREFIXES = ["--port=", "--host="];
+let fatalExitInProgress = false;
 
 function isKnownArg(arg: string): boolean {
   if (KNOWN_ARGS_EXACT.has(arg)) return true;
@@ -83,18 +125,55 @@ function printVersion(): void {
   console.log(`ChaosMod Streamer Mode v${VERSION}`);
 }
 
+async function pauseBeforeExitOnError(): Promise<void> {
+  if (process.platform === "win32") {
+    try {
+      spawnSync("cmd.exe", ["/c", "pause"], {
+        stdio: "inherit",
+        windowsHide: false,
+      });
+      return;
+    } catch {
+      // Fall through to readline-based pause.
+    }
+  }
+
+  if (!input.isTTY || !output.isTTY) {
+    return;
+  }
+
+  const rl = readline.createInterface({ input, output });
+  try {
+    await rl.question(colors.gray("Press Enter to close... "));
+  } catch {
+    // Ignore prompt errors during shutdown.
+  } finally {
+    rl.close();
+  }
+}
+
+async function handleFatalError(err: unknown): Promise<never> {
+  if (fatalExitInProgress) {
+    process.exit(1);
+  }
+  fatalExitInProgress = true;
+
+  const message =
+    err instanceof Error ? (err.stack ?? err.message) : String(err);
+  console.error(colors.red(`Fatal error: ${message}`));
+  await pauseBeforeExitOnError();
+  process.exit(1);
+}
+
 function parsePortArg(args: string[]): number {
   const portArg = args.find((a) => a.startsWith("--port="));
   if (!portArg) return DEFAULT_PORT;
   const raw = portArg.slice("--port=".length);
   const val = parseInt(raw, 10);
   if (!Number.isInteger(val) || val < 1 || val > 65535) {
-    console.error(
-      colors.red(
-        `Invalid port "${raw}". Must be an integer between 1 and 65535.`,
-      ),
+    throw new Error(
+      `Invalid port "${raw}". Must be an integer between 1 and 65535.`,
     );
-    process.exit(1);
   }
   return val;
 }
@@ -104,8 +183,7 @@ function parseHostArg(args: string[]): string | null {
   if (!hostArg) return null;
   const val = hostArg.slice("--host=".length);
   if (!val) {
-    console.error(colors.red(`--host value cannot be empty.`));
-    process.exit(1);
+    throw new Error(`--host value cannot be empty.`);
   }
   return val;
 }
@@ -130,18 +208,49 @@ function applyLoadedConfig(
   initLocalization(modFolder, targetConfig.lang);
 }
 
+async function promptForModFolder(dataRoot: string): Promise<string> {
+  const rl = readline.createInterface({ input, output });
+
+  try {
+    logger.warn("Auto-detection failed — mod folder not found.");
+    logger.info("Enter the full path to the ChaosMod mod folder.");
+
+    while (true) {
+      const answer = (await rl.question("Mod folder path: ")).trim();
+      if (!answer) {
+        logger.warn("Mod folder path cannot be empty.");
+        continue;
+      }
+
+      if (!isValidModFolderPath(answer)) {
+        logger.warn(
+          `Invalid mod folder path. Expected a ChaosMod folder containing ${colors.cyan("common/config.json")} and ${colors.cyan("common/effects.json")}.`,
+        );
+        continue;
+      }
+
+      const savedPath = persistModFolder(dataRoot, answer);
+      if (!savedPath) {
+        logger.warn("Failed to save mod folder path.");
+        continue;
+      }
+
+      logger.info(`Mod folder saved: ${colors.cyan(savedPath)}`);
+      return savedPath;
+    }
+  } finally {
+    rl.close();
+  }
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
 
   const unknownArgs = args.filter((a) => !isKnownArg(a));
   if (unknownArgs.length > 0) {
-    console.error(colors.red(`Unknown argument(s): ${unknownArgs.join(", ")}`));
-    console.error(
-      colors.gray(
-        `Known arguments: ${[...KNOWN_ARGS_EXACT, ...KNOWN_ARGS_PREFIXES.map((p) => `${p}<value>`)].join(", ")}`,
-      ),
+    throw new Error(
+      `Unknown argument(s): ${unknownArgs.join(", ")}\nKnown arguments: ${[...KNOWN_ARGS_EXACT, ...KNOWN_ARGS_PREFIXES.map((p) => `${p}<value>`)].join(", ")}`,
     );
-    process.exit(1);
   }
 
   if (args.includes("--version")) {
@@ -159,7 +268,10 @@ async function main(): Promise<void> {
 
   const luaFolder = setupLuaFolder();
   const dataRoot = luaFolder ?? STREAMERMODE_ROOT;
-  const modFolder = getModFolder(dataRoot);
+  let modFolder = getModFolder(dataRoot);
+  if (!modFolder) {
+    modFolder = await promptForModFolder(dataRoot);
+  }
   const config = modFolder ? loadConfig(modFolder) : null;
   const effects = modFolder ? loadEffects(modFolder) : [];
 
@@ -388,6 +500,10 @@ async function main(): Promise<void> {
       ) {
         return { success: false, error: "Not available" };
       }
+      const effect = effects.find((entry) => entry.id === effectId);
+      if (!effect?.enabled_donate) {
+        return { success: false, error: "Effect is not available for donations" };
+      }
       if (!externalEffectsManager) {
         return { success: false, error: "Lua folder not available" };
       }
@@ -395,20 +511,9 @@ async function main(): Promise<void> {
       return { success: true };
     },
     getEffectsResponse: () => {
-      const donateEnabled = config?.streamer_mode.enable_donate ?? false;
-      if (!donateEnabled) {
-        return { effects };
-      }
       const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
       return {
-        effects: effects.map((e) => {
-          let price_result: number | null = null;
-          if (e.enabled_donate && e.price_group) {
-            const group = priceGroups.find((g) => g.group === e.price_group);
-            price_result = group ? group.price : null;
-          }
-          return { ...e, price_result };
-        }),
+        effects: effects.map((e) => buildEffectResponseEntry(e, priceGroups)),
       };
     },
   });
@@ -528,37 +633,44 @@ async function main(): Promise<void> {
         logger.warn("Lua folder not available.");
         return;
       }
-      const donateEnabled = config?.streamer_mode.enable_donate ?? false;
       const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
       const rows: string[] = [
-        "name,id,enabled,chance(percent),duration,price_group,price",
+        "name,id,enabled,chance,duration,price_group,price",
       ];
       for (const e of effects) {
+        const effect = buildEffectResponseEntry(e, priceGroups);
         const name = getString("effects", e.id).replace(/,/g, "");
         const duration =
           e.withDuration && e.duration != null ? String(e.duration) : "";
-        const group =
-          donateEnabled && e.price_group
-            ? priceGroups.find((g) => g.group === e.price_group)
-            : undefined;
-        const priceGroup = donateEnabled ? e.price_group : "";
-        const price =
-          donateEnabled && e.enabled_donate && group ? String(group.price) : "";
         rows.push(
           [
             name,
             e.id,
             String(e.enabled),
-            String(e.chance),
+            `${e.chance}%`,
             duration,
-            priceGroup,
-            price,
+            effect.price_group,
+            effect.price_result != null ? String(effect.price_result) : "",
           ].join(","),
         );
       }
       const outputPath = join(luaFolder, "export.csv");
       writeFileSync(outputPath, rows.join("\n"), "utf-8");
       logger.info(`Exported to ${colors.cyan(outputPath)}`);
+      console.log("");
+      logger.info(colors.bold("Google Sheets:"));
+      logger.info(
+        `1. Open ${colors.cyan("https://docs.google.com/spreadsheets/")}.`,
+      );
+      logger.info(
+        `2. Press ${colors.green("Plus")} to create a new spreadsheet.`,
+      );
+      logger.info(`3. Open ${colors.yellow("File -> Import -> Upload")}.`);
+      logger.info(`4. Upload ${colors.cyan(outputPath)}.`);
+      logger.info(`5. Open ${colors.yellow("Format -> Convert to table")}.`);
+      logger.info(
+        `6. Open ${colors.green("Share")} in the top-right corner, then set ${colors.yellow("General access -> Anyone with the link -> Viewer")}.`,
+      );
     },
     "Export effects to a CSV file in the Lua folder",
   );
@@ -571,6 +683,30 @@ async function main(): Promise<void> {
       reloadRuntimeConfig();
     },
     "Reload config and effects from config.json and effects.json",
+  );
+
+  app.registerCommand(
+    "default_config",
+    [],
+    [],
+    () => {
+      if (!config || !modFolder) {
+        logger.warn("Config not available.");
+        return;
+      }
+
+      const nextConfig = resetConfigToDefaultsPreservingUnknowns(modFolder);
+      if (!nextConfig) {
+        logger.warn("Failed to reset config.");
+        return;
+      }
+
+      applyLoadedConfig(config, nextConfig, modFolder);
+      logger.info(
+        `Config reset to defaults, backup saved as ${colors.cyan("config_backup.json")}. Unknown custom fields were preserved.`,
+      );
+    },
+    "Reset config.json to typed defaults and create config_backup.json",
   );
 
   app.registerCommand(
@@ -698,8 +834,14 @@ async function main(): Promise<void> {
   await app.start();
 }
 
+process.on("uncaughtException", (err) => {
+  void handleFatalError(err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  void handleFatalError(reason);
+});
+
 main().catch((err: unknown) => {
-  const message = err instanceof Error ? err.message : String(err);
-  console.error(colors.red(`Fatal error: ${message}`));
-  process.exit(1);
+  void handleFatalError(err);
 });

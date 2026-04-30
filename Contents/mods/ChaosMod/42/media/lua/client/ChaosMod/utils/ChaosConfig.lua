@@ -71,7 +71,7 @@ ChaosConfig = ChaosConfig or {
         progress_bar_text_rgb      = { r = 1, g = 1, b = 1 },
         effect_progress_rgb        = { r = 159 / 255, g = 33 / 255, b = 31 / 255 },
         effect_progress_text_rgb   = { r = 1, g = 1, b = 1 },
-        progress_bar_voting_color  = "11a8cd",
+        progress_bar_voting_color  = "3b8eea",
         progress_bar_voting_rgb    = { r = 17 / 255, g = 168 / 255, b = 205 / 255 },
         vote_background_color      = "9f211f",
         vote_background_rgb        = { r = 159 / 255, g = 33 / 255, b = 31 / 255 },

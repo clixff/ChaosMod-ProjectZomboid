@@ -2080,6 +2080,66 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
+        },
+        {
+            "id": "all_zombies_are_cops",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_2"
+        },
+        {
+            "id": "replace_zombies_with_animals",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "spawn_trees",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_3"
+        },
+        {
+            "id": "kamikaze_zombies",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "kamikaze_zombies"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "disney_princess",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "give_spoon_weapon",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_2"
+        },
+        {
+            "id": "effect_spawn_friendly_clone",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
         }
     ]
 }

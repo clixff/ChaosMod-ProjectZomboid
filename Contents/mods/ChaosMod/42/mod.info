@@ -1,7 +1,7 @@
 name=Chaos Mod
 id=ChaosMod
 author=zoidxf
-description=Chaos mod.
+description=Chaos Mod introduces a timed random effect system for Project Zomboid, applying a variety of beneficial, harmful, and neutral effects during gameplay. The mod also includes Twitch integration, allowing viewers to participate in effect voting and displaying Twitch viewer nicknames above zombies.
 poster=preview.png
 icon=preview.png
-modversion=0.1.0
+modversion=1.0.1

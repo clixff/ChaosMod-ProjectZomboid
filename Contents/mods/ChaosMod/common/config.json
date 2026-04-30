@@ -1,5 +1,5 @@
 {
-    "lang": "ru",
+    "lang": "en",
     "effects_interval_enabled": true,
     "effects_interval": 45,
     "vote_start_time": 10,
@@ -22,15 +22,15 @@
     "ignore_effect_chances": false,
     "streamer_mode": {
         "streamer_mode_enabled": true,
-        "voting_enabled": true,
+        "voting_enabled": false,
         "voting_mode": 0,
         "type": "twitch",
-        "use_localhost_ip": false,
+        "use_localhost_ip": true,
         "advanced_voting_numbers": true,
         "use_zombie_nicknames": true,
         "say_killed_zombie_name": true,
         "zombie_nicknames_buffer": 150,
-        "enable_donate": true,
+        "enable_donate": false,
         "donate_providers": [],
         "donate_price_groups": [
             {
@@ -47,7 +47,7 @@
             },
             {
                 "group": "positive_4",
-                "price": 7.5
+                "price": 7
             },
             {
                 "group": "negative_1",
@@ -63,7 +63,7 @@
             },
             {
                 "group": "negative_4",
-                "price": 7.5
+                "price": 7
             },
             {
                 "group": "neutral_1",
@@ -75,11 +75,11 @@
             },
             {
                 "group": "neutral_3",
-                "price": 5
+                "price": 4.5
             },
             {
                 "group": "neutral_4",
-                "price": 7.5
+                "price": 7
             }
         ],
         "allow_vote_command": true,
