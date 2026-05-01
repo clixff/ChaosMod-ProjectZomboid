@@ -88,6 +88,7 @@ export function App() {
     bgColor: "#9f211f",
     lastWinner: null,
   });
+  const [hasSeenVoteOptions, setHasSeenVoteOptions] = useState(false);
 
   const displayStateRef = useRef(displayState);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -102,6 +103,10 @@ export function App() {
         const res = await fetch("/mod/status");
         if (!res.ok) return;
         const data = (await res.json()) as ModStatus;
+
+        if (data.vote_options.length > 0) {
+          setHasSeenVoteOptions(true);
+        }
 
         if (data.voting_enabled && data.vote_options.length > 0) {
           if (hideTimerRef.current !== null) {
@@ -166,6 +171,15 @@ export function App() {
   }, []);
 
   const { mode, options, totalVotes, totalVotesLabel, bgColor, lastWinner } = displayState;
+
+  if (!hasSeenVoteOptions && mode === "hidden" && options.length === 0) {
+    return (
+      <main className="overlay overlay--idle">
+        <div className="idle-line">Chaos Mod OBS is working</div>
+        <div className="idle-line">Waiting for vote</div>
+      </main>
+    );
+  }
 
   if (mode === "hidden" || options.length === 0) return null;
 
