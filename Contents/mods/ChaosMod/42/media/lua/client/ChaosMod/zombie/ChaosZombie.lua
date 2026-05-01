@@ -1,4 +1,6 @@
 ChaosZombie = ChaosZombie or {}
+ChaosZombie.modDataChatLineKey = "ChaosModChatLine"
+ChaosZombie.modDataChatLineTimestampKey = "ChaosModChatLineTimestampMs"
 
 ---@param player IsoGameCharacter
 ---@param zombie IsoZombie
@@ -37,6 +39,30 @@ function ChaosZombie.CanPlayerSeeZombie(player, zombie, checkLightLevel, doLineT
             return false
         end
     end
+    return true
+end
+
+---@param zombie IsoZombie
+---@param text string|nil
+---@return boolean
+function ChaosZombie.AddNewChatLine(zombie, text)
+    if not zombie then
+        return false
+    end
+
+    local md = zombie:getModData()
+    if not md then
+        return false
+    end
+
+    if type(text) ~= "string" or text == "" then
+        md[ChaosZombie.modDataChatLineKey] = nil
+        md[ChaosZombie.modDataChatLineTimestampKey] = nil
+        return true
+    end
+
+    md[ChaosZombie.modDataChatLineKey] = text
+    md[ChaosZombie.modDataChatLineTimestampKey] = getTimestampMs()
     return true
 end
 
@@ -146,8 +172,8 @@ function ChaosZombie.OnZombieDead(zombie)
             local phrases = { "Wow!", "Cool!", "Amazing!", "Incredible!", "Awesome!" }
             for _, fan in ipairs(adoringFans) do
                 local phrase = phrases[math.floor(ZombRand(#phrases) + 1)]
-                if phrase then
-                    fan:SayDebug(phrase)
+                if phrase and fan.zombie then
+                    ChaosZombie.AddNewChatLine(fan.zombie, phrase)
                 end
             end
         end
