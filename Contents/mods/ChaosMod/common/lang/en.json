@@ -263,7 +263,9 @@
         "cure_zombies_nearby": "Cure Zombies Nearby",
         "rainbow_cars": "Rainbow Cars",
         "spawn_explosive_flamingo": "Spawn Explosive Flamingo",
-        "spawn_pig_follower": "Spawn Pig Follower"
+        "spawn_pig_follower": "Spawn Pig Follower",
+        "remember_code": "Remember Code",
+        "select_random_card": "Select Random Card"
     },
     "core": {
         "start_mod": "Start ChaosMod",

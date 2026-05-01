@@ -263,7 +263,9 @@
         "cure_zombies_nearby": "Wylecz pobliskie zombie",
         "rainbow_cars": "Teczowe samochody",
         "spawn_explosive_flamingo": "Stworz wybuchowego flaminga",
-        "spawn_pig_follower": "Stworz podazajaca swinie"
+        "spawn_pig_follower": "Stworz podazajaca swinie",
+        "remember_code": "Zapamietaj kod",
+        "select_random_card": "Wybierz losowa karte"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

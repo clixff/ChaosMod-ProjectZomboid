@@ -263,7 +263,9 @@
         "cure_zombies_nearby": "Soigner les zombies proches",
         "rainbow_cars": "Voitures arc-en-ciel",
         "spawn_explosive_flamingo": "Faire apparaitre un flamant explosif",
-        "spawn_pig_follower": "Faire apparaitre un cochon suiveur"
+        "spawn_pig_follower": "Faire apparaitre un cochon suiveur",
+        "remember_code": "Memoriser le code",
+        "select_random_card": "Selectionner une carte aleatoire"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

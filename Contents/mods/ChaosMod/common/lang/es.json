@@ -263,7 +263,9 @@
         "cure_zombies_nearby": "Curar zombis cercanos",
         "rainbow_cars": "Coches arcoiris",
         "spawn_explosive_flamingo": "Generar flamenco explosivo",
-        "spawn_pig_follower": "Generar cerdo seguidor"
+        "spawn_pig_follower": "Generar cerdo seguidor",
+        "remember_code": "Recordar codigo",
+        "select_random_card": "Seleccionar carta aleatoria"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

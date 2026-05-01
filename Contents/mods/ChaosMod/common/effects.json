@@ -2306,6 +2306,24 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
+        },
+        {
+            "id": "remember_code",
+            "enabled": true,
+            "chance": 45,
+            "withDuration": true,
+            "duration": 35,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "select_random_card",
+            "enabled": true,
+            "chance": 35,
+            "withDuration": true,
+            "duration": 60,
+            "enabled_donate": true,
+            "price_group": "neutral_4"
         }
     ]
 }

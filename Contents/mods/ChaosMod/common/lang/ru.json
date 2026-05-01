@@ -264,7 +264,9 @@
         "cure_zombies_nearby": "Вылечить зомби поблизости",
         "rainbow_cars": "Радужные машины",
         "spawn_explosive_flamingo": "Заспавнить взрывного фламинго",
-        "spawn_pig_follower": "Заспавнить свинью-спутника"
+        "spawn_pig_follower": "Заспавнить свинью-спутника",
+        "remember_code": "Запомни код",
+        "select_random_card": "Выбери случайную карту"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

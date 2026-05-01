@@ -263,7 +263,9 @@
         "cure_zombies_nearby": "Curar zumbis proximos",
         "rainbow_cars": "Carros arco-iris",
         "spawn_explosive_flamingo": "Gerar flamingo explosivo",
-        "spawn_pig_follower": "Gerar porco seguidor"
+        "spawn_pig_follower": "Gerar porco seguidor",
+        "remember_code": "Memorizar codigo",
+        "select_random_card": "Selecionar carta aleatoria"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

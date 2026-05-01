@@ -263,7 +263,9 @@
         "cure_zombies_nearby": "Nahegelegene Zombies heilen",
         "rainbow_cars": "Regenbogenautos",
         "spawn_explosive_flamingo": "Explosiven Flamingo spawnen",
-        "spawn_pig_follower": "Begleitschwein spawnen"
+        "spawn_pig_follower": "Begleitschwein spawnen",
+        "remember_code": "Code merken",
+        "select_random_card": "Zufallskarte waehlen"
     },
     "core": {
         "start_mod": "ChaosMod starten",
