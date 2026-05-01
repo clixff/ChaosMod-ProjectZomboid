@@ -1,3 +1,12 @@
+---@param npc ChaosNPC
+---@return boolean
+local function canOpenWindowsAndDoorsWithoutDamage(npc)
+    if not npc then return false end
+
+    return npc.npcGroup == ChaosNPCGroupID.COMPANIONS or
+        npc.npcGroup == ChaosNPCGroupID.FOLLOWERS
+end
+
 function ChaosNPC:HandleCollisions()
     if not self.zombie then return end
     if self.isAttacking then return end
@@ -16,7 +25,7 @@ function ChaosNPC:HandleCollisions()
     local forwardY = zombie:getForwardDirectionY()
 
     local squaresToCheck = {
-        { x = math.floor(x1), y = math.floor(y1), z = z1 },
+        { x = math.floor(x1),            y = math.floor(y1),            z = z1 },
         { x = math.floor(x1 + forwardX), y = math.floor(y1 + forwardY), z = z1 },
     }
 
@@ -44,6 +53,7 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
     if not object:getProperties() then return false end
 
     local isHostileToPlayer = ChaosNPCRelations.CanNPCDestroyObjects(self)
+    local canOpenWithoutDamage = canOpenWindowsAndDoorsWithoutDamage(self)
 
     if instanceof(object, "IsoWindow") then
         ---@type IsoWindow
@@ -59,6 +69,19 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
         end
 
         if not window:IsOpen() and not window:isSmashed() then
+            local isLockedWindow = false
+            if window.isPermaLocked and window:isPermaLocked() then
+                isLockedWindow = true
+            end
+            if window.isLocked and window:isLocked() then
+                isLockedWindow = true
+            end
+
+            if canOpenWithoutDamage and not isLockedWindow then
+                window:ToggleWindow(zombie)
+                return true
+            end
+
             if isHostileToPlayer then
                 self:StartAttackingObject(window, "window")
                 return true
@@ -80,17 +103,29 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
         end
 
         local zombieSquare = zombie:getSquare()
-        local isLocked = door:isLocked() or door:isLockedByKey()
+        local isLocked = false
+        if door.isLocked and door:isLocked() then
+            isLocked = true
+        end
+        if door.isLockedByKey and door:isLockedByKey() then
+            isLocked = true
+        end
         local canOpenDoor = true
 
-        if zombieSquare:isOutside() then
+        if zombieSquare:getRoom() == nil and not canOpenWithoutDamage then
             if isHostileToPlayer or isLocked then
                 canOpenDoor = false
             end
         end
 
+        if canOpenWithoutDamage and isLocked then
+            canOpenDoor = false
+        end
+
+        print("[ChaosNPCCollisionSystem] canOpenDoor: " .. tostring(canOpenDoor))
+
         if canOpenDoor then
-            door:ToggleDoor(zombie)
+            door:ToggleDoor(getPlayer())
             return true
         elseif isHostileToPlayer then
             local isGarageDoor = IsoDoor.getGarageDoorIndex(door) ~= -1
