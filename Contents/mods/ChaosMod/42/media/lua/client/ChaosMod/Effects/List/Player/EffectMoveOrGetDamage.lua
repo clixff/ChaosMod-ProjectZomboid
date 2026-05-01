@@ -13,7 +13,7 @@ local DAMAGE_COOLDOWN_MS = 5000
 function EffectMoveOrGetDamage:OnStart()
     ChaosEffectBase:OnStart()
     self.checkIntervalMs = 0
-    self.cooldownMs = 0
+    self.cooldownMs = DAMAGE_COOLDOWN_MS
 
     ChaosPlayer.SayLineByColor(getPlayer(), "Move or get damage", ChaosPlayerChatColors.red)
 

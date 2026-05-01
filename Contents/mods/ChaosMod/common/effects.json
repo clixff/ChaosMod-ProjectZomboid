@@ -2156,6 +2156,55 @@
             "chance": 20,
             "withDuration": false,
             "enabled_donate": true,
+            "price_group": "negative_2"
+        },
+        {
+            "id": "remove_trees_nearby",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_2"
+        },
+        {
+            "id": "blood_trail",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 60,
+            "enabled_donate": true,
+            "price_group": "neutral_2"
+        },
+        {
+            "id": "blood_bath",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_2"
+        },
+        {
+            "id": "barricade_nearby_windows",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_3"
+        },
+        {
+            "id": "spawn_broken_glass",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_2"
+        },
+        {
+            "id": "womanizer",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
             "price_group": "negative_4"
         }
     ]
