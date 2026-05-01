@@ -3,7 +3,8 @@ import type { DonationAlertsProvider } from "../donationalerts/DonationAlertsPro
 import type { DonationAlertsDonation } from "../donationalerts/types.ts";
 
 interface EffectEntry {
-  id: string;
+  id: number;
+  effect_id: string;
   enabled_donate: boolean;
   price_result: number | null | undefined;
 }
@@ -55,9 +56,10 @@ export class DonationManager {
 
     const match = donation.message.match(/#([\w]+)/);
     if (!match) return;
-    const effectId = match[1];
+    const effectTag = match[1];
+    if (!effectTag) return;
 
-    logger.debug(`[DonationAlerts] Effect tag found: #${effectId}`);
+    logger.debug(`[DonationAlerts] Effect tag found: #${effectTag}`);
 
     let effectsData: EffectsApiResponse;
     try {
@@ -69,22 +71,30 @@ export class DonationManager {
       return;
     }
 
-    const effect = effectsData.effects.find((e) => e.id === effectId);
+    const effect = effectsData.effects.find((entry) => {
+      if (entry.effect_id === effectTag) {
+        return true;
+      }
+
+      if (!/^\d+$/.test(effectTag)) {
+        return false;
+      }
+
+      return entry.id === Number.parseInt(effectTag, 10);
+    });
     if (!effect || !effect.enabled_donate || effect.price_result == null)
       return;
 
     if (donation.amount < effect.price_result) {
       logger.debug(
-        `[DonationAlerts] Donation amount ${donation.amount} < required ${effect.price_result} for effect ${effectId}`,
+        `[DonationAlerts] Donation amount ${donation.amount} < required ${effect.price_result} for effect ${effect.effect_id}`,
       );
       return;
     }
 
     try {
       const url = new URL(`http://localhost:${this.port}/mod/activate-effect`);
-      if (effectId) {
-        url.searchParams.set("effect", effectId);
-      }
+      url.searchParams.set("effect", effect.effect_id);
       url.searchParams.set("nickname", donation.username ?? "");
       const res = await fetch(url.toString());
       if (!res.ok) {
@@ -94,7 +104,7 @@ export class DonationManager {
         );
       } else {
         logger.info(
-          `[DonationAlerts] Activated effect ${effectId} for ${donation.username}`,
+          `[DonationAlerts] Activated effect ${effect.effect_id} (#${effect.id}) for ${donation.username}`,
         );
       }
     } catch (e) {

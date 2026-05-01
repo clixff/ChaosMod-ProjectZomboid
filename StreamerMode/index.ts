@@ -82,18 +82,23 @@ function getBestLocalIPv4(): {
 const VERSION = "1.0.1";
 const DEFAULT_PORT = 3959;
 
-type EffectResponseEntry = EffectEntry & {
+type EffectResponseEntry = Omit<EffectEntry, "id"> & {
+  id: number;
+  effect_id: string;
   price_group: string;
   price_result: number | null;
 };
 
 function buildEffectResponseEntry(
+  effectIndex: number,
   effect: EffectEntry,
   priceGroups: Array<{ group: string; price: number }>,
 ): EffectResponseEntry {
   if (!effect.enabled_donate) {
     return {
       ...effect,
+      id: effectIndex + 1,
+      effect_id: effect.id,
       price_group: "",
       price_result: null,
     };
@@ -105,9 +110,41 @@ function buildEffectResponseEntry(
 
   return {
     ...effect,
+    id: effectIndex + 1,
+    effect_id: effect.id,
     price_group: effect.price_group,
     price_result: group ? group.price : null,
   };
+}
+
+function resolveEffectIdentifier(
+  rawEffectId: string,
+  effects: EffectEntry[],
+): EffectEntry | null {
+  const trimmed = rawEffectId.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const byStringId = effects.find((entry) => entry.id === trimmed);
+  if (byStringId) {
+    return byStringId;
+  }
+
+  if (!/^\d+$/.test(trimmed)) {
+    return null;
+  }
+
+  const numericId = Number.parseInt(trimmed, 10);
+  if (
+    !Number.isInteger(numericId) ||
+    numericId < 1 ||
+    numericId > effects.length
+  ) {
+    return null;
+  }
+
+  return effects[numericId - 1] ?? null;
 }
 
 const KNOWN_ARGS_EXACT = new Set([
@@ -525,9 +562,12 @@ async function main(): Promise<void> {
       ) {
         return { success: false, error: "Not available" };
       }
-      const effect = effects.find((entry) => entry.id === effectId);
+      const effect = resolveEffectIdentifier(effectId, effects);
       if (!effect?.enabled_donate) {
-        return { success: false, error: "Effect is not available for donations" };
+        return {
+          success: false,
+          error: "Effect is not available for donations",
+        };
       }
       if (!externalEffectsManager) {
         return { success: false, error: "Lua folder not available" };
@@ -538,7 +578,9 @@ async function main(): Promise<void> {
     getEffectsResponse: () => {
       const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
       return {
-        effects: effects.map((e) => buildEffectResponseEntry(e, priceGroups)),
+        effects: effects.map((e, index) =>
+          buildEffectResponseEntry(index, e, priceGroups),
+        ),
       };
     },
   });
@@ -660,17 +702,18 @@ async function main(): Promise<void> {
       }
       const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
       const rows: string[] = [
-        "name,id,enabled,chance,duration,price_group,price",
+        "id,name,effect_id,enabled,chance,duration,price_group,price",
       ];
-      for (const e of effects) {
-        const effect = buildEffectResponseEntry(e, priceGroups);
+      for (const [index, e] of effects.entries()) {
+        const effect = buildEffectResponseEntry(index, e, priceGroups);
         const name = getString("effects", e.id).replace(/,/g, "");
         const duration =
           e.withDuration && e.duration != null ? String(e.duration) : "";
         rows.push(
           [
+            String(effect.id),
             name,
-            e.id,
+            effect.effect_id,
             String(e.enabled),
             `${e.chance}%`,
             duration,

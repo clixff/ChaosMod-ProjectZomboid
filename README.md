@@ -108,10 +108,21 @@ Currently supported donation services:
 
 Viewers can activate effects by donating a specific amount of money and including an effect ID in their donation message.
 
+Supported tag formats:
+
+- `#numeric_id` — uses the numeric ID from `/export csv` and `/mod/effects`
+- `#effect_name_id` — uses the internal string effect ID
+
 Example donation message:
 
 ```txt
 Hello! #spawn_zombie_nearby
+```
+
+or:
+
+```txt
+Hello! #17
 ```
 
 ### DonationAlerts Setup
@@ -154,6 +165,8 @@ You can export donation prices to a CSV file with:
 
 The exported CSV file can be imported into Google Sheets and shared with viewers as a donation price table.
 
+The `id` column in the CSV is an integer starting from `1`. The same numeric ID is also returned by the local `/mod/effects` endpoint.
+
 ### Editing Donation Prices
 
 Donation prices are configured in:
@@ -185,16 +198,30 @@ To get effect prices, send a GET request to:
 http://127.0.0.1:3959/mod/effects
 ```
 
+Each effect entry includes:
+
+- `id` — numeric ID starting from `1`
+- `effect_id` — internal string effect ID such as `spawn_zombie_nearby`
+- `price_result` — resolved donation price for that effect
+
 To activate an effect, send a request to:
 
 ```txt
 http://127.0.0.1:3959/mod/activate-effect?effect=effect_id&nickname=nickname
 ```
 
+The `effect` query parameter accepts either the numeric `id` or the string `effect_id`.
+
 Example:
 
 ```txt
 http://127.0.0.1:3959/mod/activate-effect?effect=spawn_zombie_nearby&nickname=ViewerName
+```
+
+or:
+
+```txt
+http://127.0.0.1:3959/mod/activate-effect?effect=17&nickname=ViewerName
 ```
 
 ## Configuration
