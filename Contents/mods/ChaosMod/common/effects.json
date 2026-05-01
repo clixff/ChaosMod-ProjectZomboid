@@ -351,7 +351,7 @@
             "chance": 30,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "negative_2"
+            "price_group": "negative_4"
         },
         {
             "id": "launch_everyone_up",
@@ -359,7 +359,7 @@
             "chance": 45,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "neutral_2"
+            "price_group": "neutral_4"
         },
         {
             "id": "launch_zombies_up",

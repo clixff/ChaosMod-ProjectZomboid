@@ -11,6 +11,8 @@ function ChaosNPC:initializeHuman()
     zombie:setNoTeeth(true)
     zombie:setVariable("ChaosNPC", true)
     self.weaponItemCached = instanceItem("Base.BareHands")
+    zombie:setPrimaryHandItem(nil)
+    zombie:setSecondaryHandItem(nil)
 
     local md = zombie:getModData()
     if md then
@@ -25,6 +27,159 @@ function ChaosNPC:initializeHuman()
     self:DisableZombieVoice()
 
     ChaosNPCUtils.npcList:add(self)
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:IsGroundMeleeWeaponWorldObject(worldObj)
+    if not worldObj then return false end
+
+    local item = worldObj:getItem()
+    if not item or not item:IsWeapon() then
+        return false
+    end
+
+    ---@cast item HandWeapon
+    return item:isMelee()
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:CanUseGroundMeleeWeaponWorldObject(worldObj)
+    if not self:IsGroundMeleeWeaponWorldObject(worldObj) then
+        return false
+    end
+
+    local owner = self:GetGroundWeaponClaimOwner(worldObj)
+    local token = self:GetGroundWeaponClaimToken()
+    return owner == nil or owner == token
+end
+
+---@return boolean
+function ChaosNPC:HasEquippedWeapon()
+    local weapon = self.weaponItemCached
+    return weapon ~= nil and weapon:getFullType() ~= "Base.BareHands"
+end
+
+---@return string
+function ChaosNPC:GetGroundWeaponClaimToken()
+    return self.actionWorldObjectClaimToken or ""
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return string?
+function ChaosNPC:GetGroundWeaponClaimOwner(worldObj)
+    if not worldObj then return nil end
+
+    local item = worldObj:getItem()
+    if not item or not item.getModData then return nil end
+
+    local md = item:getModData()
+    if not md then return nil end
+
+    local owner = md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY]
+    if type(owner) ~= "string" or owner == "" then
+        return nil
+    end
+
+    return owner
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:TryClaimGroundWeapon(worldObj)
+    if not worldObj then return false end
+
+    local item = worldObj:getItem()
+    if not item or not item.getModData then return false end
+
+    local token = self:GetGroundWeaponClaimToken()
+    local md = item:getModData()
+    local owner = md and md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] or nil
+    if owner and owner ~= token then
+        return false
+    end
+
+    md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] = token
+    return true
+end
+
+---@param worldObj IsoWorldInventoryObject
+function ChaosNPC:ReleaseGroundWeaponClaim(worldObj)
+    if not worldObj then return end
+
+    local item = worldObj:getItem()
+    if not item or not item.getModData then return end
+
+    local md = item:getModData()
+    if not md then return end
+
+    local token = self:GetGroundWeaponClaimToken()
+    if md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] == token then
+        md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] = nil
+    end
+end
+
+function ChaosNPC:ClearAction()
+    if self.actionType == "pickup_ground_weapon" and self.actionWorldObjectTarget then
+        self:ReleaseGroundWeaponClaim(self.actionWorldObjectTarget)
+    end
+
+    self.actionType = nil
+    self.actionWorldObjectTarget = nil
+end
+
+---@param worldObj IsoWorldInventoryObject
+function ChaosNPC:StartPickupGroundWeaponAction(worldObj)
+    if not self.zombie or not worldObj then return end
+    if self.enemy then return end
+    if self:HasEquippedWeapon() then return end
+    if not self:TryClaimGroundWeapon(worldObj) then return end
+
+    local square = worldObj:getSquare()
+    if not square then
+        self:ReleaseGroundWeaponClaim(worldObj)
+        return
+    end
+
+    self.actionType = "pickup_ground_weapon"
+    self.actionWorldObjectTarget = worldObj
+    self:MoveToLocation(square)
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return InventoryItem?
+function ChaosNPC:pickGroundItemToPrimary(worldObj)
+    if not self.zombie or not worldObj then return nil end
+
+    local character = self.zombie
+    local claimOwner = self:GetGroundWeaponClaimOwner(worldObj)
+    if claimOwner ~= self:GetGroundWeaponClaimToken() then
+        return nil
+    end
+
+    local item = worldObj:getItem()
+    if not item then return nil end
+
+    InventoryItem.RemoveFromContainer(item)
+    self.weaponItemCached = item
+    character:setPrimaryHandItem(item)
+
+    if item:IsWeapon() and item.isTwoHandWeapon and item:isTwoHandWeapon() then
+        character:setSecondaryHandItem(item)
+        character:setVariable("Chaos2HandsWeapon", true)
+    else
+        ---@diagnostic disable-next-line: param-type-mismatch
+        character:setSecondaryHandItem(nil)
+        character:setVariable("Chaos2HandsWeapon", false)
+    end
+
+    local md = item:getModData()
+    if md then
+        md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] = nil
+    end
+
+    return item
 end
 
 function ChaosNPC:setNPCAsZombie()
@@ -73,7 +228,9 @@ function ChaosNPC:setNPCAsZombie()
     self.attackObjectTarget = nil
     self.attackObjectType = nil
     self.findEnemyTimeoutMs = 0
+    self.findGroundWeaponTimeoutMs = 0
     self.lastZombieThatAttackedNPC = nil
+    self:ClearAction()
 
     local index = ChaosNPCUtils.npcList:indexOf(self)
     if index ~= -1 then
@@ -102,6 +259,8 @@ function ChaosNPC:Destroy()
     self.moveTargetLocation = nil
     self.moving = false
     self.isAttacking = false
+    self.findGroundWeaponTimeoutMs = 0
+    self:ClearAction()
 
     local index = ChaosNPCUtils.npcList:indexOf(self)
     if index ~= -1 then
@@ -142,6 +301,8 @@ function ChaosNPC:OnZombieDead()
     self.attackAnimWindowMs = 0
     self.endurance = CHAOS_NPC_ENDURANCE_MAX
     self.canRun = true
+    self.findGroundWeaponTimeoutMs = 0
+    self:ClearAction()
 
     local index = ChaosNPCUtils.npcList:indexOf(self)
     if index ~= -1 then

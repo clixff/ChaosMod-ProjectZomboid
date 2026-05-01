@@ -26,7 +26,13 @@ function ChaosNPC:update(deltaMs)
         self.findEnemyTimeoutMs = self.findEnemyTimeoutMs + deltaMs
     end
 
+    if self.findGroundWeaponTimeoutMs < CHAOS_NPC_FIND_GROUND_WEAPON_TIMEOUT_MS then
+        self.findGroundWeaponTimeoutMs = self.findGroundWeaponTimeoutMs + deltaMs
+    end
+
     local canFindNewEnemyThisFrame = self.findEnemyTimeoutMs >= CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS and
+        not self.isAttacking
+    local canFindGroundWeaponThisFrame = self.findGroundWeaponTimeoutMs >= CHAOS_NPC_FIND_GROUND_WEAPON_TIMEOUT_MS and
         not self.isAttacking
 
     if not self.moving then
@@ -93,18 +99,80 @@ function ChaosNPC:update(deltaMs)
     end
 
     if self.enemy then
+        if self.actionType == "pickup_ground_weapon" then
+            self:StopMoving(true, "pickup_ground_weapon_enemy_override")
+        end
+        self:ClearAction()
         self.moveTargetCharacter = self.enemy
+        shouldUpdatePathfind = true
     end
 
-    if not self.moveTargetCharacter and not self.isAttacking then
+    if self.actionType == "pickup_ground_weapon" then
+        local actionWorldObj = self.actionWorldObjectTarget
+        if not actionWorldObj or not self:IsGroundMeleeWeaponWorldObject(actionWorldObj) then
+            self:StopMoving(true, "pickup_ground_weapon_invalid")
+            self:ClearAction()
+        else
+            local actionSquare = actionWorldObj:getSquare()
+            if not actionSquare or actionSquare:getZ() ~= zombie:getZ() then
+                self:StopMoving(true, "pickup_ground_weapon_square_invalid")
+                self:ClearAction()
+            else
+                local zombieSquare = zombie:getSquare()
+                local isOnActionSquare = zombieSquare and
+                    zombieSquare:getX() == actionSquare:getX() and
+                    zombieSquare:getY() == actionSquare:getY() and
+                    zombieSquare:getZ() == actionSquare:getZ()
+
+                if isOnActionSquare then
+                    self:pickGroundItemToPrimary(actionWorldObj)
+                    self:StopMoving(true, "pickup_ground_weapon")
+                    self:ClearAction()
+                    shouldUpdatePathfind = false
+                elseif shouldUpdatePathfind then
+                    self:MoveToLocation(actionSquare)
+                end
+            end
+        end
+    end
+
+    if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil then
         self:UpdateNextTargetMoveCharacter()
         shouldUpdatePathfind = true
     end
 
-    if not self.moveTargetCharacter and not self.isAttacking and self:HasTag("item_robber") then
+    if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil and self:HasTag("item_robber") then
         if not self.moving then
             self:UpdateWanderTarget()
         end
+    end
+
+    local shouldFindGroundWeapon = self.enemy == nil and self.moveTargetCharacter == nil and self.actionType == nil and
+        not self:HasEquippedWeapon()
+    if shouldFindGroundWeapon and canFindGroundWeaponThisFrame and zombie:getVehicle() == nil then
+        self.findGroundWeaponTimeoutMs = 0
+
+        local px = math.floor(zombie:getX())
+        local py = math.floor(zombie:getY())
+        local pz = math.floor(zombie:getZ())
+
+        ChaosUtils.SquareRingSearchTile_2D(px, py, function(square)
+            local foundWorldObj = nil
+            local hasWeapon = ChaosUtils.ForAllWorldObjectsOnSquare(square, function(worldObj)
+                if self:CanUseGroundMeleeWeaponWorldObject(worldObj) then
+                    foundWorldObj = worldObj
+                    return true
+                end
+                return false
+            end)
+
+            if hasWeapon and foundWorldObj then
+                self:StartPickupGroundWeaponAction(foundWorldObj)
+                return self.actionType == "pickup_ground_weapon" and self.actionWorldObjectTarget == foundWorldObj
+            end
+
+            return false
+        end, 0, 3, false, false, true, pz, pz)
     end
 
     local isNearby = false
@@ -162,6 +230,8 @@ function ChaosNPC:update(deltaMs)
         if moveResult == BehaviorResult.Succeeded or moveResult == BehaviorResult.Failed then
             if isNearby then
                 self:StopMoving(true, "nearby_finished")
+            elseif self.actionType == "pickup_ground_weapon" then
+                self:StopMoving(true, "pickup_ground_weapon_reached")
             elseif not self.moveTargetCharacter and self:HasTag("item_robber") then
                 self:StopMoving(true, "wander_reached")
             end

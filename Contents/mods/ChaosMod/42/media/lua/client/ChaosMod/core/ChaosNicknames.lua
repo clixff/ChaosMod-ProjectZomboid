@@ -33,9 +33,10 @@ ChaosNicknames = ChaosNicknames or {
 local NICKNAME_CHAT_MESSAGE_MAX_AGE_MS = 30000
 local NICKNAME_CHAT_MESSAGE_RENDER_MS = 7000
 local NICKNAME_CHAT_MESSAGE_FADE_MS = 1000
+local NICKNAME_CHAT_MESSAGE_MAX_ALPHA = 0.8
 local NICKNAME_CHAT_MESSAGE_WRAP_CHARS = 50
 local NICKNAME_CHAT_MESSAGE_LIMIT_CHARS = 150
-local INTERNAL_CHAT_LINE_BLUE = { r = 0.20, g = 0.55, b = 1.00 }
+local INTERNAL_CHAT_LINE_GREEN = { r = 155 / 255, g = 204 / 255, b = 49 / 255 }
 local getNicknameEntryByName
 
 ---@param s string
@@ -187,10 +188,10 @@ local function resolveChatMessageState(entry, nowMs)
         return nil, elapsedMs, 0
     end
 
-    local alpha = 1
+    local alpha = NICKNAME_CHAT_MESSAGE_MAX_ALPHA
     local fadeStartMs = NICKNAME_CHAT_MESSAGE_RENDER_MS - NICKNAME_CHAT_MESSAGE_FADE_MS
     if elapsedMs > fadeStartMs then
-        alpha = 1 - ((elapsedMs - fadeStartMs) / NICKNAME_CHAT_MESSAGE_FADE_MS)
+        alpha = NICKNAME_CHAT_MESSAGE_MAX_ALPHA * (1 - ((elapsedMs - fadeStartMs) / NICKNAME_CHAT_MESSAGE_FADE_MS))
         if alpha < 0 then
             alpha = 0
         end
@@ -424,10 +425,10 @@ local function resolveInternalChatLineState(zombie, nowMs)
         return nil, elapsedMs, 0
     end
 
-    local alpha = 1
+    local alpha = NICKNAME_CHAT_MESSAGE_MAX_ALPHA
     local fadeStartMs = NICKNAME_CHAT_MESSAGE_RENDER_MS - NICKNAME_CHAT_MESSAGE_FADE_MS
     if elapsedMs > fadeStartMs then
-        alpha = 1 - ((elapsedMs - fadeStartMs) / NICKNAME_CHAT_MESSAGE_FADE_MS)
+        alpha = NICKNAME_CHAT_MESSAGE_MAX_ALPHA * (1 - ((elapsedMs - fadeStartMs) / NICKNAME_CHAT_MESSAGE_FADE_MS))
         if alpha < 0 then
             alpha = 0
         end
@@ -468,9 +469,9 @@ local function resolveZombieRenderedMessage(zombie, nowMs)
         return internalMessage,
             internalElapsedMs,
             internalAlpha,
-            INTERNAL_CHAT_LINE_BLUE.r,
-            INTERNAL_CHAT_LINE_BLUE.g,
-            INTERNAL_CHAT_LINE_BLUE.b
+            INTERNAL_CHAT_LINE_GREEN.r,
+            INTERNAL_CHAT_LINE_GREEN.g,
+            INTERNAL_CHAT_LINE_GREEN.b
     end
 
     return nil, 0, 0, 0, 0, 0

@@ -38,6 +38,10 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field spawnTimeMs integer
 ---@field debugLastTimePathfindMs integer
 ---@field attackLastTimeMs integer
+---@field findGroundWeaponTimeoutMs integer
+---@field actionType? string
+---@field actionWorldObjectTarget? IsoWorldInventoryObject
+---@field actionWorldObjectClaimToken? string
 ---@field tags table<string, boolean>
 ---@field relationOverridesByGroup table<integer, ChaosNPCRelationTypeValue>
 ---@field relationOverridesByCharacterId table<integer, ChaosNPCRelationTypeValue>
@@ -48,6 +52,7 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field stalkerTeleportCooldownMs? integer
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
+ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
 
 require "ChaosMod/NPC/ChaosNPCLifecycle"
 require "ChaosMod/NPC/ChaosNPCMovementSystem"
@@ -84,6 +89,10 @@ function ChaosNPC:new(zombie)
     o.spawnTimeMs = getTimestampMs()
     o.debugLastTimePathfindMs = 0
     o.attackLastTimeMs = 0
+    o.findGroundWeaponTimeoutMs = 0
+    o.actionType = nil
+    o.actionWorldObjectTarget = nil
+    o.actionWorldObjectClaimToken = nil
     o.tags = {}
     o.relationOverridesByGroup = {}
     o.relationOverridesByCharacterId = {}
@@ -92,6 +101,8 @@ function ChaosNPC:new(zombie)
     o.endurance = CHAOS_NPC_ENDURANCE_MAX
     o.canRun = true
     o.stalkerTeleportCooldownMs = 0
+    ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
+    o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o
 end
 
