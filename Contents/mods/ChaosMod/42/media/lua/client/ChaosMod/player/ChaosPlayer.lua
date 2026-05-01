@@ -114,6 +114,11 @@ function ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius
         return square
     end
 
+    if newZ ~= 0 then
+        return ChaosPlayer.GetRandomSquareAroundPlayer(player, 0, minRadius, maxRadius, maxTries, shouldCheckEmpty,
+            allowInteriors, returnPlayerSquare)
+    end
+
     return nil
 end
 

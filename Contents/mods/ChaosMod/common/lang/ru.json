@@ -245,7 +245,9 @@
         "random_controls": "Случайное управление",
         "remove_items_from_dead_zombies": "Убрать предметы с трупов зомби",
         "all_zombies_are_cops": "Все зомби — полицейские",
-        "effect_spawn_friendly_clone": "Дружелюбный двойник"
+        "effect_spawn_friendly_clone": "Дружелюбный двойник",
+        "disable_attack": "Отключить атаку",
+        "every_tv_spawns_a_girl": "Из каждого телевизора появляется девушка"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

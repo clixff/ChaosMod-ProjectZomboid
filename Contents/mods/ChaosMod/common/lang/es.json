@@ -244,7 +244,9 @@
         "random_controls": "Controles aleatorios",
         "remove_items_from_dead_zombies": "Quitar objetos de zombis muertos",
         "all_zombies_are_cops": "Todos los zombis son policías",
-        "effect_spawn_friendly_clone": "Clon amistoso"
+        "effect_spawn_friendly_clone": "Clon amistoso",
+        "disable_attack": "Desactivar ataque",
+        "every_tv_spawns_a_girl": "Cada televisor genera una chica"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

@@ -244,7 +244,9 @@
         "random_controls": "Controles Aleatórios",
         "remove_items_from_dead_zombies": "Remover Itens de Zumbis Mortos",
         "all_zombies_are_cops": "Todos os Zumbis são Policiais",
-        "effect_spawn_friendly_clone": "Clone amigável"
+        "effect_spawn_friendly_clone": "Clone amigável",
+        "disable_attack": "Desativar ataque",
+        "every_tv_spawns_a_girl": "Toda TV gera uma garota"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

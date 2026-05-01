@@ -244,7 +244,9 @@
         "random_controls": "Random Controls",
         "remove_items_from_dead_zombies": "Remove Items From Dead Zombies",
         "all_zombies_are_cops": "All Zombies Are Cops",
-        "effect_spawn_friendly_clone": "Friendly Clone"
+        "effect_spawn_friendly_clone": "Friendly Clone",
+        "disable_attack": "Disable Attack",
+        "every_tv_spawns_a_girl": "Every TV Spawns A Girl"
     },
     "core": {
         "start_mod": "Start ChaosMod",

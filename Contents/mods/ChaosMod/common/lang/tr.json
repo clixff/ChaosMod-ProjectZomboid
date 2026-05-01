@@ -244,7 +244,9 @@
         "random_controls": "Rastgele Kontroller",
         "remove_items_from_dead_zombies": "Ölü Zombilerden Eşyaları Kaldır",
         "all_zombies_are_cops": "Tüm Zombiler Polis",
-        "effect_spawn_friendly_clone": "Dost klon"
+        "effect_spawn_friendly_clone": "Dost klon",
+        "disable_attack": "Saldiriyi devre disi birak",
+        "every_tv_spawns_a_girl": "Her televizyon bir kiz olusturur"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

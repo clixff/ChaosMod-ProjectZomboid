@@ -244,7 +244,9 @@
         "random_controls": "Zufällige Steuerung",
         "remove_items_from_dead_zombies": "Gegenstände von toten Zombies entfernen",
         "all_zombies_are_cops": "Alle Zombies sind Polizisten",
-        "effect_spawn_friendly_clone": "Freundlicher Doppelgänger"
+        "effect_spawn_friendly_clone": "Freundlicher Doppelgänger",
+        "disable_attack": "Angriff deaktivieren",
+        "every_tv_spawns_a_girl": "Jeder Fernseher spawnt ein Maedchen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

@@ -244,7 +244,9 @@
         "random_controls": "Commandes aléatoires",
         "remove_items_from_dead_zombies": "Retirer les objets des zombies morts",
         "all_zombies_are_cops": "Tous les zombies sont des flics",
-        "effect_spawn_friendly_clone": "Clone amical"
+        "effect_spawn_friendly_clone": "Clone amical",
+        "disable_attack": "Desactiver l'attaque",
+        "every_tv_spawns_a_girl": "Chaque tele cree une fille"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

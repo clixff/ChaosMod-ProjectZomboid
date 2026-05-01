@@ -244,7 +244,9 @@
         "random_controls": "随机控制",
         "remove_items_from_dead_zombies": "从尸体上移除物品",
         "all_zombies_are_cops": "所有僵尸都是警察",
-        "effect_spawn_friendly_clone": "友好分身"
+        "effect_spawn_friendly_clone": "友好分身",
+        "disable_attack": "禁止攻击",
+        "every_tv_spawns_a_girl": "每台电视生成一个女孩"
     },
     "core": {
         "start_mod": "启动混乱模式",
