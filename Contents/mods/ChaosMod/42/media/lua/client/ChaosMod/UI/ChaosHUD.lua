@@ -9,6 +9,35 @@ ChaosHUD = ISPanel:derive("ChaosHUD")
 
 local PANEL_HEIGHT = 100
 local MESSAGE_TIMEOUT_MS = 5000
+local BUTTON_HORIZONTAL_PADDING = 24
+local MAIN_BUTTON_MIN_WIDTH = 120
+local SECOND_BUTTON_MIN_WIDTH = 100
+
+---@param button ISButton
+---@param minWidth number
+---@return number
+function ChaosHUD:GetButtonWidth(button, minWidth)
+    local textManager = getTextManager()
+    local font = button.font or UIFont.Small
+    local title = button.title or ""
+    local textWidth = textManager:MeasureStringX(font, title)
+    local padding = ChaosUIManager.GetScaledWidth(BUTTON_HORIZONTAL_PADDING)
+    local scaledMinWidth = ChaosUIManager.GetScaledWidth(minWidth)
+
+    return math.max(scaledMinWidth, textWidth + padding)
+end
+
+function ChaosHUD:RefreshButtonLayout()
+    if not self.btn or not self.secondBtn then return end
+
+    local buttonGap = ChaosUIManager.GetScaledWidth(6)
+    local mainButtonWidth = self:GetButtonWidth(self.btn, MAIN_BUTTON_MIN_WIDTH)
+    local secondButtonWidth = self:GetButtonWidth(self.secondBtn, SECOND_BUTTON_MIN_WIDTH)
+
+    self.btn:setWidth(mainButtonWidth)
+    self.secondBtn:setWidth(secondButtonWidth)
+    self.secondBtn:setX(self.btn:getX() + mainButtonWidth + buttonGap)
+end
 
 function ChaosHUD:initialise()
     ISPanel.initialise(self)
@@ -41,7 +70,7 @@ function ChaosHUD:createChildren()
     local buttonMargin = ChaosUIManager.GetScaledWidth(6)
     local buttonY = panelHeight - barHeight - buttonMargin - buttonHeight
 
-    local buttonWidth = ChaosUIManager.GetScaledWidth(120)
+    local buttonWidth = ChaosUIManager.GetScaledWidth(MAIN_BUTTON_MIN_WIDTH)
     local buttonX = ChaosUIManager.GetScaledWidth(10)
 
     self.btn = ISButton:new(buttonX, buttonY, buttonWidth, buttonHeight, "Button", self, ChaosHUD.OnMainButtonClick)
@@ -50,7 +79,7 @@ function ChaosHUD:createChildren()
     self:addChild(self.btn)
     self:OnModStatusChanged(ChaosMod.enabled)
 
-    local secondButtonWidth = ChaosUIManager.GetScaledWidth(100)
+    local secondButtonWidth = ChaosUIManager.GetScaledWidth(SECOND_BUTTON_MIN_WIDTH)
     local secondButtonX = buttonX + buttonWidth + ChaosUIManager.GetScaledWidth(6)
 
     self.secondBtn = ISButton:new(secondButtonX, buttonY, secondButtonWidth, buttonHeight,
@@ -60,6 +89,7 @@ function ChaosHUD:createChildren()
     self.secondBtn:initialise()
     self.secondBtn:instantiate()
     self:addChild(self.secondBtn)
+    self:RefreshButtonLayout()
 end
 
 ---@param text string
@@ -174,14 +204,12 @@ function ChaosHUD:OnModStatusChanged(enabled)
         self.btn:enableAcceptColor()
     end
 
-    local buttonWidth = ChaosUIManager.GetScaledWidth(120)
-    self.btn:setWidthToTitle(buttonWidth)
+    self:RefreshButtonLayout()
 end
 
 function ChaosHUD:OnLanguageLoaded()
     -- Update text of select_effect button
     self.secondBtn:setTitle(ChaosLocalization.GetString("core", "select_effect"))
-    self.secondBtn:setWidthToTitle(ChaosUIManager.GetScaledWidth(100))
     -- Update width of main button
     self:OnModStatusChanged(ChaosMod.enabled)
 end
