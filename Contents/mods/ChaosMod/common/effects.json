@@ -2206,6 +2206,46 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
+        },
+        {
+            "id": "npc_fight_each_other",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "npc_duel",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "kill_all_friendly_npc",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "npcs_betray_player",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "npcs_turn_into_zombies",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
         }
     ]
 }

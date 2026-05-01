@@ -78,6 +78,68 @@ function ChaosNPCRelations.GetRelation(fromId, toId)
 end
 
 ---@param character IsoGameCharacter
+---@return integer | nil
+function ChaosNPCRelations.GetCharacterId(character)
+    if not character then return nil end
+    if not character.getID then return nil end
+    return character:getID()
+end
+
+---@param npc ChaosNPC
+---@param groupId integer
+---@param relationType ChaosNPCRelationTypeValue
+function ChaosNPCRelations.SetNPCRelationToGroup(npc, groupId, relationType)
+    if not npc then return end
+    npc.relationOverridesByGroup = npc.relationOverridesByGroup or {}
+    npc.relationOverridesByGroup[groupId] = relationType
+end
+
+---@param npc ChaosNPC
+---@param characterId integer
+---@param relationType ChaosNPCRelationTypeValue
+function ChaosNPCRelations.SetNPCRelationToCharacterId(npc, characterId, relationType)
+    if not npc then return end
+    npc.relationOverridesByCharacterId = npc.relationOverridesByCharacterId or {}
+    npc.relationOverridesByCharacterId[characterId] = relationType
+end
+
+---@param npc ChaosNPC
+---@param character IsoGameCharacter
+---@param relationType ChaosNPCRelationTypeValue
+function ChaosNPCRelations.SetNPCRelationToCharacter(npc, character, relationType)
+    local characterId = ChaosNPCRelations.GetCharacterId(character)
+    if not characterId then return end
+    ChaosNPCRelations.SetNPCRelationToCharacterId(npc, characterId, relationType)
+end
+
+---@param npc ChaosNPC
+---@param character IsoGameCharacter
+---@return ChaosNPCRelationTypeValue
+function ChaosNPCRelations.GetRelationForNPC(npc, character)
+    if not npc then return ChaosNPCRelationType.IGNORE end
+
+    local characterId = ChaosNPCRelations.GetCharacterId(character)
+    local characterOverrides = npc.relationOverridesByCharacterId
+    if characterId and characterOverrides then
+        local explicitCharacterRelation = characterOverrides[characterId]
+        if explicitCharacterRelation then
+            return explicitCharacterRelation
+        end
+    end
+
+    local targetGroupId = ChaosNPCRelations.GetNPCGroupByCharacter(character)
+    local groupOverrides = npc.relationOverridesByGroup
+    if groupOverrides then
+        local explicitGroupRelation = groupOverrides[targetGroupId]
+        if explicitGroupRelation then
+            return explicitGroupRelation
+        end
+    end
+
+    return ChaosNPCRelations.GetRelation(npc.npcGroup, targetGroupId)
+end
+
+---@param character IsoGameCharacter
 ---@return integer
 function ChaosNPCRelations.GetNPCGroupByCharacter(character)
     if not character then return ChaosNPCGroupID.ZOMBIES end

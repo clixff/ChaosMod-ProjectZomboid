@@ -53,8 +53,7 @@ function ChaosNPCUtils.FindNewTargetForNPC(npc)
                 local z2 = otherZombie:getZ()
 
                 if dist <= maxDist and z1 == z2 then
-                    local otherGroup = ChaosNPCRelations.GetNPCGroupByCharacter(otherZombie)
-                    local rel = ChaosNPCRelations.GetRelation(npc.npcGroup, otherGroup)
+                    local rel = ChaosNPCRelations.GetRelationForNPC(npc, otherZombie)
                     if rel == ChaosNPCRelationType.ATTACK then
                         if not nearestTarget or dist < nearestDist then
                             nearestTarget = otherZombie
@@ -69,7 +68,7 @@ function ChaosNPCUtils.FindNewTargetForNPC(npc)
     -- Check player as potential target
     local player = getPlayer()
     if player then
-        local playerRel = ChaosNPCRelations.GetRelation(npc.npcGroup, ChaosNPCGroupID.PLAYER)
+        local playerRel = ChaosNPCRelations.GetRelationForNPC(npc, player)
         if playerRel == ChaosNPCRelationType.ATTACK then
             local dist = ChaosUtils.distTo(x1, y1, player:getX(), player:getY())
             if dist <= maxDist and z1 == player:getZ() then

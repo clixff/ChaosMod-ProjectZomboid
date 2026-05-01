@@ -27,6 +27,62 @@ function ChaosNPC:initializeHuman()
     ChaosNPCUtils.npcList:add(self)
 end
 
+function ChaosNPC:setNPCAsZombie()
+    if not self.zombie then
+        return
+    end
+
+    local zombie = self.zombie
+
+    zombie:clearAggroList()
+    ---@diagnostic disable-next-line: param-type-mismatch
+    zombie:setTarget(nil)
+    zombie:getPathFindBehavior2():reset()
+    zombie:getPathFindBehavior2():cancel()
+    ---@diagnostic disable-next-line: param-type-mismatch
+    zombie:setPath2(nil)
+    zombie:setVariable("bPathfind", false)
+    zombie:setVariable("bMoving", false)
+    zombie:setBumpType("")
+    zombie:changeState(ZombieIdleState.instance())
+
+    local md = zombie:getModData()
+    if md then
+        md[CHAOS_NPC_MOD_DATA_KEY] = nil
+        md[CHAOS_NPC_MOD_DATA_KEY_2] = nil
+    end
+
+    zombie:setNoTeeth(false)
+    zombie:setVariable("ChaosNPC", false)
+    zombie:setVariable("Chaos2HandsWeapon", false)
+    zombie:setVariable("ChaosSneak", false)
+    zombie:setUseless(false)
+    zombie:Wander()
+
+    self.weaponItemCached = nil
+    self.enemy = nil
+    self.moveTargetCharacter = nil
+    self.moveTargetLocation = nil
+    self.lastCachedTargetMoveLocation = nil
+    self.moving = false
+    self.isAttacking = false
+    self.attackAnimTimeMs = 0
+    self.attackAnimWindowMs = 0
+    self.attackAnimName = nil
+    self.attackHitPassed = false
+    self.attackObjectTarget = nil
+    self.attackObjectType = nil
+    self.findEnemyTimeoutMs = 0
+    self.lastZombieThatAttackedNPC = nil
+
+    local index = ChaosNPCUtils.npcList:indexOf(self)
+    if index ~= -1 then
+        ChaosNPCUtils.npcList:remove(index)
+    end
+
+    self.zombie = nil
+end
+
 function ChaosNPC:Destroy()
     if not self.zombie then return end
 

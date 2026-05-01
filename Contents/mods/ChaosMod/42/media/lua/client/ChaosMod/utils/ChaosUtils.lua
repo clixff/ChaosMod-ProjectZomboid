@@ -611,7 +611,7 @@ function ChaosUtils.AdjustVisibleZombiesForNPCs()
         local npc = npcList:get(i)
         if npc and npc.zombie and not npc.zombie:isDead() then
             -- Only subtract NPCs that follow the player
-            local npcRel = ChaosNPCRelations.GetRelation(npc.npcGroup, ChaosNPCGroupID.PLAYER)
+            local npcRel = ChaosNPCRelations.GetRelationForNPC(npc, player)
             if npcRel == ChaosNPCRelationType.FOLLOW then
                 local zombie = npc.zombie
                 local dist = IsoUtils.DistanceTo(zombie:getX(), zombie:getY(), px, py)

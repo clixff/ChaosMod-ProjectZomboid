@@ -39,6 +39,10 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field debugLastTimePathfindMs integer
 ---@field attackLastTimeMs integer
 ---@field tags table<string, boolean>
+---@field relationOverridesByGroup table<integer, ChaosNPCRelationTypeValue>
+---@field relationOverridesByCharacterId table<integer, ChaosNPCRelationTypeValue>
+---@field DamageMultiplier number
+---@field CanAddWounds boolean
 ---@field endurance number
 ---@field canRun boolean
 ---@field stalkerTeleportCooldownMs? integer
@@ -81,6 +85,10 @@ function ChaosNPC:new(zombie)
     o.debugLastTimePathfindMs = 0
     o.attackLastTimeMs = 0
     o.tags = {}
+    o.relationOverridesByGroup = {}
+    o.relationOverridesByCharacterId = {}
+    o.DamageMultiplier = 1.0
+    o.CanAddWounds = true
     o.endurance = CHAOS_NPC_ENDURANCE_MAX
     o.canRun = true
     o.stalkerTeleportCooldownMs = 0
@@ -109,9 +117,12 @@ end
 
 ---@return IsoGameCharacter?
 function ChaosNPC:GetFollowTarget()
-    local rel = ChaosNPCRelations.GetRelation(self.npcGroup, ChaosNPCGroupID.PLAYER)
-    if rel == ChaosNPCRelationType.FOLLOW then
-        return getPlayer()
+    local player = getPlayer()
+    if player then
+        local rel = ChaosNPCRelations.GetRelationForNPC(self, player)
+        if rel == ChaosNPCRelationType.FOLLOW then
+            return player
+        end
     end
     return nil
 end

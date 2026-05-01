@@ -50,10 +50,10 @@ function ChaosNPC:UpdateNextEnemyTarget()
         return
     end
 
-    local playerRel = ChaosNPCRelations.GetRelation(self.npcGroup, ChaosNPCGroupID.PLAYER)
-    if playerRel == ChaosNPCRelationType.ATTACK then
-        local player = getPlayer()
-        if player then
+    local player = getPlayer()
+    if player then
+        local playerRel = ChaosNPCRelations.GetRelationForNPC(self, player)
+        if playerRel == ChaosNPCRelationType.ATTACK then
             self:SetAsTargetEnemy(player)
         end
     end
@@ -231,6 +231,7 @@ function ChaosNPC:OnAttackEnemyHit()
     if maxDamage <= 0 then maxDamage = 4 end
 
     local damage = ZombRandFloat(minDamage, maxDamage)
+    damage = damage * self.DamageMultiplier
     if damage <= 0.1 then
         damage = 0.1
     end
@@ -306,7 +307,9 @@ function ChaosNPC:OnAttackEnemyHit()
         end
 
         bodyDamage:ReduceGeneralHealth(damage)
-        ChaosPlayer.SetRandomBodyDamageByMeleeWeapon(enemy, damage, self.weaponItemCached)
+        if self.CanAddWounds then
+            ChaosPlayer.SetRandomBodyDamageByMeleeWeapon(enemy, damage, self.weaponItemCached)
+        end
     end
 end
 
@@ -348,7 +351,7 @@ end
 
 ---@return integer
 function ChaosNPC:GetNextAttackWindowMs()
-    return 500
+    return 500 + math.floor(ZombRand(0, 350))
 end
 
 ---@return number
@@ -411,7 +414,7 @@ function ChaosNPC:StartAttackAnimation()
 
     local isAttackingEnemy = self.enemy ~= nil and self.attackObjectTarget == nil
     self.attackLastTimeMs = ChaosMod.lastTimeTickMs
-    if isAttackingEnemy and self.enemy ~= nil and not ChaosNPCUtils.IsNPC(self.enemy) then
+    if isAttackingEnemy and self.enemy ~= nil and self.enemy:isZombie() then
         self.attackLastTimeMs = 0
     end
 
@@ -461,8 +464,7 @@ function ChaosNPC:IsEnemyToNPC(otherZombie)
     if otherZombie == zombie then return false end
     if zombie:isDead() or otherZombie:isDead() then return false end
 
-    local otherGroup = ChaosNPCRelations.GetNPCGroupByCharacter(otherZombie)
-    local rel = ChaosNPCRelations.GetRelation(self.npcGroup, otherGroup)
+    local rel = ChaosNPCRelations.GetRelationForNPC(self, otherZombie)
     return rel == ChaosNPCRelationType.ATTACK
 end
 
@@ -475,8 +477,7 @@ function ChaosNPC:OnZombieDamagedNPC(otherZombie)
     if zombie:isDead() or otherZombie:isDead() then return end
     if otherZombie == zombie or otherZombie == self.enemy or self.isAttacking then return end
 
-    local attackerGroup = ChaosNPCRelations.GetNPCGroupByCharacter(otherZombie)
-    local rel = ChaosNPCRelations.GetRelation(self.npcGroup, attackerGroup)
+    local rel = ChaosNPCRelations.GetRelationForNPC(self, otherZombie)
     if rel == ChaosNPCRelationType.ATTACK then
         self:SetAsTargetEnemy(otherZombie)
     end
