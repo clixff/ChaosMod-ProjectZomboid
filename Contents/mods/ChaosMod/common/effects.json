@@ -2121,7 +2121,11 @@
             "id": "disney_princess",
             "enabled": true,
             "chance": 15,
-            "withDuration": false,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "disney_princess"
+            ],
             "enabled_donate": true,
             "price_group": "positive_3"
         },
@@ -2246,6 +2250,62 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
+        },
+        {
+            "id": "give_painkillers",
+            "enabled": true,
+            "chance": 35,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_2"
+        },
+        {
+            "id": "explode_nearby_cars",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "cure_zombies_nearby",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "rainbow_cars",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "rainbow_cars"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_2"
+        },
+        {
+            "id": "spawn_explosive_flamingo",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 5,
+            "disable_effects": [
+                "spawn_explosive_flamingo"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "spawn_pig_follower",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
         }
     ]
 }

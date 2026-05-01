@@ -257,7 +257,13 @@
         "all_zombies_are_cops": "Alle Zombies sind Polizisten",
         "effect_spawn_friendly_clone": "Freundlicher Doppelgänger",
         "disable_attack": "Angriff deaktivieren",
-        "every_tv_spawns_a_girl": "Jeder Fernseher spawnt ein Maedchen"
+        "every_tv_spawns_a_girl": "Jeder Fernseher spawnt ein Maedchen",
+        "give_painkillers": "Schmerzmittel geben",
+        "explode_nearby_cars": "Nahegelegene Autos explodieren lassen",
+        "cure_zombies_nearby": "Nahegelegene Zombies heilen",
+        "rainbow_cars": "Regenbogenautos",
+        "spawn_explosive_flamingo": "Explosiven Flamingo spawnen",
+        "spawn_pig_follower": "Begleitschwein spawnen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

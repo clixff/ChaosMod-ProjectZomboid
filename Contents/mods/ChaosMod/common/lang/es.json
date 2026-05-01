@@ -257,7 +257,13 @@
         "all_zombies_are_cops": "Todos los zombis son policías",
         "effect_spawn_friendly_clone": "Clon amistoso",
         "disable_attack": "Desactivar ataque",
-        "every_tv_spawns_a_girl": "Cada televisor genera una chica"
+        "every_tv_spawns_a_girl": "Cada televisor genera una chica",
+        "give_painkillers": "Dar analgesicos",
+        "explode_nearby_cars": "Hacer explotar coches cercanos",
+        "cure_zombies_nearby": "Curar zombis cercanos",
+        "rainbow_cars": "Coches arcoiris",
+        "spawn_explosive_flamingo": "Generar flamenco explosivo",
+        "spawn_pig_follower": "Generar cerdo seguidor"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

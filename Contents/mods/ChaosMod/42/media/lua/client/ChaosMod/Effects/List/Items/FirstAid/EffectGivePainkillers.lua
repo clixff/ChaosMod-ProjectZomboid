@@ -10,5 +10,12 @@ function EffectGivePainkillers:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    inventory:AddItem("Base.Pills")
+    local amount = math.floor(ZombRand(1, 5 + 1))
+
+    for i = 1, amount do
+        local item = inventory:AddItem("Base.Pills")
+        if i == amount then
+            ChaosPlayer.SayLineNewItem(player, item, amount)
+        end
+    end
 end

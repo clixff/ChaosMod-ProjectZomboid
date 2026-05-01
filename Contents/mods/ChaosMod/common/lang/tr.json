@@ -257,7 +257,13 @@
         "all_zombies_are_cops": "Tüm Zombiler Polis",
         "effect_spawn_friendly_clone": "Dost klon",
         "disable_attack": "Saldiriyi devre disi birak",
-        "every_tv_spawns_a_girl": "Her televizyon bir kiz olusturur"
+        "every_tv_spawns_a_girl": "Her televizyon bir kiz olusturur",
+        "give_painkillers": "Agri Kesici Ver",
+        "explode_nearby_cars": "Yakin Arabalari Patlat",
+        "cure_zombies_nearby": "Yakin Zombileri Iyilestir",
+        "rainbow_cars": "Gokkusagi Arabalar",
+        "spawn_explosive_flamingo": "Patlayici Flamingo Olustur",
+        "spawn_pig_follower": "Takipci Domuz Olustur"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

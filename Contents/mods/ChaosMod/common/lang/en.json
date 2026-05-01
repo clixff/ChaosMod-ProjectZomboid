@@ -257,7 +257,13 @@
         "all_zombies_are_cops": "All Zombies Are Cops",
         "effect_spawn_friendly_clone": "Friendly Clone",
         "disable_attack": "Disable Attack",
-        "every_tv_spawns_a_girl": "Every TV Spawns A Girl"
+        "every_tv_spawns_a_girl": "Every TV Spawns A Girl",
+        "give_painkillers": "Give Painkillers",
+        "explode_nearby_cars": "Explode Nearby Cars",
+        "cure_zombies_nearby": "Cure Zombies Nearby",
+        "rainbow_cars": "Rainbow Cars",
+        "spawn_explosive_flamingo": "Spawn Explosive Flamingo",
+        "spawn_pig_follower": "Spawn Pig Follower"
     },
     "core": {
         "start_mod": "Start ChaosMod",

@@ -257,7 +257,13 @@
         "all_zombies_are_cops": "Wszystkie zombie to policjanci",
         "effect_spawn_friendly_clone": "Przyjazny klon",
         "disable_attack": "Wylacz atak",
-        "every_tv_spawns_a_girl": "Kazdy telewizor tworzy dziewczyne"
+        "every_tv_spawns_a_girl": "Kazdy telewizor tworzy dziewczyne",
+        "give_painkillers": "Daj srodki przeciwbolowe",
+        "explode_nearby_cars": "Wysadz pobliskie samochody",
+        "cure_zombies_nearby": "Wylecz pobliskie zombie",
+        "rainbow_cars": "Teczowe samochody",
+        "spawn_explosive_flamingo": "Stworz wybuchowego flaminga",
+        "spawn_pig_follower": "Stworz podazajaca swinie"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

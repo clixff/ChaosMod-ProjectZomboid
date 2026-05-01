@@ -5,13 +5,15 @@
 ---@field modData ChooseGameInfo.Mod? -- Internal mod data such as ID, version, etc.
 ---@field lastTimeTickMs integer -- Last time tick milliseconds
 ---@field wallhack boolean -- If wallhack is enabled
+---@field specialAnimalsFollowers table<integer, {animal: IsoAnimal, repathTicks: integer}>
 ChaosMod = ChaosMod or {
     mapLoaded = false,
     enabled = false,
     modId = "ChaosMod",
     modData = nil,
     lastTimeTickMs = 0,
-    wallhack = false
+    wallhack = false,
+    specialAnimalsFollowers = {}
 }
 
 function ChaosMod.StartMod()
@@ -36,6 +38,7 @@ function ChaosMod.StartMod()
     -- Clear position history so it starts fresh from this session
     ChaosUtils.playerPositionHistory = {}
     ChaosUtils.positionSampleMs = 0
+    ChaosMod.specialAnimalsFollowers = {}
     -- Load last sleep position from global mod data
     ChaosUtils.LoadSleepData()
     -- Set mod enabled flag to true
@@ -91,6 +94,7 @@ function ChaosMod.StopMod()
     ChaosEffectsManager.syncTimestamp = "0"
     ChaosEffectsManager.lastVotingActive = 0
     ChaosEffectsManager.pendingVoteReadMs = -1
+    ChaosMod.specialAnimalsFollowers = {}
     ChaosFileReader.WriteSyncFile("0", 0, 0)
 end
 
@@ -117,6 +121,7 @@ end
 function ChaosMod.OnInitWorld()
     print("[ChaosMod] OnInitWorld")
     ChaosMod.mapLoaded = true;
+    ChaosMod.specialAnimalsFollowers = {}
     ChaosEffectsManager.iterationIndex = 0
     ChaosEffectsManager.syncTimestamp = "0"
     ChaosEffectsManager.lastVotingActive = 0
@@ -217,6 +222,33 @@ function ChaosMod.OnTick()
     end
 end
 
+function ChaosMod.OnSpecialAnimalsTick()
+    if ChaosMod.enabled == false then
+        return
+    end
+
+    local player = getPlayer()
+    if not player then return end
+
+    for i = #ChaosMod.specialAnimalsFollowers, 1, -1 do
+        local followState = ChaosMod.specialAnimalsFollowers[i]
+        local animal = followState and followState.animal
+
+        if not animal or animal:isDead() then
+            table.remove(ChaosMod.specialAnimalsFollowers, i)
+        else
+            followState.repathTicks = followState.repathTicks - 1
+            if followState.repathTicks <= 0 then
+                followState.repathTicks = 20
+
+                if animal:DistToProper(player) > 2.0 then
+                    animal:pathToCharacter(player)
+                end
+            end
+        end
+    end
+end
+
 ---@param zombie IsoZombie
 function ChaosMod.OnZombieDead(zombie)
     ChaosZombie.OnZombieDead(zombie)
@@ -237,6 +269,7 @@ Events.OnWeaponHitCharacter.Add(ChaosMod.OnWeaponHitCharacter)
 Events.OnGameStart.Add(ChaosMod.OnGameStart)
 Events.OnZombieUpdate.Add(ChaosMod.OnZombieUpdate)
 Events.OnTick.Add(ChaosMod.OnTick)
+Events.OnTick.Add(ChaosMod.OnSpecialAnimalsTick)
 Events.OnZombieDead.Add(ChaosMod.OnZombieDead)
 Events.OnEnterVehicle.Add(ChaosMod.OnEnterVehicle)
 

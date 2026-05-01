@@ -21,5 +21,10 @@ function EffectSpawnRandomAnimal:OnStart()
 
         local str = string.format(ChaosLocalization.GetString("misc", "spawned_animal"), breedName, displayName)
         ChaosPlayer.SayLine(player, str, 0.05, 0.333, 1.0)
+
+        table.insert(ChaosMod.specialAnimalsFollowers, {
+            animal = animal,
+            repathTicks = 20
+        })
     end
 end

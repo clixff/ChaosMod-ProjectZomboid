@@ -258,7 +258,13 @@
         "all_zombies_are_cops": "Все зомби — полицейские",
         "effect_spawn_friendly_clone": "Дружелюбный двойник",
         "disable_attack": "Отключить атаку",
-        "every_tv_spawns_a_girl": "Из каждого телевизора появляется девушка"
+        "every_tv_spawns_a_girl": "Из каждого телевизора появляется девушка",
+        "give_painkillers": "Дать обезболивающие",
+        "explode_nearby_cars": "Взорвать машины поблизости",
+        "cure_zombies_nearby": "Вылечить зомби поблизости",
+        "rainbow_cars": "Радужные машины",
+        "spawn_explosive_flamingo": "Заспавнить взрывного фламинго",
+        "spawn_pig_follower": "Заспавнить свинью-спутника"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

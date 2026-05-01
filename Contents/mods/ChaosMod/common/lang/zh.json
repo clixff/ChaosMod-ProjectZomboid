@@ -257,7 +257,13 @@
         "all_zombies_are_cops": "所有僵尸都是警察",
         "effect_spawn_friendly_clone": "友好分身",
         "disable_attack": "禁止攻击",
-        "every_tv_spawns_a_girl": "每台电视生成一个女孩"
+        "every_tv_spawns_a_girl": "每台电视生成一个女孩",
+        "give_painkillers": "给予止痛药",
+        "explode_nearby_cars": "引爆附近的汽车",
+        "cure_zombies_nearby": "治愈附近的僵尸",
+        "rainbow_cars": "彩虹汽车",
+        "spawn_explosive_flamingo": "生成爆炸火烈鸟",
+        "spawn_pig_follower": "生成跟随猪"
     },
     "core": {
         "start_mod": "启动混乱模式",

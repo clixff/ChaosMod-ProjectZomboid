@@ -10,6 +10,7 @@ ChaosNPCGroupID                = ChaosNPCGroupID or {}
 ChaosNPCGroupID.RAIDERS        = 1
 ChaosNPCGroupID.COMPANIONS     = 2
 ChaosNPCGroupID.FOLLOWERS      = 3
+ChaosNPCGroupID.PEDESTRIAN     = 6
 -- Pseudo-groups: used as relation targets only, no NPC has these as npcGroup
 ChaosNPCGroupID.PLAYER         = 100
 ChaosNPCGroupID.ZOMBIES        = 101
@@ -168,6 +169,7 @@ end
 ChaosNPCRelations.CreateGroup("RAIDERS", ChaosNPCRelationType.ATTACK, true, ChaosNPCGroupID.RAIDERS)
 ChaosNPCRelations.CreateGroup("COMPANIONS", ChaosNPCRelationType.IGNORE, false, ChaosNPCGroupID.COMPANIONS)
 ChaosNPCRelations.CreateGroup("FOLLOWERS", ChaosNPCRelationType.IGNORE, false, ChaosNPCGroupID.FOLLOWERS)
+ChaosNPCRelations.CreateGroup("PEDESTRIAN", ChaosNPCRelationType.IGNORE, false, ChaosNPCGroupID.PEDESTRIAN)
 
 -- Relations for RAIDERS group
 ChaosNPCRelations.SetRelation(ChaosNPCGroupID.RAIDERS, ChaosNPCGroupID.RAIDERS, ChaosNPCRelationType.FRIEND)
@@ -180,6 +182,9 @@ ChaosNPCRelations.SetRelation(ChaosNPCGroupID.COMPANIONS, ChaosNPCGroupID.RAIDER
 
 -- Relations for FOLLOWERS group
 ChaosNPCRelations.SetRelation(ChaosNPCGroupID.FOLLOWERS, ChaosNPCGroupID.PLAYER, ChaosNPCRelationType.FOLLOW)
+
+-- Relations for PEDESTRIAN group
+ChaosNPCRelations.SetRelation(ChaosNPCGroupID.PEDESTRIAN, ChaosNPCGroupID.ZOMBIES, ChaosNPCRelationType.ATTACK)
 
 -- ROBBER group: ignores everyone, just wanders
 ChaosNPCGroupID.ROBBER = 4

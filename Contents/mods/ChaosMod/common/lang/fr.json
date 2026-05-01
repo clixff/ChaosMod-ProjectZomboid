@@ -257,7 +257,13 @@
         "all_zombies_are_cops": "Tous les zombies sont des flics",
         "effect_spawn_friendly_clone": "Clone amical",
         "disable_attack": "Desactiver l'attaque",
-        "every_tv_spawns_a_girl": "Chaque tele cree une fille"
+        "every_tv_spawns_a_girl": "Chaque tele cree une fille",
+        "give_painkillers": "Donner des antidouleurs",
+        "explode_nearby_cars": "Faire exploser les voitures proches",
+        "cure_zombies_nearby": "Soigner les zombies proches",
+        "rainbow_cars": "Voitures arc-en-ciel",
+        "spawn_explosive_flamingo": "Faire apparaitre un flamant explosif",
+        "spawn_pig_follower": "Faire apparaitre un cochon suiveur"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
