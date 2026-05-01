@@ -20,28 +20,23 @@ function EffectEnableAlarmNearby:OnStart()
     local roomDef = nil
     local building = nil
 
-    for _ = 1, 100 do
-        local dx = ZombRand(-MAX_RADIUS, MAX_RADIUS + 1)
-        local dy = ZombRand(-MAX_RADIUS, MAX_RADIUS + 1)
-        local distSq = dx * dx + dy * dy
-        if distSq >= MIN_RADIUS * MIN_RADIUS and distSq <= MAX_RADIUS * MAX_RADIUS then
-            local sq = cell:getGridSquare(px + dx, py + dy, 0)
-            if sq then
-                local rd = sq:getRoomDef()
-                if rd then
-                    local b = rd:getBuilding()
-                    if b then
-                        roomDef = rd
-                        building = b
-                        break
-                    end
+    ChaosUtils.SquareRingSearchTile_2D(px, py, function(sq)
+        if sq then
+            local rd = sq:getRoomDef()
+            if rd then
+                local b = rd:getBuilding()
+                if b then
+                    roomDef = rd
+                    building = b
+                    return true
                 end
             end
         end
-    end
+    end, 0, MAX_RADIUS, false, false, true, 0, 0)
+
 
     if not roomDef or not building then
-        ChaosPlayer.SayLine(player, "No building nearby!", 1.0, 0.5, 0.0)
+        ChaosPlayer.SayLine(player, "No building nearby", 1.0, 0.5, 0.0)
         return
     end
 
