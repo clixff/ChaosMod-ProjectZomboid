@@ -30,14 +30,13 @@ function EffectRemoveBarricadesNearby:OnStart()
     local cell = getCell()
     local countRemoved = 0
 
-    for dz = -1, 2 do
-        for dx = -radius, radius do
-            for dy = -radius, radius do
-                local sq = cell:getGridSquare(x + dx, y + dy, z + dz)
-                countRemoved = countRemoved + removeBarricadesOnSquare(sq)
-            end
+    local Z = square:getZ()
+
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            countRemoved = countRemoved + removeBarricadesOnSquare(sq)
         end
-    end
+    end, 0, radius, false, false, true, Z - 1, Z + 3)
 
     local str = string.format(ChaosLocalization.GetString("misc", "removed_barricades"), countRemoved)
     ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)

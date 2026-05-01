@@ -7,7 +7,8 @@ function EffectLaunchEveryoneUp:OnStart()
 
     ChaosVehicle.ExitVehicle(player)
 
-    player:setZ(player:getZ() + 3)
+    player:setZ(player:getZ() + 1.25)
+    player:addStiffness(BodyPartType.Foot_L, 100)
 
     local square = player:getSquare()
     if not square then return end

@@ -24,26 +24,6 @@ local function isFridge(obj)
     return false
 end
 
----@param fridge IsoObject
----@param sq IsoGridSquare
-local function dumpItemsToFloor(fridge, sq)
-    for c = 0, fridge:getContainerCount() - 1 do
-        local container = fridge:getContainerByIndex(c)
-        if container then
-            local items = container:getItems()
-            local snapshot = {}
-            for i = 0, items:size() - 1 do
-                table.insert(snapshot, items:get(i))
-            end
-            for _, item in ipairs(snapshot) do
-                local ox = ZombRand(0.15, 0.85)
-                local oy = ZombRand(0.15, 0.85)
-                sq:AddWorldInventoryItem(item, ox, oy, 0.0)
-            end
-        end
-    end
-end
-
 function EffectDestroyNearbyFridges:OnStart()
     ChaosEffectBase:OnStart()
     print("[EffectDestroyNearbyFridges] OnStart " .. tostring(self.effectId))
@@ -56,30 +36,23 @@ function EffectDestroyNearbyFridges:OnStart()
     local px, py, pz = square:getX(), square:getY(), square:getZ()
     local count = 0
 
-    for dx = -RANGE, RANGE do
-        for dy = -RANGE, RANGE do
-            for dz = -Z_RANGE, Z_RANGE do
-                local sq = cell:getGridSquare(px + dx, py + dy, pz + dz)
-                if sq then
-                    local objects = sq:getObjects()
-                    ---@type table<integer, IsoObject>
-                    local fridges = {}
-                    for i = 0, objects:size() - 1 do
-                        local obj = objects:get(i)
-                        if isFridge(obj) then
-                            table.insert(fridges, obj)
-                        end
-                    end
-                    for _, fridge in ipairs(fridges) do
-                        dumpItemsToFloor(fridge, sq)
-                        fridge:removeFromWorld()
-                        fridge:removeFromSquare()
-                        count = count + 1
-                    end
+
+    ChaosUtils.SquareRingSearchTile_2D(px, py, function(sq)
+        if sq then
+            ---@type table<integer, IsoObject>
+            local fridges = {}
+            ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                if isFridge(obj) then
+                    table.insert(fridges, obj)
                 end
+            end)
+            for _, fridge in ipairs(fridges) do
+                fridge:removeFromWorld()
+                fridge:removeFromSquare()
+                count = count + 1
             end
         end
-    end
+    end, 0, RANGE, false, false, true, pz - 1, pz + 2)
 
     print("[EffectDestroyNearbyFridges] Destroyed " .. tostring(count) .. " fridges")
     ChaosPlayer.SayLineByColor(player, string.format(ChaosLocalization.GetString("misc", "fridges_destroyed"), count),

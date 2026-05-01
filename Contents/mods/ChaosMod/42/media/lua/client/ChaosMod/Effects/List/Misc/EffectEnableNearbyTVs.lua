@@ -24,21 +24,15 @@ function EffectEnableNearbyTVs:OnStart()
     local cell = getCell()
     local countEnabled = 0
 
-    for dz = -1, 2 do
-        for dx = -radius, radius do
-            for dy = -radius, radius do
-                local sq = cell:getGridSquare(x + dx, y + dy, z + dz)
-                if sq then
-                    local objects = sq:getObjects()
-                    for i = 0, objects:size() - 1 do
-                        if enableTV(objects:get(i)) then
-                            countEnabled = countEnabled + 1
-                        end
-                    end
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                if enableTV(obj) then
+                    countEnabled = countEnabled + 1
                 end
-            end
+            end)
         end
-    end
+    end, 0, radius, false, false, true, z - 1, z + 2)
 
     print("[EffectEnableNearbyTVs] Enabled " .. tostring(countEnabled) .. " TVs")
 end

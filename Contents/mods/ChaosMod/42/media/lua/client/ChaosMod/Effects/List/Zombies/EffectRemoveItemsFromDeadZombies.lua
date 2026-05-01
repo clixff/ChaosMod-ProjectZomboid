@@ -1,4 +1,5 @@
-EffectRemoveItemsFromDeadZombies = ChaosEffectBase:derive("EffectRemoveItemsFromDeadZombies", "remove_items_from_dead_zombies")
+EffectRemoveItemsFromDeadZombies = ChaosEffectBase:derive("EffectRemoveItemsFromDeadZombies",
+    "remove_items_from_dead_zombies")
 
 function EffectRemoveItemsFromDeadZombies:OnStart()
     ChaosEffectBase:OnStart()
@@ -18,23 +19,19 @@ function EffectRemoveItemsFromDeadZombies:OnStart()
 
     local countCleaned = 0
 
-    for dx = -radius, radius do
-        for dy = -radius, radius do
-            for dz = minZ, maxZ do
-                local sq = cell:getGridSquare(x + dx, y + dy, dz)
-                if sq then
-                    local body = sq:getDeadBody()
-                    if body then
-                        local container = body:getContainer()
-                        if container then
-                            container:removeAllItems()
-                            countCleaned = countCleaned + 1
-                        end
-                    end
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            local body = sq:getDeadBody()
+            if body then
+                local container = body:getContainer()
+                if container then
+                    container:removeAllItems()
+                    countCleaned = countCleaned + 1
                 end
             end
         end
-    end
+    end, 0, radius, false, false, true, minZ, maxZ)
+
 
     print("[EffectRemoveItemsFromDeadZombies] Cleaned " .. tostring(countCleaned) .. " dead bodies")
 end

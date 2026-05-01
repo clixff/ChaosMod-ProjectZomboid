@@ -41,22 +41,15 @@ function EffectMoveFurniture:OnStart()
     ---@type table<integer, {obj: IsoObject, z: integer}>
     local furniture = {}
 
-    for dx = -RANGE, RANGE do
-        for dy = -RANGE, RANGE do
-            for dz = -Z_RANGE, Z_RANGE do
-                local sq = cell:getGridSquare(px + dx, py + dy, pz + dz)
-                if sq then
-                    local objects = sq:getObjects()
-                    for i = 0, objects:size() - 1 do
-                        local obj = objects:get(i)
-                        if obj and not obj:hasSpriteGrid() and ChaosProps.GetFurnitureType(obj) ~= nil then
-                            table.insert(furniture, { obj = obj, z = sq:getZ() })
-                        end
-                    end
+    ChaosUtils.SquareRingSearchTile_2D(px, py, function(sq)
+        if sq then
+            ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                if obj and not obj:hasSpriteGrid() and ChaosProps.GetFurnitureType(obj) ~= nil then
+                    table.insert(furniture, { obj = obj, z = sq:getZ() })
                 end
-            end
+            end)
         end
-    end
+    end, 0, RANGE, false, false, true, pz - 1, pz + 2)
 
     local moved = 0
     for _, entry in ipairs(furniture) do

@@ -1399,7 +1399,7 @@
         {
             "id": "spawn_cow",
             "enabled": true,
-            "chance": 65,
+            "chance": 30,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_2"

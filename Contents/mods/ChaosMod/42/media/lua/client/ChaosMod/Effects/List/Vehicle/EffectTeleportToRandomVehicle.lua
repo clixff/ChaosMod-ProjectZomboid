@@ -7,7 +7,7 @@ function EffectTeleportToRandomVehicle:OnStart()
     local player = getPlayer()
     if not player then return end
 
-    local vehicles = ChaosVehicle.GetVehiclesNearby(player:getSquare(), 80)
+    local vehicles = ChaosVehicle.GetVehiclesNearby(player:getSquare(), 90)
 
     for i = 0, vehicles:size() - 1 do
         local randIndex = math.floor(ZombRand(vehicles:size()))

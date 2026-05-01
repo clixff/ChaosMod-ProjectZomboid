@@ -4,14 +4,15 @@ EffectEnableLightsNearby = ChaosEffectBase:derive("EffectEnableLightsNearby", "e
 ---@return IsoLightSwitch | nil
 local function getLightSwitchOnSquare(square)
     if not square then return nil end
-    local objects = square:getObjects()
-    for i = 0, objects:size() - 1 do
-        local obj = objects:get(i)
+    ---@type IsoLightSwitch | nil
+    local lightSwitch = nil
+    ChaosUtils.ForAllObjectsInSquare(square, function(obj)
         if instanceof(obj, "IsoLightSwitch") then
-            return obj
+            lightSwitch = obj
+            return true
         end
-    end
-    return nil
+    end)
+    return lightSwitch
 end
 
 function EffectEnableLightsNearby:OnStart()
@@ -26,20 +27,15 @@ function EffectEnableLightsNearby:OnStart()
     local cell = getCell()
     local countEnabled = 0
 
-    for dz = -1, 2 do
-        for dx = -radius, radius do
-            for dy = -radius, radius do
-                local sq = cell:getGridSquare(x + dx, y + dy, z + dz)
-                if sq then
-                    local lightSwitch = getLightSwitchOnSquare(sq)
-                    if lightSwitch and not lightSwitch:isActivated() then
-                        lightSwitch:setActive(true)
-                        countEnabled = countEnabled + 1
-                    end
-                end
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            local lightSwitch = getLightSwitchOnSquare(sq)
+            if lightSwitch and not lightSwitch:isActivated() then
+                lightSwitch:setActive(true)
+                countEnabled = countEnabled + 1
             end
         end
-    end
+    end, 0, radius, false, false, true, z - 1, z + 2)
 
     print("[EffectEnableLightsNearby] Enabled " .. tostring(countEnabled) .. " lights")
 end

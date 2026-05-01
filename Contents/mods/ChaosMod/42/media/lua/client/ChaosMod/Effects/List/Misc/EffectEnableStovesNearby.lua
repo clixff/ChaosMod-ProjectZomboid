@@ -22,21 +22,18 @@ function EffectEnableStovesNearby:OnStart()
     local cell = getCell()
     local countEnabled = 0
 
-    for dz = -1, 2 do
-        for dx = -radius, radius do
-            for dy = -radius, radius do
-                local sq = cell:getGridSquare(x + dx, y + dy, z + dz)
-                if sq then
-                    local objects = sq:getObjects()
-                    for i = 0, objects:size() - 1 do
-                        if enableStove(objects:get(i)) then
-                            countEnabled = countEnabled + 1
-                        end
-                    end
+    local Z = square:getZ()
+
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            local objects = sq:getObjects()
+            for i = 0, objects:size() - 1 do
+                if enableStove(objects:get(i)) then
+                    countEnabled = countEnabled + 1
                 end
             end
         end
-    end
+    end, 0, radius, false, false, true, Z - 1, Z + 2)
 
     print("[EffectEnableStovesNearby] Enabled " .. tostring(countEnabled) .. " stoves")
 end

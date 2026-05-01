@@ -15,25 +15,24 @@ function EffectSmashNearbyWindows:OnStart()
 
     local countSmashed = 0
 
-    for dx = -radius, radius do
-        for dy = -radius, radius do
-            local sq = cell:getGridSquare(x + dx, y + dy, z)
-            if sq then
-                local objects = sq:getObjects()
-                for i = 0, objects:size() - 1 do
-                    local obj = objects:get(i)
-                    if instanceof(obj, "IsoWindow") then
-                        ---@type IsoWindow
-                        local window = obj
-                        if window:isSmashed() == false then
-                            window:smashWindow()
-                            countSmashed = countSmashed + 1
-                        end
-                    end
+    local Z = square:getZ()
+
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                if not obj or not instanceof(obj, "IsoWindow") then
+                    return false
                 end
-            end
+                ---@type IsoWindow
+                local window = obj
+                if window:isSmashed() == false then
+                    window:smashWindow()
+                    countSmashed = countSmashed + 1
+                end
+            end)
         end
-    end
+    end, 0, radius, false, false, true, Z - 1, Z + 3)
+
 
     print("[EffectSmashNearbyWindows] Smashed " .. tostring(countSmashed) .. " windows")
 end

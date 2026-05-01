@@ -4,7 +4,7 @@ EffectSpawnTrees = ChaosEffectBase:derive("EffectSpawnTrees", "spawn_trees")
 local MIN_RADIUS = 3
 local MAX_RADIUS = 12
 local TREE_SPRITE = "e_americanlinden_1_3"
-local TREE_SPAWN_CHANCE = 35
+local TREE_SPAWN_CHANCE = 45
 
 function EffectSpawnTrees:OnStart()
     ChaosEffectBase:OnStart()
@@ -23,28 +23,20 @@ function EffectSpawnTrees:OnStart()
     local pz = square:getZ()
     local spawned = 0
 
-    for dx = -MAX_RADIUS, MAX_RADIUS do
-        for dy = -MAX_RADIUS, MAX_RADIUS do
-            local x = px + dx
-            local y = py + dy
-            local isInMaxRadius = ChaosUtils.isInRange(px, py, x, y, MAX_RADIUS)
-            local isOutsideMinRadius = not ChaosUtils.isInRange(px, py, x, y, MIN_RADIUS)
-
-            if isInMaxRadius and isOutsideMinRadius and ZombRand(100) < TREE_SPAWN_CHANCE then
-                local sq = cell:getGridSquare(x, y, pz)
-                if sq and sq:isSolidFloor() and sq:isFree(false) then
-                    local tree = IsoTree.new(sq, TREE_SPRITE)
-                    tree:addAttachedAnimSpriteByName("e_americanlinden_1_11")
-                    if tree then
-                        tree:setSquare(sq)
-                        tree:addToWorld()
-                        sq:AddTileObject(tree)
-                        spawned = spawned + 1
-                    end
+    ChaosUtils.SquareRingSearchTile_2D(px, py, function(sq)
+        if sq then
+            if ZombRand(100) < TREE_SPAWN_CHANCE then
+                local tree = IsoTree.new(sq, TREE_SPRITE)
+                tree:addAttachedAnimSpriteByName("e_americanlinden_1_11")
+                if tree then
+                    tree:setSquare(sq)
+                    tree:addToWorld()
+                    sq:AddTileObject(tree)
+                    spawned = spawned + 1
                 end
             end
         end
-    end
+    end, MIN_RADIUS, MAX_RADIUS, true, false, true, pz, pz)
 
     print("[EffectSpawnTrees] Spawned " .. tostring(spawned) .. " trees")
 end

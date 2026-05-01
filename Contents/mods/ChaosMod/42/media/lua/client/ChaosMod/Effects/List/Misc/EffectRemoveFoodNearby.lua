@@ -13,41 +13,27 @@ function EffectRemoveFoodNearby:OnStart()
 
     local totalRemoved = 0
 
-    for dz = -1, 2 do
-        for dx = -radius, radius do
-            for dy = -radius, radius do
-                local sq = cell:getGridSquare(x + dx, y + dy, z + dz)
-                if sq then
-                    local objects = sq:getObjects()
-                    for i = 0, objects:size() - 1 do
-                        local obj = objects:get(i)
-                        if obj and obj:getContainerCount() > 0 then
-                            for ci = 0, obj:getContainerCount() - 1 do
-                                local container = obj:getContainerByIndex(ci)
-                                if container then
-                                    local items = container:getItems()
-                                    if items and items:size() > 0 then
-                                        ---@type table<integer, InventoryItem>
-                                        local itemList = {}
-                                        for ii = 0, items:size() - 1 do
-                                            local item = items:get(ii)
-                                            if item and item:isFood() then
-                                                table.insert(itemList, item)
-                                            end
-                                        end
-                                        for _, item in ipairs(itemList) do
-                                            container:Remove(item)
-                                            totalRemoved = totalRemoved + 1
-                                        end
-                                    end
-                                end
+    local Z = square:getZ()
+
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                ChaosUtils.ForAllContainersInObject(obj, function(container)
+                    local items = container:getItems()
+                    --- backward loop to avoid index out of bounds
+                    if items and items:size() > 0 then
+                        for i = items:size() - 1, 0, -1 do
+                            local item = items:get(i)
+                            if item and item:isFood() then
+                                container:Remove(item)
+                                totalRemoved = totalRemoved + 1
                             end
                         end
                     end
-                end
-            end
+                end)
+            end)
         end
-    end
+    end, 0, radius, false, false, true, Z - 1, Z + 3)
 
     print("[EffectRemoveFoodNearby] Removed " .. tostring(totalRemoved) .. " food items")
 end

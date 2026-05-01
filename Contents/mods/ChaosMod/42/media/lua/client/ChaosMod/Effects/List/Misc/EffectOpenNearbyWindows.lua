@@ -28,28 +28,24 @@ function EffectOpenNearbyWindows:OnStart()
     local cell = getCell()
     local countOpened = 0
 
-    for dz = -1, 2 do
-        for dx = -radius, radius do
-            for dy = -radius, radius do
-                local sq = cell:getGridSquare(x + dx, y + dy, z + dz)
-                if sq then
-                    local objects = sq:getObjects()
-                    for i = 0, objects:size() - 1 do
-                        local obj = objects:get(i)
-                        if instanceof(obj, "IsoWindow") then
-                            ---@type IsoWindow
-                            local window = obj
-                            if not window:isSmashed() then
-                                if forceUnlockAndOpenWindow(window, player) then
-                                    countOpened = countOpened + 1
-                                end
-                            end
-                        end
+    local Z = square:getZ()
+
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                if not obj or not instanceof(obj, "IsoWindow") then
+                    return false
+                end
+                ---@type IsoWindow | nil
+                local window = obj
+                if window and not window:isSmashed() then
+                    if forceUnlockAndOpenWindow(window, player) then
+                        countOpened = countOpened + 1
                     end
                 end
-            end
+            end)
         end
-    end
+    end, 0, radius, false, false, true, Z - 1, Z + 3)
 
     local str = string.format(ChaosLocalization.GetString("misc", "opened_windows"), countOpened)
     ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.green)

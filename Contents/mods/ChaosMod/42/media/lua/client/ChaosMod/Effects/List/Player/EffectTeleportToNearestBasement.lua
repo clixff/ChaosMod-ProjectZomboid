@@ -18,18 +18,13 @@ function EffectTeleportToNearestBasement:OnStart()
     local bestSq = nil
     local bestDistSq = math.huge
 
-    for dx = -radius, radius do
-        for dy = -radius, radius do
-            local distSq = dx * dx + dy * dy
-            if distSq <= radius * radius and distSq < bestDistSq then
-                local sq = cell:getGridSquare(px + dx, py + dy, -1)
-                if sq and sq:isSolidFloor() and sq:isFree(false) then
-                    bestSq = sq
-                    bestDistSq = distSq
-                end
-            end
+    ChaosUtils.SquareRingSearchTile_2D(px, py, function(sq)
+        if sq then
+            bestSq = sq
+            return true
         end
-    end
+    end, 0, radius, true, true, true, -1, -1)
+
 
     if not bestSq then
         ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "no_basement_found"),

@@ -17,7 +17,7 @@ function EffectHonkVehiclesNearby:OnStart()
     self.vehicles = {}
     self.isActivated = true
     self.currentTimeMs = 0
-    local vehicles = ChaosVehicle.GetVehiclesNearby(player:getSquare(), 30)
+    local vehicles = ChaosVehicle.GetVehiclesNearby(player:getSquare(), 70)
     for i = 0, vehicles:size() - 1 do
         local vehicle = vehicles:get(i)
         if vehicle then

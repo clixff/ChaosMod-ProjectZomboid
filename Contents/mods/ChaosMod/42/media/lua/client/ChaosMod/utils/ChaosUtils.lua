@@ -271,10 +271,12 @@ end
 ---@param minRadius integer
 ---@param maxRadius integer
 ---@param maxTries integer | nil
+---@param checkEmptiness boolean?
 ---@return IsoGridSquare | nil
-function ChaosUtils.GetRandomSquareAroundPosition(x, y, z, minRadius, maxRadius, maxTries)
+function ChaosUtils.GetRandomSquareAroundPosition(x, y, z, minRadius, maxRadius, maxTries, checkEmptiness)
     local cell = getCell()
     if not cell then return nil end
+    checkEmptiness = checkEmptiness or false
 
     maxTries = maxTries or 50
     local minSq = minRadius * minRadius
@@ -288,12 +290,259 @@ function ChaosUtils.GetRandomSquareAroundPosition(x, y, z, minRadius, maxRadius,
         if distSq >= minSq and distSq <= maxSq then
             local sq = cell:getGridSquare(x + dx, y + dy, z)
             if sq and sq:isSolidFloor() then
-                return sq
+                if checkEmptiness == false then
+                    return sq
+                else
+                    if sq:isFree(false) then
+                        return sq
+                    end
+                end
             end
         end
     end
 
     return nil
+end
+
+---@param value unknown
+---@return integer
+local function _normalizeBFSZOffset(value)
+    if type(value) ~= "number" then return 0 end
+    if value % 1 ~= 0 then return 0 end
+    return value
+end
+
+---@param square IsoGridSquare | nil
+---@param checkFloor boolean
+---@param onlyEmpty boolean
+---@param allowInteriors boolean
+---@return boolean
+local function _isValidBFSSquare(square, checkFloor, onlyEmpty, allowInteriors)
+    if not square then return false end
+
+    if checkFloor and not square:isSolidFloor() then
+        return false
+    end
+
+    if not allowInteriors and not square:isOutside() then
+        return false
+    end
+
+    if onlyEmpty and not square:isFree(false) then
+        return false
+    end
+
+    return true
+end
+
+---@param cell IsoCell
+---@param originX number
+---@param originY number
+---@param targetX integer
+---@param targetY integer
+---@param z integer
+---@param callback fun(square: IsoGridSquare): boolean?
+---@param minDistance number
+---@param maxDistance number
+---@param checkFloor boolean
+---@param onlyEmpty boolean
+---@param allowInteriors boolean
+---@return boolean
+local function _checkSquareAtZ(cell, originX, originY, targetX, targetY, z, callback, minDistance, maxDistance,
+                               checkFloor, onlyEmpty, allowInteriors)
+    local dist = ChaosUtils.distTo(originX, originY, targetX, targetY)
+    if dist < minDistance or dist > maxDistance then
+        return false
+    end
+
+    local square = cell:getGridSquare(targetX, targetY, z)
+    if not _isValidBFSSquare(square, checkFloor, onlyEmpty, allowInteriors) then
+        return false
+    end
+
+    return callback(square) == true
+end
+
+---@param cell IsoCell
+---@param originX number
+---@param originY number
+---@param targetX integer
+---@param targetY integer
+---@param callback fun(square: IsoGridSquare): boolean?
+---@param minDistance number
+---@param maxDistance number
+---@param checkFloor boolean
+---@param onlyEmpty boolean
+---@param allowInteriors boolean
+---@param minZ integer
+---@param maxZ integer
+---@return boolean
+local function _checkSquareAcrossZ(cell, originX, originY, targetX, targetY, callback, minDistance, maxDistance,
+                                   checkFloor, onlyEmpty, allowInteriors, minZ, maxZ)
+    for currentZ = minZ, maxZ do
+        if _checkSquareAtZ(cell, originX, originY, targetX, targetY, currentZ, callback, minDistance, maxDistance,
+                checkFloor, onlyEmpty, allowInteriors) then
+            return true
+        end
+    end
+
+    return false
+end
+
+--- Breadth-first XY scan around a world position. Traversal order is BFS by cardinal neighbors.
+--- The callback is invoked only for squares that match the filters and whose 2D distance is within range.
+--- Absolute Z levels are evaluated per visited XY.
+---@param x integer
+---@param y integer
+---@param callback fun(square: IsoGridSquare): boolean?
+---@param minDistance number
+---@param maxDistance number
+---@param checkFloor boolean?
+---@param onlyEmpty boolean?
+---@param allowInteriors boolean?
+---@param minZ integer?
+---@param maxZ integer?
+---@return boolean
+function ChaosUtils.GetTilesBFS_2D(x, y, callback, minDistance, maxDistance, checkFloor, onlyEmpty, allowInteriors,
+                                   minZ, maxZ)
+    local cell = getCell()
+    if not cell then return false end
+    if type(callback) ~= "function" then return false end
+
+    checkFloor = checkFloor == true
+    onlyEmpty = onlyEmpty == true
+    allowInteriors = allowInteriors ~= false
+    minDistance = minDistance or 0
+    maxDistance = maxDistance or 0
+
+    if maxDistance < 0 then return false end
+    if minDistance < 0 then minDistance = 0 end
+    if minDistance > maxDistance then return false end
+
+    minZ = _normalizeBFSZOffset(minZ)
+    maxZ = _normalizeBFSZOffset(maxZ)
+    if minZ > maxZ then return false end
+
+    ---@type table<integer, {x: integer, y: integer}>
+    local queue = {
+        { x = x, y = y }
+    }
+    local head = 1
+
+    ---@type table<string, boolean>
+    local visited = {}
+    visited[tostring(x) .. ":" .. tostring(y)] = true
+
+    while head <= #queue do
+        local node = queue[head]
+        head = head + 1
+
+        local nodeX = node.x
+        local nodeY = node.y
+        local dist = ChaosUtils.distTo(x, y, nodeX, nodeY)
+
+        if dist <= maxDistance then
+            if _checkSquareAcrossZ(cell, x, y, nodeX, nodeY, callback, minDistance, maxDistance, checkFloor,
+                    onlyEmpty, allowInteriors, minZ, maxZ) then
+                return true
+            end
+        end
+
+        local neighbors = {
+            { x = nodeX + 1, y = nodeY },
+            { x = nodeX - 1, y = nodeY },
+            { x = nodeX,     y = nodeY + 1 },
+            { x = nodeX,     y = nodeY - 1 }
+        }
+
+        for i = 1, #neighbors do
+            local neighbor = neighbors[i]
+            local key = tostring(neighbor.x) .. ":" .. tostring(neighbor.y)
+            if not visited[key] and ChaosUtils.distTo(x, y, neighbor.x, neighbor.y) <= maxDistance then
+                visited[key] = true
+                queue[#queue + 1] = neighbor
+            end
+        end
+    end
+
+    return false
+end
+
+--- Expanding square-ring XY scan around a world position using Chebyshev distance.
+--- Ring 0 checks the center tile, ring 1 checks the 8 surrounding tiles, ring 2 checks the next 16, etc.
+--- Each visited XY is checked against the 2D distance filters before callback dispatch.
+---@param x integer
+---@param y integer
+---@param callback fun(square: IsoGridSquare): boolean?
+---@param minDistance number
+---@param maxDistance number
+---@param checkFloor boolean?
+---@param onlyEmpty boolean?
+---@param allowInteriors boolean?
+---@param minZ integer?
+---@param maxZ integer?
+---@return boolean
+function ChaosUtils.SquareRingSearchTile_2D(x, y, callback, minDistance, maxDistance, checkFloor, onlyEmpty,
+                                            allowInteriors, minZ, maxZ)
+    local cell = getCell()
+    if not cell then return false end
+    if type(callback) ~= "function" then return false end
+
+    checkFloor = checkFloor == true
+    onlyEmpty = onlyEmpty == true
+    allowInteriors = allowInteriors ~= false
+    minDistance = minDistance or 0
+    maxDistance = maxDistance or 0
+
+    if maxDistance < 0 then return false end
+    if minDistance < 0 then minDistance = 0 end
+    if minDistance > maxDistance then return false end
+
+    minZ = _normalizeBFSZOffset(minZ)
+    maxZ = _normalizeBFSZOffset(maxZ)
+    if minZ > maxZ then return false end
+
+    local maxRing = math.ceil(maxDistance)
+
+    for ring = 0, maxRing do
+        if ring == 0 then
+            if _checkSquareAcrossZ(cell, x, y, x, y, callback, minDistance, maxDistance, checkFloor, onlyEmpty,
+                    allowInteriors, minZ, maxZ) then
+                return true
+            end
+        else
+            local minX = x - ring
+            local maxX = x + ring
+            local minY = y - ring
+            local maxY = y + ring
+
+            for currentX = minX, maxX do
+                if _checkSquareAcrossZ(cell, x, y, currentX, minY, callback, minDistance, maxDistance, checkFloor,
+                        onlyEmpty, allowInteriors, minZ, maxZ) then
+                    return true
+                end
+
+                if _checkSquareAcrossZ(cell, x, y, currentX, maxY, callback, minDistance, maxDistance, checkFloor,
+                        onlyEmpty, allowInteriors, minZ, maxZ) then
+                    return true
+                end
+            end
+
+            for currentY = minY + 1, maxY - 1 do
+                if _checkSquareAcrossZ(cell, x, y, minX, currentY, callback, minDistance, maxDistance, checkFloor,
+                        onlyEmpty, allowInteriors, minZ, maxZ) then
+                    return true
+                end
+
+                if _checkSquareAcrossZ(cell, x, y, maxX, currentY, callback, minDistance, maxDistance, checkFloor,
+                        onlyEmpty, allowInteriors, minZ, maxZ) then
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
 end
 
 ---@param a number
@@ -479,4 +728,58 @@ function ChaosUtils.RemoveRandomItem(player)
     inventory:Remove(randomItem.item)
 
     ChaosPlayer.SayLineRemovedItem(player, randomItem.item)
+end
+
+---@param square IsoGridSquare
+---@param callback fun(obj: IsoObject): boolean?
+---@return boolean
+function ChaosUtils.ForAllObjectsInSquare(square, callback)
+    if not square then return false end
+    if not callback then return false end
+    local objects = square:getObjects()
+    if not objects then return false end
+    for i = 0, objects:size() - 1 do
+        local obj = objects:get(i)
+        if obj then
+            local result = callback(obj)
+            if result == true then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+---@param obj IsoObject
+---@param callback fun(container: ItemContainer)
+function ChaosUtils.ForAllContainersInObject(obj, callback)
+    if not obj then return end
+    if not callback then return end
+    if not obj:getContainerCount() then return end
+    for i = 0, obj:getContainerCount() - 1 do
+        local container = obj:getContainerByIndex(i)
+        if container then
+            callback(container)
+        end
+    end
+end
+
+---@param square IsoGridSquare
+---@param callback fun(obj: IsoWorldInventoryObject): boolean?
+---@return boolean
+function ChaosUtils.ForAllWorldObjectsOnSquare(square, callback)
+    if not square then return false end
+    if not callback then return false end
+    local worldObjects = square:getWorldObjects()
+    if not worldObjects then return false end
+    for i = 0, worldObjects:size() - 1 do
+        local obj = worldObjects:get(i)
+        if obj then
+            local result = callback(obj)
+            if result == true then
+                return true
+            end
+        end
+    end
+    return false
 end

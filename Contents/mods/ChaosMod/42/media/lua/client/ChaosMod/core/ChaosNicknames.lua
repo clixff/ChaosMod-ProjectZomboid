@@ -235,17 +235,13 @@ function ChaosNicknames.LoadNicknamesFromDisk()
                 if chatMessage and externalTimestampMs and externalTimestampMs > 0 then
                     local messageAgeMs = nowMs - externalTimestampMs
                     if messageAgeMs >= 0 and messageAgeMs <= NICKNAME_CHAT_MESSAGE_MAX_AGE_MS then
-                        print("[ChaosNicknames] Raw message is " .. tostring(chatMessage))
                         entry.chatMessage = formatChatMessage(chatMessage)
-                        print("[ChaosNicknames] Formatted message is " .. tostring(entry.chatMessage))
                         if entry.chatMessage then
                             entry.externalTimestampMs = externalTimestampMs
                             if previousEntry and previousEntry.externalTimestampMs == externalTimestampMs and previousEntry.internalTimestampMs then
                                 entry.internalTimestampMs = previousEntry.internalTimestampMs
                             else
                                 entry.internalTimestampMs = nowMs
-                                print("[ChaosNicknames] Loaded new chat message for nickname '" ..
-                                    tostring(nickname) .. "' with timestamp " .. tostring(externalTimestampMs))
                             end
                         end
                     end

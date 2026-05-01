@@ -51,27 +51,15 @@ function EffectSpoilFoodNearby:OnStart()
     local x, y, z = square:getX(), square:getY(), square:getZ()
     local cell = getCell()
 
-    for dz = -1, 2 do
-        for dx = -RADIUS, RADIUS do
-            for dy = -RADIUS, RADIUS do
-                local sq = cell:getGridSquare(x + dx, y + dy, z + dz)
-                if sq then
-                    local objects = sq:getObjects()
-                    for i = 0, objects:size() - 1 do
-                        local obj = objects:get(i)
-                        if obj and obj:getContainerCount() > 0 then
-                            for j = 0, obj:getContainerCount() - 1 do
-                                local container = obj:getContainerByIndex(j)
-                                if container then
-                                    totalSpoiled = totalSpoiled + spoilFoodInContainer(container)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
+
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+            ChaosUtils.ForAllContainersInObject(obj, function(container)
+                totalSpoiled = totalSpoiled + spoilFoodInContainer(container)
+            end)
+        end)
+    end, 0, RADIUS, false, false, true, z - 1, z + 2)
+
 
     print("[EffectSpoilFoodNearby] Spoiled " .. tostring(totalSpoiled) .. " food items")
 

@@ -206,6 +206,7 @@ function ChaosVehicle.GetRandomVehicleName()
     return str
 end
 
+---@param vehicle BaseVehicle
 function ChaosVehicle.SetRandomVehicleColors(vehicle)
     if not vehicle then return end
     local randomIndex = math.floor(ZombRandBetween(1, #VEHICLE_COLORS + 1))

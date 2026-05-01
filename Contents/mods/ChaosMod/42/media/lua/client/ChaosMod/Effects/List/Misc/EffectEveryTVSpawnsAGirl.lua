@@ -1,6 +1,11 @@
 ---@class EffectEveryTVSpawnsAGirl : ChaosEffectBase
 EffectEveryTVSpawnsAGirl = ChaosEffectBase:derive("EffectEveryTVSpawnsAGirl", "every_tv_spawns_a_girl")
 
+---@param obj IsoObject
+---@param player IsoPlayer
+---@param playerX number
+---@param playerY number
+---@return boolean
 local function spawnGirlAtTV(obj, player, playerX, playerY)
     if not obj or not instanceof(obj, "IsoTelevision") then
         return false
@@ -11,7 +16,24 @@ local function spawnGirlAtTV(obj, player, playerX, playerY)
         return false
     end
 
-    local zombies = ChaosZombie.SpawnZombieAt(square:getX(), square:getY(), square:getZ(), 1, "WeddingDress", 100)
+    local newSquare = square;
+    local originalRoom = square:getRoom();
+    local Z = square:getZ();
+
+
+    ChaosUtils.SquareRingSearchTile_2D(square:getX(), square:getY(), function(sq)
+        if sq and sq:isInARoom() and sq:getRoom() == originalRoom then
+            newSquare = sq;
+            return true
+        end
+    end, 0, 3, true, true, true, Z - 1, Z + 2)
+
+    if not newSquare then
+        return false
+    end
+
+    local zombies = ChaosZombie.SpawnZombieAt(newSquare:getX(), newSquare:getY(), newSquare:getZ(), 1, "WeddingDress",
+        100)
     if not zombies or zombies:size() == 0 then
         return false
     end
@@ -21,7 +43,7 @@ local function spawnGirlAtTV(obj, player, playerX, playerY)
         return false
     end
 
-    zombie:setTurnAlertedValues(playerX, playerY)
+    zombie:setTurnAlertedValues(math.floor(playerX), math.floor(playerY))
     return true
 end
 
@@ -40,21 +62,15 @@ function EffectEveryTVSpawnsAGirl:OnStart()
     local cell = getCell()
     local countSpawned = 0
 
-    for dz = -1, 2 do
-        for dx = -radius, radius do
-            for dy = -radius, radius do
-                local sq = cell:getGridSquare(x + dx, y + dy, z + dz)
-                if sq then
-                    local objects = sq:getObjects()
-                    for i = 0, objects:size() - 1 do
-                        if spawnGirlAtTV(objects:get(i), player, playerX, playerY) then
-                            countSpawned = countSpawned + 1
-                        end
-                    end
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+        if sq then
+            ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                if spawnGirlAtTV(obj, player, playerX, playerY) then
+                    countSpawned = countSpawned + 1
                 end
-            end
+            end)
         end
-    end
+    end, 0, radius, false, false, true, -1, 2)
 
     print("[EffectEveryTVSpawnsAGirl] Spawned " .. tostring(countSpawned) .. " girls from TVs")
 end
