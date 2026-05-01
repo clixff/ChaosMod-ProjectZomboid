@@ -14,7 +14,7 @@ function EffectEnableAlarmNearby:OnStart()
     local py = playerSq:getY()
     local cell = getCell()
 
-    local MIN_RADIUS = 30
+    local MIN_RADIUS = 5
     local MAX_RADIUS = 80
 
     local roomDef = nil

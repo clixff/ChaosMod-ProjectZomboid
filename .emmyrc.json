@@ -20,6 +20,9 @@
     ],
     "workspaceRoots": [
       "Contents/mods/ChaosMod/42/media/lua"
+    ],
+    "ignoreDir": [
+      "releases"
     ]
   }
 }
