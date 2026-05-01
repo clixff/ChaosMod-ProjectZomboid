@@ -99,12 +99,19 @@ function ChaosNPC:update(deltaMs)
     end
 
     if self.enemy then
-        if self.actionType == "pickup_ground_weapon" then
+        local wasPickingGroundWeapon = self.actionType == "pickup_ground_weapon"
+        local shouldSwitchToEnemyPath = self.moveTargetCharacter ~= self.enemy or
+            wasPickingGroundWeapon or
+            not self.moving
+
+        if wasPickingGroundWeapon then
             self:StopMoving(true, "pickup_ground_weapon_enemy_override")
         end
         self:ClearAction()
         self.moveTargetCharacter = self.enemy
-        shouldUpdatePathfind = true
+        if shouldSwitchToEnemyPath then
+            shouldUpdatePathfind = true
+        end
     end
 
     if self.actionType == "pickup_ground_weapon" then
@@ -147,8 +154,7 @@ function ChaosNPC:update(deltaMs)
         end
     end
 
-    local shouldFindGroundWeapon = self.enemy == nil and self.moveTargetCharacter == nil and self.actionType == nil and
-        not self:HasEquippedWeapon()
+    local shouldFindGroundWeapon = self.enemy == nil and self.actionType == nil and not self:HasEquippedWeapon()
     if shouldFindGroundWeapon and canFindGroundWeaponThisFrame and zombie:getVehicle() == nil then
         self.findGroundWeaponTimeoutMs = 0
 

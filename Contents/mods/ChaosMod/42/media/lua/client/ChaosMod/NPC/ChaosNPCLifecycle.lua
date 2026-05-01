@@ -72,7 +72,7 @@ function ChaosNPC:GetGroundWeaponClaimOwner(worldObj)
     if not worldObj then return nil end
 
     local item = worldObj:getItem()
-    if not item or not item.getModData then return nil end
+    if not item then return nil end
 
     local md = item:getModData()
     if not md then return nil end
@@ -91,11 +91,13 @@ function ChaosNPC:TryClaimGroundWeapon(worldObj)
     if not worldObj then return false end
 
     local item = worldObj:getItem()
-    if not item or not item.getModData then return false end
+    if not item then return false end
 
     local token = self:GetGroundWeaponClaimToken()
     local md = item:getModData()
-    local owner = md and md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] or nil
+    if not md then return false end
+
+    local owner = md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY]
     if owner and owner ~= token then
         return false
     end
@@ -109,7 +111,7 @@ function ChaosNPC:ReleaseGroundWeaponClaim(worldObj)
     if not worldObj then return end
 
     local item = worldObj:getItem()
-    if not item or not item.getModData then return end
+    if not item then return end
 
     local md = item:getModData()
     if not md then return end
