@@ -47,6 +47,7 @@ export interface ChatEvent {
   color: string;
   badges: unknown[];
   message_type: string;
+  timestamp_ms: number;
 }
 
 export interface TwitchChatParams {
@@ -161,8 +162,12 @@ export class TwitchChat {
 
     if (type === "notification") {
       if (msg.metadata?.subscription_type !== "channel.chat.message") return;
-      const chat = msg.payload.event;
-      if (!chat) return;
+      const rawChat = msg.payload.event;
+      if (!rawChat) return;
+      const chat: ChatEvent = {
+        ...rawChat,
+        timestamp_ms: Date.now(),
+      };
       logger.debug(
         `${this.coloredName} New chat message: (${chat.color}) ${chat.chatter_user_name}: ${chat.message.text}`,
       );
@@ -201,5 +206,4 @@ export class TwitchChat {
       throw new Error(`${res.status} ${JSON.stringify(json)}`);
     }
   }
-
 }

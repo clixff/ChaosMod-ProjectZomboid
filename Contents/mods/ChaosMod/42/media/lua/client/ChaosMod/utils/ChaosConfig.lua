@@ -17,6 +17,7 @@
 ---@field donate_price_groups DonatePriceGroup[]
 ---@field allow_vote_command boolean
 ---@field hide_votes boolean
+---@field render_chat_messages boolean
 
 ---@class ChaosConfigUI
 ---@field progress_bar_color string
@@ -101,6 +102,7 @@ ChaosConfig = ChaosConfig or {
         vote_start_time = 15,
         allow_vote_command = true,
         hide_votes = false,
+        render_chat_messages = true,
     }
 }
 
@@ -278,6 +280,10 @@ function ChaosConfig.LoadConfigFromDisk()
         -- If vote counts are hidden from viewers
         if type(configData.streamer_mode.hide_votes) == "boolean" then
             ChaosConfig.streamer_mode.hide_votes = configData.streamer_mode.hide_votes
+        end
+        -- If zombie chat messages should be rendered above zombies
+        if type(configData.streamer_mode.render_chat_messages) == "boolean" then
+            ChaosConfig.streamer_mode.render_chat_messages = configData.streamer_mode.render_chat_messages
         end
         -- Donate price groups
         if type(configData.streamer_mode.donate_price_groups) == "table" then

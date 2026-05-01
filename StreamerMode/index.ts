@@ -28,7 +28,10 @@ import { initLocalization, getString } from "./src/localization.ts";
 import { TwitchChat, type ChatEvent } from "./src/streamer/TwitchChat.ts";
 import { NicknamesManager } from "./src/streamer/NicknamesManager.ts";
 import { VotingManager } from "./src/streamer/VotingManager.ts";
-import { startDebugNicknames } from "./src/debugNicknames.ts";
+import {
+  startDebugChatMessages,
+  startDebugNicknames,
+} from "./src/debugNicknames.ts";
 import { startDebugVotes } from "./src/debugVotes.ts";
 import { ExternalEffectsManager } from "./src/externalEffects.ts";
 import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
@@ -110,6 +113,7 @@ function buildEffectResponseEntry(
 const KNOWN_ARGS_EXACT = new Set([
   "--version",
   "--debug",
+  "--debug-chat-messages",
   "--debug-nicknames",
   "--debug-votes",
 ]);
@@ -288,6 +292,7 @@ async function main(): Promise<void> {
     ? new NicknamesManager(
         luaFolder,
         config?.streamer_mode.zombie_nicknames_buffer ?? 150,
+        config?.streamer_mode.render_chat_messages ?? true,
       )
     : null;
   nicknamesManager?.start();
@@ -298,6 +303,16 @@ async function main(): Promise<void> {
     } else {
       logger.warn(
         "--debug-nicknames: nicknames manager not available (no Lua folder).",
+      );
+    }
+  }
+
+  if (args.includes("--debug-chat-messages")) {
+    if (nicknamesManager) {
+      startDebugChatMessages(nicknamesManager);
+    } else {
+      logger.warn(
+        "--debug-chat-messages: nicknames manager not available (no Lua folder).",
       );
     }
   }
@@ -335,31 +350,38 @@ async function main(): Promise<void> {
   function handleChatMessage(chat: ChatEvent): void {
     if (!config?.streamer_mode.streamer_mode_enabled) return;
 
+    const text = chat.message.text.trim();
+    let voteNum: number | null = null;
+
+    const direct = Number(text);
+    if (Number.isInteger(direct) && text !== "") {
+      voteNum = direct;
+    }
+
+    if (voteNum === null && config.streamer_mode.allow_vote_command) {
+      const parts = text.split(/\s+/);
+      if (parts[0]?.toLowerCase() === "!vote" && parts.length === 2) {
+        const n = Number(parts[1]);
+        if (Number.isInteger(n)) voteNum = n;
+      }
+    }
+
     if (config.streamer_mode.use_zombie_nicknames && nicknamesManager) {
+      const sanitizedMessage =
+        config.streamer_mode.render_chat_messages && voteNum === null
+          ? text.replace(/\\n/g, "").replace(/\r?\n/g, "")
+          : undefined;
+
       nicknamesManager.add(
         chat.chatter_user_login,
         chat.chatter_user_name,
         chat.color,
+        sanitizedMessage,
+        chat.timestamp_ms,
       );
     }
 
     if (config.streamer_mode.voting_enabled) {
-      const text = chat.message.text.trim();
-      let voteNum: number | null = null;
-
-      const direct = Number(text);
-      if (Number.isInteger(direct) && text !== "") {
-        voteNum = direct;
-      }
-
-      if (voteNum === null && config.streamer_mode.allow_vote_command) {
-        const parts = text.split(/\s+/);
-        if (parts[0]?.toLowerCase() === "!vote" && parts.length === 2) {
-          const n = Number(parts[1]);
-          if (Number.isInteger(n)) voteNum = n;
-        }
-      }
-
       if (voteNum !== null) {
         if (voteNum >= 5 && voteNum <= 8) voteNum -= 4;
         if (voteNum >= 1 && voteNum <= 4) {
@@ -429,6 +451,9 @@ async function main(): Promise<void> {
     const nextConfig = loadConfig(modFolder);
     const nextEffects = loadEffects(modFolder);
     applyLoadedConfig(config, nextConfig, modFolder);
+    nicknamesManager?.setRenderChatMessages(
+      config.streamer_mode.render_chat_messages,
+    );
     effects.splice(0, effects.length, ...nextEffects);
     logger.info(
       `Reloaded ${colors.cyan("config.json")} and ${colors.cyan("effects.json")} (${colors.cyan(String(effects.length))} effects).`,
