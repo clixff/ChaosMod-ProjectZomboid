@@ -1,7 +1,7 @@
 EffectSpawnLootbox = ChaosEffectBase:derive("EffectSpawnLootbox", "spawn_lootbox")
 
 ---@type table<string, table<integer, string>>
-local ITEMS = {
+LOOTBOX_ITEMS = {
     common = {
         "Base.Bandage",
         "Base.BandageDirty",
@@ -63,6 +63,13 @@ local function rollRarity()
     end
 end
 
+---@return string
+function GetRandomLootboxItem()
+    local rarity = rollRarity()
+    local pool = LOOTBOX_ITEMS[rarity]
+    return pool[ChaosUtils.RandArrayIndex(pool)]
+end
+
 function EffectSpawnLootbox:OnStart()
     ChaosEffectBase:OnStart()
     print("[EffectSpawnLootbox] OnStart " .. tostring(self.effectId))
@@ -92,7 +99,7 @@ function EffectSpawnLootbox:OnStart()
 
     ---@type string
     local rarity = rollRarity()
-    local pool = ITEMS[rarity]
+    local pool = LOOTBOX_ITEMS[rarity]
     if not pool then return end
     ---@type string
     local itemId = pool[ChaosUtils.RandArrayIndex(pool)]

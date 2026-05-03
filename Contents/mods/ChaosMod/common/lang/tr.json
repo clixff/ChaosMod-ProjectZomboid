@@ -272,7 +272,8 @@
         "select_card_add_items": "Kart Sec: Esya Ekle",
         "equip_bunny_costume": "Tavsan Kostumu Giy",
         "equip_spiffo_costume": "Spiffo Kostumu Giy",
-        "equip_furry_ears": "Tuylu Kulaklar Giy"
+        "equip_furry_ears": "Tuylu Kulaklar Giy",
+        "spawn_explosive_spiffos": "Patlayici Spiffolar Olustur"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

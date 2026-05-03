@@ -18,6 +18,7 @@
 - Equip Bunny Costume
 - Equip Spiffo Costume
 - Equip Furry Ears
+- Spawn Explosive Spiffos
 
 ### Effect Fixes
 

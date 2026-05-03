@@ -272,7 +272,8 @@
         "select_card_add_items": "选择卡牌：添加物品",
         "equip_bunny_costume": "穿上兔子服装",
         "equip_spiffo_costume": "穿上Spiffo服装",
-        "equip_furry_ears": "戴上毛茸茸的耳朵"
+        "equip_furry_ears": "戴上毛茸茸的耳朵",
+        "spawn_explosive_spiffos": "召唤爆炸Spiffo"
     },
     "core": {
         "start_mod": "启动混乱模式",

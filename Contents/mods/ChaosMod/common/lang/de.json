@@ -272,7 +272,8 @@
         "select_card_add_items": "Karte waehlen: Gegenstaende hinzufuegen",
         "equip_bunny_costume": "Hasenkostuem anlegen",
         "equip_spiffo_costume": "Spiffo-Kostuem anlegen",
-        "equip_furry_ears": "Fellohren anlegen"
+        "equip_furry_ears": "Fellohren anlegen",
+        "spawn_explosive_spiffos": "Explosive Spiffos spawnen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

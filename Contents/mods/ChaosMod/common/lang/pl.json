@@ -272,7 +272,8 @@
         "select_card_add_items": "Wybierz karte: Dodaj przedmioty",
         "equip_bunny_costume": "Zaloz kostium krolika",
         "equip_spiffo_costume": "Zaloz kostium Spiffo",
-        "equip_furry_ears": "Zaloz futrzane uszy"
+        "equip_furry_ears": "Zaloz futrzane uszy",
+        "spawn_explosive_spiffos": "Pojaw wybuchowe Spiffo"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

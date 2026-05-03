@@ -272,7 +272,8 @@
         "select_card_add_items": "Choisir une carte: Ajouter des objets",
         "equip_bunny_costume": "Equiper le costume de lapin",
         "equip_spiffo_costume": "Equiper le costume de Spiffo",
-        "equip_furry_ears": "Equiper les oreilles poilues"
+        "equip_furry_ears": "Equiper les oreilles poilues",
+        "spawn_explosive_spiffos": "Invoquer des Spiffos explosifs"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

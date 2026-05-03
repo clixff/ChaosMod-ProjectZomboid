@@ -272,7 +272,8 @@
         "select_card_add_items": "Select Card: Add Items",
         "equip_bunny_costume": "Equip Bunny Costume",
         "equip_spiffo_costume": "Equip Spiffo Costume",
-        "equip_furry_ears": "Equip Furry Ears"
+        "equip_furry_ears": "Equip Furry Ears",
+        "spawn_explosive_spiffos": "Spawn Explosive Spiffos"
     },
     "core": {
         "start_mod": "Start ChaosMod",

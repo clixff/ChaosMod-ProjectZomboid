@@ -25,8 +25,8 @@ function EffectSelectCardAddItems:OnStart()
 
     self.itemPairs = {}
     for i = 1, 3 do
-        local id1 = ChaosItems.GetRandomItemId()
-        local id2 = ChaosItems.GetRandomItemId()
+        local id1 = GetRandomLootboxItem()
+        local id2 = GetRandomLootboxItem()
         self.itemPairs[i] = {
             id1 = id1,
             id2 = id2,

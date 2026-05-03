@@ -273,7 +273,8 @@
         "select_card_add_items": "Выбор карты: Добавить предметы",
         "equip_bunny_costume": "Надеть костюм зайчика",
         "equip_spiffo_costume": "Надеть костюм Спиффо",
-        "equip_furry_ears": "Надеть пушистые ушки"
+        "equip_furry_ears": "Надеть пушистые ушки",
+        "spawn_explosive_spiffos": "Заспавнить взрывных Спиффо"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
