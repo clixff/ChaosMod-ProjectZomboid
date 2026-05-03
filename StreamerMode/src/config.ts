@@ -108,14 +108,20 @@ const DEFAULT_DONATE_PRICE_GROUPS: DonatePriceGroup[] = [
   { group: "positive_2", price: 2.5 },
   { group: "positive_3", price: 5 },
   { group: "positive_4", price: 7.5 },
+  { group: "positive_5", price: 8 },
+  { group: "positive_6", price: 10 },
   { group: "negative_1", price: 1 },
   { group: "negative_2", price: 2.5 },
   { group: "negative_3", price: 5 },
   { group: "negative_4", price: 7.5 },
+  { group: "negative_5", price: 8 },
+  { group: "negative_6", price: 10 },
   { group: "neutral_1", price: 1 },
   { group: "neutral_2", price: 2.5 },
   { group: "neutral_3", price: 5 },
   { group: "neutral_4", price: 7.5 },
+  { group: "neutral_5", price: 8 },
+  { group: "neutral_6", price: 10 },
 ];
 
 const DEFAULT_STREAMER_MODE: StreamerModeConfig = {

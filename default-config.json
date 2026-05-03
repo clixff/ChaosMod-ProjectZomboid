@@ -51,6 +51,14 @@
                 "price": 7
             },
             {
+                "group": "positive_5",
+                "price": 8
+            },
+            {
+                "group": "positive_6",
+                "price": 10
+            },
+            {
                 "group": "negative_1",
                 "price": 1
             },
@@ -67,6 +75,14 @@
                 "price": 7
             },
             {
+                "group": "negative_5",
+                "price": 8
+            },
+            {
+                "group": "negative_6",
+                "price": 10
+            },
+            {
                 "group": "neutral_1",
                 "price": 1
             },
@@ -81,6 +97,14 @@
             {
                 "group": "neutral_4",
                 "price": 7
+            },
+            {
+                "group": "neutral_5",
+                "price": 8
+            },
+            {
+                "group": "neutral_6",
+                "price": 10
             }
         ],
         "allow_vote_command": true,

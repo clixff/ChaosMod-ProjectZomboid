@@ -14,7 +14,7 @@ function EffectZombiesAreComing:OnStart()
 
     local counter = 0
 
-    ChaosZombie.ForEachZombieInRange(x1, y1, 40, function(zombie)
+    ChaosZombie.ForEachZombieInRange(x1, y1, 80, function(zombie)
         if zombie and zombie:isAlive() then
             zombie:getPathFindBehavior2():cancel()
             zombie:getPathFindBehavior2():reset()
