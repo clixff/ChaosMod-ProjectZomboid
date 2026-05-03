@@ -86,10 +86,65 @@ function ChaosUtils.TrackPlayerPosition(deltaMs)
     end
 end
 
+---@param obj IsoObject
+function ChaosUtils.RemovePropExplosion(obj)
+    if not obj then return end
+
+    if instanceof(obj, "IsoWindow") then
+        ---@type IsoWindow
+        local window = obj
+        if not window:isSmashed() then
+            window:smashWindow()
+        end
+        return
+    end
+
+    local containerCount = obj:getContainerCount()
+    if not containerCount or containerCount == 0 then return end
+    local sq = obj:getSquare()
+    if not sq then return end
+    for i = 0, containerCount - 1 do
+        local container = obj:getContainerByIndex(i)
+        if container then
+            local items = container:getItems()
+            ---@type InventoryItem[]
+            local snapshot = {}
+            for j = 0, items:size() - 1 do
+                table.insert(snapshot, items:get(j))
+            end
+            for _, item in ipairs(snapshot) do
+                local ox = ChaosUtils.RandFloat(0.15, 0.85)
+                local oy = ChaosUtils.RandFloat(0.15, 0.85)
+                sq:AddWorldInventoryItem(item, ox, oy, 0.0)
+            end
+        end
+    end
+
+    local square = obj:getSquare()
+    if square then
+        square:RemoveTileObject(obj)
+    end
+    obj:removeFromSquare()
+    obj:removeFromWorld()
+end
+
 ---@param square IsoGridSquare
 ---@param explosionRange integer | nil defaults to 5
-function ChaosUtils.TriggerExplosionAt(square, explosionRange)
+---@param shouldRemoveProps boolean | nil defaults to true
+function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps)
     explosionRange = explosionRange or 5
+    if shouldRemoveProps == nil then shouldRemoveProps = true end
+
+    if shouldRemoveProps then
+        local x, y, z = square:getX(), square:getY(), square:getZ()
+        ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+            if sq then
+                ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                    ChaosUtils.RemovePropExplosion(obj)
+                end)
+            end
+        end, 0, explosionRange, false, false, true, z, z)
+    end
 
     local weapon = instanceItem("Base.PipeBomb")
     local fakeZombie = getFakeAttacker()
@@ -738,7 +793,7 @@ function ChaosUtils.ForAllObjectsInSquare(square, callback)
     if not callback then return false end
     local objects = square:getObjects()
     if not objects then return false end
-    for i = 0, objects:size() - 1 do
+    for i = objects:size() - 1, 0, -1 do
         local obj = objects:get(i)
         if obj then
             local result = callback(obj)
@@ -772,7 +827,7 @@ function ChaosUtils.ForAllWorldObjectsOnSquare(square, callback)
     if not callback then return false end
     local worldObjects = square:getWorldObjects()
     if not worldObjects then return false end
-    for i = 0, worldObjects:size() - 1 do
+    for i = worldObjects:size() - 1, 0, -1 do
         local obj = worldObjects:get(i)
         if obj then
             local result = callback(obj)

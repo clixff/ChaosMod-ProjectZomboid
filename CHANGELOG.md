@@ -10,6 +10,7 @@
 ### Mod fixes
 
 - Updated `obs` command to show the new instructions for setting up the OBS browser source with LAN IP.
+- `ChaosUtils.TriggerExplosionAt` now accepts an optional `shouldRemoveProps` parameter (default `true`); when enabled, smashes nearby windows and scatters container items before the explosion
 
 ### New Effects
 
