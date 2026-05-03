@@ -200,7 +200,7 @@ end
 
 ---@return string
 function ChaosVehicle.GetRandomVehicleName()
-    local randomIndex = math.floor(ZombRandBetween(1, #VEHICLES_RANDOM_1 + 1))
+    local randomIndex = ChaosUtils.RandArrayIndex(VEHICLES_RANDOM_1)
     local str = VEHICLES_RANDOM_1[randomIndex]
     if not str then return "Base.CarNormal" end
     return str
@@ -209,7 +209,7 @@ end
 ---@param vehicle BaseVehicle
 function ChaosVehicle.SetRandomVehicleColors(vehicle)
     if not vehicle then return end
-    local randomIndex = math.floor(ZombRandBetween(1, #VEHICLE_COLORS + 1))
+    local randomIndex = ChaosUtils.RandArrayIndex(VEHICLE_COLORS)
     local color = VEHICLE_COLORS[randomIndex]
     if not color then return end
     vehicle:setColorHSV(color.hue, color.sat, color.val)

@@ -20,10 +20,7 @@ local MAX_TRIES = 50
 
 ---@param animal IsoAnimal
 local function addAnimalFollower(animal)
-    table.insert(ChaosMod.specialAnimalsFollowers, {
-        animal = animal,
-        repathTicks = 20
-    })
+    SpecialAnimal:new(animal)
 end
 
 ---@param animal IsoAnimal

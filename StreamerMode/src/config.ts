@@ -29,6 +29,7 @@ export interface StreamerModeConfig {
   use_localhost_ip: boolean;
   advanced_voting_numbers: boolean;
   use_zombie_nicknames: boolean;
+  use_animals_nicknames: boolean;
   render_chat_messages: boolean;
   say_killed_zombie_name: boolean;
   zombie_nicknames_buffer: number;
@@ -132,6 +133,7 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   use_localhost_ip: true,
   advanced_voting_numbers: true,
   use_zombie_nicknames: true,
+  use_animals_nicknames: true,
   render_chat_messages: true,
   say_killed_zombie_name: true,
   zombie_nicknames_buffer: 150,
@@ -239,6 +241,10 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
     use_zombie_nicknames: bool(
       raw["use_zombie_nicknames"],
       d.use_zombie_nicknames,
+    ),
+    use_animals_nicknames: bool(
+      raw["use_animals_nicknames"],
+      d.use_animals_nicknames,
     ),
     render_chat_messages: bool(
       raw["render_chat_messages"],

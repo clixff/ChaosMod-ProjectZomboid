@@ -28,6 +28,7 @@
         "use_localhost_ip": true,
         "advanced_voting_numbers": true,
         "use_zombie_nicknames": true,
+        "use_animals_nicknames": true,
         "render_chat_messages": true,
         "say_killed_zombie_name": true,
         "zombie_nicknames_buffer": 150,

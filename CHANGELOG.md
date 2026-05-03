@@ -4,6 +4,8 @@
 
 - Added new command `use_localhost_ip` to set whether the server binds to localhost only (on) or all interfaces (off), and restart the server
 - New default donation price groups
+- Added `use_animals_nicknames` config option to display Twitch viewer nicknames above follower animals
+- Refactored follower animal tracking into a `SpecialAnimal` class
 
 ### Mod fixes
 

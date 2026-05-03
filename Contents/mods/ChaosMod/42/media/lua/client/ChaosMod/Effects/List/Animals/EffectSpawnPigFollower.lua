@@ -19,8 +19,5 @@ function EffectSpawnPigFollower:OnStart()
     local animal = ChaosAnimals.SpawnAnimal(square:getX(), square:getY(), square:getZ(), "sow", breed)
     if not animal then return end
 
-    table.insert(ChaosMod.specialAnimalsFollowers, {
-        animal = animal,
-        repathTicks = 20
-    })
+    SpecialAnimal:new(animal)
 end

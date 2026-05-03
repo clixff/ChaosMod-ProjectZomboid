@@ -5,7 +5,7 @@
 ---@field modData ChooseGameInfo.Mod? -- Internal mod data such as ID, version, etc.
 ---@field lastTimeTickMs integer -- Last time tick milliseconds
 ---@field wallhack boolean -- If wallhack is enabled
----@field specialAnimalsFollowers table<integer, {animal: IsoAnimal, repathTicks: integer}>
+---@field specialAnimalsFollowers table<integer, SpecialAnimal>
 ChaosMod = ChaosMod or {
     mapLoaded = false,
     enabled = false,
@@ -227,27 +227,12 @@ function ChaosMod.OnSpecialAnimalsTick()
         return
     end
 
-    local player = getPlayer()
-    if not player then return end
-
     for i = #ChaosMod.specialAnimalsFollowers, 1, -1 do
-        local followState = ChaosMod.specialAnimalsFollowers[i]
-        local animal = followState and followState.animal
-
-        if not animal or animal:isDead() then
+        local specialAnimal = ChaosMod.specialAnimalsFollowers[i]
+        if not specialAnimal or specialAnimal:isDead() then
             table.remove(ChaosMod.specialAnimalsFollowers, i)
         else
-            if animal.addLineChatElement then
-                animal:addLineChatElement("Nickname", 1.0, 1.0, 1.0)
-            end
-            followState.repathTicks = followState.repathTicks - 1
-            if followState.repathTicks <= 0 then
-                followState.repathTicks = 20
-
-                if animal:DistToProper(player) > 2.0 then
-                    animal:pathToCharacter(player)
-                end
-            end
+            specialAnimal:tick()
         end
     end
 end

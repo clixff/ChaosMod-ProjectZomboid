@@ -18,6 +18,7 @@
 ---@field allow_vote_command boolean
 ---@field hide_votes boolean
 ---@field render_chat_messages boolean
+---@field use_animals_nicknames boolean
 
 ---@class ChaosConfigUI
 ---@field progress_bar_color string
@@ -103,6 +104,7 @@ ChaosConfig = ChaosConfig or {
         allow_vote_command = true,
         hide_votes = false,
         render_chat_messages = true,
+        use_animals_nicknames = true,
     }
 }
 
@@ -285,6 +287,10 @@ function ChaosConfig.LoadConfigFromDisk()
         if type(configData.streamer_mode.render_chat_messages) == "boolean" then
             ChaosConfig.streamer_mode.render_chat_messages = configData.streamer_mode.render_chat_messages
         end
+        -- If animal nicknames should be displayed above follower animals
+        if type(configData.streamer_mode.use_animals_nicknames) == "boolean" then
+            ChaosConfig.streamer_mode.use_animals_nicknames = configData.streamer_mode.use_animals_nicknames
+        end
         -- Donate price groups
         if type(configData.streamer_mode.donate_price_groups) == "table" then
             local groups = {}
@@ -319,6 +325,19 @@ function ChaosConfig.IsZombieNicknamesEnabled()
     end
 
     return ChaosConfig.streamer_mode.use_zombie_nicknames == true
+end
+
+---@return boolean
+function ChaosConfig.IsAnimalsNicknamesEnabled()
+    if not ChaosConfig.streamer_mode then
+        return false
+    end
+
+    if ChaosConfig.streamer_mode.streamer_mode_enabled == false then
+        return false
+    end
+
+    return ChaosConfig.streamer_mode.use_animals_nicknames == true
 end
 
 ---@return boolean

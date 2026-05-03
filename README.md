@@ -281,6 +281,7 @@ The `streamer_mode` section contains the following properties:
 - `type` — streamer mode type. Currently only Twitch is supported.
 - `use_localhost_ip` — if `true`, the server binds to `127.0.0.1` (localhost only). If `false`, it binds to all interfaces so OBS on another PC on the same network can connect. Can be changed at runtime with `/use_localhost_ip on|off`.
 - `use_zombie_nicknames` — displays Twitch nicknames above zombies.
+- `use_animals_nicknames` — displays Twitch nicknames above follower animals.
 - `say_killed_zombie_name` — says the name of the killed zombie.
 - `zombie_nicknames_buffer` — size of the nickname buffer.
 - `enable_donate` — enables or disables donation-triggered effects.

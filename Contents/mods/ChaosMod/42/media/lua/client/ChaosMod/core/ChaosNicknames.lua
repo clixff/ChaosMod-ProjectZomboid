@@ -271,7 +271,7 @@ end
 
 ---@return string, ChaosZombieNicknameColor
 function ChaosNicknames.GetRandomNickname()
-    local randomIndex = math.floor(ZombRandBetween(1, #ChaosNicknames.availableNicknames + 1))
+    local randomIndex = ChaosUtils.RandArrayIndex(ChaosNicknames.availableNicknames)
     if randomIndex < 1 or randomIndex > #ChaosNicknames.availableNicknames then
         return "", { r = 1.00, g = 0.00, b = 0.00 }
     end
@@ -371,6 +371,29 @@ local function measureMultilineText(text, font)
     end
 
     return maxWidth, lineCount
+end
+
+---@param animal IsoAnimal
+---@param text string
+---@param playerNum integer
+---@param alpha number|nil
+---@param colorR number|nil
+---@param colorG number|nil
+---@param colorB number|nil
+local function drawAnimalLabel(animal, text, playerNum, alpha, colorR, colorG, colorB)
+    if not animal or animal:isDead() then return end
+
+    local z = animal:getZ() + 0.8
+    local sx = isoToScreenX(playerNum, animal:getX(), animal:getY(), z)
+    local sy = isoToScreenY(playerNum, animal:getX(), animal:getY(), z)
+
+    local font = UIFont.Dialogue
+    local w, lineCount = measureMultilineText(text, font)
+
+    sx = sx - w / 2
+    sy = sy - (20 * lineCount)
+
+    getTextManager():DrawString(font, sx, sy, text, colorR or 1, colorG or 1, colorB or 1, alpha or 0.8)
 end
 
 ---@param zombie IsoZombie
@@ -543,6 +566,26 @@ function ChaosNicknames.OnPreUIDraw()
         end
     end)
     ChaosNicknames.visibleZombiesForLabel = {}
+
+    if ChaosConfig.IsAnimalsNicknamesEnabled() then
+        local playerX = player:getX()
+        local playerY = player:getY()
+        for i = #ChaosMod.specialAnimalsFollowers, 1, -1 do
+            local specialAnimal = ChaosMod.specialAnimalsFollowers[i]
+            if specialAnimal and specialAnimal.renderNickname and not specialAnimal:isDead() then
+                local animal = specialAnimal.animal
+                if ChaosUtils.isInRange(playerX, playerY, animal:getX(), animal:getY(), 15) then
+                    local md = animal:getModData()
+                    local nickname = md and md[SpecialAnimal.modDataNameKey] or ""
+                    local entry = ChaosNicknames.availableNicknamesByName[nickname]
+                    local chatMessage, _, alpha = resolveChatMessageState(entry, nowMs)
+                    if chatMessage and alpha > 0 then
+                        drawAnimalLabel(animal, chatMessage, 0, alpha, 1, 1, 1)
+                    end
+                end
+            end
+        end
+    end
 end
 
 Events.OnPreUIDraw.Add(ChaosNicknames.OnPreUIDraw)
