@@ -274,7 +274,8 @@
         "equip_spiffo_costume": "Equiper le costume de Spiffo",
         "equip_furry_ears": "Equiper les oreilles poilues",
         "spawn_explosive_spiffos": "Invoquer des Spiffos explosifs",
-        "spawn_many_explosive_chickens": "Faire apparaître plusieurs poulets explosifs"
+        "spawn_many_explosive_chickens": "Faire apparaître plusieurs poulets explosifs",
+        "replace_furniture_with_zombies": "Remplacer les meubles par des zombies"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

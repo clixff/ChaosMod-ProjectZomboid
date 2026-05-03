@@ -274,7 +274,8 @@
         "equip_spiffo_costume": "Spiffo-Kostuem anlegen",
         "equip_furry_ears": "Fellohren anlegen",
         "spawn_explosive_spiffos": "Explosive Spiffos spawnen",
-        "spawn_many_explosive_chickens": "Viele Explosionshühner spawnen"
+        "spawn_many_explosive_chickens": "Viele Explosionshühner spawnen",
+        "replace_furniture_with_zombies": "Möbel durch Zombies ersetzen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

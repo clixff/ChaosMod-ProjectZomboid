@@ -2417,6 +2417,14 @@
             "duration": 5,
             "enabled_donate": true,
             "price_group": "negative_5"
+        },
+        {
+            "id": "replace_furniture_with_zombies",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
         }
     ]
 }

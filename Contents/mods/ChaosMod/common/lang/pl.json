@@ -274,7 +274,8 @@
         "equip_spiffo_costume": "Zaloz kostium Spiffo",
         "equip_furry_ears": "Zaloz futrzane uszy",
         "spawn_explosive_spiffos": "Pojaw wybuchowe Spiffo",
-        "spawn_many_explosive_chickens": "Zespawnuj wiele wybuchowych kur"
+        "spawn_many_explosive_chickens": "Zespawnuj wiele wybuchowych kur",
+        "replace_furniture_with_zombies": "Zamien meble na zombie"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

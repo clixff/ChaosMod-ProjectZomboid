@@ -274,7 +274,8 @@
         "equip_spiffo_costume": "Equip Spiffo Costume",
         "equip_furry_ears": "Equip Furry Ears",
         "spawn_explosive_spiffos": "Spawn Explosive Spiffos",
-        "spawn_many_explosive_chickens": "Spawn Many Explosive Chickens"
+        "spawn_many_explosive_chickens": "Spawn Many Explosive Chickens",
+        "replace_furniture_with_zombies": "Replace Furniture With Zombies"
     },
     "core": {
         "start_mod": "Start ChaosMod",

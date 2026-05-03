@@ -275,7 +275,8 @@
         "equip_spiffo_costume": "Надеть костюм Спиффо",
         "equip_furry_ears": "Надеть пушистые ушки",
         "spawn_explosive_spiffos": "Заспавнить взрывных Спиффо",
-        "spawn_many_explosive_chickens": "Заспавнить много взрывных куриц"
+        "spawn_many_explosive_chickens": "Заспавнить много взрывных куриц",
+        "replace_furniture_with_zombies": "Заменить мебель зомби"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

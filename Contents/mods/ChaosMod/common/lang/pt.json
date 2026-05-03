@@ -274,7 +274,8 @@
         "equip_spiffo_costume": "Equipar Fantasia de Spiffo",
         "equip_furry_ears": "Equipar Orelhas Peludas",
         "spawn_explosive_spiffos": "Invocar Spiffos Explosivos",
-        "spawn_many_explosive_chickens": "Invocar Várias Galinhas Explosivas"
+        "spawn_many_explosive_chickens": "Invocar Várias Galinhas Explosivas",
+        "replace_furniture_with_zombies": "Substituir Móveis por Zumbis"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

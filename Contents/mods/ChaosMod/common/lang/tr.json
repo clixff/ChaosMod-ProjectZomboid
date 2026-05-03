@@ -274,7 +274,8 @@
         "equip_spiffo_costume": "Spiffo Kostumu Giy",
         "equip_furry_ears": "Tuylu Kulaklar Giy",
         "spawn_explosive_spiffos": "Patlayici Spiffolar Olustur",
-        "spawn_many_explosive_chickens": "Cok Sayida Patlayici Tavuk Olustur"
+        "spawn_many_explosive_chickens": "Cok Sayida Patlayici Tavuk Olustur",
+        "replace_furniture_with_zombies": "Mobilyalari Zombilerle Degistir"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

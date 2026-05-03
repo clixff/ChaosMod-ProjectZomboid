@@ -23,6 +23,7 @@
 - Equip Furry Ears
 - Spawn Explosive Spiffos
 - Spawn Many Explosive Chickens
+- Replace Furniture With Zombies
 
 ### Effect Fixes
 

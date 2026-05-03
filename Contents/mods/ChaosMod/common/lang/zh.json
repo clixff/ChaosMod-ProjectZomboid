@@ -274,7 +274,8 @@
         "equip_spiffo_costume": "穿上Spiffo服装",
         "equip_furry_ears": "戴上毛茸茸的耳朵",
         "spawn_explosive_spiffos": "召唤爆炸Spiffo",
-        "spawn_many_explosive_chickens": "生成多只爆炸鸡"
+        "spawn_many_explosive_chickens": "生成多只爆炸鸡",
+        "replace_furniture_with_zombies": "用僵尸替换家具"
     },
     "core": {
         "start_mod": "启动混乱模式",
