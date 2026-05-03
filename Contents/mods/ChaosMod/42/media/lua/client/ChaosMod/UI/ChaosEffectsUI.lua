@@ -19,11 +19,16 @@ require "ISUI/ISButton"
 ---@field btnAnchor ISButton
 ChaosEffectsUI = ISPanel:derive("ChaosEffectsUI")
 
+ChaosEffectsUI.hideEffectNames = false
+
 local MIN_WINDOW_W = 280
 
 ---@param effect ChaosEffectBase
 ---@return string
 local function buildEffectString(effect)
+    if ChaosEffectsUI.hideEffectNames and not effect.showNameAlways then
+        return "???"
+    end
     local effectString = tostring(effect.effectName)
     if effect.withDuration then
         local msToEnd = effect.maxTicks - effect.ticksActiveTime
@@ -237,7 +242,7 @@ function ChaosEffectsUI:prerender()
 
         self:drawRect(self.margin, rowY, rectW, self.effectRowH, 0.7, 0.1, 0.1, 0.1)
 
-        if effect.withDuration and effect.maxTicks > 0 then
+        if effect.withDuration and effect.maxTicks > 0 and (not ChaosEffectsUI.hideEffectNames or effect.showNameAlways) then
             local progress = 1 - (effect.ticksActiveTime / effect.maxTicks)
             local fgWidth = math.floor(rectW * progress)
             if fgWidth > 0 then

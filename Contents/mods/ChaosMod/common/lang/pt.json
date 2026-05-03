@@ -266,7 +266,8 @@
         "spawn_pig_follower": "Gerar porco seguidor",
         "remember_code": "Memorizar codigo",
         "select_random_card": "Selecionar carta aleatoria",
-        "remove_player_hat": "Remover Chapeu do Jogador"
+        "remove_player_hat": "Remover Chapeu do Jogador",
+        "hide_effect_names": "Ocultar Nomes dos Efeitos"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

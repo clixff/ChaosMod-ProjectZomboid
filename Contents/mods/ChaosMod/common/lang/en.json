@@ -266,7 +266,8 @@
         "spawn_pig_follower": "Spawn Pig Follower",
         "remember_code": "Remember Code",
         "select_random_card": "Select Random Card",
-        "remove_player_hat": "Remove Player's Hat"
+        "remove_player_hat": "Remove Player's Hat",
+        "hide_effect_names": "Hide Effect Names"
     },
     "core": {
         "start_mod": "Start ChaosMod",

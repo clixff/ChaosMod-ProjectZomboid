@@ -2332,6 +2332,18 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
+        },
+        {
+            "id": "hide_effect_names",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": true,
+            "duration": 300,
+            "disable_effects": [
+                "hide_effect_names"
+            ],
+            "enabled_donate": true,
+            "price_group": "negaitve_3"
         }
     ]
 }

@@ -266,7 +266,8 @@
         "spawn_pig_follower": "生成跟随猪",
         "remember_code": "记住代码",
         "select_random_card": "选择随机卡牌",
-        "remove_player_hat": "移除玩家的帽子"
+        "remove_player_hat": "移除玩家的帽子",
+        "hide_effect_names": "隐藏效果名称"
     },
     "core": {
         "start_mod": "启动混乱模式",

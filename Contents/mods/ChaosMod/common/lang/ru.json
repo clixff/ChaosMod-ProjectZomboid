@@ -267,7 +267,8 @@
         "spawn_pig_follower": "Заспавнить свинью-спутника",
         "remember_code": "Запомни код",
         "select_random_card": "Выбери случайную карту",
-        "remove_player_hat": "Удалить головной убор игрока"
+        "remove_player_hat": "Удалить головной убор игрока",
+        "hide_effect_names": "Скрыть названия эффектов"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

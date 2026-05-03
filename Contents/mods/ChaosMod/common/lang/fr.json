@@ -266,7 +266,8 @@
         "spawn_pig_follower": "Faire apparaitre un cochon suiveur",
         "remember_code": "Memoriser le code",
         "select_random_card": "Selectionner une carte aleatoire",
-        "remove_player_hat": "Retirer le chapeau du joueur"
+        "remove_player_hat": "Retirer le chapeau du joueur",
+        "hide_effect_names": "Masquer les noms des effets"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
