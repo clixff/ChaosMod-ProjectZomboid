@@ -23,3 +23,4 @@
 ### Effect Fixes
 
 - Fixed 'Select Random Card' UI (text wrapping)
+- Fixed "Spawn Explosive Flamingo" effect to use movement system

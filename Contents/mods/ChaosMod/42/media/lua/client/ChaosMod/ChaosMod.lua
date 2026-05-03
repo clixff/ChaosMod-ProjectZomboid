@@ -237,6 +237,9 @@ function ChaosMod.OnSpecialAnimalsTick()
         if not animal or animal:isDead() then
             table.remove(ChaosMod.specialAnimalsFollowers, i)
         else
+            if animal.addLineChatElement then
+                animal:addLineChatElement("Nickname", 1.0, 1.0, 1.0)
+            end
             followState.repathTicks = followState.repathTicks - 1
             if followState.repathTicks <= 0 then
                 followState.repathTicks = 20
