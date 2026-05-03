@@ -15,6 +15,9 @@ function EffectSpawnExplosionChicken:OnStart()
     local z = square:getZ()
 
     self.chicken = ChaosAnimals.SpawnAnimal(x, y, z, "hen", "rhodeisland")
+    if self.chicken then
+        SpecialAnimal:new(self.chicken)
+    end
     print("[EffectSpawnExplosionChicken] Spawned chicken")
 end
 

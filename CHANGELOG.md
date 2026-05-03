@@ -26,3 +26,7 @@
 
 - Fixed 'Select Random Card' UI (text wrapping)
 - Fixed "Spawn Explosive Flamingo" effect to use movement system
+- Renamed "Spawn Chicken" → "Spawn Chicken Follower" (`spawn_chicken_follower`): now follows the player and shows viewer nickname
+- Renamed "Spawn Cow" → "Spawn Cow Follower" (`spawn_cow_follower`): now follows the player and shows viewer nickname
+- Renamed "Spawn Random Animal" → "Spawn Random Animal Follower" (`spawn_random_animal_follower`): now follows the player and shows viewer nickname
+- "Spawn Explosion Chicken" now follows the player and shows viewer nickname until it explodes

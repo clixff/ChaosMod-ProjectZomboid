@@ -218,7 +218,7 @@
             "price_group": "positive_2"
         },
         {
-            "id": "spawn_random_animal",
+            "id": "spawn_random_animal_follower",
             "enabled": true,
             "chance": 65,
             "withDuration": false,
@@ -1397,7 +1397,7 @@
             "price_group": "negative_1"
         },
         {
-            "id": "spawn_cow",
+            "id": "spawn_cow_follower",
             "enabled": true,
             "chance": 30,
             "withDuration": false,
@@ -1405,7 +1405,7 @@
             "price_group": "neutral_2"
         },
         {
-            "id": "spawn_chicken",
+            "id": "spawn_chicken_follower",
             "enabled": true,
             "chance": 70,
             "withDuration": false,
@@ -1547,7 +1547,7 @@
             "enabled": true,
             "chance": 25,
             "withDuration": true,
-            "duration": 20,
+            "duration": 8,
             "enabled_donate": true,
             "price_group": "negative_2"
         },
@@ -2348,7 +2348,7 @@
         {
             "id": "select_card_remove_items",
             "enabled": true,
-            "chance": 20,
+            "chance": 25,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -2362,7 +2362,7 @@
         {
             "id": "select_card_add_items",
             "enabled": true,
-            "chance": 20,
+            "chance": 25,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
