@@ -51,7 +51,7 @@ local ITEMS = {
 -- Roll rarity: 60% common, 25% uncommon, 12% rare, 3% legendary
 ---@return string
 local function rollRarity()
-    local roll = ZombRand(100)
+    local roll = ChaosUtils.RandInteger(100)
     if roll < 60 then
         return "common"
     elseif roll < 85 then
@@ -95,7 +95,7 @@ function EffectSpawnLootbox:OnStart()
     local pool = ITEMS[rarity]
     if not pool then return end
     ---@type string
-    local itemId = pool[math.floor(ZombRand(#pool) + 1)]
+    local itemId = pool[ChaosUtils.RandArrayIndex(pool)]
     if not itemId then return end
 
     container:AddItem(itemId)

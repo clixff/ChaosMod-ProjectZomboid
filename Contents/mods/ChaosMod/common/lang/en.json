@@ -267,7 +267,12 @@
         "remember_code": "Remember Code",
         "select_random_card": "Select Random Card",
         "remove_player_hat": "Remove Player's Hat",
-        "hide_effect_names": "Hide Effect Names"
+        "hide_effect_names": "Hide Effect Names",
+        "select_card_remove_items": "Select Card: Remove Items",
+        "select_card_add_items": "Select Card: Add Items",
+        "equip_bunny_costume": "Equip Bunny Costume",
+        "equip_spiffo_costume": "Equip Spiffo Costume",
+        "equip_furry_ears": "Equip Furry Ears"
     },
     "core": {
         "start_mod": "Start ChaosMod",

@@ -269,7 +269,7 @@ function ChaosNPC:OnAttackEnemyHit()
     if enemy:isZombie() then
         ---@type table<integer, string>
         local hitReactions = { "HeadLeft", "HeadRight", "HeadTop" }
-        fakeAttacker:setVariable("ZombieHitReaction", hitReactions[1 + math.floor(ZombRand(#hitReactions))])
+        fakeAttacker:setVariable("ZombieHitReaction", hitReactions[ChaosUtils.RandArrayIndex(hitReactions)])
         enemy:Hit(self.weaponItemCached, fakeAttacker, damage, false, 1.0)
         enemy:playSound(self.weaponItemCached:getZombieHitSound())
 
@@ -410,7 +410,7 @@ function ChaosNPC:StartAttackAnimation()
     end
 
     self.endurance = math.max(0, self.endurance - attackEnduranceDrain)
-    self.attackAnimName = animsTable[1 + ZombRand(#animsTable)]
+    self.attackAnimName = animsTable[ChaosUtils.RandArrayIndex(animsTable)]
 
     local isAttackingEnemy = self.enemy ~= nil and self.attackObjectTarget == nil
     self.attackLastTimeMs = ChaosMod.lastTimeTickMs

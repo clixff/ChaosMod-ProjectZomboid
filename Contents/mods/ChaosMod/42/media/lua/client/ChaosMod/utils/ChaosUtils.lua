@@ -654,11 +654,11 @@ function ChaosUtils.GetShortTextureIconName(item)
     return string.sub(textureIconName, 6, -1)
 end
 
----@param item string
+---@param itemId string
 ---@return string
-function ChaosUtils.GetShortTextureIconNameByString(item)
-    if not item then return "" end
-    local item = instanceItem(item)
+function ChaosUtils.GetShortTextureIconNameByString(itemId)
+    if not itemId then return "" end
+    local item = instanceItem(itemId)
     if not item then return "" end
     return ChaosUtils.GetShortTextureIconName(item)
 end
@@ -782,4 +782,34 @@ function ChaosUtils.ForAllWorldObjectsOnSquare(square, callback)
         end
     end
     return false
+end
+
+---Returns a pseudorandom integer between 0 and max - 1.
+---@param max number Exclusive upper bound of the integer value.
+---@return integer
+function ChaosUtils.RandInteger(max)
+    return math.floor(ZombRand(max))
+end
+
+---Returns a pseudorandom integer between min and max - 1.
+---@param min number Inclusive lower bound of the random integer.
+---@param max number Exclusive upper bound of the random integer.
+---@return integer
+function ChaosUtils.RandIntegerRange(min, max)
+    return math.floor(ZombRand(min, max))
+end
+
+---Returns a pseudorandom float between min and max.
+---@param min number Lower bound of the random float.
+---@param max number Upper bound of the random float.
+---@return number
+function ChaosUtils.RandFloat(min, max)
+    return ZombRandFloat(min, max)
+end
+
+---Returns a pseudorandom valid index into the given table (1-based).
+---@param array table
+---@return integer
+function ChaosUtils.RandArrayIndex(array)
+    return math.floor(ZombRand(#array)) + 1
 end

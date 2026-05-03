@@ -267,7 +267,12 @@
         "remember_code": "Memorizar codigo",
         "select_random_card": "Selecionar carta aleatoria",
         "remove_player_hat": "Remover Chapeu do Jogador",
-        "hide_effect_names": "Ocultar Nomes dos Efeitos"
+        "hide_effect_names": "Ocultar Nomes dos Efeitos",
+        "select_card_remove_items": "Selecionar Carta: Remover Itens",
+        "select_card_add_items": "Selecionar Carta: Adicionar Itens",
+        "equip_bunny_costume": "Equipar Fantasia de Coelho",
+        "equip_spiffo_costume": "Equipar Fantasia de Spiffo",
+        "equip_furry_ears": "Equipar Orelhas Peludas"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

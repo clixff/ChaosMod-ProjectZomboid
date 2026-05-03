@@ -171,7 +171,7 @@ function ChaosZombie.OnZombieDead(zombie)
             ---@type string[]
             local phrases = { "Wow!", "Cool!", "Amazing!", "Incredible!", "Awesome!" }
             for _, fan in ipairs(adoringFans) do
-                local phrase = phrases[math.floor(ZombRand(#phrases) + 1)]
+                local phrase = phrases[ChaosUtils.RandArrayIndex(phrases)]
                 if phrase and fan.zombie then
                     ChaosZombie.AddNewChatLine(fan.zombie, phrase)
                 end

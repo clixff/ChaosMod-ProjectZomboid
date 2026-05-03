@@ -1,14 +1,21 @@
 require "ISUI/ISPanel"
 require "ISUI/ISButton"
 
+---@class ChaosCardSelectEffect : ChaosEffectBase
+---@field selectedCardIndex integer | nil
+---@field onCardSelected fun(self: ChaosCardSelectEffect, cardIndex: integer)
+
 ---@class ChaosSelectRandomCardWindow : ISPanel
----@field effect EffectSelectRandomCard
+---@field effect ChaosCardSelectEffect
 ---@field listedEffectIds string[]
 ---@field cardEffectIds string[]
 ---@field listedEffectNames string[]
 ---@field cardEffectNames string[]
 ---@field selectButtons ISButton[]
 ---@field resolved boolean
+---@field title string | nil
+---@field listedLabels string[] | nil
+---@field cardLabels string[] | nil
 ChaosSelectRandomCardWindow = ISPanel:derive("ChaosSelectRandomCardWindow")
 
 local WINDOW_W = 860
@@ -18,7 +25,7 @@ local CARD_GAP = 20
 local CARD_H = 220
 local CARD_BTN_H = 36
 
----@param effect EffectSelectRandomCard
+---@param effect ChaosCardSelectEffect
 ---@param listedEffectIds string[]
 ---@param cardEffectIds string[]
 ---@return ChaosSelectRandomCardWindow
@@ -44,6 +51,9 @@ function ChaosSelectRandomCardWindow:new(effect, listedEffectIds, cardEffectIds)
     o.cardEffectNames = {}
     o.selectButtons = {}
     o.resolved = false
+    o.title = nil
+    o.listedLabels = nil
+    o.cardLabels = nil
 
     for i = 1, #o.listedEffectIds do
         local effectData = ChaosEffectsRegistry.effects[o.listedEffectIds[i]]
@@ -52,7 +62,8 @@ function ChaosSelectRandomCardWindow:new(effect, listedEffectIds, cardEffectIds)
 
     for i = 1, #o.cardEffectIds do
         local effectData = ChaosEffectsRegistry.effects[o.cardEffectIds[i]]
-        o.cardEffectNames[i] = effectData and effectData.name or o.cardEffectIds[i]
+        local name = effectData and effectData.name or o.cardEffectIds[i]
+        o.cardEffectNames[i] = name:gsub(" ", "\n")
     end
 
     return o
@@ -69,6 +80,7 @@ function ChaosSelectRandomCardWindow:createChildren()
             ChaosSelectRandomCardWindow.onSelectClicked)
         button:initialise()
         button:instantiate()
+        ---@diagnostic disable-next-line: inject-field
         button.cardIndex = i
         self.selectButtons[i] = button
         self:addChild(button)
@@ -78,12 +90,13 @@ end
 function ChaosSelectRandomCardWindow:prerender()
     ISPanel.prerender(self)
 
-    local title = "Select a card"
+    local title = self.title or "Select a card"
     local titleX = math.floor((WINDOW_W - getTextManager():MeasureStringX(UIFont.Large, title)) / 2)
     self:drawText(title, titleX, 18, 1, 1, 1, 1, UIFont.Large)
 
-    for i = 1, math.min(3, #self.listedEffectNames) do
-        local label = string.format("%d. %s", i, self.listedEffectNames[i] or "")
+    local listNames = self.listedLabels or self.listedEffectNames
+    for i = 1, math.min(3, #listNames) do
+        local label = string.format("%d. %s", i, listNames[i] or "")
         self:drawText(label, PAD, 62 + (i - 1) * 38, 1, 1, 1, 1, UIFont.Medium)
     end
 
@@ -104,9 +117,14 @@ function ChaosSelectRandomCardWindow:drawCards()
         local cardTitleX = cardX + math.floor((cardW - getTextManager():MeasureStringX(UIFont.NewMedium, cardTitle)) / 2)
         self:drawText(cardTitle, cardTitleX, cardsY + 18, 0.9, 0.9, 0.9, 1, UIFont.NewMedium)
 
-        local effectText = revealCards and (self.cardEffectNames[i] or "") or "?????"
+        local effectText
+        if revealCards then
+            effectText = (self.cardLabels and self.cardLabels[i]) or self.cardEffectNames[i] or ""
+        else
+            effectText = "?????"
+        end
         local effectTextX = cardX + math.floor((cardW - getTextManager():MeasureStringX(UIFont.NewLarge, effectText)) / 2)
-        local textR, textG, textB = 1, 1, 1
+        local textR, textG, textB = 1.0, 1.0, 1.0
         if revealCards and self.effect.selectedCardIndex == i then
             textR, textG, textB = 0.2, 1.0, 0.2
         end
@@ -114,7 +132,13 @@ function ChaosSelectRandomCardWindow:drawCards()
 
         local button = self.selectButtons[i]
         if button then
-            button.enable = not revealCards and self.cardEffectIds[i] ~= nil
+            local hasContent
+            if self.cardLabels then
+                hasContent = self.cardLabels[i] ~= nil
+            else
+                hasContent = self.cardEffectIds[i] ~= nil
+            end
+            button.enable = not revealCards and hasContent
             button:setVisible(not revealCards)
         end
     end

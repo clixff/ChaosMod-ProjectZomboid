@@ -11,7 +11,9 @@ function ChaosNPC:initializeHuman()
     zombie:setNoTeeth(true)
     zombie:setVariable("ChaosNPC", true)
     self.weaponItemCached = instanceItem("Base.BareHands")
+    ---@diagnostic disable-next-line: param-type-mismatch
     zombie:setPrimaryHandItem(nil)
+    ---@diagnostic disable-next-line: param-type-mismatch
     zombie:setSecondaryHandItem(nil)
 
     local md = zombie:getModData()

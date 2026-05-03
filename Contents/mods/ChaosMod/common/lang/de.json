@@ -267,7 +267,12 @@
         "remember_code": "Code merken",
         "select_random_card": "Zufallskarte waehlen",
         "remove_player_hat": "Hut des Spielers entfernen",
-        "hide_effect_names": "Effektnamen verbergen"
+        "hide_effect_names": "Effektnamen verbergen",
+        "select_card_remove_items": "Karte waehlen: Gegenstaende entfernen",
+        "select_card_add_items": "Karte waehlen: Gegenstaende hinzufuegen",
+        "equip_bunny_costume": "Hasenkostuem anlegen",
+        "equip_spiffo_costume": "Spiffo-Kostuem anlegen",
+        "equip_furry_ears": "Fellohren anlegen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

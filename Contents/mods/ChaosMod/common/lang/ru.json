@@ -268,7 +268,12 @@
         "remember_code": "Запомни код",
         "select_random_card": "Выбери случайную карту",
         "remove_player_hat": "Удалить головной убор игрока",
-        "hide_effect_names": "Скрыть названия эффектов"
+        "hide_effect_names": "Скрыть названия эффектов",
+        "select_card_remove_items": "Выбор карты: Удалить предметы",
+        "select_card_add_items": "Выбор карты: Добавить предметы",
+        "equip_bunny_costume": "Надеть костюм зайчика",
+        "equip_spiffo_costume": "Надеть костюм Спиффо",
+        "equip_furry_ears": "Надеть пушистые ушки"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

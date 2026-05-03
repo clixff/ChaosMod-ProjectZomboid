@@ -1,4 +1,4 @@
----@class EffectSelectRandomCard : ChaosEffectBase
+---@class EffectSelectRandomCard : ChaosCardSelectEffect
 ---@field cardEffectIds string[]
 ---@field listedEffectIds string[]
 ---@field revealEndTimeMs integer | nil
@@ -27,7 +27,7 @@ function EffectSelectRandomCard:activateRandomCardEffect()
     if self.selectedEffectId then return end
     if not self.cardEffectIds or #self.cardEffectIds == 0 then return end
 
-    local randomIndex = ZombRand(#self.cardEffectIds) + 1
+    local randomIndex = ChaosUtils.RandArrayIndex(self.cardEffectIds)
     local effectId = self.cardEffectIds[randomIndex]
     if not effectId then return end
 
@@ -61,7 +61,7 @@ function EffectSelectRandomCard:onCardSelected(cardIndex)
 
     self.selectedCardIndex = cardIndex
     self.selectedEffectId = self.cardEffectIds[cardIndex]
-    self.revealEndTimeMs = getTimestampMs() + 5000
+    self.revealEndTimeMs = getTimestampMs() + 3000
 
     setGameSpeed(1)
 

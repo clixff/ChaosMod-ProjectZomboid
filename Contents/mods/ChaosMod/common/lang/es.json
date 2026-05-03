@@ -267,7 +267,12 @@
         "remember_code": "Recordar codigo",
         "select_random_card": "Seleccionar carta aleatoria",
         "remove_player_hat": "Quitar sombrero del jugador",
-        "hide_effect_names": "Ocultar nombres de efectos"
+        "hide_effect_names": "Ocultar nombres de efectos",
+        "select_card_remove_items": "Seleccionar carta: Eliminar objetos",
+        "select_card_add_items": "Seleccionar carta: Agregar objetos",
+        "equip_bunny_costume": "Equipar disfraz de conejo",
+        "equip_spiffo_costume": "Equipar disfraz de Spiffo",
+        "equip_furry_ears": "Equipar orejas peludas"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

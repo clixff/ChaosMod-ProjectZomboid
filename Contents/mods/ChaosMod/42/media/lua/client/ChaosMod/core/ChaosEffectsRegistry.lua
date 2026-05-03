@@ -105,7 +105,7 @@ function ChaosEffectsRegistry.GetRandomEffects(amount, pickType)
     for _ = 1, amount do
         if totalWeight <= 0 then break end
 
-        local roll = ZombRand(totalWeight) + 1
+        local roll = ChaosUtils.RandInteger(totalWeight) + 1
         local cumulative = 0
         local picked = nil
         local pickedIndex = nil

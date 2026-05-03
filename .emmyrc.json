@@ -3,7 +3,8 @@
   "diagnostics": {
     "disable": [
       "unnecessary-if",
-      "invert-if"
+      "invert-if",
+      "unused"
     ]
   },
   "runtime": {
@@ -22,7 +23,8 @@
       "Contents/mods/ChaosMod/42/media/lua"
     ],
     "ignoreDir": [
-      "releases"
+      "releases",
+      "Contents/mods/ChaosMod/42/media/lua/client/ChaosMod/thirdparty"
     ]
   }
 }

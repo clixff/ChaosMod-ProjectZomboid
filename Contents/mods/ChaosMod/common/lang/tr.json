@@ -267,7 +267,12 @@
         "remember_code": "Kodu Hatirla",
         "select_random_card": "Rastgele Kart Sec",
         "remove_player_hat": "Oyuncunun Sapkasini Cikar",
-        "hide_effect_names": "Efekt Adlarini Gizle"
+        "hide_effect_names": "Efekt Adlarini Gizle",
+        "select_card_remove_items": "Kart Sec: Esyalari Kaldir",
+        "select_card_add_items": "Kart Sec: Esya Ekle",
+        "equip_bunny_costume": "Tavsan Kostumu Giy",
+        "equip_spiffo_costume": "Spiffo Kostumu Giy",
+        "equip_furry_ears": "Tuylu Kulaklar Giy"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

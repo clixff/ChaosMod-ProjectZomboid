@@ -1,7 +1,8 @@
 ---@class EffectSpawnChicken : ChaosEffectBase
 EffectSpawnChicken = ChaosEffectBase:derive("EffectSpawnChicken", "spawn_chicken")
 
-local breeds = { "leghorn", "rhodeisland" }
+---@type string[]
+local CHICKEN_BREEDS = { "leghorn", "rhodeisland" }
 
 function EffectSpawnChicken:OnStart()
     ChaosEffectBase:OnStart()
@@ -12,7 +13,9 @@ function EffectSpawnChicken:OnStart()
     local square = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 1, 6, 50, true, true, true)
     if not square then return end
 
-    local breed = breeds[ZombRand(#breeds) + 1]
+    ---@type string?
+    local breed = CHICKEN_BREEDS[ChaosUtils.RandArrayIndex(CHICKEN_BREEDS)]
+    if not breed then return end
     print("[EffectSpawnChicken] Spawning chicken: " .. breed)
     ChaosAnimals.SpawnAnimal(square:getX(), square:getY(), square:getZ(), "hen", breed)
 end

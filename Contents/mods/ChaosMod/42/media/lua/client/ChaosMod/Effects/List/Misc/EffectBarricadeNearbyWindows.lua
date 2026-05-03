@@ -50,7 +50,7 @@ local function addPlanksToWindow(window, amount, chr)
         if barricade and not barricade:isMetal() and not barricade:isMetalBar() then
             while remaining > 0 and barricade:canAddPlank() do
                 ---@diagnostic disable-next-line: param-type-mismatch
-                barricade:addPlank(chr, nil)
+                barricade:addPlank(chr)
                 remaining = remaining - 1
                 added = added + 1
             end

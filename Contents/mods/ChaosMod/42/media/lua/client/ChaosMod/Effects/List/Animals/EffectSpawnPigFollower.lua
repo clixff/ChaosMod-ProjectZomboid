@@ -13,7 +13,8 @@ function EffectSpawnPigFollower:OnStart()
     local square = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 1, 6, 50, true, true, true)
     if not square then return end
 
-    local breed = PIG_BREEDS[math.floor(ZombRand(#PIG_BREEDS) + 1)]
+    ---@type string?
+    local breed = PIG_BREEDS[ChaosUtils.RandArrayIndex(PIG_BREEDS)]
     if not breed then return end
     local animal = ChaosAnimals.SpawnAnimal(square:getX(), square:getY(), square:getZ(), "sow", breed)
     if not animal then return end

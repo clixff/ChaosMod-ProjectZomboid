@@ -79,7 +79,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.0.2";
+const VERSION = "1.1.0";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -547,7 +547,7 @@ async function main(): Promise<void> {
         donateEnabled: config?.streamer_mode.enable_donate ?? false,
       };
     },
-    onDonationAlertsCode: async (code) => {
+    onDonationAlertsCode: async (code: string) => {
       const user = await daProvider.handleOAuthCode(code, port);
       if (user) {
         logger.info(
@@ -556,7 +556,7 @@ async function main(): Promise<void> {
       }
       return user ? { name: user.name } : null;
     },
-    activateEffect: (nickname, effectId) => {
+    activateEffect: (nickname: string | undefined, effectId: string) => {
       if (
         !config?.streamer_mode.streamer_mode_enabled ||
         !config?.streamer_mode.enable_donate

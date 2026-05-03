@@ -2344,6 +2344,58 @@
             ],
             "enabled_donate": true,
             "price_group": "negaitve_3"
+        },
+        {
+            "id": "select_card_remove_items",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "select_card_remove_items",
+                "select_card_add_items",
+                "select_random_card"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "select_card_add_items",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "select_card_add_items",
+                "select_card_remove_items",
+                "select_random_card"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "equip_bunny_costume",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_1"
+        },
+        {
+            "id": "equip_spiffo_costume",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_1"
+        },
+        {
+            "id": "equip_furry_ears",
+            "enabled": true,
+            "chance": 45,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_1"
         }
     ]
 }

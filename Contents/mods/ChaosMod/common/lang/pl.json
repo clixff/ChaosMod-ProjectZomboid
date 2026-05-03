@@ -267,7 +267,12 @@
         "remember_code": "Zapamietaj kod",
         "select_random_card": "Wybierz losowa karte",
         "remove_player_hat": "Zdejmij czapke gracza",
-        "hide_effect_names": "Ukryj nazwy efektow"
+        "hide_effect_names": "Ukryj nazwy efektow",
+        "select_card_remove_items": "Wybierz karte: Usun przedmioty",
+        "select_card_add_items": "Wybierz karte: Dodaj przedmioty",
+        "equip_bunny_costume": "Zaloz kostium krolika",
+        "equip_spiffo_costume": "Zaloz kostium Spiffo",
+        "equip_furry_ears": "Zaloz futrzane uszy"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

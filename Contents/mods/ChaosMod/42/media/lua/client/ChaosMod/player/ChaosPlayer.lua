@@ -216,6 +216,27 @@ function ChaosPlayer.SetRandomBodyDamageByMeleeWeapon(character, baseDamage, wea
     character:playWeaponHitArmourSound(bodyPartIndex, false)
 end
 
+---@param container ItemContainer
+---@param out InventoryItem[]
+function ChaosPlayer.CollectAllItems(container, out)
+    if not container then return end
+    if not container.getItems then return end
+    local items = container:getItems()
+    if not items then return end
+    for i = 0, items:size() - 1 do
+        local item = items:get(i)
+        if item then
+            if item:IsInventoryContainer() then
+                ---@type InventoryContainer
+                local inner = item
+                ChaosPlayer.CollectAllItems(inner:getInventory(), out)
+            else
+                table.insert(out, item)
+            end
+        end
+    end
+end
+
 ---@param inventory ItemContainer
 ---@param useDeepLookup boolean
 ---@param skipContainers boolean
@@ -334,13 +355,37 @@ function ChaosPlayer.SayLineRemovedItem(player, item)
 end
 
 ---@param player IsoPlayer
----@param item string
----@param amount integer?
-function ChaosPlayer.SayLineNewItemByString(player, item, amount)
+function ChaosPlayer.UnequipAllClothes(player)
+    if not player then return end
+    local worn = player:getWornItems()
+    if not worn then return end
+
+    for i = worn:size() - 1, 0, -1 do
+        local item = worn:getItemByIndex(i)
+        if item then
+            player:removeWornItem(item, false)
+        end
+    end
+end
+
+---@param player IsoPlayer
+---@param item InventoryItem
+function ChaosPlayer.EquipClothes(player, item)
     if not player then return end
     if not item then return end
+    if item:getBodyLocation() then
+        player:setWornItem(item:getBodyLocation(), item, false)
+    end
+end
 
-    local item = instanceItem(item)
+---@param player IsoPlayer
+---@param itemId string
+---@param amount integer?
+function ChaosPlayer.SayLineNewItemByString(player, itemId, amount)
+    if not player then return end
+    if not itemId then return end
+
+    local item = instanceItem(itemId)
     if item then
         ChaosPlayer.SayLineNewItem(player, item, amount)
     end

@@ -12,7 +12,7 @@ function EffectSetRandomVehicleColors:OnStart()
     for i = 0, vehicles:size() - 1 do
         local vehicle = vehicles:get(i)
         if vehicle then
-            local randomIndex = math.floor(ZombRand(#VEHICLE_COLORS) + 1)
+            local randomIndex = ChaosUtils.RandArrayIndex(VEHICLE_COLORS)
             local color = VEHICLE_COLORS[randomIndex]
             if color then
                 vehicle:setColorHSV(color.hue, color.sat, color.val)

@@ -45,6 +45,7 @@ local function killAnimal(animal)
     end
 
     if animal.DoDeath then
+        ---@diagnostic disable-next-line: param-type-mismatch
         animal:DoDeath(nil, nil)
     else
         animal:removeFromWorld()

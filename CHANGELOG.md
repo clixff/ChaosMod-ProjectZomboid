@@ -12,3 +12,13 @@
 ### New Effects
 
 - Remove Player Hat
+- Hide Effect Names
+- Select Card: Remove Items
+- Select Card: Add Items
+- Equip Bunny Costume
+- Equip Spiffo Costume
+- Equip Furry Ears
+
+### Effect Fixes
+
+- Fixed 'Select Random Card' UI (text wrapping)
