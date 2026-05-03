@@ -2324,6 +2324,14 @@
             "duration": 60,
             "enabled_donate": true,
             "price_group": "neutral_4"
+        },
+        {
+            "id": "remove_player_hat",
+            "enabled": true,
+            "chance": 35,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_2"
         }
     ]
 }

@@ -1,0 +1,14 @@
+[1.1.0]
+
+### New mod features
+
+- Added new command `use_localhost_ip` to set whether the server binds to localhost only (on) or all interfaces (off), and restart the server
+- New default donation price groups
+
+### Mod fixes
+
+- Updated `obs` command to show the new instructions for setting up the OBS browser source with LAN IP.
+
+### New Effects
+
+- Remove Player Hat

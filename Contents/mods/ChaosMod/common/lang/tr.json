@@ -265,7 +265,8 @@
         "spawn_explosive_flamingo": "Patlayici Flamingo Olustur",
         "spawn_pig_follower": "Takipci Domuz Olustur",
         "remember_code": "Kodu Hatirla",
-        "select_random_card": "Rastgele Kart Sec"
+        "select_random_card": "Rastgele Kart Sec",
+        "remove_player_hat": "Oyuncunun Sapkasini Cikar"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

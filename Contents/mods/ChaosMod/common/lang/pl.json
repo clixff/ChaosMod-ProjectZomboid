@@ -265,7 +265,8 @@
         "spawn_explosive_flamingo": "Stworz wybuchowego flaminga",
         "spawn_pig_follower": "Stworz podazajaca swinie",
         "remember_code": "Zapamietaj kod",
-        "select_random_card": "Wybierz losowa karte"
+        "select_random_card": "Wybierz losowa karte",
+        "remove_player_hat": "Zdejmij czapke gracza"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

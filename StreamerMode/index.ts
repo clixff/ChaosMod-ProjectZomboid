@@ -518,12 +518,13 @@ async function main(): Promise<void> {
     },
   });
 
-  startServer({
-    host,
-    port,
-    provider,
-    onLogin,
-    getModStatus: () => {
+  function buildServerCtx(serverHost: string) {
+    return {
+      host: serverHost,
+      port,
+      provider,
+      onLogin,
+      getModStatus: () => {
       const watcher = app?.getModSyncWatcher();
       const iterationIndex = watcher?.iterationIndex ?? 0;
       const offset = iterationIndex % 2 !== 0 ? 4 : 0;
@@ -583,7 +584,10 @@ async function main(): Promise<void> {
         ),
       };
     },
-  });
+    };
+  }
+
+  let activeServer = startServer(buildServerCtx(host));
 
   if (modFolder && config) {
     registerLangCommand(app, modFolder, config);
@@ -646,13 +650,42 @@ async function main(): Promise<void> {
       console.log(
         `Refresh Browser When Scene Becomes Active = ${colors.cyan("On")}`,
       );
-      console.log("");
-      console.log(
-        `Disclaimer: If you have OBS in different PC, you need to set ${colors.cyan("streamer_mode.use_localhost_ip")} to ${colors.cyan("false")}. ` +
-          `Then restart Streamer App and use ${colors.cyan("ip")} command to get your local IP, and use it instead of ${colors.cyan("127.0.0.1")}.`,
-      );
+      if (useLocalhost) {
+        console.log("");
+        console.log(
+          `Disclaimer: If you have OBS on a different PC, run ${colors.cyan("use_localhost_ip off")} and then ${colors.cyan("obs")} again to get the LAN URL.`,
+        );
+      }
     },
     "Print OBS Browser source setup instructions",
+  );
+
+  app.registerCommand(
+    "use_localhost_ip",
+    [],
+    [{ name: "on|off", required: true }],
+    (args) => {
+      if (!config || !modFolder) {
+        logger.warn("Config not available.");
+        return;
+      }
+      const val = args[0]?.toLowerCase();
+      if (val !== "on" && val !== "off") {
+        logger.warn(`Usage: ${colors.cyan("use_localhost_ip on|off")}`);
+        return;
+      }
+      const useLocalhostNew = val === "on";
+      config.streamer_mode.use_localhost_ip = useLocalhostNew;
+      saveConfig(modFolder, config);
+
+      const newHost = hostOverride ?? (useLocalhostNew ? "127.0.0.1" : "0.0.0.0");
+      activeServer.stop(true);
+      activeServer = startServer(buildServerCtx(newHost));
+      logger.info(
+        `use_localhost_ip set to ${colors.cyan(val)}. Server restarted on ${colors.cyan(`http://${newHost}:${port}`)}.`,
+      );
+    },
+    "Set whether the server binds to localhost only (on) or all interfaces (off), and restart the server",
   );
 
   app.registerCommand(

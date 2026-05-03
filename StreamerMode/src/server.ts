@@ -60,10 +60,10 @@ export interface ServerContext {
   onDonationAlertsCode?: (code: string) => Promise<{ name: string } | null>;
 }
 
-export function startServer(ctx: ServerContext): void {
+export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
   const { host, port, provider } = ctx;
 
-  Bun.serve({
+  const server = Bun.serve({
     hostname: host,
     port,
     routes: {
@@ -149,4 +149,5 @@ export function startServer(ctx: ServerContext): void {
   });
 
   logger.debug(`HTTP server listening on http://${host}:${port}`);
+  return server;
 }

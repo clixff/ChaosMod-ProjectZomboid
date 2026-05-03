@@ -279,7 +279,7 @@ The `streamer_mode` section contains the following properties:
   - `0` — normal voting. The option with the most votes wins.
   - `1` — weighted random voting. More votes mean a higher chance to win.
 - `type` — streamer mode type. Currently only Twitch is supported.
-- `use_localhost_ip` — if `true`, StreamerApp uses a local IP address. If `false`, it uses a public IP address.
+- `use_localhost_ip` — if `true`, the server binds to `127.0.0.1` (localhost only). If `false`, it binds to all interfaces so OBS on another PC on the same network can connect. Can be changed at runtime with `/use_localhost_ip on|off`.
 - `use_zombie_nicknames` — displays Twitch nicknames above zombies.
 - `say_killed_zombie_name` — says the name of the killed zombie.
 - `zombie_nicknames_buffer` — size of the nickname buffer.
@@ -401,23 +401,19 @@ Open `config.json` and set:
 
 ### I use OBS Studio on a different PC. How can I use StreamerApp?
 
-Open `config.json` and set:
+Run this command in the StreamerApp terminal:
 
-```json
-{
-  "streamer_mode": {
-    "use_localhost_ip": false
-  }
-}
+```txt
+/use_localhost_ip off
 ```
 
-Then restart StreamerApp and use:
+This saves the setting and restarts the server so it accepts connections from other PCs on your network. Then run:
 
 ```txt
 /obs
 ```
 
-StreamerApp will show instructions for setting up the OBS browser source.
+StreamerApp will show instructions for setting up the OBS browser source with your local network IP.
 
 ### Is multiplayer supported?
 

@@ -265,7 +265,8 @@
         "spawn_explosive_flamingo": "Gerar flamingo explosivo",
         "spawn_pig_follower": "Gerar porco seguidor",
         "remember_code": "Memorizar codigo",
-        "select_random_card": "Selecionar carta aleatoria"
+        "select_random_card": "Selecionar carta aleatoria",
+        "remove_player_hat": "Remover Chapeu do Jogador"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

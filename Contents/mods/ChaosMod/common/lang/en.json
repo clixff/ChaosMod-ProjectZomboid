@@ -265,7 +265,8 @@
         "spawn_explosive_flamingo": "Spawn Explosive Flamingo",
         "spawn_pig_follower": "Spawn Pig Follower",
         "remember_code": "Remember Code",
-        "select_random_card": "Select Random Card"
+        "select_random_card": "Select Random Card",
+        "remove_player_hat": "Remove Player's Hat"
     },
     "core": {
         "start_mod": "Start ChaosMod",
