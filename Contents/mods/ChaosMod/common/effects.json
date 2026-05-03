@@ -2408,6 +2408,15 @@
             ],
             "enabled_donate": true,
             "price_group": "negative_3"
+        },
+        {
+            "id": "spawn_many_explosive_chickens",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 5,
+            "enabled_donate": true,
+            "price_group": "negative_5"
         }
     ]
 }

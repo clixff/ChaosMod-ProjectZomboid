@@ -273,7 +273,8 @@
         "equip_bunny_costume": "Equiper le costume de lapin",
         "equip_spiffo_costume": "Equiper le costume de Spiffo",
         "equip_furry_ears": "Equiper les oreilles poilues",
-        "spawn_explosive_spiffos": "Invoquer des Spiffos explosifs"
+        "spawn_explosive_spiffos": "Invoquer des Spiffos explosifs",
+        "spawn_many_explosive_chickens": "Faire apparaître plusieurs poulets explosifs"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

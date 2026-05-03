@@ -273,7 +273,8 @@
         "equip_bunny_costume": "Zaloz kostium krolika",
         "equip_spiffo_costume": "Zaloz kostium Spiffo",
         "equip_furry_ears": "Zaloz futrzane uszy",
-        "spawn_explosive_spiffos": "Pojaw wybuchowe Spiffo"
+        "spawn_explosive_spiffos": "Pojaw wybuchowe Spiffo",
+        "spawn_many_explosive_chickens": "Zespawnuj wiele wybuchowych kur"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

@@ -273,7 +273,8 @@
         "equip_bunny_costume": "Equipar disfraz de conejo",
         "equip_spiffo_costume": "Equipar disfraz de Spiffo",
         "equip_furry_ears": "Equipar orejas peludas",
-        "spawn_explosive_spiffos": "Invocar Spiffos explosivos"
+        "spawn_explosive_spiffos": "Invocar Spiffos explosivos",
+        "spawn_many_explosive_chickens": "Generar muchas gallinas explosivas"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

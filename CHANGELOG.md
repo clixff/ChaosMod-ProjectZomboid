@@ -21,6 +21,7 @@
 - Equip Spiffo Costume
 - Equip Furry Ears
 - Spawn Explosive Spiffos
+- Spawn Many Explosive Chickens
 
 ### Effect Fixes
 

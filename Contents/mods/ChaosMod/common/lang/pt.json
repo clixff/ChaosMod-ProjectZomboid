@@ -273,7 +273,8 @@
         "equip_bunny_costume": "Equipar Fantasia de Coelho",
         "equip_spiffo_costume": "Equipar Fantasia de Spiffo",
         "equip_furry_ears": "Equipar Orelhas Peludas",
-        "spawn_explosive_spiffos": "Invocar Spiffos Explosivos"
+        "spawn_explosive_spiffos": "Invocar Spiffos Explosivos",
+        "spawn_many_explosive_chickens": "Invocar Várias Galinhas Explosivas"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

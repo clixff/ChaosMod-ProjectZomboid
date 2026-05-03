@@ -273,7 +273,8 @@
         "equip_bunny_costume": "Hasenkostuem anlegen",
         "equip_spiffo_costume": "Spiffo-Kostuem anlegen",
         "equip_furry_ears": "Fellohren anlegen",
-        "spawn_explosive_spiffos": "Explosive Spiffos spawnen"
+        "spawn_explosive_spiffos": "Explosive Spiffos spawnen",
+        "spawn_many_explosive_chickens": "Viele Explosionshühner spawnen"
     },
     "core": {
         "start_mod": "ChaosMod starten",
