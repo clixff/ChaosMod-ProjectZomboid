@@ -9,14 +9,14 @@ function EffectFoodThief:OnStart()
     if not playerSquare then return end
 
     local newZombies = ChaosZombie.SpawnZombieAt(
-        playerSquare:getX(), playerSquare:getY(), playerSquare:getZ(), 1, "Inmate", 0)
+        playerSquare:getX(), playerSquare:getY(), playerSquare:getZ(), 1, "Spiffo", 0)
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
     local npc = ChaosNPC:new(zombie)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.ROBBER
-    npc:AddTag("item_food_thief")
+    npc:AddTag("item_robber")
     self.npc = npc
 
     local inventory = player:getInventory()

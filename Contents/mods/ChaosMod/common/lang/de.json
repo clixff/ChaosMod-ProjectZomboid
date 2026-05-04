@@ -277,6 +277,10 @@
         "spawn_many_explosive_chickens": "Viele Explosionshühner spawnen",
         "replace_furniture_with_zombies": "Möbel durch Zombies ersetzen",
         "food_thief": "Lebensmitteldieb"
+    ,
+        "temporary_obesity": "Vorübergehende Fettleibigkeit"
+    ,
+        "shorter_effects_interval": "Kürzeres Effektintervall"
     },
     "core": {
         "start_mod": "ChaosMod starten",

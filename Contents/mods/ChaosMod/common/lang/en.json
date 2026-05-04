@@ -277,6 +277,10 @@
         "spawn_many_explosive_chickens": "Spawn Many Explosive Chickens",
         "replace_furniture_with_zombies": "Replace Furniture With Zombies",
         "food_thief": "Food Thief"
+    ,
+        "temporary_obesity": "Temporary Obesity"
+    ,
+        "shorter_effects_interval": "Shorter Effects Interval"
     },
     "core": {
         "start_mod": "Start ChaosMod",

@@ -278,6 +278,10 @@
         "spawn_many_explosive_chickens": "Заспавнить много взрывных куриц",
         "replace_furniture_with_zombies": "Заменить мебель зомби",
         "food_thief": "Похититель еды"
+    ,
+        "temporary_obesity": "Временное ожирение"
+    ,
+        "shorter_effects_interval": "Уменьшенный интервал эффектов"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

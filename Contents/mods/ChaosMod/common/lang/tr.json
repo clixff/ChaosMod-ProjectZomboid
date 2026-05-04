@@ -277,6 +277,10 @@
         "spawn_many_explosive_chickens": "Cok Sayida Patlayici Tavuk Olustur",
         "replace_furniture_with_zombies": "Mobilyalari Zombilerle Degistir",
         "food_thief": "Yiyecek Hirsizi"
+    ,
+        "temporary_obesity": "Geçici Obezite"
+    ,
+        "shorter_effects_interval": "Daha Kısa Efekt Aralığı"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

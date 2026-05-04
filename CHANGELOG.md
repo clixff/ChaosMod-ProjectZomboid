@@ -25,6 +25,8 @@
 - Spawn Many Explosive Chickens
 - Replace Furniture With Zombies
 - Food Thief
+- Temporary Obesity
+- Shorter Effects Interval
 
 ### Effect Fixes
 

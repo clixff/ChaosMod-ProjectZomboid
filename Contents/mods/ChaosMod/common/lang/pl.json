@@ -277,6 +277,10 @@
         "spawn_many_explosive_chickens": "Zespawnuj wiele wybuchowych kur",
         "replace_furniture_with_zombies": "Zamien meble na zombie",
         "food_thief": "Złodziej jedzenia"
+    ,
+        "temporary_obesity": "Tymczasowa otyłość"
+    ,
+        "shorter_effects_interval": "Krótszy Interwał Efektów"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

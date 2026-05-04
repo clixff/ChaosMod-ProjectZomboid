@@ -277,6 +277,10 @@
         "spawn_many_explosive_chickens": "生成多只爆炸鸡",
         "replace_furniture_with_zombies": "用僵尸替换家具",
         "food_thief": "食物窃贼"
+    ,
+        "temporary_obesity": "暂时性肥胖"
+    ,
+        "shorter_effects_interval": "缩短效果间隔"
     },
     "core": {
         "start_mod": "启动混乱模式",

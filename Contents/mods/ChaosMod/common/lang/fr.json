@@ -277,6 +277,10 @@
         "spawn_many_explosive_chickens": "Faire apparaître plusieurs poulets explosifs",
         "replace_furniture_with_zombies": "Remplacer les meubles par des zombies",
         "food_thief": "Voleur de nourriture"
+    ,
+        "temporary_obesity": "Obésité Temporaire"
+    ,
+        "shorter_effects_interval": "Intervalle d'Effets Réduit"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

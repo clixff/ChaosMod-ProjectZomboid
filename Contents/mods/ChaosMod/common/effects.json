@@ -2434,6 +2434,26 @@
             "duration": 30,
             "enabled_donate": true,
             "price_group": "negative_3"
+        },
+        {
+            "id": "temporary_obesity",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": ["temporary_obesity", "player_is_obese", "player_is_underweight"],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "shorter_effects_interval",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": ["shorter_effects_interval"],
+            "enabled_donate": true,
+            "price_group": "negative_3"
         }
     ]
 }

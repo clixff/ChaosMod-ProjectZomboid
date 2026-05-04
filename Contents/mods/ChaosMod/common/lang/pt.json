@@ -277,6 +277,10 @@
         "spawn_many_explosive_chickens": "Invocar Várias Galinhas Explosivas",
         "replace_furniture_with_zombies": "Substituir Móveis por Zumbis",
         "food_thief": "Ladrão de Comida"
+    ,
+        "temporary_obesity": "Obesidade Temporária"
+    ,
+        "shorter_effects_interval": "Intervalo de Efeitos Mais Curto"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
