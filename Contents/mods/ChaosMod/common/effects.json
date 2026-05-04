@@ -422,7 +422,7 @@
             "enabled": true,
             "chance": 40,
             "withDuration": true,
-            "duration": 45,
+            "duration": 60,
             "disable_effects": [
                 "effect_insanity"
             ],
@@ -845,7 +845,7 @@
             "price_group": "neutral_1"
         },
         {
-            "id": "player_gain_weight",
+            "id": "player_is_obese",
             "enabled": true,
             "chance": 45,
             "withDuration": false,
@@ -853,7 +853,7 @@
             "price_group": "negative_2"
         },
         {
-            "id": "player_lose_weight",
+            "id": "player_is_underweight",
             "enabled": true,
             "chance": 45,
             "withDuration": false,
@@ -1589,7 +1589,7 @@
             "enabled": true,
             "chance": 45,
             "withDuration": true,
-            "duration": 25,
+            "duration": 20,
             "enabled_donate": true,
             "price_group": "negative_4"
         },
@@ -2423,6 +2423,15 @@
             "enabled": true,
             "chance": 30,
             "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "food_thief",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": true,
+            "duration": 30,
             "enabled_donate": true,
             "price_group": "negative_3"
         }

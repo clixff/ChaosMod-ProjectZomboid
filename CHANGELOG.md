@@ -24,6 +24,7 @@
 - Spawn Explosive Spiffos
 - Spawn Many Explosive Chickens
 - Replace Furniture With Zombies
+- Food Thief
 
 ### Effect Fixes
 
@@ -33,3 +34,12 @@
 - Renamed "Spawn Cow" → "Spawn Cow Follower" (`spawn_cow_follower`): now follows the player and shows viewer nickname
 - Renamed "Spawn Random Animal" → "Spawn Random Animal Follower" (`spawn_random_animal_follower`): now follows the player and shows viewer nickname
 - "Spawn Explosion Chicken" now follows the player and shows viewer nickname until it explodes
+- "Math Captcha" now generates random numbers between 0 and 999 and has 20s duration
+- "Insanity" effect now spawns some real zombies and has 60s duration
+- "Remove Bandages" now removes similar items
+- "Spawn Robber" now steals 3 items
+- Renamed "Player Gains Weight" → "Player Is Obese" (`player_is_obese`): now sets weight to 100 if below it
+- Renamed "Player Loses Weight" → "Player Is Underweight" (`player_is_underweight`): now sets weight to 55 if above it
+- "Spawn Stalker" has updated AI and can attack the player
+- "Player Lose Weight" was renamed to "Player Is Underweight" (`player_is_underweight`) and now sets weight to 55 Kg
+- "Player Gain Weight" was renamed to "Player Is Obese" (`player_is_obese`) and now sets weight to 100 Kg

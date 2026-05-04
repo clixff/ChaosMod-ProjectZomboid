@@ -96,8 +96,8 @@
         "player_is_hungry": "Le joueur a faim",
         "add_permanent_asthma": "Ajouter de l'asthme permanent",
         "give_chicken_hat": "Donner un chapeau poulet",
-        "player_gain_weight": "Le joueur prend du poids",
-        "player_lose_weight": "Le joueur perd du poids",
+        "player_is_obese": "Le joueur est obèse",
+        "player_is_underweight": "Le joueur est en sous-poids",
         "blurry_vision": "Vision floue",
         "add_cigarette_addiction": "Ajouter une dépendance aux cigarettes",
         "heal_player": "Soigner le joueur",
@@ -275,7 +275,8 @@
         "equip_furry_ears": "Equiper les oreilles poilues",
         "spawn_explosive_spiffos": "Invoquer des Spiffos explosifs",
         "spawn_many_explosive_chickens": "Faire apparaître plusieurs poulets explosifs",
-        "replace_furniture_with_zombies": "Remplacer les meubles par des zombies"
+        "replace_furniture_with_zombies": "Remplacer les meubles par des zombies",
+        "food_thief": "Voleur de nourriture"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

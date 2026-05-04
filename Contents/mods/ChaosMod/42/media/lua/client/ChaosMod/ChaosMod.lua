@@ -117,6 +117,8 @@ function ChaosMod.OnKeyPressed(key)
     end
 end
 
+local SPAWN_POINT_MOD_DATA_KEY = "ChaosMod_SpawnPoint"
+
 -- When world loads first time per session
 function ChaosMod.OnInitWorld()
     print("[ChaosMod] OnInitWorld")
@@ -127,6 +129,28 @@ function ChaosMod.OnInitWorld()
     ChaosEffectsManager.lastVotingActive = 0
     ChaosEffectsManager.pendingVoteReadMs = -1
     ChaosFileReader.WriteSyncFile("0", 0, 0)
+
+    local player = getPlayer()
+    if player then
+        local md = ModData.getOrCreate(SPAWN_POINT_MOD_DATA_KEY)
+        if md["x"] and md["y"] and md["z"] then
+            ChaosUtils.playerSpawnPoint = {
+                x = md["x"] --[[@as number]],
+                y = md["y"] --[[@as number]],
+                z = md
+                    ["z"] --[[@as number]]
+            }
+            print(string.format("[ChaosMod] Loaded spawn point: %.1f, %.1f, %.1f", md["x"], md["y"], md["z"]))
+        else
+            local x, y, z = player:getX(), player:getY(), player:getZ()
+            ChaosUtils.playerSpawnPoint = { x = x, y = y, z = z }
+            md["x"] = x
+            md["y"] = y
+            md["z"] = z
+            ModData.transmit(SPAWN_POINT_MOD_DATA_KEY)
+            print(string.format("[ChaosMod] Saved spawn point: %.1f, %.1f, %.1f", x, y, z))
+        end
+    end
 end
 
 ---@param attacker IsoGameCharacter

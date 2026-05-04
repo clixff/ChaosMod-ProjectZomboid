@@ -42,7 +42,11 @@ function EffectInsanity:OnStart()
                 self.spawnedZombies:add(zombie)
                 local md = zombie:getModData()
                 if md then
-                    md["EFFECT_INSANITY"] = true
+                    if ChaosUtils.RandFloat(0, 1) < 0.2 then
+                        md["EFFECT_INSANITY_REAL"] = true
+                    else
+                        md["EFFECT_INSANITY"] = true
+                    end
                 end
             end
         end
@@ -82,6 +86,7 @@ function EffectInsanity:OnTick(deltaMs)
 
             local md = zombie:getModData()
             local isFakeZombie = md and md["EFFECT_INSANITY"] and true or false
+            local isRealZombie = md and md["EFFECT_INSANITY_REAL"] and true or false
             if isFakeZombie then
                 EffectInsanity.FakeZombieTick(zombie, player)
                 if dist < MIN_DIST_TELEPORT or dist > MAX_DIST_TELEPORT then
@@ -92,10 +97,20 @@ function EffectInsanity:OnTick(deltaMs)
                         zombie:setZ(z)
                     end
                 end
+            elseif isRealZombie then
+                ChaosZombie.MoveToLocation(zombie, x1, y1, z1)
+                if dist > MAX_DIST_TELEPORT then
+                    local x, y, z = EffectInsanity.GetRandomLocationForZombie(player)
+                    if x ~= nil and y ~= nil and z ~= nil then
+                        zombie:setX(x)
+                        zombie:setY(y)
+                        zombie:setZ(z)
+                    end
+                end
             else
                 -- Hide distance zombies
                 if dist > 10.0 then
-                    zombie:setAlpha(0.0)
+                    zombie:setTargetAlpha(0.0)
                 end
             end
         end

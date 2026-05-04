@@ -96,8 +96,8 @@
         "player_is_hungry": "Игрок голоден",
         "add_permanent_asthma": "Добавить перманентную астму",
         "give_chicken_hat": "Дать шапку-курицу",
-        "player_gain_weight": "Игрок набирает вес",
-        "player_lose_weight": "Игрок теряет вес",
+        "player_is_obese": "Игрок страдает ожирением",
+        "player_is_underweight": "Игрок имеет недостаточный вес",
         "blurry_vision": "Размытое зрение",
         "add_cigarette_addiction": "Добавить никотиновую зависимость",
         "heal_player": "Вылечить игрока",
@@ -276,7 +276,8 @@
         "equip_furry_ears": "Надеть пушистые ушки",
         "spawn_explosive_spiffos": "Заспавнить взрывных Спиффо",
         "spawn_many_explosive_chickens": "Заспавнить много взрывных куриц",
-        "replace_furniture_with_zombies": "Заменить мебель зомби"
+        "replace_furniture_with_zombies": "Заменить мебель зомби",
+        "food_thief": "Похититель еды"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

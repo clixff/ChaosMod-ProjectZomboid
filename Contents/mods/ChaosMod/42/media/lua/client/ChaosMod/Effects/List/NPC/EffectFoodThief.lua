@@ -1,9 +1,8 @@
----@class EffectSpawnRobber : ChaosEffectBase
-EffectSpawnRobber = ChaosEffectBase:derive("EffectSpawnRobber", "spawn_robber")
+---@class EffectFoodThief : ChaosEffectBase
+EffectFoodThief = ChaosEffectBase:derive("EffectFoodThief", "food_thief")
 
-function EffectSpawnRobber:OnStart()
+function EffectFoodThief:OnStart()
     ChaosEffectBase:OnStart()
-    print("[EffectSpawnRobber] OnStart " .. tostring(self.effectId))
     local player = getPlayer()
     if not player then return end
     local playerSquare = player:getSquare()
@@ -17,28 +16,23 @@ function EffectSpawnRobber:OnStart()
     local npc = ChaosNPC:new(zombie)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.ROBBER
-    npc:AddTag("item_robber")
+    npc:AddTag("item_food_thief")
     self.npc = npc
 
     local inventory = player:getInventory()
     ---@type InventoryItem[]
-    local allItems = {}
-    local invItems = inventory:getItems()
-    for i = 0, invItems:size() - 1 do
-        local it = invItems:get(i)
-        if it and not it:IsInventoryContainer() then
-            table.insert(allItems, it)
-        end
-    end
-    if #allItems == 0 then return end
-
+    local foodItems = {}
     local worn = player:getWornItems()
-    local stealCount = math.min(3, #allItems)
-    for i = 1, stealCount do
-        local index = ChaosUtils.RandIntegerRange(1, #allItems + 1)
-        local stolenItem = allItems[index]
-        table.remove(allItems, index)
-        if not stolenItem then break end
+    ChaosPlayer.RecursiveInventoryLookup(inventory, true, true, function(item)
+        if item and item:isFood() then
+            table.insert(foodItems, item)
+        end
+    end)
+
+    if #foodItems == 0 then return end
+
+    for i = 1, #foodItems do
+        local stolenItem = foodItems[i]
         if worn and worn:contains(stolenItem) then
             player:removeWornItem(stolenItem)
         end
@@ -53,7 +47,7 @@ function EffectSpawnRobber:OnStart()
     end
 end
 
-function EffectSpawnRobber:OnEnd()
+function EffectFoodThief:OnEnd()
     if self.npc then
         self.npc:Destroy()
         self.npc = nil

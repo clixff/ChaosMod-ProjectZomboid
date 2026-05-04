@@ -96,8 +96,8 @@
         "player_is_hungry": "Gracz jest głodny",
         "add_permanent_asthma": "Dodaj stałą astmę",
         "give_chicken_hat": "Daj czapkę kurczaka",
-        "player_gain_weight": "Gracz przybiera na wadze",
-        "player_lose_weight": "Gracz traci na wadze",
+        "player_is_obese": "Gracz jest otyły",
+        "player_is_underweight": "Gracz ma niedowagę",
         "blurry_vision": "Rozmyty obraz",
         "add_cigarette_addiction": "Dodaj uzależnienie od nikotyny",
         "heal_player": "Ulecz gracza",
@@ -275,7 +275,8 @@
         "equip_furry_ears": "Zaloz futrzane uszy",
         "spawn_explosive_spiffos": "Pojaw wybuchowe Spiffo",
         "spawn_many_explosive_chickens": "Zespawnuj wiele wybuchowych kur",
-        "replace_furniture_with_zombies": "Zamien meble na zombie"
+        "replace_furniture_with_zombies": "Zamien meble na zombie",
+        "food_thief": "Złodziej jedzenia"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

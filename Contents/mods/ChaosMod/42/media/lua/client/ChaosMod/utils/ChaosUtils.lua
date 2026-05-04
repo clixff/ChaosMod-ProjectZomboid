@@ -5,13 +5,15 @@
 ---@field isSleeping boolean -- Whether the player is sleeping this tick
 ---@field lastIsSleeping boolean -- Whether the player was sleeping last tick
 ---@field sleepWorldLocation {x: number, y: number, z: number} | nil -- World position where player last fell asleep
+---@field playerSpawnPoint {x: number, y: number, z: number} | nil -- World position where player first spawned this save
 ChaosUtils = ChaosUtils or {
     lastUsedVehicle = nil,
     playerPositionHistory = {},
     positionSampleMs = 0,
     isSleeping = false,
     lastIsSleeping = false,
-    sleepWorldLocation = nil
+    sleepWorldLocation = nil,
+    playerSpawnPoint = nil
 }
 
 local SLEEP_MOD_DATA_KEY = "ChaosMod_SleepData"

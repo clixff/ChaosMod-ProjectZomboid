@@ -96,8 +96,8 @@
         "player_is_hungry": "Spieler ist hungrig",
         "add_permanent_asthma": "Permanentes Asthma hinzufügen",
         "give_chicken_hat": "Hühnerhut geben",
-        "player_gain_weight": "Spieler nimmt zu",
-        "player_lose_weight": "Spieler nimmt ab",
+        "player_is_obese": "Spieler ist fettleibig",
+        "player_is_underweight": "Spieler ist untergewichtig",
         "blurry_vision": "Verschwommene Sicht",
         "add_cigarette_addiction": "Zigarettensucht hinzufügen",
         "heal_player": "Spieler heilen",
@@ -275,7 +275,8 @@
         "equip_furry_ears": "Fellohren anlegen",
         "spawn_explosive_spiffos": "Explosive Spiffos spawnen",
         "spawn_many_explosive_chickens": "Viele Explosionshühner spawnen",
-        "replace_furniture_with_zombies": "Möbel durch Zombies ersetzen"
+        "replace_furniture_with_zombies": "Möbel durch Zombies ersetzen",
+        "food_thief": "Lebensmitteldieb"
     },
     "core": {
         "start_mod": "ChaosMod starten",

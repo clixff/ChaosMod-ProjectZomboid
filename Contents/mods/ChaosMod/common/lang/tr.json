@@ -96,8 +96,8 @@
         "player_is_hungry": "Oyuncu Aç",
         "add_permanent_asthma": "Kalıcı Astım Ekle",
         "give_chicken_hat": "Tavuk Şapkası Ver",
-        "player_gain_weight": "Oyuncu Kilo Alır",
-        "player_lose_weight": "Oyuncu Kilo Verir",
+        "player_is_obese": "Oyuncu Obez",
+        "player_is_underweight": "Oyuncu Düşük Kilolu",
         "blurry_vision": "Bulanık Görüş",
         "add_cigarette_addiction": "Sigara Bağımlılığı Ekle",
         "heal_player": "Oyuncuyu İyileştir",
@@ -275,7 +275,8 @@
         "equip_furry_ears": "Tuylu Kulaklar Giy",
         "spawn_explosive_spiffos": "Patlayici Spiffolar Olustur",
         "spawn_many_explosive_chickens": "Cok Sayida Patlayici Tavuk Olustur",
-        "replace_furniture_with_zombies": "Mobilyalari Zombilerle Degistir"
+        "replace_furniture_with_zombies": "Mobilyalari Zombilerle Degistir",
+        "food_thief": "Yiyecek Hirsizi"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

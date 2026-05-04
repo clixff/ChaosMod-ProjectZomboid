@@ -9,8 +9,8 @@ function EffectMathCaptcha:OnStart()
 
     setGameSpeed(0)
 
-    local a = ZombRand(0, 101)
-    local b = ZombRand(0, 101)
+    local a = ZombRand(0, 999)
+    local b = ZombRand(0, 999)
     self.answer = math.floor(a + b)
 
     local question = string.format("%d + %d = ?", a, b)
@@ -40,7 +40,8 @@ function EffectMathCaptcha.applyWrongAnswer()
 
     player:setKnockedDown(true)
 
-    ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "wrong_answer"), ChaosPlayerChatColors.removedItem)
+    ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "wrong_answer"),
+        ChaosPlayerChatColors.removedItem)
 end
 
 function EffectMathCaptcha.applyCorrectAnswer()

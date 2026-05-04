@@ -50,6 +50,7 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field endurance number
 ---@field canRun boolean
 ---@field stalkerTeleportCooldownMs? integer
+---@field stalkerInteractionCount integer
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -101,6 +102,7 @@ function ChaosNPC:new(zombie)
     o.endurance = CHAOS_NPC_ENDURANCE_MAX
     o.canRun = true
     o.stalkerTeleportCooldownMs = 0
+    o.stalkerInteractionCount = 0
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o
@@ -118,6 +120,11 @@ end
 ---@param tag string
 function ChaosNPC:AddTag(tag)
     self.tags[tag] = true
+end
+
+---@param tag string
+function ChaosNPC:RemoveTag(tag)
+    self.tags[tag] = nil
 end
 
 ---@param tag string

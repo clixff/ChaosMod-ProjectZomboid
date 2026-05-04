@@ -96,8 +96,8 @@
         "player_is_hungry": "Player Is Hungry",
         "add_permanent_asthma": "Add Permanent Asthma",
         "give_chicken_hat": "Give Chicken Hat",
-        "player_gain_weight": "Player Gains Weight",
-        "player_lose_weight": "Player Loses Weight",
+        "player_is_obese": "Player Is Obese",
+        "player_is_underweight": "Player Is Underweight",
         "blurry_vision": "Blurry Vision",
         "add_cigarette_addiction": "Add Cigarette Addiction",
         "heal_player": "Heal Player",
@@ -275,7 +275,8 @@
         "equip_furry_ears": "Equip Furry Ears",
         "spawn_explosive_spiffos": "Spawn Explosive Spiffos",
         "spawn_many_explosive_chickens": "Spawn Many Explosive Chickens",
-        "replace_furniture_with_zombies": "Replace Furniture With Zombies"
+        "replace_furniture_with_zombies": "Replace Furniture With Zombies",
+        "food_thief": "Food Thief"
     },
     "core": {
         "start_mod": "Start ChaosMod",

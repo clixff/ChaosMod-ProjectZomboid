@@ -96,8 +96,8 @@
         "player_is_hungry": "玩家饿了",
         "add_permanent_asthma": "添加永久性哮喘",
         "give_chicken_hat": "给予公鸡帽",
-        "player_gain_weight": "玩家体重增加",
-        "player_lose_weight": "玩家体重减轻",
+        "player_is_obese": "玩家肥胖",
+        "player_is_underweight": "玩家体重不足",
         "blurry_vision": "视觉模糊",
         "add_cigarette_addiction": "添加烟瘾",
         "heal_player": "治愈玩家",
@@ -275,7 +275,8 @@
         "equip_furry_ears": "戴上毛茸茸的耳朵",
         "spawn_explosive_spiffos": "召唤爆炸Spiffo",
         "spawn_many_explosive_chickens": "生成多只爆炸鸡",
-        "replace_furniture_with_zombies": "用僵尸替换家具"
+        "replace_furniture_with_zombies": "用僵尸替换家具",
+        "food_thief": "食物窃贼"
     },
     "core": {
         "start_mod": "启动混乱模式",

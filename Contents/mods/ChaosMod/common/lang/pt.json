@@ -96,8 +96,8 @@
         "player_is_hungry": "Jogador Está Com Fome",
         "add_permanent_asthma": "Adicionar Asma Permanente",
         "give_chicken_hat": "Dar Chapéu de Galinha",
-        "player_gain_weight": "Jogador Ganha Peso",
-        "player_lose_weight": "Jogador Perde Peso",
+        "player_is_obese": "Jogador Está Obeso",
+        "player_is_underweight": "Jogador Está Abaixo do Peso",
         "blurry_vision": "Visão Embaçada",
         "add_cigarette_addiction": "Adicionar Vício em Cigarro",
         "heal_player": "Curar Jogador",
@@ -275,7 +275,8 @@
         "equip_furry_ears": "Equipar Orelhas Peludas",
         "spawn_explosive_spiffos": "Invocar Spiffos Explosivos",
         "spawn_many_explosive_chickens": "Invocar Várias Galinhas Explosivas",
-        "replace_furniture_with_zombies": "Substituir Móveis por Zumbis"
+        "replace_furniture_with_zombies": "Substituir Móveis por Zumbis",
+        "food_thief": "Ladrão de Comida"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
