@@ -280,7 +280,10 @@
     ,
         "temporary_obesity": "Geçici Obezite"
     ,
-        "shorter_effects_interval": "Daha Kısa Efekt Aralığı"
+        "shorter_effects_interval": "Daha Kısa Efekt Aralığı",
+        "less_inventory_capacity": "Daha Az Envanter Kapasitesi",
+        "more_inventory_capacity": "Daha Fazla Envanter Kapasitesi",
+        "random_items_weight_more": "Rastgele Eşyalar Daha Ağır"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

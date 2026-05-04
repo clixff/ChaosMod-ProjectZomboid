@@ -276,11 +276,12 @@
         "spawn_explosive_spiffos": "Spawn Explosive Spiffos",
         "spawn_many_explosive_chickens": "Spawn Many Explosive Chickens",
         "replace_furniture_with_zombies": "Replace Furniture With Zombies",
-        "food_thief": "Food Thief"
-    ,
-        "temporary_obesity": "Temporary Obesity"
-    ,
-        "shorter_effects_interval": "Shorter Effects Interval"
+        "food_thief": "Food Thief",
+        "temporary_obesity": "Temporary Obesity",
+        "shorter_effects_interval": "Shorter Effects Interval",
+        "less_inventory_capacity": "Less Inventory Capacity",
+        "more_inventory_capacity": "More Inventory Capacity",
+        "random_items_weight_more": "Random Items Weight More"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -321,7 +322,7 @@
         "no_basement_found": "I can't find a basement nearby...",
         "food_spoiled": "%s Spoiled %d items",
         "water_replaced_with_bleach": "%s Replaced %d water containers with bleach",
-        "books_hidden": "Hid books: %d",
+        "books_hidden": "Books Hidden: %d",
         "item_hidden": "%s Item hidden: %s",
         "electricity_globally_disabled": "Electricity has been disabled globally",
         "electricity_globally_enabled": "Electricity has been enabled globally",

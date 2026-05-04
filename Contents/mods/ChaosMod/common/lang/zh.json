@@ -280,7 +280,10 @@
     ,
         "temporary_obesity": "暂时性肥胖"
     ,
-        "shorter_effects_interval": "缩短效果间隔"
+        "shorter_effects_interval": "缩短效果间隔",
+        "less_inventory_capacity": "更少的背包容量",
+        "more_inventory_capacity": "更多的背包容量",
+        "random_items_weight_more": "随机物品变得更重"
     },
     "core": {
         "start_mod": "启动混乱模式",

@@ -2454,6 +2454,30 @@
             "disable_effects": ["shorter_effects_interval"],
             "enabled_donate": true,
             "price_group": "negative_3"
+        },
+        {
+            "id": "less_inventory_capacity",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "more_inventory_capacity",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "random_items_weight_more",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
         }
     ]
 }

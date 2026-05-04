@@ -280,7 +280,10 @@
     ,
         "temporary_obesity": "Obésité Temporaire"
     ,
-        "shorter_effects_interval": "Intervalle d'Effets Réduit"
+        "shorter_effects_interval": "Intervalle d'Effets Réduit",
+        "less_inventory_capacity": "Capacité d'Inventaire Réduite",
+        "more_inventory_capacity": "Capacité d'Inventaire Augmentée",
+        "random_items_weight_more": "Des Objets Aléatoires Pèsent Plus"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

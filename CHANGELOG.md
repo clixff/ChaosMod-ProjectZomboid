@@ -27,6 +27,9 @@
 - Food Thief
 - Temporary Obesity
 - Shorter Effects Interval
+- Less Inventory Capacity
+- More Inventory Capacity
+- Random Items Weight More
 
 ### Effect Fixes
 
