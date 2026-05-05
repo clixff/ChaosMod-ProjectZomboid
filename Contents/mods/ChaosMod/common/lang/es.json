@@ -283,7 +283,9 @@
         "shorter_effects_interval": "Intervalo de Efectos Más Corto",
         "less_inventory_capacity": "Menor Capacidad de Inventario",
         "more_inventory_capacity": "Mayor Capacidad de Inventario",
-        "random_items_weight_more": "Los Objetos Aleatorios Pesan Más"
+        "random_items_weight_more": "Los Objetos Aleatorios Pesan Más",
+        "necromancy": "Nigromancia",
+        "spawn_griefer_miner": "Generar minero saboteador"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

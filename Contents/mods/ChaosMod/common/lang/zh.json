@@ -283,7 +283,9 @@
         "shorter_effects_interval": "缩短效果间隔",
         "less_inventory_capacity": "更少的背包容量",
         "more_inventory_capacity": "更多的背包容量",
-        "random_items_weight_more": "随机物品变得更重"
+        "random_items_weight_more": "随机物品变得更重",
+        "necromancy": "死灵术",
+        "spawn_griefer_miner": "生成捣乱矿工"
     },
     "core": {
         "start_mod": "启动混乱模式",

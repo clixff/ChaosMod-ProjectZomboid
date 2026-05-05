@@ -283,7 +283,9 @@
         "shorter_effects_interval": "Kürzeres Effektintervall",
         "less_inventory_capacity": "Weniger Inventarkapazität",
         "more_inventory_capacity": "Mehr Inventarkapazität",
-        "random_items_weight_more": "Zufällige Gegenstände werden schwerer"
+        "random_items_weight_more": "Zufällige Gegenstände werden schwerer",
+        "necromancy": "Nekromantie",
+        "spawn_griefer_miner": "Griefer-Bergmann spawnen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

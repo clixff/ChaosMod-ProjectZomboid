@@ -284,7 +284,9 @@
         "shorter_effects_interval": "Уменьшенный интервал эффектов",
         "less_inventory_capacity": "Меньше вместимости инвентаря",
         "more_inventory_capacity": "Больше вместимости инвентаря",
-        "random_items_weight_more": "Случайные предметы весят больше"
+        "random_items_weight_more": "Случайные предметы весят больше",
+        "necromancy": "Некромантия",
+        "spawn_griefer_miner": "Заспавнить шахтёра-грифера"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

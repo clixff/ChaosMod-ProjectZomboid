@@ -281,7 +281,9 @@
         "shorter_effects_interval": "Shorter Effects Interval",
         "less_inventory_capacity": "Less Inventory Capacity",
         "more_inventory_capacity": "More Inventory Capacity",
-        "random_items_weight_more": "Random Items Weight More"
+        "random_items_weight_more": "Random Items Weight More",
+        "necromancy": "Necromancy",
+        "spawn_griefer_miner": "Spawn Griefer Miner"
     },
     "core": {
         "start_mod": "Start ChaosMod",

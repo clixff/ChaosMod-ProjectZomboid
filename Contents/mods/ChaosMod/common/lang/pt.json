@@ -283,7 +283,9 @@
         "shorter_effects_interval": "Intervalo de Efeitos Mais Curto",
         "less_inventory_capacity": "Menor Capacidade de Inventário",
         "more_inventory_capacity": "Maior Capacidade de Inventário",
-        "random_items_weight_more": "Itens Aleatórios Pesam Mais"
+        "random_items_weight_more": "Itens Aleatórios Pesam Mais",
+        "necromancy": "Necromancia",
+        "spawn_griefer_miner": "Invocar Minerador Troll"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

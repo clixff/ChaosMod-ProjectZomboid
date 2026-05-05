@@ -347,5 +347,11 @@ function ChaosNPC:SetWeapon(weaponFullType)
         self.weaponItemCached = newWeapon
         self.zombie:setPrimaryHandItem(newWeapon)
         self.zombie:setVariable("Chaos2HandsWeapon", newWeapon:isTwoHandWeapon())
+        if newWeapon:isTwoHandWeapon() then
+            self.zombie:setSecondaryHandItem(newWeapon)
+        else
+            ---@diagnostic disable-next-line: param-type-mismatch
+            self.zombie:setSecondaryHandItem(nil)
+        end
     end
 end

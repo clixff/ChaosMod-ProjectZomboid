@@ -283,7 +283,9 @@
         "shorter_effects_interval": "Krótszy Interwał Efektów",
         "less_inventory_capacity": "Mniejsza Pojemność Ekwipunku",
         "more_inventory_capacity": "Większa Pojemność Ekwipunku",
-        "random_items_weight_more": "Losowe Przedmioty Są Cięższe"
+        "random_items_weight_more": "Losowe Przedmioty Są Cięższe",
+        "necromancy": "Nekromancja",
+        "spawn_griefer_miner": "Zespawnuj górnika-griefera"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

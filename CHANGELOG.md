@@ -30,6 +30,8 @@
 - Less Inventory Capacity
 - More Inventory Capacity
 - Random Items Weight More
+- Necromancy
+- Spawn Griefer Miner
 
 ### Effect Fixes
 

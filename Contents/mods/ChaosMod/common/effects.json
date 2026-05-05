@@ -2478,6 +2478,22 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
+        },
+        {
+            "id": "necromancy",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "spawn_griefer_miner",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
         }
     ]
 }

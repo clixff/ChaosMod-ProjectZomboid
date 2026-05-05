@@ -283,7 +283,9 @@
         "shorter_effects_interval": "Daha Kısa Efekt Aralığı",
         "less_inventory_capacity": "Daha Az Envanter Kapasitesi",
         "more_inventory_capacity": "Daha Fazla Envanter Kapasitesi",
-        "random_items_weight_more": "Rastgele Eşyalar Daha Ağır"
+        "random_items_weight_more": "Rastgele Eşyalar Daha Ağır",
+        "necromancy": "Nekromansi",
+        "spawn_griefer_miner": "Griefer Madenciyi Olustur"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
