@@ -218,15 +218,19 @@ end
 
 ---@param container ItemContainer
 ---@param out InventoryItem[]
-function ChaosPlayer.CollectAllItems(container, out)
+---@param useDeepLookup boolean?
+function ChaosPlayer.CollectAllItems(container, out, useDeepLookup)
     if not container then return end
     if not container.getItems then return end
+    if useDeepLookup == nil then
+        useDeepLookup = true
+    end
     local items = container:getItems()
     if not items then return end
     for i = 0, items:size() - 1 do
         local item = items:get(i)
         if item then
-            if item:IsInventoryContainer() then
+            if item:IsInventoryContainer() and useDeepLookup then
                 ---@type InventoryContainer
                 local inner = item
                 ChaosPlayer.CollectAllItems(inner:getInventory(), out)
@@ -327,7 +331,8 @@ end
 
 ---@param player IsoPlayer
 ---@param item InventoryItem
-function ChaosPlayer.SayLineRemovedItem(player, item)
+---@param amount integer?
+function ChaosPlayer.SayLineRemovedItem(player, item, amount)
     if not player then return end
     if not item then return end
 
@@ -338,6 +343,10 @@ function ChaosPlayer.SayLineRemovedItem(player, item)
     if not imgCode then return end
 
     local str = string.format(ChaosLocalization.GetString("misc", "removed_item"), imgCode, itemDisplayName)
+
+    if amount and amount > 1 then
+        str = str .. string.format(" (x%d)", amount)
+    end
 
     player:addLineChatElement(
         str,
@@ -352,6 +361,13 @@ function ChaosPlayer.SayLineRemovedItem(player, item)
         false,
         true
     )
+end
+
+---@param player IsoPlayer
+---@param item InventoryItem
+---@param amount integer?
+function ChaosPlayer.SayLineRemoveItem(player, item, amount)
+    ChaosPlayer.SayLineRemovedItem(player, item, amount)
 end
 
 ---@param player IsoPlayer

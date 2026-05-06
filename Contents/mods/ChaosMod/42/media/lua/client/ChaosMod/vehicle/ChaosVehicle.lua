@@ -75,7 +75,7 @@ function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKe
     if not player then return nil end
     local x  = player:getX()
     local y  = player:getY()
-    local z  = player:getZ()
+    local z  = 0
 
     radius   = radius or 12
     maxTries = maxTries or 80

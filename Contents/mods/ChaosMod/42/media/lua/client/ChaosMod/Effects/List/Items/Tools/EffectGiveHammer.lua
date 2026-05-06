@@ -10,5 +10,8 @@ function EffectGiveHammer:OnStart()
     local inventory = player:getInventory()
     if not inventory then return end
 
-    inventory:AddItem("Base.Hammer")
+    local newItem = inventory:AddItem("Base.Hammer")
+    if not newItem then return end
+
+    ChaosPlayer.SayLineNewItem(player, newItem)
 end

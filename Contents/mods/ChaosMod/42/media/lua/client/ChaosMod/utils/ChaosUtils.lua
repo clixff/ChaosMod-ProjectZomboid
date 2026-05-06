@@ -6,6 +6,8 @@
 ---@field lastIsSleeping boolean -- Whether the player was sleeping last tick
 ---@field sleepWorldLocation {x: number, y: number, z: number} | nil -- World position where player last fell asleep
 ---@field playerSpawnPoint {x: number, y: number, z: number} | nil -- World position where player first spawned this save
+---@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 2 recorded player world positions, oldest first
+---@field playerPreviousPositionsSampleMs integer
 ChaosUtils = ChaosUtils or {
     lastUsedVehicle = nil,
     playerPositionHistory = {},
@@ -13,7 +15,9 @@ ChaosUtils = ChaosUtils or {
     isSleeping = false,
     lastIsSleeping = false,
     sleepWorldLocation = nil,
-    playerSpawnPoint = nil
+    playerSpawnPoint = nil,
+    playerPreviousPositions = {},
+    playerPreviousPositionsSampleMs = 0
 }
 
 local SLEEP_MOD_DATA_KEY = "ChaosMod_SleepData"
@@ -65,6 +69,8 @@ end
 
 local POSITION_SAMPLE_INTERVAL_MS = 1000
 local POSITION_HISTORY_MAX = 60
+local PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS = 60000
+local PREVIOUS_LOCATION_MAX = 2
 
 --- Records the local player's position once per second (call only when ChaosMod is enabled).
 ---@param deltaMs integer
@@ -85,6 +91,28 @@ function ChaosUtils.TrackPlayerPosition(deltaMs)
 
     while #ChaosUtils.playerPositionHistory > POSITION_HISTORY_MAX do
         table.remove(ChaosUtils.playerPositionHistory, 1)
+    end
+end
+
+--- Records the player's location every 60 seconds, keeping only the last 2 entries (oldest first).
+---@param deltaMs integer
+function ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
+    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs + deltaMs
+    if ChaosUtils.playerPreviousPositionsSampleMs < PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS then return end
+    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs - PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS
+
+    local player = getPlayer()
+    if not player then return end
+    if not player:getSquare() then return end
+
+    table.insert(ChaosUtils.playerPreviousPositions, {
+        x = player:getX(),
+        y = player:getY(),
+        z = player:getZ()
+    })
+
+    while #ChaosUtils.playerPreviousPositions > PREVIOUS_LOCATION_MAX do
+        table.remove(ChaosUtils.playerPreviousPositions, 1)
     end
 end
 
@@ -869,4 +897,41 @@ end
 ---@return integer
 function ChaosUtils.RandArrayIndex(array)
     return math.floor(ZombRand(#array)) + 1
+end
+
+---@param worldObject IsoWorldInventoryObject
+---@param removeInventoryItem boolean | nil
+---@return InventoryItem | nil
+function ChaosUtils.RemoveWorldObject(worldObject, removeInventoryItem)
+    if not worldObject then return nil end
+
+    local square = worldObject:getSquare()
+    if not square then return nil end
+
+    if removeInventoryItem == nil then
+        removeInventoryItem = true
+    end
+
+    local item = nil
+    if worldObject.getItem then
+        item = worldObject:getItem()
+    end
+
+    -- Detach item from world object first, otherwise Lua can keep a stale worldItem ref.
+    if item then
+        ---@diagnostic disable-next-line: param-type-mismatch
+        item:setWorldItem(nil)
+    end
+
+    -- Proper removal path (handles MP sync too)
+    square:transmitRemoveItemFromSquare(worldObject)
+
+    if removeInventoryItem then
+        if item then
+            item:Remove()
+        end
+        return nil
+    end
+
+    return item
 end

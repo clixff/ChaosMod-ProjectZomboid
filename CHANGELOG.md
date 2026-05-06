@@ -25,13 +25,42 @@
 - Spawn Many Explosive Chickens
 - Replace Furniture With Zombies
 - Food Thief
-- Temporary Obesity
 - Shorter Effects Interval
 - Less Inventory Capacity
 - More Inventory Capacity
 - Random Items Weight More
 - Necromancy
 - Spawn Griefer Miner
+- Teleport To Nearest Bed
+- Vampire Weakness
+- Toxic Rain
+- Remove Nearby Items
+- Player Can't Stop Coughing
+- Spawn Kamikaze NPC
+- Quest: Kill 4 Zombies
+- Dark Souls Bonfire
+- Pick Up Nearby Items
+- Medieval Plague
+- Heal Random Wound
+- Temporary Obesity
+- Start Fire
+- Random Item Bomb
+- Teleport To Previous Location
+- Add Bomb To Player Inventory
+- Restore Standard Weight
+- Player Can't Eat
+- Hide Player's Clothes
+- Hide Player's Weapons
+- Blow Up Nearby Corpses
+- Immortal Zombies
+- Remove Medical Items
+- Replace Items With Rocks
+- Remove Items In Cars
+- Find Chest With Loot
+- Fill Area With Zombies
+- Spawn Random L4D2 Companion
+- DOOM
+- Medieval Times
 
 ### Effect Fixes
 
@@ -48,5 +77,7 @@
 - Renamed "Player Gains Weight" → "Player Is Obese" (`player_is_obese`): now sets weight to 100 if below it
 - Renamed "Player Loses Weight" → "Player Is Underweight" (`player_is_underweight`): now sets weight to 55 if above it
 - "Spawn Stalker" has updated AI and can attack the player
-- "Player Lose Weight" was renamed to "Player Is Underweight" (`player_is_underweight`) and now sets weight to 55 Kg
-- "Player Gain Weight" was renamed to "Player Is Obese" (`player_is_obese`) and now sets weight to 100 Kg
+- Renamed "Hide Random Item" → "Hide Random Items" (`hide_random_items`) and now hides 3 random items
+- "Force Zoom In" and "Force Zoom Out" now set zoom levels to 25-250%
+- Effect "Teleport To Last Used Bed" now uses the saved spawn point if available
+- Effect "Insane Traffic" now causes player to take damage from vehicles

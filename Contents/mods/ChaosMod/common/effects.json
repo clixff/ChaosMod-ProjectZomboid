@@ -663,14 +663,6 @@
             "price_group": "neutral_2"
         },
         {
-            "id": "remove_random_item",
-            "enabled": true,
-            "chance": 30,
-            "withDuration": false,
-            "enabled_donate": true,
-            "price_group": "negative_4"
-        },
-        {
             "id": "remove_vehicle_doors",
             "enabled": true,
             "chance": 20,
@@ -1961,7 +1953,7 @@
             "price_group": "negative_3"
         },
         {
-            "id": "hide_random_item",
+            "id": "hide_random_items",
             "enabled": true,
             "chance": 30,
             "withDuration": false,
@@ -2436,22 +2428,14 @@
             "price_group": "negative_3"
         },
         {
-            "id": "temporary_obesity",
-            "enabled": true,
-            "chance": 25,
-            "withDuration": true,
-            "duration": 120,
-            "disable_effects": ["temporary_obesity", "player_is_obese", "player_is_underweight"],
-            "enabled_donate": true,
-            "price_group": "negative_3"
-        },
-        {
             "id": "shorter_effects_interval",
             "enabled": true,
             "chance": 25,
             "withDuration": true,
             "duration": 120,
-            "disable_effects": ["shorter_effects_interval"],
+            "disable_effects": [
+                "shorter_effects_interval"
+            ],
             "enabled_donate": true,
             "price_group": "negative_3"
         },
@@ -2494,6 +2478,306 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
+        },
+        {
+            "id": "teleport_to_nearest_bed",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "vampire_weakness",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "vampire_weakness"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "toxic_rain",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "enable_rain",
+                "enable_snow",
+                "toxic_rain"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "remove_nearby_items",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "player_cant_stop_coughing",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "player_cant_stop_coughing"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "spawn_kamikaze_npc",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": true,
+            "duration": 25,
+            "disable_effects": [
+                "spawn_kamikaze_npc"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "quest_kill_zombies",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 150,
+            "disable_effects": [
+                "quest_kill_zombies"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "dark_souls_bonfire",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_3"
+        },
+        {
+            "id": "pick_up_nearby_items",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "medieval_plague",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "heal_random_wound",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "temporary_obesity",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": true,
+            "duration": 100,
+            "disable_effects": [
+                "temporary_obesity",
+                "player_is_obese",
+                "player_is_underweight"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "start_fire",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "random_item_bomb",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 8,
+            "disable_effects": [
+                "random_item_bomb"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "remove_random_item",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "teleport_to_previous_location",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "add_bomb_to_player_inventory",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 8,
+            "disable_effects": [
+                "add_bomb_to_player_inventory"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "restore_standart_weight",
+            "enabled": true,
+            "chance": 45,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_2"
+        },
+        {
+            "id": "player_cant_eat",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "player_cant_eat"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "hide_player_clothes",
+            "enabled": true,
+            "chance": 35,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "hide_player_weapons",
+            "enabled": true,
+            "chance": 35,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "blow_up_nearby_corpses",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "immortal_zombies",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "immortal_zombies"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "remove_medical_items",
+            "enabled": true,
+            "chance": 25,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "replace_items_with_rocks",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "remove_items_in_cars",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "find_chest_with_loot",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "find_chest_with_loot"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "fill_area_with_zombies",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "spawn_random_l4d2_companion",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "doom",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "doom"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "medieval_times",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_3"
         }
     ]
 }

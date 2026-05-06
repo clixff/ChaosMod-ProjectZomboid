@@ -16,6 +16,9 @@ ChaosMod = ChaosMod or {
     specialAnimalsFollowers = {}
 }
 
+local LoadSpawnPointFromModData
+local SaveSpawnPointIfMissing
+
 function ChaosMod.StartMod()
     -- Return early if mod is already enabled
     if ChaosMod.enabled == true then
@@ -41,6 +44,10 @@ function ChaosMod.StartMod()
     ChaosMod.specialAnimalsFollowers = {}
     -- Load last sleep position from global mod data
     ChaosUtils.LoadSleepData()
+    -- Save spawn point when enabling the mod the first time for this save
+    if SaveSpawnPointIfMissing then
+        SaveSpawnPointIfMissing()
+    end
     -- Set mod enabled flag to true
     ChaosMod.enabled = true;
     -- Set last time tick milliseconds to current time for next tick function call
@@ -119,6 +126,43 @@ end
 
 local SPAWN_POINT_MOD_DATA_KEY = "ChaosMod_SpawnPoint"
 
+LoadSpawnPointFromModData = function()
+    local md = ModData.getOrCreate(SPAWN_POINT_MOD_DATA_KEY)
+    if not (md["x"] and md["y"] and md["z"]) then
+        return false
+    end
+
+    ChaosUtils.playerSpawnPoint = {
+        x = md["x"] --[[@as number]],
+        y = md["y"] --[[@as number]],
+        z = md["z"] --[[@as number]]
+    }
+    print(string.format("[ChaosMod] Loaded spawn point: %.1f, %.1f, %.1f", md["x"], md["y"], md["z"]))
+    return true
+end
+
+SaveSpawnPointIfMissing = function()
+    if LoadSpawnPointFromModData() then
+        return true
+    end
+
+    local player = getPlayer()
+    if not player then
+        return false
+    end
+
+    local x, y, z = player:getX(), player:getY(), player:getZ()
+    ChaosUtils.playerSpawnPoint = { x = x, y = y, z = z }
+
+    local md = ModData.getOrCreate(SPAWN_POINT_MOD_DATA_KEY)
+    md["x"] = x
+    md["y"] = y
+    md["z"] = z
+    ModData.transmit(SPAWN_POINT_MOD_DATA_KEY)
+    print(string.format("[ChaosMod] Saved spawn point: %.1f, %.1f, %.1f", x, y, z))
+    return true
+end
+
 -- When world loads first time per session
 function ChaosMod.OnInitWorld()
     print("[ChaosMod] OnInitWorld")
@@ -130,27 +174,10 @@ function ChaosMod.OnInitWorld()
     ChaosEffectsManager.pendingVoteReadMs = -1
     ChaosFileReader.WriteSyncFile("0", 0, 0)
 
-    local player = getPlayer()
-    if player then
-        local md = ModData.getOrCreate(SPAWN_POINT_MOD_DATA_KEY)
-        if md["x"] and md["y"] and md["z"] then
-            ChaosUtils.playerSpawnPoint = {
-                x = md["x"] --[[@as number]],
-                y = md["y"] --[[@as number]],
-                z = md
-                    ["z"] --[[@as number]]
-            }
-            print(string.format("[ChaosMod] Loaded spawn point: %.1f, %.1f, %.1f", md["x"], md["y"], md["z"]))
-        else
-            local x, y, z = player:getX(), player:getY(), player:getZ()
-            ChaosUtils.playerSpawnPoint = { x = x, y = y, z = z }
-            md["x"] = x
-            md["y"] = y
-            md["z"] = z
-            ModData.transmit(SPAWN_POINT_MOD_DATA_KEY)
-            print(string.format("[ChaosMod] Saved spawn point: %.1f, %.1f, %.1f", x, y, z))
-        end
-    end
+    ChaosUtils.playerPreviousPositionsSampleMs = 0
+    ChaosUtils.playerPreviousPositions = {}
+
+    LoadSpawnPointFromModData()
 end
 
 ---@param attacker IsoGameCharacter
@@ -241,6 +268,7 @@ function ChaosMod.OnTick()
     if ChaosMod.enabled then
         ChaosUtils.AdjustVisibleZombiesForNPCs()
         ChaosUtils.TrackPlayerPosition(deltaMs)
+        ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
         ChaosUtils.sleepHandleTick()
         ChaosNPCUtils.OnTick(deltaMs)
     end

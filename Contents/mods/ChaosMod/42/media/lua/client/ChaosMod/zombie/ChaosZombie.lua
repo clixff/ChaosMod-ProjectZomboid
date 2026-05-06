@@ -103,6 +103,33 @@ function ChaosZombie.CanPlayerSeeZombieLineTrace(player, zombie)
 end
 
 ---@param zombie IsoZombie
+---@param fullType string
+---@param tint table?
+---@return ItemVisual?
+function ChaosZombie.AddZombieClothes(zombie, fullType, tint)
+    if not zombie or not fullType or fullType == "" then return nil end
+
+    local item = instanceItem(fullType)
+    if not item then return nil end
+
+    local scriptItem = item:getScriptItem()
+    if not scriptItem then return nil end
+
+    local visual = zombie:getHumanVisual():addClothingItem(zombie:getItemVisuals(), scriptItem)
+    if not visual then return nil end
+
+    if tint then
+        visual:setTint(ImmutableColor.new(tint.r, tint.g, tint.b))
+    end
+
+    zombie:getWornItems():setFromItemVisuals(zombie:getItemVisuals())
+    zombie:resetModelNextFrame()
+    zombie:onWornItemsChanged()
+
+    return visual
+end
+
+---@param zombie IsoZombie
 function ChaosZombie.HumanizeZombie(zombie)
     if not zombie then return end
 

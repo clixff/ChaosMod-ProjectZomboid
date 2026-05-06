@@ -54,7 +54,8 @@ function EffectSpawnGrieferMiner:OnStart()
 
 
     zombie:getHumanVisual():setHairModel("LeftParting")
-    zombie:getHumanVisual():setBeardModel("None")
+    ---@diagnostic disable-next-line: param-type-mismatch
+    zombie:getHumanVisual():setBeardModel(nil)
     local haircolor = ImmutableColor.new(53 / 255, 36 / 255, 18 / 255)
     zombie:getHumanVisual():setHairColor(haircolor)
     zombie:getHumanVisual():setNaturalHairColor(haircolor)

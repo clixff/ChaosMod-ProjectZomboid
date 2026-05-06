@@ -10,11 +10,15 @@ function EffectTemporaryObesity:OnStart()
     local nutrition = player:getNutrition()
     self.originalWeight = nutrition:getWeight()
 
-    if self.originalWeight < 100 then
-        nutrition:setWeight(100)
+    local weight = self.originalWeight
+    if weight < 100 then
+        weight = 100
+        nutrition:setWeight(weight)
         nutrition:applyTraitFromWeight()
-        player:Say(string.format(ChaosLocalization.GetString("misc", "new_weight"), ChaosUtils.FormatWeight(100)))
     end
+
+    ChaosPlayer.SayLineByColor(player, string.format("Temporary obesity: %s", ChaosUtils.FormatWeight(weight)),
+        ChaosPlayerChatColors.red)
 end
 
 function EffectTemporaryObesity:OnEnd()
@@ -22,8 +26,11 @@ function EffectTemporaryObesity:OnEnd()
     local player = getPlayer()
     if not player then return end
 
+    if not self.originalWeight then return end
+
     local nutrition = player:getNutrition()
     nutrition:setWeight(self.originalWeight)
     nutrition:applyTraitFromWeight()
-    player:Say(string.format(ChaosLocalization.GetString("misc", "new_weight"), ChaosUtils.FormatWeight(self.originalWeight)))
+    ChaosPlayer.SayLineByColor(player, string.format("Weight restored: %s", ChaosUtils.FormatWeight(self.originalWeight)),
+        ChaosPlayerChatColors.green)
 end

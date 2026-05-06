@@ -1,28 +1,29 @@
----@class EffectHideRandomItem : ChaosEffectBase
-EffectHideRandomItem = ChaosEffectBase:derive("EffectHideRandomItem", "hide_random_item")
+---@class EffectHidePlayerClothes : ChaosEffectBase
+EffectHidePlayerClothes = ChaosEffectBase:derive("EffectHidePlayerClothes", "hide_player_clothes")
 
 ---@param container ItemContainer
 ---@param out InventoryItem[]
-local function collectItems(container, out)
+local function collectClothes(container, out)
     if not container then return end
     if not container.getItems then return end
     local items = container:getItems()
     if not items then return end
+
     for i = 0, items:size() - 1 do
         local item = items:get(i)
         if item then
             if item:IsInventoryContainer() then
                 ---@type InventoryContainer
                 local inner = item
-                collectItems(inner:getInventory(), out)
-            else
+                collectClothes(inner:getInventory(), out)
+            elseif item:IsClothing() then
                 table.insert(out, item)
             end
         end
     end
 end
 
-function EffectHideRandomItem:OnStart()
+function EffectHidePlayerClothes:OnStart()
     ChaosEffectBase:OnStart()
     local player = getPlayer()
     if not player then return end
@@ -31,30 +32,31 @@ function EffectHideRandomItem:OnStart()
     if not inventory then return end
 
     ---@type InventoryItem[]
-    local items = {}
-    collectItems(inventory, items)
+    local clothes = {}
+    collectClothes(inventory, clothes)
 
-    if #items == 0 then return end
-
-    local item = items[math.floor(ZombRand(1, #items + 1))]
-    if not item then return end
+    if #clothes == 0 then return end
 
     local sq = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 3, 20, 50, true, true, false)
     if not sq then return end
 
-    print("[EffectHideRandomItem] X: " ..
+    print("[EffectHidePlayerClothes] X: " ..
         tostring(sq:getX()) .. " Y: " .. tostring(sq:getY()) .. " Z: " .. tostring(sq:getZ()))
 
-    local worn = player:getWornItems()
-    if worn and worn:contains(item) then
-        player:removeWornItem(item)
+    for _, clothing in ipairs(clothes) do
+        local worn = player:getWornItems()
+        if worn and worn:contains(clothing) then
+            player:removeWornItem(clothing)
+        end
+
+        inventory:Remove(clothing)
+        sq:AddWorldInventoryItem(clothing, 0.5, 0.5, 0)
     end
 
-    inventory:Remove(item)
-    sq:AddWorldInventoryItem(item, 0.5, 0.5, 0)
+    player:onWornItemsChanged()
+    player:resetModelNextFrame()
+    triggerEvent("OnClothingUpdated", player)
 
-    local imgCode = ChaosUtils.GetImgCodeByItemTexture(item)
-    local itemName = item:getDisplayName() or ""
-    local str = string.format(ChaosLocalization.GetString("misc", "item_hidden"), imgCode, itemName)
+    local str = string.format(ChaosLocalization.GetString("misc", "clothes_hidden"), #clothes)
     ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
 end
