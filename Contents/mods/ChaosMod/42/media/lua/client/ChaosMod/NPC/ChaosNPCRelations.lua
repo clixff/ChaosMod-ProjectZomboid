@@ -11,6 +11,7 @@ ChaosNPCGroupID.RAIDERS        = 1
 ChaosNPCGroupID.COMPANIONS     = 2
 ChaosNPCGroupID.FOLLOWERS      = 3
 ChaosNPCGroupID.PEDESTRIAN     = 6
+ChaosNPCGroupID.COURIER        = 7
 -- Pseudo-groups: used as relation targets only, no NPC has these as npcGroup
 ChaosNPCGroupID.PLAYER         = 100
 ChaosNPCGroupID.ZOMBIES        = 101
@@ -185,6 +186,9 @@ ChaosNPCRelations.SetRelation(ChaosNPCGroupID.FOLLOWERS, ChaosNPCGroupID.PLAYER,
 
 -- Relations for PEDESTRIAN group
 ChaosNPCRelations.SetRelation(ChaosNPCGroupID.PEDESTRIAN, ChaosNPCGroupID.ZOMBIES, ChaosNPCRelationType.ATTACK)
+
+-- COURIER group: ignores everyone and only follows effect-controlled movement
+ChaosNPCRelations.CreateGroup("COURIER", ChaosNPCRelationType.IGNORE, false, ChaosNPCGroupID.COURIER)
 
 -- ROBBER group: ignores everyone, just wanders
 ChaosNPCGroupID.ROBBER = 4

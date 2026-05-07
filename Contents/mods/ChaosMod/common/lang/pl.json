@@ -312,7 +312,16 @@
         "fill_area_with_zombies": "Wypełnij Obszar Zombie",
         "spawn_random_l4d2_companion": "Zespawnuj losowego towarzysza z L4D2",
         "doom": "DOOM",
-        "medieval_times": "Medieval Times"
+        "medieval_times": "Średniowiecze",
+        "zombies_turret": "Wieżyczka z zombie",
+        "spawn_walter_white": "Zespawnuj Waltera White'a",
+        "pig_turret": "Wieżyczka ze świni",
+        "spawn_annoying_pig": "Irytująca świnia",
+        "zombies_rain": "Deszcz Zombie",
+        "spawn_courier": "Przywołaj Kuriera",
+        "food_delivery": "Dostawa Jedzenia",
+        "spawn_npc_with_loot": "Zespawnuj NPC z Łupem",
+        "bounty_on_player_head": "Nagroda za Głowę Gracza"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

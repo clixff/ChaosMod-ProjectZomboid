@@ -105,8 +105,9 @@ end
 ---@param zombie IsoZombie
 ---@param fullType string
 ---@param tint table?
+---@param textureChoice integer?
 ---@return ItemVisual?
-function ChaosZombie.AddZombieClothes(zombie, fullType, tint)
+function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice)
     if not zombie or not fullType or fullType == "" then return nil end
 
     local item = instanceItem(fullType)
@@ -118,8 +119,17 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint)
     local visual = zombie:getHumanVisual():addClothingItem(zombie:getItemVisuals(), scriptItem)
     if not visual then return nil end
 
+    visual:setInventoryItem(item)
+
+    if textureChoice ~= nil then
+        visual:setTextureChoice(textureChoice)
+    end
+
     if tint then
-        visual:setTint(ImmutableColor.new(tint.r, tint.g, tint.b))
+        item:setColorRed(tint.r)
+        item:setColorGreen(tint.g)
+        item:setColorBlue(tint.b)
+        item:setCustomColor(true)
     end
 
     zombie:getWornItems():setFromItemVisuals(zombie:getItemVisuals())
@@ -134,36 +144,74 @@ function ChaosZombie.HumanizeZombie(zombie)
     if not zombie then return end
 
     local humanVisual = zombie:getHumanVisual()
-    if not humanVisual then
-        print("[ChaosZombie] Failed to get human visual")
-        return
-    end
+    if not humanVisual then return end
+
+    -- Base skin
     humanVisual:setSkinTextureName(zombie:isFemale() and "FemaleBody03" or "MaleBody03")
+
+    -- Remove attached knives / weapons / props
+    zombie:clearAttachedItems()
+
+    -- Remove zombie-only visual overlays:
+    -- bandages, wound decals, many scar-like face/body visuals
+    humanVisual:getBodyVisuals():clear()
+
+    -- Remove blood/dirt on body
     humanVisual:removeBlood()
     humanVisual:removeDirt()
 
-    local bloodBodyPartsMaxIndex = BloodBodyPartType.MAX:index()
-    -- Remove blood from body
-    for i = 0, bloodBodyPartsMaxIndex - 1 do
-        local bodyPart = BloodBodyPartType.FromIndex(i)
-        humanVisual:setBlood(bodyPart, 0)
-        humanVisual:setDirt(bodyPart, 0)
+    local bloodMax = BloodBodyPartType.MAX:index()
+    for i = 0, bloodMax - 1 do
+        local bloodPart = BloodBodyPartType.FromIndex(i)
+        humanVisual:setBlood(bloodPart, 0)
+        humanVisual:setDirt(bloodPart, 0)
     end
 
+    -- Remove blood/dirt/holes from clothing visuals
     local itemVisuals = zombie:getItemVisuals()
-
-    -- Remove blood from clothes and items
     for i = 0, itemVisuals:size() - 1 do
         local item = itemVisuals:get(i)
         if item then
-            for j = 0, bloodBodyPartsMaxIndex - 1 do
-                local part = BloodBodyPartType.FromIndex(j)
-                item:setDirt(part, 0)
-                item:setBlood(part, 0)
+            item:removeBlood()
+            item:removeDirt()
+            for j = 0, bloodMax - 1 do
+                local bloodPart = BloodBodyPartType.FromIndex(j)
+                item:setBlood(bloodPart, 0)
+                item:setDirt(bloodPart, 0)
                 item:removeHole(j)
+                item:removePatch(j)
             end
         end
     end
+
+    -- Clear actual wound/bandage state too
+    local bd = zombie:getBodyDamage()
+    if bd then
+        for i = 0, BodyPartType.MAX:index() - 1 do
+            local bp = bd:getBodyPart(BodyPartType.FromIndex(i))
+            if bp then
+                bp:setBandaged(false, 0)
+                bp:setBleeding(false)
+                bp:setBleedingTime(0)
+                bp:setBiteTime(0)
+                bp:setCut(false, false)
+                bp:setCutTime(0)
+                bp:setScratched(false, false)
+                bp:setScratchTime(0)
+                bp:setDeepWounded(false)
+                bp:setDeepWoundTime(0)
+                bp:setStitched(false)
+                bp:setSplint(false, 0)
+                bp:setHaveGlass(false)
+                bp:setHaveBullet(false, 0)
+                bp:setBurnTime(0)
+                bp:setWoundInfectionLevel(0)
+                bp:setInfectedWound(false)
+            end
+        end
+    end
+
+    zombie:resetModelNextFrame()
 end
 
 ---@param zombie IsoZombie

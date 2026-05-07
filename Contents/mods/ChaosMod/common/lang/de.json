@@ -312,7 +312,16 @@
         "fill_area_with_zombies": "Gebiet Mit Zombies Füllen",
         "spawn_random_l4d2_companion": "Zufälligen L4D2-Begleiter spawnen",
         "doom": "DOOM",
-        "medieval_times": "Medieval Times"
+        "medieval_times": "Mittelalter",
+        "zombies_turret": "Zombie-Geschützturm",
+        "spawn_walter_white": "Walter White spawnen",
+        "pig_turret": "Schwein-Geschützturm",
+        "spawn_annoying_pig": "Nerviges Schwein",
+        "zombies_rain": "Zombie-Regen",
+        "spawn_courier": "Kurier spawnen",
+        "food_delivery": "Essenslieferung",
+        "spawn_npc_with_loot": "NPC mit Beute spawnen",
+        "bounty_on_player_head": "Kopfgeld auf den Spieler"
     },
     "core": {
         "start_mod": "ChaosMod starten",

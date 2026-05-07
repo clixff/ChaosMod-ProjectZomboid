@@ -61,6 +61,15 @@
 - Spawn Random L4D2 Companion
 - DOOM
 - Medieval Times
+- Zombies Turret
+- Spawn Walter White
+- Pig Turret
+- Spawn Annoying Pig
+- Zombies Rain
+- Spawn Courier
+- Food Delivery
+- Spawn NPC With Loot
+- Bounty On Player Head
 
 ### Effect Fixes
 
@@ -81,3 +90,5 @@
 - "Force Zoom In" and "Force Zoom Out" now set zoom levels to 25-250%
 - Effect "Teleport To Last Used Bed" now uses the saved spawn point if available
 - Effect "Insane Traffic" now causes player to take damage from vehicles
+- Fixed Courier, Food Delivery, and Spawn NPC With Loot NPC movement to use the ChaosNPC AI movement system correctly
+- Increased Courier and Food Delivery spawn distance so they do not appear too close to the player

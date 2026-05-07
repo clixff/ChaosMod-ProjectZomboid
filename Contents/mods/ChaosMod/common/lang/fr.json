@@ -312,7 +312,16 @@
         "fill_area_with_zombies": "Remplir La Zone De Zombies",
         "spawn_random_l4d2_companion": "Faire apparaître un compagnon L4D2 aléatoire",
         "doom": "DOOM",
-        "medieval_times": "Medieval Times"
+        "medieval_times": "Temps médiévaux",
+        "zombies_turret": "Tourelle de zombies",
+        "spawn_walter_white": "Faire apparaître Walter White",
+        "pig_turret": "Tourelle de cochon",
+        "spawn_annoying_pig": "Cochon agaçant",
+        "zombies_rain": "Pluie de Zombies",
+        "spawn_courier": "Faire apparaître un livreur",
+        "food_delivery": "Livraison de nourriture",
+        "spawn_npc_with_loot": "Faire apparaître un PNJ avec butin",
+        "bounty_on_player_head": "Prime sur la tête du joueur"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

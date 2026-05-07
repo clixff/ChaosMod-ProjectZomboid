@@ -313,7 +313,16 @@
         "fill_area_with_zombies": "Заполнить область зомби",
         "spawn_random_l4d2_companion": "Заспавнить случайного спутника из L4D2",
         "doom": "DOOM",
-        "medieval_times": "Medieval Times"
+        "medieval_times": "Средневековье",
+        "zombies_turret": "Турель из зомби",
+        "spawn_walter_white": "Заспавнить Walter White",
+        "pig_turret": "Свинья с турелью",
+        "spawn_annoying_pig": "Назойливая свинья",
+        "zombies_rain": "Дождь из зомби",
+        "spawn_courier": "Курьер",
+        "food_delivery": "Доставка еды",
+        "spawn_npc_with_loot": "NPC с лутом",
+        "bounty_on_player_head": "Награда за голову игрока"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

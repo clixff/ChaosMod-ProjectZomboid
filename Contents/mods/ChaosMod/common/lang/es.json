@@ -312,7 +312,16 @@
         "fill_area_with_zombies": "Llenar El Área Con Zombis",
         "spawn_random_l4d2_companion": "Generar compañero aleatorio de L4D2",
         "doom": "DOOM",
-        "medieval_times": "Medieval Times"
+        "medieval_times": "Tiempos medievales",
+        "zombies_turret": "Torreta de zombis",
+        "spawn_walter_white": "Generar a Walter White",
+        "pig_turret": "Torreta de cerdo",
+        "spawn_annoying_pig": "Cerdo Molesto",
+        "zombies_rain": "Lluvia de Zombis",
+        "spawn_courier": "Generar Repartidor",
+        "food_delivery": "Entrega de Comida",
+        "spawn_npc_with_loot": "Generar NPC con Botín",
+        "bounty_on_player_head": "Recompensa por la Cabeza del Jugador"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

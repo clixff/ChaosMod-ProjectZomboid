@@ -312,7 +312,16 @@
         "fill_area_with_zombies": "Alanı Zombilerle Doldur",
         "spawn_random_l4d2_companion": "Rastgele L4D2 Yoldaşı Oluştur",
         "doom": "DOOM",
-        "medieval_times": "Medieval Times"
+        "medieval_times": "Orta Çağ",
+        "zombies_turret": "Zombi Taret",
+        "spawn_walter_white": "Walter White Oluştur",
+        "pig_turret": "Domuz Taret",
+        "spawn_annoying_pig": "Sinir Bozucu Domuz",
+        "zombies_rain": "Zombi Yağmuru",
+        "spawn_courier": "Kurye Çağır",
+        "food_delivery": "Yemek Teslimatı",
+        "spawn_npc_with_loot": "Ganimetli NPC Çağır",
+        "bounty_on_player_head": "Oyuncunun Başına Ödül"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

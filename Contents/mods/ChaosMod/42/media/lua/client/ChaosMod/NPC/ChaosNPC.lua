@@ -51,6 +51,7 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field canRun boolean
 ---@field stalkerTeleportCooldownMs? integer
 ---@field stalkerInteractionCount integer
+---@field effectMoveTargetLocation? IsoGridSquare
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -103,6 +104,7 @@ function ChaosNPC:new(zombie)
     o.canRun = true
     o.stalkerTeleportCooldownMs = 0
     o.stalkerInteractionCount = 0
+    o.effectMoveTargetLocation = nil
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o

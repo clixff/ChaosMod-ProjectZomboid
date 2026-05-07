@@ -312,7 +312,16 @@
         "fill_area_with_zombies": "Fill Area With Zombies",
         "spawn_random_l4d2_companion": "Spawn Random L4D2 Companion",
         "doom": "DOOM",
-        "medieval_times": "Medieval Times"
+        "medieval_times": "Medieval Times",
+        "zombies_turret": "Zombies Turret",
+        "spawn_walter_white": "Spawn Walter White",
+        "pig_turret": "Pig Turret",
+        "spawn_annoying_pig": "Spawn Annoying Pig",
+        "zombies_rain": "Zombies Rain",
+        "spawn_courier": "Spawn Courier",
+        "food_delivery": "Food Delivery",
+        "spawn_npc_with_loot": "Spawn NPC With Loot",
+        "bounty_on_player_head": "Bounty On Player Head"
     },
     "core": {
         "start_mod": "Start ChaosMod",

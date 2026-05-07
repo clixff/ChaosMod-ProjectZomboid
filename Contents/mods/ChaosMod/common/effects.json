@@ -2778,6 +2778,112 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
+        },
+        {
+            "id": "zombies_turret",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "zombies_turret",
+                "pig_turret"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "spawn_walter_white",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "pig_turret",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 40,
+            "disable_effects": [
+                "pig_turret",
+                "zombies_turret"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "spawn_annoying_pig",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 40,
+            "disable_effects": [
+                "spawn_annoying_pig"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "zombies_rain",
+            "enabled": true,
+            "chance": 10,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "zombies_rain"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "spawn_courier",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 35,
+            "disable_effects": [
+                "spawn_courier"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "food_delivery",
+            "enabled": true,
+            "chance": 20,
+            "withDuration": true,
+            "duration": 35,
+            "disable_effects": [
+                "food_delivery"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "spawn_npc_with_loot",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "spawn_npc_with_loot"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "bounty_on_player_head",
+            "enabled": true,
+            "chance": 15,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "bounty_on_player_head"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
         }
     ]
 }
