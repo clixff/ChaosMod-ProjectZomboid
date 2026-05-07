@@ -4,7 +4,7 @@ local json = require("ChaosMod/thirdparty/Json")
 ChaosBridge = ChaosBridge or {}
 
 local PROTOCOL_VERSION = 1
-local MAX_LINES = 15
+local MAX_LINES = 300
 local POLL_INTERVAL_MS = 1000
 local SESSION_ID_LEN = 16
 local SESSION_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

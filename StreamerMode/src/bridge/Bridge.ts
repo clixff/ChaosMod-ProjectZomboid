@@ -12,7 +12,7 @@ import { dirname, join } from "path";
 import { logger } from "../utils/logger.ts";
 
 const PROTOCOL_VERSION = 1;
-const MAX_LINES = 15;
+const MAX_LINES = 300;
 const POLL_INTERVAL_MS = 1000;
 const SESSION_ID_LEN = 16;
 const SESSION_ID_ALPHABET =
@@ -249,9 +249,7 @@ export class Bridge {
         handler(evt.payload ?? {});
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        logger.error(
-          `[Bridge] Handler for '${evt.event}' errored: ${msg}`,
-        );
+        logger.error(`[Bridge] Handler for '${evt.event}' errored: ${msg}`);
       }
     }
   }
