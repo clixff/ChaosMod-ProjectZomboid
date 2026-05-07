@@ -7,6 +7,7 @@
 - Added `use_animals_nicknames` config option to display Twitch viewer nicknames above follower animals
 - Refactored follower animal tracking into a `SpecialAnimal` class
 - Moved user `config.json` and `effects.json` to `%UserProfile%\Zomboid\Lua\ChaosMod\`. The mod now ships read-only `default_config.json` and `default_effects.json`; user files are auto-created on first run, and missing keys / new effect ids are merged in from default.
+- New Inter-process communication protocol for mod. Lua and Node.js communicates with bridge system in .jsonl files instead of .txt. files.
 
 ### Mod fixes
 

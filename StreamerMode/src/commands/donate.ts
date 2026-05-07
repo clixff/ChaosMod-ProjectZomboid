@@ -11,6 +11,7 @@ export function registerDonateCommand(
   daProvider: DonationAlertsProvider,
   luaFolder: string | null,
   config: ModConfig | null,
+  onConfigSaved?: () => void,
 ): void {
   app.registerCommand(
     "donate",
@@ -88,6 +89,7 @@ export function registerDonateCommand(
           if (!config.streamer_mode.donate_providers.includes("donationalerts")) {
             config.streamer_mode.donate_providers.push("donationalerts");
             saveConfig(luaFolder, config);
+            onConfigSaved?.();
           }
         }
         logger.info(`[DonationAlerts] App credentials saved with currency ${currency}. Opening login...`);
@@ -105,6 +107,7 @@ export function registerDonateCommand(
             (p) => p !== "donationalerts",
           );
           saveConfig(luaFolder, config);
+          onConfigSaved?.();
         }
         logger.info(`[DonationAlerts] Logged out and credentials removed.`);
         return;

@@ -75,11 +75,10 @@ function ChaosMod.StartMod()
     end
 
     if ChaosConfig.streamer_mode and ChaosConfig.streamer_mode.streamer_mode_enabled == true then
-        local ts = tostring(getTimestampMs())
         ChaosEffectsManager.iterationIndex = 0
-        ChaosEffectsManager.syncTimestamp = ts
-        ChaosEffectsManager.lastVotingActive = 0
-        ChaosFileReader.WriteSyncFile(ts, 0, 0)
+        ChaosBridge.Init()
+        ChaosBridge.Emit("mod_change_status", { enabled = true })
+        ChaosBridge.Emit("interval_start", { iteration = 0 })
     end
 
     ChaosUIManager.hud:AddMessage("Chaos Mod started")
@@ -98,11 +97,11 @@ function ChaosMod.StopMod()
     ChaosUIManager.hud:OnModStatusChanged(false)
     ChaosUIManager:HideEffectsUI()
     ChaosEffectsManager.iterationIndex = 0
-    ChaosEffectsManager.syncTimestamp = "0"
-    ChaosEffectsManager.lastVotingActive = 0
-    ChaosEffectsManager.pendingVoteReadMs = -1
     ChaosMod.specialAnimalsFollowers = {}
-    ChaosFileReader.WriteSyncFile("0", 0, 0)
+    if ChaosBridge.enabled then
+        ChaosBridge.Emit("mod_change_status", { enabled = false })
+        ChaosBridge.Shutdown()
+    end
 end
 
 ---@param key integer
@@ -169,10 +168,6 @@ function ChaosMod.OnInitWorld()
     ChaosMod.mapLoaded = true;
     ChaosMod.specialAnimalsFollowers = {}
     ChaosEffectsManager.iterationIndex = 0
-    ChaosEffectsManager.syncTimestamp = "0"
-    ChaosEffectsManager.lastVotingActive = 0
-    ChaosEffectsManager.pendingVoteReadMs = -1
-    ChaosFileReader.WriteSyncFile("0", 0, 0)
 
     ChaosUtils.playerPreviousPositionsSampleMs = 0
     ChaosUtils.playerPreviousPositions = {}
@@ -200,6 +195,8 @@ function ChaosMod.OnGameStart()
     ChaosUIManager.hud:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
+
+    ChaosMod.RegisterBridgeHandlers()
 
     -- Custom fix for fishing equip event
     -- By default it runs even if zombie equips a weapon
@@ -271,7 +268,35 @@ function ChaosMod.OnTick()
         ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
         ChaosUtils.sleepHandleTick()
         ChaosNPCUtils.OnTick(deltaMs)
+        ChaosBridge.Tick(deltaMs)
     end
+end
+
+function ChaosMod.RegisterBridgeHandlers()
+    ChaosBridge.On("reload_config", function(_payload)
+        print("[ChaosMod] Reloading config and effects via bridge")
+        ChaosConfig.LoadConfigFromDisk()
+        ChaosLocalization.ReloadLanguages()
+        if ChaosUIManager and ChaosUIManager.hud then
+            ChaosUIManager.hud:OnLanguageLoaded()
+        end
+        ChaosEffectsRegistry.Initialize()
+    end)
+
+    ChaosBridge.On("activate_effects", function(payload)
+        if type(payload) ~= "table" then return end
+        local effects = payload.effects
+        if type(effects) ~= "table" then return end
+        for _, e in ipairs(effects) do
+            if type(e) == "table" and type(e.id) == "string" and e.id ~= "" then
+                local nickname = type(e.nickname) == "string" and e.nickname ~= "" and e.nickname or nil
+                ChaosEffectsManager.StartEffect(e.id, nickname)
+                if e.type == "donate" and ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
+                    ChaosUIManager.onDonateEffectActivated(nickname or "Anonymous", e.id)
+                end
+            end
+        end
+    end)
 end
 
 function ChaosMod.OnSpecialAnimalsTick()

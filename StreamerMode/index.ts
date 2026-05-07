@@ -33,7 +33,7 @@ import {
   startDebugNicknames,
 } from "./src/debugNicknames.ts";
 import { startDebugVotes } from "./src/debugVotes.ts";
-import { ExternalEffectsManager } from "./src/externalEffects.ts";
+import { Bridge } from "./src/bridge/Bridge.ts";
 import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
 import { DonationManager } from "./src/donations/DonationManager.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
@@ -354,12 +354,47 @@ async function main(): Promise<void> {
     }
   }
 
-  const votingManager = new VotingManager(effects, config, luaFolder);
+  const votingManager = new VotingManager(effects, config);
 
-  const externalEffectsManager = luaFolder
-    ? new ExternalEffectsManager(luaFolder)
-    : null;
-  externalEffectsManager?.start();
+  const bridge = luaFolder ? new Bridge(luaFolder) : null;
+  let modEnabled = false;
+  let iterationIndex = 0;
+
+  if (bridge) {
+    bridge.on("mod_change_status", (payload) => {
+      const enabled = payload.enabled === true;
+      modEnabled = enabled;
+      logger.debug(`[Bridge] mod_change_status: enabled=${enabled}`);
+      if (!enabled) {
+        votingManager.stop();
+        bridge.rotateOutbound();
+      }
+    });
+
+    bridge.on("interval_start", (payload) => {
+      const iter = typeof payload.iteration === "number" ? payload.iteration : 0;
+      iterationIndex = iter;
+      logger.debug(`[Bridge] interval_start: iteration=${iter}`);
+      if (votingManager.isActive) {
+        votingManager.stop();
+        const winnerEffectId = votingManager.lastWinnerEffectId;
+        if (winnerEffectId) {
+          bridge.emit("activate_effects", {
+            effects: [{ id: winnerEffectId, type: "vote" }],
+          });
+        }
+      }
+    });
+
+    bridge.on("vote_start", () => {
+      logger.debug("[Bridge] vote_start");
+      if (config?.streamer_mode.voting_enabled) {
+        votingManager.start();
+      }
+    });
+
+    bridge.start();
+  }
 
   const daProvider = new DonationAlertsProvider();
   const donationManager = new DonationManager(port);
@@ -475,6 +510,7 @@ async function main(): Promise<void> {
       config.streamer_mode.streamer_mode_enabled = true;
       config.streamer_mode.voting_enabled = true;
       saveConfig(luaFolder, config);
+      bridge?.emit("reload_config");
       logger.info("Streamer mode and voting enabled.");
     }
   }
@@ -503,18 +539,8 @@ async function main(): Promise<void> {
     luaFolder,
     config,
     effectCount: effects.length,
-    onIterationChanged: (votingActive) => {
-      votingManager.stop();
-      if (votingActive && config?.streamer_mode.voting_enabled) {
-        votingManager.start();
-      }
-    },
-    onVotingActiveChanged: (votingActive) => {
-      if (votingActive && config?.streamer_mode.voting_enabled) {
-        votingManager.start();
-      } else {
-        votingManager.stop();
-      }
+    onShutdown: () => {
+      bridge?.stop();
     },
   });
 
@@ -525,13 +551,11 @@ async function main(): Promise<void> {
       provider,
       onLogin,
       getModStatus: () => {
-      const watcher = app?.getModSyncWatcher();
-      const iterationIndex = watcher?.iterationIndex ?? 0;
       const offset = iterationIndex % 2 !== 0 ? 4 : 0;
       const options = votingManager.displayOptions;
       const totalVotes = options.reduce((sum, o) => sum + o.voters.size, 0);
       return {
-        enabled: watcher?.isModEnabled ?? false,
+        enabled: modEnabled,
         voting_enabled: votingManager.isActive,
         iteration_index: iterationIndex,
         total_votes: totalVotes,
@@ -570,10 +594,18 @@ async function main(): Promise<void> {
           error: "Effect is not available for donations",
         };
       }
-      if (!externalEffectsManager) {
+      if (!bridge) {
         return { success: false, error: "Lua folder not available" };
       }
-      externalEffectsManager.add(nickname ?? "", effectId);
+      bridge.emit("activate_effects", {
+        effects: [
+          {
+            id: effect.id,
+            type: "donate",
+            nickname: nickname ?? "",
+          },
+        ],
+      });
       return { success: true };
     },
     getEffectsResponse: () => {
@@ -590,10 +622,14 @@ async function main(): Promise<void> {
   let activeServer = startServer(buildServerCtx(host));
 
   if (modFolder && luaFolder && config) {
-    registerLangCommand(app, modFolder, luaFolder, config);
+    registerLangCommand(app, modFolder, luaFolder, config, () => {
+      bridge?.emit("reload_config");
+    });
   }
 
-  registerDonateCommand(app, port, daProvider, luaFolder, config);
+  registerDonateCommand(app, port, daProvider, luaFolder, config, () => {
+    bridge?.emit("reload_config");
+  });
 
   app.registerCommand(
     "login",
@@ -677,6 +713,7 @@ async function main(): Promise<void> {
       const useLocalhostNew = val === "on";
       config.streamer_mode.use_localhost_ip = useLocalhostNew;
       saveConfig(luaFolder, config);
+      bridge?.emit("reload_config");
 
       const newHost = hostOverride ?? (useLocalhostNew ? "127.0.0.1" : "0.0.0.0");
       activeServer.stop(true);
@@ -781,7 +818,9 @@ async function main(): Promise<void> {
     [],
     [],
     () => {
-      reloadRuntimeConfig();
+      if (reloadRuntimeConfig()) {
+        bridge?.emit("reload_config");
+      }
     },
     "Reload config and effects from config.json and effects.json",
   );
@@ -803,6 +842,7 @@ async function main(): Promise<void> {
       }
 
       applyLoadedConfig(config, nextConfig, modFolder);
+      bridge?.emit("reload_config");
       logger.info(
         `Config reset to defaults, backup saved as ${colors.cyan("config_backup.json")}. Unknown custom fields were preserved.`,
       );
@@ -826,6 +866,7 @@ async function main(): Promise<void> {
       }
       config.streamer_mode.voting_enabled = val === "on";
       saveConfig(luaFolder, config);
+      bridge?.emit("reload_config");
       logger.info(`Voting ${val === "on" ? "enabled" : "disabled"}.`);
     },
     "Enable or disable voting",
@@ -868,6 +909,7 @@ async function main(): Promise<void> {
       }
       config.streamer_mode.voting_mode = val;
       saveConfig(luaFolder, config);
+      bridge?.emit("reload_config");
       logger.info(
         `Voting mode set to ${colors.cyan(String(val))} — ${VOTING_MODES[val]}`,
       );
@@ -891,6 +933,7 @@ async function main(): Promise<void> {
       }
       config.streamer_mode.enable_donate = val === "on";
       saveConfig(luaFolder, config);
+      bridge?.emit("reload_config");
       logger.info(`Donate mode ${val === "on" ? "enabled" : "disabled"}.`);
     },
     "Enable or disable donate mode",
@@ -912,6 +955,7 @@ async function main(): Promise<void> {
       }
       config.streamer_mode.streamer_mode_enabled = val === "on";
       saveConfig(luaFolder, config);
+      bridge?.emit("reload_config");
       logger.info(`Streamer Mode ${val === "on" ? "enabled" : "disabled"}.`);
     },
     "Enable or disable streamer mode",

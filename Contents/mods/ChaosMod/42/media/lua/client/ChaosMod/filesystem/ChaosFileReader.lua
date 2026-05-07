@@ -54,19 +54,6 @@ function ChaosFileReader.ReadFileFromCacheAllLines(filename)
     return table.concat(lines, "\n")
 end
 
----@param line1 string | number -- timestamp or "0"
----@param iterationIndex integer -- current interval iteration count
----@param votingActive integer -- 1 if voting is active, 0 otherwise
-function ChaosFileReader.WriteSyncFile(line1, iterationIndex, votingActive)
-    local writer = getFileWriter("ChaosMod/mod-sync.txt", true, false)
-    if not writer then
-        print("[ChaosMod] Failed to open mod-sync.txt for writing")
-        return
-    end
-    writer:write(tostring(line1) .. "\n" .. tostring(iterationIndex) .. "\n" .. tostring(votingActive))
-    writer:close()
-end
-
 ---@param filename string
 ---@return table | nil
 function ChaosFileReader.ReadJsonFile(filename)

@@ -1,5 +1,3 @@
-import { writeFileSync } from "fs";
-import { join } from "path";
 import { logger } from "../utils/logger.ts";
 import type { EffectEntry } from "../effects.ts";
 import type { ModConfig } from "../config.ts";
@@ -15,11 +13,11 @@ export class VotingManager {
   private options: VoteOption[] = [];
   private lastOptions: VoteOption[] = [];
   private lastWinner: string | null = null;
+  private lastWinnerEffect: string | null = null;
 
   constructor(
     private readonly effects: EffectEntry[],
     private readonly config: ModConfig | null,
-    private readonly luaFolder: string | null,
   ) {}
 
   get isActive(): boolean {
@@ -38,9 +36,14 @@ export class VotingManager {
     return this.lastWinner;
   }
 
+  get lastWinnerEffectId(): string | null {
+    return this.lastWinnerEffect;
+  }
+
   start(): void {
     if (!this.config) return;
     this.lastWinner = null;
+    this.lastWinnerEffect = null;
     this.lastOptions = [];
     const ids = getRandomEffects(this.effects, 3, "default", this.config.ignore_effect_chances);
     this.options = [
@@ -100,20 +103,9 @@ export class VotingManager {
     logger.debug(`Voting winner: ${winnerId}`);
     this.lastWinner = winnerId;
 
-    const effectIdToWrite =
+    this.lastWinnerEffect =
       winnerId === "random_effect"
-        ? (getRandomEffects(this.effects, 1, "default", this.config.ignore_effect_chances)[0] ?? "random_effect")
+        ? (getRandomEffects(this.effects, 1, "default", this.config.ignore_effect_chances)[0] ?? null)
         : winnerId;
-
-    this.writeResult(effectIdToWrite);
-  }
-
-  private writeResult(effectId: string): void {
-    if (!this.luaFolder) return;
-    try {
-      writeFileSync(join(this.luaFolder, "effect_votes.txt"), effectId, "utf-8");
-    } catch (e) {
-      logger.error(`Failed to write effect_votes.txt: ${e instanceof Error ? e.message : String(e)}`);
-    }
   }
 }
