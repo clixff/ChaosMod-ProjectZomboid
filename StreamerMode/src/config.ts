@@ -27,7 +27,6 @@ export interface StreamerModeConfig {
   voting_mode: number;
   type: string;
   use_localhost_ip: boolean;
-  advanced_voting_numbers: boolean;
   use_zombie_nicknames: boolean;
   use_animals_nicknames: boolean;
   render_chat_messages: boolean;
@@ -131,7 +130,6 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   voting_mode: 0,
   type: "twitch",
   use_localhost_ip: true,
-  advanced_voting_numbers: true,
   use_zombie_nicknames: true,
   use_animals_nicknames: true,
   render_chat_messages: true,
@@ -234,10 +232,6 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
     voting_mode: num(raw["voting_mode"], d.voting_mode),
     type: str(raw["type"], d.type),
     use_localhost_ip: bool(raw["use_localhost_ip"], d.use_localhost_ip),
-    advanced_voting_numbers: bool(
-      raw["advanced_voting_numbers"],
-      d.advanced_voting_numbers,
-    ),
     use_zombie_nicknames: bool(
       raw["use_zombie_nicknames"],
       d.use_zombie_nicknames,
@@ -346,11 +340,7 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
         `config.json not found at ${configPath}; copying default_config.json`,
       );
       try {
-        writeFileSync(
-          configPath,
-          JSON.stringify(defaultRaw, null, 4),
-          "utf-8",
-        );
+        writeFileSync(configPath, JSON.stringify(defaultRaw, null, 4), "utf-8");
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         logger.error(`Failed to write config.json: ${msg}`);

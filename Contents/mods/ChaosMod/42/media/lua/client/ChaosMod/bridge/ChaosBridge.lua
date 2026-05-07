@@ -261,6 +261,12 @@ function ChaosBridge.On(eventName, handler)
     ChaosBridge.handlers[eventName] = handler
 end
 
+--- Tells the Node bridge that config.json and/or effects.json on disk have changed
+--- and should be reloaded. Safe to call when the bridge is disabled (no-op).
+function ChaosBridge.NotifyConfigReloaded()
+    ChaosBridge.Emit("reload_config", nil)
+end
+
 function ChaosBridge.Init()
     ChaosBridge.startTime = nowSec()
     ChaosBridge.outSessionId = generateSessionId()

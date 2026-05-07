@@ -393,6 +393,11 @@ async function main(): Promise<void> {
       }
     });
 
+    bridge.on("reload_config", () => {
+      logger.debug("[Bridge] reload_config");
+      reloadRuntimeConfig();
+    });
+
     bridge.start();
   }
 

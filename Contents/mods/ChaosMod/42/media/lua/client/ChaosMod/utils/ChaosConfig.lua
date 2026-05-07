@@ -1,5 +1,5 @@
 ---@class DonatePriceGroup
----@field group integer
+---@field group string
 ---@field price number
 
 ---@class ChaosConfigStreamerMode
@@ -8,7 +8,6 @@
 ---@field voting_mode number
 ---@field type string -- Streamer mode type (twitch or ...)
 ---@field use_localhost_ip boolean
----@field advanced_voting_numbers boolean
 ---@field say_killed_zombie_name boolean
 ---@field zombie_nicknames_buffer number
 ---@field use_zombie_nicknames boolean
@@ -86,19 +85,30 @@ ChaosConfig = ChaosConfig or {
         voting_mode = 0,
         type = "twitch",
         use_localhost_ip = true,
-        advanced_voting_numbers = false,
         say_killed_zombie_name = true,
         zombie_nicknames_buffer = 150,
         use_zombie_nicknames = true,
         enable_donate = false,
         donate_providers = {},
         donate_price_groups = {
-            { group = 1, price = 1.0 },
-            { group = 2, price = 2.0 },
-            { group = 3, price = 4.0 },
-            { group = 4, price = 5.0 },
-            { group = 5, price = 7.5 },
-            { group = 6, price = 10.0 },
+            { group = "positive_1", price = 1 },
+            { group = "positive_2", price = 2.5 },
+            { group = "positive_3", price = 5 },
+            { group = "positive_4", price = 7 },
+            { group = "positive_5", price = 8 },
+            { group = "positive_6", price = 10 },
+            { group = "negative_1", price = 1 },
+            { group = "negative_2", price = 2.5 },
+            { group = "negative_3", price = 5 },
+            { group = "negative_4", price = 7 },
+            { group = "negative_5", price = 8 },
+            { group = "negative_6", price = 10 },
+            { group = "neutral_1", price = 1 },
+            { group = "neutral_2", price = 2.5 },
+            { group = "neutral_3", price = 4.5 },
+            { group = "neutral_4", price = 7 },
+            { group = "neutral_5", price = 8 },
+            { group = "neutral_6", price = 10 },
         },
         vote_start_time = 15,
         allow_vote_command = true,
@@ -311,10 +321,6 @@ function ChaosConfig.LoadConfigFromDisk()
         if type(configData.streamer_mode.use_localhost_ip) == "boolean" then
             ChaosConfig.streamer_mode.use_localhost_ip = configData.streamer_mode.use_localhost_ip
         end
-        -- If should use advanced voting numbers
-        if type(configData.streamer_mode.advanced_voting_numbers) == "boolean" then
-            ChaosConfig.streamer_mode.advanced_voting_numbers = configData.streamer_mode.advanced_voting_numbers
-        end
         -- If should say killed zombie name
         if type(configData.streamer_mode.say_killed_zombie_name) == "boolean" then
             ChaosConfig.streamer_mode.say_killed_zombie_name = configData.streamer_mode.say_killed_zombie_name
@@ -355,13 +361,13 @@ function ChaosConfig.LoadConfigFromDisk()
         if type(configData.streamer_mode.donate_price_groups) == "table" then
             local groups = {}
             for _, entry in ipairs(configData.streamer_mode.donate_price_groups) do
-                if type(entry) == "table" and type(entry.group) == "number" and type(entry.price) == "number" then
-                    table.insert(groups, { group = entry.group, price = entry.price })
+                if type(entry) == "table"
+                    and (type(entry.group) == "string" or type(entry.group) == "number")
+                    and type(entry.price) == "number" then
+                    table.insert(groups, { group = tostring(entry.group), price = entry.price })
                 end
             end
-            if #groups > 0 then
-                ChaosConfig.streamer_mode.donate_price_groups = groups
-            end
+            ChaosConfig.streamer_mode.donate_price_groups = groups
         end
     end
 
@@ -442,4 +448,92 @@ end
 ---@return boolean
 function ChaosConfig.IsUISoundsEnabled()
     return ChaosConfig.ui_sounds_enabled == true
+end
+
+---@return table
+function ChaosConfig.BuildJsonSnapshot()
+    local ui = ChaosConfig.ui or {}
+    local sm = ChaosConfig.streamer_mode or {}
+    local groups = {}
+    if type(sm.donate_price_groups) == "table" then
+        for _, g in ipairs(sm.donate_price_groups) do
+            if type(g) == "table" then
+                table.insert(groups, { group = tostring(g.group or ""), price = tonumber(g.price) or 0 })
+            end
+        end
+    end
+    local providers = {}
+    if type(sm.donate_providers) == "table" then
+        for _, p in ipairs(sm.donate_providers) do
+            table.insert(providers, p)
+        end
+    end
+    return {
+        lang = ChaosConfig.lang,
+        effects_interval_enabled = ChaosConfig.effects_interval_enabled,
+        effects_interval = ChaosConfig.effects_interval,
+        vote_start_time = ChaosConfig.vote_start_time,
+        hide_progress_bar = ChaosConfig.hide_progress_bar,
+        use_voting_progress_bar_color = ChaosConfig.use_voting_progress_bar_color,
+        ui = {
+            progress_bar_color = ui.progress_bar_color,
+            progress_bar_opacity = ui.progress_bar_opacity,
+            progress_bar_text_color = ui.progress_bar_text_color,
+            progress_bar_height = ui.progress_bar_height,
+            effect_progress_color = ui.effect_progress_color,
+            effect_progress_text_color = ui.effect_progress_text_color,
+            effects_default_x = ui.effects_default_x,
+            effects_default_y = ui.effects_default_y,
+            effects_from_bottom_to_top = ui.effects_from_bottom_to_top,
+            progress_bar_voting_color = ui.progress_bar_voting_color,
+            vote_background_color = ui.vote_background_color,
+        },
+        ui_sounds_enabled = ChaosConfig.ui_sounds_enabled,
+        ignore_effect_chances = ChaosConfig.ignore_effect_chances,
+        streamer_mode = {
+            streamer_mode_enabled = sm.streamer_mode_enabled,
+            voting_enabled = sm.voting_enabled,
+            voting_mode = sm.voting_mode,
+            type = sm.type,
+            use_localhost_ip = sm.use_localhost_ip,
+            use_zombie_nicknames = sm.use_zombie_nicknames,
+            use_animals_nicknames = sm.use_animals_nicknames,
+            render_chat_messages = sm.render_chat_messages,
+            say_killed_zombie_name = sm.say_killed_zombie_name,
+            zombie_nicknames_buffer = sm.zombie_nicknames_buffer,
+            enable_donate = sm.enable_donate,
+            donate_providers = providers,
+            donate_price_groups = groups,
+            allow_vote_command = sm.allow_vote_command,
+            hide_votes = sm.hide_votes,
+        },
+    }
+end
+
+---@return boolean
+function ChaosConfig.SaveConfigToDisk()
+    local snapshot = ChaosConfig.BuildJsonSnapshot()
+    local ok = ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", snapshot)
+    if ok then
+        print("[ChaosConfig] Saved config.json")
+    else
+        print("[ChaosConfig] Failed to save config.json")
+    end
+    return ok
+end
+
+---@return boolean
+function ChaosConfig.ResetToDefaults()
+    local defaults = ChaosFileReader.ReadJsonFile("default_config.json")
+    if not defaults then
+        print("[ChaosConfig] Cannot reset: default_config.json not found")
+        return false
+    end
+    if not ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", defaults) then
+        print("[ChaosConfig] Failed to write defaults to user config.json")
+        return false
+    end
+    ChaosConfig.LoadConfigFromDisk()
+    print("[ChaosConfig] Reset to defaults complete")
+    return true
 end

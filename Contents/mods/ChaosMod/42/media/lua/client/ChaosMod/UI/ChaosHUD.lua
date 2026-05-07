@@ -37,6 +37,10 @@ function ChaosHUD:RefreshButtonLayout()
     self.btn:setWidth(mainButtonWidth)
     self.secondBtn:setWidth(secondButtonWidth)
     self.secondBtn:setX(self.btn:getX() + mainButtonWidth + buttonGap)
+
+    if self.settingsBtn then
+        self.settingsBtn:setX(self.secondBtn:getX() + secondButtonWidth + buttonGap)
+    end
 end
 
 function ChaosHUD:initialise()
@@ -89,6 +93,18 @@ function ChaosHUD:createChildren()
     self.secondBtn:initialise()
     self.secondBtn:instantiate()
     self:addChild(self.secondBtn)
+
+    local settingsButtonX = secondButtonX + secondButtonWidth + ChaosUIManager.GetScaledWidth(6)
+    self.settingsBtn = ISButton:new(settingsButtonX, buttonY, buttonHeight, buttonHeight, "",
+        self,
+        ChaosHUD.OnSettingsButtonClick)
+    self.settingsBtn:initialise()
+    self.settingsBtn:instantiate()
+    self.settingsBtn:setImage(getTexture("media/ui/chaos_gear.png"))
+    local iconSize = math.floor(buttonHeight * 0.6)
+    self.settingsBtn:forceImageSize(iconSize, iconSize)
+    self:addChild(self.settingsBtn)
+
     self:RefreshButtonLayout()
 end
 
@@ -217,4 +233,8 @@ end
 function ChaosHUD:OnSecondButtonClick()
     print("Second button clicked")
     ChaosUIManager:ToggleEffectsWindow()
+end
+
+function ChaosHUD:OnSettingsButtonClick()
+    ChaosUIManager:ToggleSettingsWindow()
 end

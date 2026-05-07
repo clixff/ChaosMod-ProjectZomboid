@@ -29,9 +29,14 @@ ChaosEffectsRegistry = ChaosEffectsRegistry or {}
 ---@type table<string, ChaosEffectBase>
 ChaosEffectsClassMap = ChaosEffectsClassMap or {}
 
+--- Stable order of effect ids as loaded from effects.json (used to preserve file order on save).
+---@type string[]
+ChaosEffectsRegistry.effectOrder = ChaosEffectsRegistry.effectOrder or {}
+
 function ChaosEffectsRegistry.Initialize()
     --- Remove old effects
     ChaosEffectsRegistry.effects = {}
+    ChaosEffectsRegistry.effectOrder = {}
 
     local enabledEffects = 0;
     local totalEffects = 0;
@@ -85,6 +90,9 @@ function ChaosEffectsRegistry.Initialize()
 
         local newEffectData = ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
         if newEffectData then
+            if not ChaosEffectsRegistry.effects[newEffectData.id] then
+                table.insert(ChaosEffectsRegistry.effectOrder, newEffectData.id)
+            end
             ChaosEffectsRegistry.effects[newEffectData.id] = newEffectData
             if newEffectData.enabled then
                 enabledEffects = enabledEffects + 1
@@ -205,4 +213,77 @@ function ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
     end
 
     return newEffectData
+end
+
+---@return table
+function ChaosEffectsRegistry.BuildJsonSnapshot()
+    local order = ChaosEffectsRegistry.effectOrder or {}
+    local seen = {}
+    local effectsArr = {}
+
+    local function appendEntry(effect)
+        local disable = {}
+        if type(effect.disableEffects) == "table" then
+            for _, id in ipairs(effect.disableEffects) do
+                table.insert(disable, id)
+            end
+        end
+        local entry = {
+            id = effect.id,
+            enabled = effect.enabled,
+            chance = effect.chance,
+            withDuration = effect.withDuration,
+            duration = effect.duration,
+            disable_effects = disable,
+            enabled_donate = effect.enabled_donate,
+            price_group = effect.price_group,
+        }
+        table.insert(effectsArr, entry)
+    end
+
+    for _, id in ipairs(order) do
+        local effect = ChaosEffectsRegistry.effects[id]
+        if effect and not seen[id] then
+            seen[id] = true
+            appendEntry(effect)
+        end
+    end
+    -- Append any effects not in the recorded order (e.g. newly added)
+    for id, effect in pairs(ChaosEffectsRegistry.effects) do
+        if not seen[id] then
+            seen[id] = true
+            appendEntry(effect)
+            table.insert(order, id)
+        end
+    end
+
+    return { effects = effectsArr }
+end
+
+---@return boolean
+function ChaosEffectsRegistry.SaveEffectsToDisk()
+    local snapshot = ChaosEffectsRegistry.BuildJsonSnapshot()
+    local ok = ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", snapshot)
+    if ok then
+        print("[ChaosEffectsRegistry] Saved effects.json")
+    else
+        print("[ChaosEffectsRegistry] Failed to save effects.json")
+    end
+    return ok
+end
+
+---@return boolean
+function ChaosEffectsRegistry.ResetToDefaults()
+    local defaults = ChaosFileReader.ReadJsonFile("default_effects.json")
+    if not defaults then
+        print("[ChaosEffectsRegistry] Cannot reset: default_effects.json not found")
+        return false
+    end
+    if not ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", defaults) then
+        print("[ChaosEffectsRegistry] Failed to write defaults to user effects.json")
+        return false
+    end
+    ChaosEffectsRegistry.Initialize()
+    print("[ChaosEffectsRegistry] Reset to defaults complete")
+    return true
 end
