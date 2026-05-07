@@ -2,7 +2,7 @@ import type { EffectEntry } from "./effects.ts";
 
 export type EffectPickType = "default" | "donate";
 
-const RECENT_EFFECTS_MAX = 30;
+const RECENT_EFFECTS_MAX = 90;
 const recentSet = new Set<string>();
 const recentQueue: string[] = [];
 
@@ -30,7 +30,8 @@ export function getRandomEffects(
   let totalWeight = 0;
 
   for (const effect of effects) {
-    const eligible = pickType === "donate" ? effect.enabled_donate : effect.enabled;
+    const eligible =
+      pickType === "donate" ? effect.enabled_donate : effect.enabled;
     if (eligible && effect.chance > 0 && !recentSet.has(effect.id)) {
       const weight = ignoreChances ? 1 : effect.chance;
       pool.push({ id: effect.id, weight });

@@ -1,9 +1,10 @@
 import colors from "colors";
 import open from "open";
-import { writeFileSync } from "fs";
+import { existsSync, statSync, writeFileSync } from "fs";
+import { tmpdir } from "os";
 import { join } from "path";
 import { networkInterfaces } from "os";
-import { spawnSync } from "child_process";
+import { spawnSync, spawn } from "child_process";
 import readline from "readline/promises";
 import { stdin as input, stdout as output } from "process";
 import { App } from "./src/cli/App.ts";
@@ -20,8 +21,11 @@ import {
   resetConfigToDefaultsPreservingUnknowns,
   saveConfig,
 } from "./src/config.ts";
-import { registerLangCommand } from "./src/commands/lang.ts";
-import { loadEffects } from "./src/effects.ts";
+import {
+  registerLangCommand,
+  getAvailableLanguages,
+} from "./src/commands/lang.ts";
+import { loadEffects, saveEffects } from "./src/effects.ts";
 import { startServer } from "./src/server.ts";
 import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
@@ -38,6 +42,7 @@ import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvi
 import { DonationManager } from "./src/donations/DonationManager.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
 import type { EffectEntry } from "./src/effects.ts";
+import { ActivityLog } from "./src/activityLog.ts";
 
 function getBestLocalIPv4(): {
   interfaceName: string;
@@ -229,6 +234,79 @@ function parseHostArg(args: string[]): string | null {
   return val;
 }
 
+// Open the dashboard at most once per "session". Bun's --watch reruns the
+// script on file changes, so a naive call would reopen a tab on every save.
+// We stamp a per-port lockfile in the OS temp dir; a fresh stamp means the
+// dashboard was already auto-opened recently — skip until it ages out.
+const DASHBOARD_OPEN_TTL_MS = 60_000;
+
+function dashboardLockPath(port: number): string {
+  return join(tmpdir(), `chaosmod-streamer-dashboard-${port}.lock`);
+}
+
+function shouldOpenDashboard(port: number): boolean {
+  const lockPath = dashboardLockPath(port);
+  try {
+    if (existsSync(lockPath)) {
+      const ageMs = Date.now() - statSync(lockPath).mtimeMs;
+      if (ageMs < DASHBOARD_OPEN_TTL_MS) {
+        return false;
+      }
+    }
+  } catch {
+    // Ignore — fall through and try to open + restamp.
+  }
+  try {
+    writeFileSync(lockPath, String(Date.now()), "utf-8");
+  } catch {
+    // If we can't write the stamp, still open it; worst case is reopen on next reload.
+  }
+  return true;
+}
+
+function revealInExplorer(filePath: string): void {
+  try {
+    if (process.platform === "win32") {
+      Bun.spawn({
+        cmd: ["explorer.exe", `/select,${filePath}`],
+        detached: true,
+        stdout: "ignore",
+        stderr: "ignore",
+        stdin: "ignore",
+      }).unref();
+    } else if (process.platform === "darwin") {
+      spawn("open", ["-R", filePath], {
+        detached: true,
+        stdio: "ignore",
+      }).unref();
+    } else {
+      const dir = filePath.replace(/[\\/][^\\/]*$/, "");
+      spawn("xdg-open", [dir], { detached: true, stdio: "ignore" }).unref();
+    }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.debug(`revealInExplorer failed: ${msg}`);
+  }
+}
+
+function isPlainObj(val: unknown): val is Record<string, unknown> {
+  return val !== null && typeof val === "object" && !Array.isArray(val);
+}
+
+function deepMergeInto(
+  target: Record<string, unknown>,
+  patch: Record<string, unknown>,
+): void {
+  for (const [key, value] of Object.entries(patch)) {
+    const existing = target[key];
+    if (isPlainObj(existing) && isPlainObj(value)) {
+      deepMergeInto(existing, value);
+    } else {
+      target[key] = value;
+    }
+  }
+}
+
 function applyLoadedConfig(
   targetConfig: NonNullable<ReturnType<typeof loadConfig>>,
   nextConfig: NonNullable<ReturnType<typeof loadConfig>>,
@@ -313,8 +391,10 @@ async function main(): Promise<void> {
   if (!modFolder) {
     modFolder = await promptForModFolder(dataRoot);
   }
-  const config = modFolder && luaFolder ? loadConfig(modFolder, luaFolder) : null;
-  const effects = modFolder && luaFolder ? loadEffects(modFolder, luaFolder) : [];
+  const config =
+    modFolder && luaFolder ? loadConfig(modFolder, luaFolder) : null;
+  const effects =
+    modFolder && luaFolder ? loadEffects(modFolder, luaFolder) : [];
 
   if (modFolder && config) {
     applyLoadedConfig(config, config, modFolder);
@@ -355,6 +435,7 @@ async function main(): Promise<void> {
   }
 
   const votingManager = new VotingManager(effects, config);
+  const activityLog = new ActivityLog();
 
   const bridge = luaFolder ? new Bridge(luaFolder) : null;
   let modEnabled = false;
@@ -372,7 +453,8 @@ async function main(): Promise<void> {
     });
 
     bridge.on("interval_start", (payload) => {
-      const iter = typeof payload.iteration === "number" ? payload.iteration : 0;
+      const iter =
+        typeof payload.iteration === "number" ? payload.iteration : 0;
       iterationIndex = iter;
       logger.debug(`[Bridge] interval_start: iteration=${iter}`);
       if (votingManager.isActive) {
@@ -381,6 +463,11 @@ async function main(): Promise<void> {
         if (winnerEffectId) {
           bridge.emit("activate_effects", {
             effects: [{ id: winnerEffectId, type: "vote" }],
+          });
+          activityLog.add({
+            type: "vote",
+            effect_id: winnerEffectId,
+            effect_name: getString("effects", winnerEffectId),
           });
         }
       }
@@ -402,6 +489,12 @@ async function main(): Promise<void> {
   }
 
   const daProvider = new DonationAlertsProvider();
+  daProvider.onConnect = () => {
+    activityLog.add({ type: "donationalerts_connected" });
+  };
+  daProvider.onDisconnect = () => {
+    activityLog.add({ type: "donationalerts_disconnected" });
+  };
   const donationManager = new DonationManager(port);
   donationManager.addProvider(daProvider);
 
@@ -460,8 +553,9 @@ async function main(): Promise<void> {
 
     if (config.streamer_mode.voting_enabled) {
       if (voteNum !== null) {
-        if (voteNum >= 5 && voteNum <= 8) voteNum -= 4;
-        if (voteNum >= 1 && voteNum <= 4) {
+        const n = config.streamer_mode.voting_options_number;
+        if (voteNum >= n + 1 && voteNum <= 2 * n) voteNum -= n;
+        if (voteNum >= 1 && voteNum <= n) {
           votingManager.addVote(chat.chatter_user_id, voteNum);
         }
       }
@@ -469,15 +563,23 @@ async function main(): Promise<void> {
   }
 
   let chat: TwitchChat | null = null;
+  let twitchUser: StreamerUser | null = null;
 
   function connectChat(token: string, user: StreamerUser): void {
     if (chat) chat.disconnect();
+    twitchUser = user;
     chat = new TwitchChat({
       accessToken: token,
       broadcasterUserId: user.id,
       readerUserId: user.id,
     });
     chat.onMessage = handleChatMessage;
+    chat.onConnect = () => {
+      activityLog.add({ type: "chat_connected" });
+    };
+    chat.onDisconnect = () => {
+      activityLog.add({ type: "chat_disconnected" });
+    };
     chat.connect();
   }
 
@@ -556,75 +658,341 @@ async function main(): Promise<void> {
       provider,
       onLogin,
       getModStatus: () => {
-      const offset = iterationIndex % 2 !== 0 ? 4 : 0;
-      const options = votingManager.displayOptions;
-      const totalVotes = options.reduce((sum, o) => sum + o.voters.size, 0);
-      return {
-        enabled: modEnabled,
-        voting_enabled: votingManager.isActive,
-        iteration_index: iterationIndex,
-        total_votes: totalVotes,
-        total_votes_label: getString("misc", "total_votes"),
-        vote_background_color: `#${config?.ui.vote_background_color ?? "9f211f"}`,
-        last_winner: votingManager.lastWinnerId,
-        vote_options: options.map((opt, i) => ({
-          effect_id: opt.id,
-          index: i + 1 + offset,
-          effect_name: getString("effects", opt.id),
-          votes: config?.streamer_mode.hide_votes ? undefined : opt.voters.size,
-        })),
-        donateEnabled: config?.streamer_mode.enable_donate ?? false,
-      };
-    },
-    onDonationAlertsCode: async (code: string) => {
-      const user = await daProvider.handleOAuthCode(code, port);
-      if (user) {
-        logger.info(
-          `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(user.name)}`,
-        );
-      }
-      return user ? { name: user.name } : null;
-    },
-    activateEffect: (nickname: string | undefined, effectId: string) => {
-      if (
-        !config?.streamer_mode.streamer_mode_enabled ||
-        !config?.streamer_mode.enable_donate
-      ) {
-        return { success: false, error: "Not available" };
-      }
-      const effect = resolveEffectIdentifier(effectId, effects);
-      if (!effect?.enabled_donate) {
+        const optionsCount = config?.streamer_mode.voting_options_number ?? 4;
+        const offset = iterationIndex % 2 !== 0 ? optionsCount : 0;
+        const options = votingManager.displayOptions;
+        const totalVotes = options.reduce((sum, o) => sum + o.voters.size, 0);
         return {
-          success: false,
-          error: "Effect is not available for donations",
+          enabled: modEnabled,
+          voting_enabled: votingManager.isActive,
+          iteration_index: iterationIndex,
+          total_votes: totalVotes,
+          total_votes_label: getString("misc", "total_votes"),
+          vote_background_color: `#${config?.ui.vote_background_color ?? "9f211f"}`,
+          last_winner: votingManager.lastWinnerId,
+          vote_options: options.map((opt, i) => ({
+            effect_id: opt.id,
+            index: i + 1 + offset,
+            effect_name: getString("effects", opt.id),
+            votes: config?.streamer_mode.hide_votes
+              ? undefined
+              : opt.voters.size,
+          })),
+          donateEnabled: config?.streamer_mode.enable_donate ?? false,
         };
-      }
-      if (!bridge) {
-        return { success: false, error: "Lua folder not available" };
-      }
-      bridge.emit("activate_effects", {
-        effects: [
-          {
-            id: effect.id,
-            type: "donate",
-            nickname: nickname ?? "",
+      },
+      onDonationAlertsCode: async (code: string) => {
+        const user = await daProvider.handleOAuthCode(code, port);
+        if (user) {
+          logger.info(
+            `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(user.name)}`,
+          );
+          if (config && luaFolder && !config.streamer_mode.enable_donate) {
+            config.streamer_mode.enable_donate = true;
+            saveConfig(luaFolder, config);
+            bridge?.emit("reload_config");
+            logger.info("Donate mode enabled.");
+          }
+        }
+        return user ? { name: user.name } : null;
+      },
+      activateEffect: (nickname: string | undefined, effectId: string) => {
+        if (
+          !config?.streamer_mode.streamer_mode_enabled ||
+          !config?.streamer_mode.enable_donate
+        ) {
+          return { success: false, error: "Not available" };
+        }
+        const effect = resolveEffectIdentifier(effectId, effects);
+        if (!effect?.enabled_donate) {
+          return {
+            success: false,
+            error: "Effect is not available for donations",
+          };
+        }
+        if (!bridge) {
+          return { success: false, error: "Lua folder not available" };
+        }
+        bridge.emit("activate_effects", {
+          effects: [
+            {
+              id: effect.id,
+              type: "donate",
+              nickname: nickname ?? "",
+            },
+          ],
+        });
+        const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
+        const groupEntry = effect.price_group
+          ? priceGroups.find((entry) => entry.group === effect.price_group)
+          : undefined;
+        activityLog.add({
+          type: "donate",
+          effect_id: effect.id,
+          effect_name: getString("effects", effect.id),
+          nickname: nickname ?? "",
+          price: groupEntry ? groupEntry.price : null,
+          price_group: effect.price_group ?? "",
+        });
+        return { success: true };
+      },
+      getEffectsResponse: () => {
+        const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
+        return {
+          effects: effects.map((e, index) =>
+            buildEffectResponseEntry(index, e, priceGroups),
+          ),
+        };
+      },
+      getConfig: () => config,
+      updateConfig: (patch: unknown) => {
+        if (!config || !luaFolder) {
+          return { success: false, error: "Config not available" };
+        }
+        if (
+          patch === null ||
+          typeof patch !== "object" ||
+          Array.isArray(patch)
+        ) {
+          return { success: false, error: "Patch must be an object" };
+        }
+        const previousUseLocalhost = config.streamer_mode.use_localhost_ip;
+        deepMergeInto(
+          config as unknown as Record<string, unknown>,
+          patch as Record<string, unknown>,
+        );
+        saveConfig(luaFolder, config);
+        if (modFolder) {
+          initLocalization(modFolder, config.lang);
+        }
+        nicknamesManager?.setRenderChatMessages(
+          config.streamer_mode.render_chat_messages,
+        );
+        bridge?.emit("reload_config");
+        if (config.streamer_mode.use_localhost_ip !== previousUseLocalhost) {
+          restartServerForLocalhostChange();
+        }
+        return { success: true };
+      },
+      getEffectsList: () => {
+        return effects.map((e) => ({ ...e, name: getString("effects", e.id) }));
+      },
+      updateEffect: (id: string, patch: unknown) => {
+        if (!luaFolder) {
+          return { success: false, error: "Lua folder not available" };
+        }
+        if (
+          patch === null ||
+          typeof patch !== "object" ||
+          Array.isArray(patch)
+        ) {
+          return { success: false, error: "Patch must be an object" };
+        }
+        const target = effects.find((e) => e.id === id);
+        if (!target) {
+          return { success: false, error: `Effect '${id}' not found` };
+        }
+        const p = patch as Record<string, unknown>;
+        if (typeof p["enabled"] === "boolean") target.enabled = p["enabled"];
+        if (typeof p["chance"] === "number") target.chance = p["chance"];
+        if (typeof p["withDuration"] === "boolean") {
+          target.withDuration = p["withDuration"];
+        }
+        if (typeof p["duration"] === "number") {
+          target.duration = p["duration"];
+        } else if (p["duration"] === null) {
+          target.duration = undefined;
+        }
+        if (typeof p["enabled_donate"] === "boolean") {
+          target.enabled_donate = p["enabled_donate"];
+        }
+        if (typeof p["price_group"] === "string") {
+          target.price_group = p["price_group"];
+        }
+        saveEffects(luaFolder, effects);
+        bridge?.emit("reload_config");
+        return { success: true };
+      },
+      getPriceGroups: () => config?.streamer_mode.donate_price_groups ?? [],
+      getLanguages: () => (modFolder ? getAvailableLanguages(modFolder) : []),
+      getHomeStatus: () => {
+        const useLocalhost = config?.streamer_mode.use_localhost_ip ?? true;
+        const lan = !useLocalhost
+          ? (getBestLocalIPv4()?.address ?? null)
+          : null;
+        const localUrl = `http://127.0.0.1:${port}/obs`;
+        const lanUrl = lan ? `http://${lan}:${port}/obs` : null;
+        return {
+          port,
+          twitch: {
+            configured: provider !== null,
+            connected: chat !== null && twitchUser !== null,
+            name: twitchUser?.display_name ?? null,
           },
-        ],
-      });
-      return { success: true };
-    },
-    getEffectsResponse: () => {
-      const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
-      return {
-        effects: effects.map((e, index) =>
-          buildEffectResponseEntry(index, e, priceGroups),
-        ),
-      };
-    },
+          donationalerts: {
+            configured: true,
+            connected: daProvider.isConnected,
+            name: daProvider.currentUser?.name ?? null,
+          },
+          obs: {
+            use_localhost_ip: useLocalhost,
+            local_url: localUrl,
+            lan_url: lanUrl,
+          },
+          recent_activity: activityLog.list(),
+        };
+      },
+      twitchLogin: async () => {
+        if (!provider) {
+          return { success: false, error: "No streamer provider configured" };
+        }
+        const loginUrl = `http://localhost:${port}/login/${provider.key}`;
+        try {
+          await open(loginUrl);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          logger.debug(`twitchLogin: failed to open browser: ${msg}`);
+        }
+        return { success: true, url: loginUrl };
+      },
+      twitchLogout: async () => {
+        if (!provider) {
+          return { success: false, error: "No streamer provider configured" };
+        }
+        if (chat) {
+          chat.disconnect();
+          chat = null;
+        }
+        twitchUser = null;
+        const deleted = await provider.deleteToken();
+        if (!deleted) {
+          return { success: false, error: "Not logged in" };
+        }
+        logger.info(`${provider.coloredName} Logged out.`);
+        return { success: true };
+      },
+      donationAlertsLogin: async () => {
+        const creds = await daProvider.loadCredentials();
+        if (!creds) {
+          return {
+            success: false,
+            error:
+              "DonationAlerts credentials not configured. Use the CLI: donate on donationalerts <app_id> <client_secret> <currency>",
+          };
+        }
+        const loginUrl = daProvider.getLoginUrl(port, creds.appId);
+        try {
+          await open(loginUrl);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          logger.debug(`donationAlertsLogin: failed to open browser: ${msg}`);
+        }
+        return { success: true, url: loginUrl };
+      },
+      donationAlertsLogout: async () => {
+        daProvider.disconnect();
+        await daProvider.deleteTokens();
+        logger.info(`${daProvider.coloredName} Logged out.`);
+        return { success: true };
+      },
+      donationAlertsSetup: async (input: {
+        appId: string;
+        clientSecret: string;
+        currency: string;
+      }) => {
+        await daProvider.saveCredentials(
+          input.appId,
+          input.clientSecret,
+          input.currency,
+        );
+        if (config && luaFolder) {
+          if (
+            !config.streamer_mode.donate_providers.includes("donationalerts")
+          ) {
+            config.streamer_mode.donate_providers.push("donationalerts");
+            saveConfig(luaFolder, config);
+            bridge?.emit("reload_config");
+          }
+        }
+        logger.info(
+          `[DonationAlerts] App credentials saved with currency ${input.currency}. Opening login...`,
+        );
+        const loginUrl = daProvider.getLoginUrl(port, input.appId);
+        try {
+          await open(loginUrl);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          logger.debug(`donationAlertsSetup: failed to open browser: ${msg}`);
+        }
+        return { success: true, url: loginUrl };
+      },
+      exportEffects: (kind: string) => {
+        if (kind !== "csv") {
+          return { success: false, error: `Unsupported export type: ${kind}` };
+        }
+        if (!luaFolder) {
+          return { success: false, error: "Lua folder not available" };
+        }
+        const outputPath = writeEffectsCsv(luaFolder);
+        revealInExplorer(outputPath);
+        logger.info(`Exported to ${colors.cyan(outputPath)}`);
+        return { success: true, path: outputPath };
+      },
     };
   }
 
+  function writeEffectsCsv(luaDir: string): string {
+    const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
+    const rows: string[] = [
+      "id,name,effect_id,enabled,chance,duration,price_group,price",
+    ];
+    for (const [index, e] of effects.entries()) {
+      const entry = buildEffectResponseEntry(index, e, priceGroups);
+      const name = getString("effects", e.id).replace(/,/g, "");
+      const duration =
+        e.withDuration && e.duration != null ? String(e.duration) : "";
+      rows.push(
+        [
+          String(entry.id),
+          name,
+          entry.effect_id,
+          String(e.enabled),
+          `${e.chance}%`,
+          duration,
+          entry.price_group,
+          entry.price_result != null ? String(entry.price_result) : "",
+        ].join(","),
+      );
+    }
+    const outputPath = join(luaDir, "export.csv");
+    writeFileSync(outputPath, rows.join("\n"), "utf-8");
+    return outputPath;
+  }
+
   let activeServer = startServer(buildServerCtx(host));
+
+  function restartServerForLocalhostChange(): void {
+    if (!config) return;
+    const useLocalhostNew = config.streamer_mode.use_localhost_ip;
+    const newHost = hostOverride ?? (useLocalhostNew ? "127.0.0.1" : "0.0.0.0");
+    activeServer.stop(true);
+    activeServer = startServer(buildServerCtx(newHost));
+    logger.info(
+      `use_localhost_ip changed. Server restarted on ${colors.cyan(`http://${newHost}:${port}`)}.`,
+    );
+  }
+
+  const dashboardHost = host === "0.0.0.0" ? "127.0.0.1" : host;
+  const dashboardUrl = `http://${dashboardHost}:${port}/dashboard`;
+  logger.info(`Dashboard: ${colors.cyan(dashboardUrl)}`);
+  if (shouldOpenDashboard(port)) {
+    open(dashboardUrl).catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.debug(`Failed to open dashboard in browser: ${msg}`);
+    });
+  } else {
+    logger.debug("Dashboard already opened recently; skipping auto-open.");
+  }
 
   if (modFolder && luaFolder && config) {
     registerLangCommand(app, modFolder, luaFolder, config, () => {
@@ -665,6 +1033,7 @@ async function main(): Promise<void> {
         chat.disconnect();
         chat = null;
       }
+      twitchUser = null;
       const deleted = await provider.deleteToken();
       if (deleted) {
         logger.info(`${provider.coloredName} Logged out.`);
@@ -687,7 +1056,7 @@ async function main(): Promise<void> {
       console.log(`Add ${colors.cyan("Browser")} source in OBS Studio.`);
       console.log(`URL = ${colors.cyan(`http://${obsHost}:${port}/obs`)}`);
       console.log(`Width = ${colors.cyan("480px")}`);
-      console.log(`Height = ${colors.cyan("300px")}`);
+      console.log(`Height = ${colors.cyan("550px")}`);
       console.log(
         `Refresh Browser When Scene Becomes Active = ${colors.cyan("On")}`,
       );
@@ -720,7 +1089,8 @@ async function main(): Promise<void> {
       saveConfig(luaFolder, config);
       bridge?.emit("reload_config");
 
-      const newHost = hostOverride ?? (useLocalhostNew ? "127.0.0.1" : "0.0.0.0");
+      const newHost =
+        hostOverride ?? (useLocalhostNew ? "127.0.0.1" : "0.0.0.0");
       activeServer.stop(true);
       activeServer = startServer(buildServerCtx(newHost));
       logger.info(
@@ -775,30 +1145,7 @@ async function main(): Promise<void> {
         logger.warn("Lua folder not available.");
         return;
       }
-      const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
-      const rows: string[] = [
-        "id,name,effect_id,enabled,chance,duration,price_group,price",
-      ];
-      for (const [index, e] of effects.entries()) {
-        const effect = buildEffectResponseEntry(index, e, priceGroups);
-        const name = getString("effects", e.id).replace(/,/g, "");
-        const duration =
-          e.withDuration && e.duration != null ? String(e.duration) : "";
-        rows.push(
-          [
-            String(effect.id),
-            name,
-            effect.effect_id,
-            String(e.enabled),
-            `${e.chance}%`,
-            duration,
-            effect.price_group,
-            effect.price_result != null ? String(effect.price_result) : "",
-          ].join(","),
-        );
-      }
-      const outputPath = join(luaFolder, "export.csv");
-      writeFileSync(outputPath, rows.join("\n"), "utf-8");
+      const outputPath = writeEffectsCsv(luaFolder);
       logger.info(`Exported to ${colors.cyan(outputPath)}`);
       console.log("");
       logger.info(colors.bold("Google Sheets:"));
@@ -840,7 +1187,10 @@ async function main(): Promise<void> {
         return;
       }
 
-      const nextConfig = resetConfigToDefaultsPreservingUnknowns(modFolder, luaFolder);
+      const nextConfig = resetConfigToDefaultsPreservingUnknowns(
+        modFolder,
+        luaFolder,
+      );
       if (!nextConfig) {
         logger.warn("Failed to reset config.");
         return;

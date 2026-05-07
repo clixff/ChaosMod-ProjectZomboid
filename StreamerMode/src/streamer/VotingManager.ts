@@ -45,7 +45,8 @@ export class VotingManager {
     this.lastWinner = null;
     this.lastWinnerEffect = null;
     this.lastOptions = [];
-    const ids = getRandomEffects(this.effects, 3, "default", this.config.ignore_effect_chances);
+    const optionsCount = this.config.streamer_mode.voting_options_number;
+    const ids = getRandomEffects(this.effects, optionsCount - 1, "default", this.config.ignore_effect_chances);
     this.options = [
       ...ids.map((id) => ({ id, voters: new Set<string>() })),
       { id: "random_effect", voters: new Set<string>() },

@@ -398,6 +398,7 @@
         "voting_mode": "Mode de vote",
         "voting_mode_most_votes": "Majorité",
         "voting_mode_weighted_random": "Aléatoire pondéré",
+        "voting_options_number": "Nombre d'options de vote",
         "voting_type": "Type de vote",
         "use_localhost_ip": "Utiliser le serveur local",
         "use_zombie_nicknames": "Pseudos de zombies",

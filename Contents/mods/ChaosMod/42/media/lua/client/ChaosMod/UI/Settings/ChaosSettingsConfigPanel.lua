@@ -203,6 +203,19 @@ function ChaosSettingsConfigPanel:rebuild()
     table.insert(children, self.controls.voting_mode)
     y = y + rowH + rowGap
 
+    addLabelled("voting_options_number")
+    self.controls.voting_options_number = W.MakeDropdown(self, controlX, y, controlW, {
+        { key = 4, label = "4" },
+        { key = 5, label = "5" },
+        { key = 6, label = "6" },
+        { key = 7, label = "7" },
+        { key = 8, label = "8" },
+    }, sm.voting_options_number or 4, function(key)
+        sm.voting_options_number = key
+    end)
+    table.insert(children, self.controls.voting_options_number)
+    y = y + rowH + rowGap
+
     addLabelled("voting_type")
     self.controls.voting_type = W.MakeDropdown(self, controlX, y, controlW, {
         { key = "twitch", label = "Twitch" },

@@ -127,3 +127,52 @@ export function loadEffects(modFolder: string, luaFolder: string): EffectEntry[]
   logger.debug(`Loaded ${effects.length} effects from ${userPath}`);
   return effects;
 }
+
+export function saveEffects(luaFolder: string, effects: EffectEntry[]): void {
+  const userPath = join(luaFolder, "effects.json");
+  let root: Record<string, unknown> = { effects: [] };
+  let existingEffects: unknown[] = [];
+  if (existsSync(userPath)) {
+    try {
+      const parsed = JSON.parse(readFileSync(userPath, "utf-8"));
+      if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
+        root = parsed as Record<string, unknown>;
+        if (Array.isArray(root["effects"])) existingEffects = root["effects"];
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.warn(`saveEffects: could not read existing effects.json: ${msg}`);
+    }
+  }
+  const byId = new Map<string, Record<string, unknown>>();
+  for (const item of existingEffects) {
+    if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+      const r = item as Record<string, unknown>;
+      if (typeof r["id"] === "string") byId.set(r["id"], r);
+    }
+  }
+  const newArr: Record<string, unknown>[] = effects.map((e) => {
+    const orig = byId.get(e.id) ?? {};
+    const merged: Record<string, unknown> = { ...orig };
+    merged["id"] = e.id;
+    merged["enabled"] = e.enabled;
+    merged["chance"] = e.chance;
+    merged["withDuration"] = e.withDuration;
+    if (e.duration !== undefined) {
+      merged["duration"] = e.duration;
+    } else {
+      delete merged["duration"];
+    }
+    merged["enabled_donate"] = e.enabled_donate;
+    merged["price_group"] = e.price_group;
+    return merged;
+  });
+  root["effects"] = newArr;
+  try {
+    writeFileSync(userPath, JSON.stringify(root, null, 4), "utf-8");
+    logger.debug(`Saved ${effects.length} effects to ${userPath}`);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.error(`Failed to save effects.json: ${msg}`);
+  }
+}

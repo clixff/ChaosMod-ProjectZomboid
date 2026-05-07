@@ -398,6 +398,7 @@
         "voting_mode": "投票模式",
         "voting_mode_most_votes": "最多票数",
         "voting_mode_weighted_random": "加权随机",
+        "voting_options_number": "投票选项数量",
         "voting_type": "投票类型",
         "use_localhost_ip": "使用本地服务器",
         "use_zombie_nicknames": "使用僵尸昵称",

@@ -3,17 +3,20 @@
 ### New mod features
 
 - Added settings UI window for configuring mod settings and effects.
+- Added dashboard for StreamerApp in browser to configure mod settings and effects.
 - Added new command `use_localhost_ip` to set whether the server binds to localhost only (on) or all interfaces (off), and restart the server
 - New default donation price groups
 - Added `use_animals_nicknames` config option to display Twitch viewer nicknames above follower animals
 - Refactored follower animal tracking into a `SpecialAnimal` class
 - Moved user `config.json` and `effects.json` to `%UserProfile%\Zomboid\Lua\ChaosMod\`. The mod now ships read-only `default_config.json` and `default_effects.json`; user files are auto-created on first run, and missing keys / new effect ids are merged in from default.
 - New Inter-process communication protocol for mod. Lua and Node.js communicates with bridge system in .jsonl files instead of .txt. files.
+- Added `streamer_mode.voting_options_number` config (default 4, range 4-8) to control how many voting options are shown each round; chat vote remap range now scales with this value.
 
 ### Mod fixes
 
 - Updated `obs` command to show the new instructions for setting up the OBS browser source with LAN IP.
 - `ChaosUtils.TriggerExplosionAt` now accepts an optional `shouldRemoveProps` parameter (default `true`); when enabled, smashes nearby windows and scatters container items before the explosion
+- Increased recent effects cache size from 30 to 90 to prevent duplicates in voting
 
 ### New Effects
 

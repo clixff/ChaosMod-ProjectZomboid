@@ -399,6 +399,7 @@
         "voting_mode": "Режим голосования",
         "voting_mode_most_votes": "Большинство голосов",
         "voting_mode_weighted_random": "Взвешенный случайный",
+        "voting_options_number": "Количество вариантов голосования",
         "voting_type": "Тип голосования",
         "use_localhost_ip": "Использовать локальный сервер",
         "use_zombie_nicknames": "Использовать ники зомби",

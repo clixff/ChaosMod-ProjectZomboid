@@ -398,6 +398,7 @@
         "voting_mode": "Abstimmungsmodus",
         "voting_mode_most_votes": "Meiste Stimmen",
         "voting_mode_weighted_random": "Gewichteter Zufall",
+        "voting_options_number": "Anzahl der Abstimmungsoptionen",
         "voting_type": "Abstimmungstyp",
         "use_localhost_ip": "Localhost-Server verwenden",
         "use_zombie_nicknames": "Zombie-Spitznamen verwenden",

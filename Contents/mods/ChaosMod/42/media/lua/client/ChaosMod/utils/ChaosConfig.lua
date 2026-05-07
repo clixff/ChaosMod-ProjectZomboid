@@ -6,6 +6,7 @@
 ---@field streamer_mode_enabled boolean -- if streamer mode is enabled
 ---@field voting_enabled boolean -- If voting is enabled
 ---@field voting_mode number
+---@field voting_options_number number
 ---@field type string -- Streamer mode type (twitch or ...)
 ---@field use_localhost_ip boolean
 ---@field say_killed_zombie_name boolean
@@ -83,6 +84,7 @@ ChaosConfig = ChaosConfig or {
         streamer_mode_enabled = false,
         voting_enabled = false,
         voting_mode = 0,
+        voting_options_number = 4,
         type = "twitch",
         use_localhost_ip = true,
         say_killed_zombie_name = true,
@@ -317,6 +319,14 @@ function ChaosConfig.LoadConfigFromDisk()
             ChaosConfig.streamer_mode.voting_mode = configData.streamer_mode.voting_mode
         end
 
+        -- Number of voting options (clamped to 4-8)
+        if type(configData.streamer_mode.voting_options_number) == "number" then
+            local n = math.floor(configData.streamer_mode.voting_options_number)
+            if n < 4 then n = 4 end
+            if n > 8 then n = 8 end
+            ChaosConfig.streamer_mode.voting_options_number = n
+        end
+
         -- If should use localhost IP for voting
         if type(configData.streamer_mode.use_localhost_ip) == "boolean" then
             ChaosConfig.streamer_mode.use_localhost_ip = configData.streamer_mode.use_localhost_ip
@@ -494,6 +504,7 @@ function ChaosConfig.BuildJsonSnapshot()
             streamer_mode_enabled = sm.streamer_mode_enabled,
             voting_enabled = sm.voting_enabled,
             voting_mode = sm.voting_mode,
+            voting_options_number = sm.voting_options_number,
             type = sm.type,
             use_localhost_ip = sm.use_localhost_ip,
             use_zombie_nicknames = sm.use_zombie_nicknames,

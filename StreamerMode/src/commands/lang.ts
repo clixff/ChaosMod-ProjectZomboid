@@ -7,7 +7,7 @@ import { logger } from "../utils/logger.ts";
 import { setLang } from "../localization.ts";
 import colors from "colors";
 
-function getAvailableLanguages(modFolder: string): string[] {
+export function getAvailableLanguages(modFolder: string): string[] {
   const langDir = join(modFolder, "common", "lang");
   if (!existsSync(langDir)) return [];
   return readdirSync(langDir)
