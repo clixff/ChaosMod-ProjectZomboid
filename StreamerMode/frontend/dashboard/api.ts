@@ -115,6 +115,9 @@ export interface HomeStatus {
     local_url: string;
     lan_url: string | null;
   };
+  mod: { enabled: boolean };
+  voting: { active: boolean };
+  twitch_chat: { connected: boolean };
   recent_activity: ActivityEvent[];
 }
 

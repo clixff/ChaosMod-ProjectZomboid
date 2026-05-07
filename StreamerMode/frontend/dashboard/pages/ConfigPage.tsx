@@ -140,7 +140,7 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setField("effects_interval", v)}
           />
         </FieldRow>
-        <FieldRow label="Vote start time">
+        <FieldRow label="Vote start time (seconds)">
           <NumberInput
             value={config.vote_start_time}
             min={1}

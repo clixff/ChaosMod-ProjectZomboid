@@ -1,4 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
+import {
+  Check,
+  CircleQuestionMark,
+  Copy,
+  DollarSign,
+  FileDown,
+  Info,
+  LogIn,
+  LogOut,
+  Pencil,
+  Settings,
+} from "lucide-react";
+import twitchLogo from "../assets/twitch_logo.webp";
+import donationAlertsLogo from "../assets/donationalerts_logo.png";
+import obsLogo from "../assets/obs_logo.png";
+import googleSheetsLogo from "../assets/google_sheets_logo.png";
 import { Modal } from "../components/Modal.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
 import { Select } from "../components/Select.tsx";
@@ -39,6 +55,22 @@ function StatusBadge({
       <span className="badge-dot" />
       {on ? labelOn : labelOff}
     </span>
+  );
+}
+
+interface StatusRowProps {
+  label: string;
+  on: boolean;
+  labelOn: string;
+  labelOff: string;
+}
+
+function StatusRow({ label, on, labelOn, labelOff }: StatusRowProps) {
+  return (
+    <div className="status-row">
+      <span className="status-row-label">{label}</span>
+      <StatusBadge on={on} labelOn={labelOn} labelOff={labelOff} />
+    </div>
   );
 }
 
@@ -149,57 +181,96 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
 
   return (
     <>
-      {config && (
-        <Section title="Quick Settings">
-          <div className="quick-grid">
-            <FieldRow label="Language">
-              <Select
-                value={config.lang}
-                options={(languages.length > 0 ? languages : [config.lang]).map(
-                  (code) => ({ value: code, label: code }),
-                )}
-                onChange={(v) => setConfigField("lang", v)}
-              />
-            </FieldRow>
-            <FieldRow label="Effects interval enabled">
-              <Checkbox
-                checked={config.effects_interval_enabled}
-                onChange={(v) => setConfigField("effects_interval_enabled", v)}
-              />
-            </FieldRow>
-            <FieldRow label="Effects interval (seconds)">
-              <NumberInput
-                value={config.effects_interval}
-                min={1}
-                onChange={(v) => setConfigField("effects_interval", v)}
-              />
-            </FieldRow>
-            <FieldRow label="Vote start time">
-              <NumberInput
-                value={config.vote_start_time}
-                min={1}
-                onChange={(v) => setConfigField("vote_start_time", v)}
-              />
-            </FieldRow>
-            <FieldRow label="Voting enabled">
-              <Checkbox
-                checked={config.streamer_mode.voting_enabled}
-                onChange={(v) => setStreamerField("voting_enabled", v)}
-              />
-            </FieldRow>
-            <FieldRow label="Donations enabled">
-              <Checkbox
-                checked={config.streamer_mode.enable_donate}
-                onChange={(v) => setStreamerField("enable_donate", v)}
-              />
-            </FieldRow>
+      <div className="top-row">
+        {config && (
+          <Section
+            title="Quick Settings"
+            icon={<Settings size={16} color="#ffffff" aria-hidden="true" />}
+          >
+            <div className="quick-grid quick-grid--single">
+              <FieldRow label="Language">
+                <Select
+                  value={config.lang}
+                  options={(languages.length > 0
+                    ? languages
+                    : [config.lang]
+                  ).map((code) => ({ value: code, label: code }))}
+                  onChange={(v) => setConfigField("lang", v)}
+                />
+              </FieldRow>
+              <FieldRow label="Effects interval enabled">
+                <Checkbox
+                  checked={config.effects_interval_enabled}
+                  onChange={(v) =>
+                    setConfigField("effects_interval_enabled", v)
+                  }
+                />
+              </FieldRow>
+              <FieldRow label="Effects interval (seconds)">
+                <NumberInput
+                  value={config.effects_interval}
+                  min={1}
+                  onChange={(v) => setConfigField("effects_interval", v)}
+                />
+              </FieldRow>
+              <FieldRow
+                label="Vote start time (seconds)"
+                hint={`Users have ${Math.max(0, config.effects_interval - config.vote_start_time)} seconds to vote`}
+              >
+                <NumberInput
+                  value={config.vote_start_time}
+                  min={1}
+                  onChange={(v) => setConfigField("vote_start_time", v)}
+                />
+              </FieldRow>
+              <FieldRow label="Voting enabled">
+                <Checkbox
+                  checked={config.streamer_mode.voting_enabled}
+                  onChange={(v) => setStreamerField("voting_enabled", v)}
+                />
+              </FieldRow>
+              <FieldRow label="Donations enabled">
+                <Checkbox
+                  checked={config.streamer_mode.enable_donate}
+                  onChange={(v) => setStreamerField("enable_donate", v)}
+                />
+              </FieldRow>
+            </div>
+          </Section>
+        )}
+        <Section
+          title="Status"
+          icon={<Info size={16} color="#ffffff" aria-hidden="true" />}
+        >
+          <div className="status-list">
+            <StatusRow
+              label="Mod Status"
+              on={status.mod.enabled}
+              labelOn="Enabled"
+              labelOff="Disabled"
+            />
+            <StatusRow
+              label="Voting Status"
+              on={status.voting.active}
+              labelOn="Started"
+              labelOff="Not Started"
+            />
+            <StatusRow
+              label="Twitch Chat"
+              on={status.twitch_chat.connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
           </div>
         </Section>
-      )}
+      </div>
       <div className="cards">
         <div className="card">
           <div className="card-head">
-            <h3 className="card-title">Twitch</h3>
+            <h3 className="card-title">
+              <img src={twitchLogo} alt="" className="card-title-logo" />
+              Twitch
+            </h3>
             <StatusBadge on={status.twitch.connected} />
           </div>
           <div className="card-row">
@@ -215,6 +286,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                   void wrap(() => twitchLogout(), "Logged out from Twitch.")
                 }
               >
+                <LogOut size={14} aria-hidden="true" />
                 Logout
               </button>
             ) : (
@@ -228,6 +300,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                   )
                 }
               >
+                <LogIn size={14} aria-hidden="true" />
                 Login
               </button>
             )}
@@ -236,14 +309,26 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
 
         <div className="card">
           <div className="card-head">
-            <h3 className="card-title">Donation Services</h3>
+            <h3 className="card-title">
+              <span className="card-title-icon">
+                <DollarSign size={18} aria-hidden="true" />
+              </span>
+              Donation Services
+            </h3>
           </div>
           <div className="card-row-label" style={{ fontSize: 12 }}>
             Supported services
           </div>
           <div className="provider-row">
             <div className="provider-row-main">
-              <span className="provider-row-name">DonationAlerts</span>
+              <span className="provider-row-name">
+                <img
+                  src={donationAlertsLogo}
+                  alt=""
+                  className="provider-row-logo"
+                />
+                DonationAlerts
+              </span>
               <StatusBadge on={status.donationalerts.connected} />
             </div>
             <div className="provider-row-sub">
@@ -264,6 +349,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                     )
                   }
                 >
+                  <LogOut size={14} aria-hidden="true" />
                   Logout
                 </button>
               ) : (
@@ -277,6 +363,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                     setDaModal(true);
                   }}
                 >
+                  <LogIn size={14} aria-hidden="true" />
                   Login
                 </button>
               )}
@@ -287,6 +374,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
               className="btn"
               onClick={() => onNavigate("config", "price-groups")}
             >
+              <Pencil size={14} aria-hidden="true" />
               Edit Price Groups
             </button>
           </div>
@@ -294,11 +382,21 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
 
         <div className="card">
           <div className="card-head">
-            <h3 className="card-title">OBS Browser Source</h3>
+            <h3 className="card-title">
+              <img src={obsLogo} alt="" className="card-title-logo" />
+              OBS Browser Source
+            </h3>
           </div>
           <div className="card-row card-row-inline">
             <span className="card-row-label">URL</span>
-            <span className="card-link">{obsUrl}</span>
+            <span className="card-link card-link--with-copy">
+              <span className="card-link-text">{obsUrl}</span>
+              <CopyButton
+                value={obsUrl}
+                onCopied={() => onNotify("OBS URL copied to clipboard.")}
+                onError={(msg) => onNotify(msg, true)}
+              />
+            </span>
           </div>
           <div className="card-row">
             <span className="card-row-label">Size</span>
@@ -320,6 +418,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           />
           <div className="card-actions">
             <button className="btn" onClick={() => setObsModal(true)}>
+              <CircleQuestionMark size={14} aria-hidden="true" />
               Setup instructions
             </button>
           </div>
@@ -327,7 +426,10 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
 
         <div className="card">
           <div className="card-head">
-            <h3 className="card-title">Export effects to Google Sheets</h3>
+            <h3 className="card-title">
+              <img src={googleSheetsLogo} alt="" className="card-title-logo" />
+              Export effects to Google Sheets
+            </h3>
           </div>
           <div className="card-row card-row-inline">
             <span className="card-row-label">Format</span>
@@ -348,9 +450,11 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 })
               }
             >
+              <FileDown size={14} aria-hidden="true" />
               Export
             </button>
             <button className="btn" onClick={() => setExportModal(true)}>
+              <CircleQuestionMark size={14} aria-hidden="true" />
               Show instructions
             </button>
           </div>
@@ -480,6 +584,40 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   );
 }
 
+interface CopyButtonProps {
+  value: string;
+  onCopied: () => void;
+  onError: (message: string) => void;
+}
+
+function CopyButton({ value, onCopied, onError }: CopyButtonProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleClick = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      onCopied();
+      setTimeout(() => setCopied(false), 1500);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      onError(`Failed to copy: ${msg}`);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      className="icon-btn"
+      title={copied ? "Copied!" : "Copy to clipboard"}
+      aria-label="Copy to clipboard"
+      onClick={() => void handleClick()}
+    >
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+    </button>
+  );
+}
+
 interface DonationAlertsLoginModalProps {
   port: number;
   busy: boolean;
@@ -591,6 +729,7 @@ function DonationAlertsLoginModal({
           disabled={!canSubmit}
           onClick={onSubmit}
         >
+          <LogIn size={14} aria-hidden="true" />
           Login
         </button>
       </div>

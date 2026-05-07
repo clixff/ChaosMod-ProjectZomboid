@@ -564,6 +564,7 @@ async function main(): Promise<void> {
 
   let chat: TwitchChat | null = null;
   let twitchUser: StreamerUser | null = null;
+  let chatConnected = false;
 
   function connectChat(token: string, user: StreamerUser): void {
     if (chat) chat.disconnect();
@@ -575,9 +576,11 @@ async function main(): Promise<void> {
     });
     chat.onMessage = handleChatMessage;
     chat.onConnect = () => {
+      chatConnected = true;
       activityLog.add({ type: "chat_connected" });
     };
     chat.onDisconnect = () => {
+      chatConnected = false;
       activityLog.add({ type: "chat_disconnected" });
     };
     chat.connect();
@@ -839,6 +842,15 @@ async function main(): Promise<void> {
             local_url: localUrl,
             lan_url: lanUrl,
           },
+          mod: {
+            enabled: modEnabled,
+          },
+          voting: {
+            active: votingManager.isActive,
+          },
+          twitch_chat: {
+            connected: chatConnected,
+          },
           recent_activity: activityLog.list(),
         };
       },
@@ -864,6 +876,7 @@ async function main(): Promise<void> {
           chat = null;
         }
         twitchUser = null;
+        chatConnected = false;
         const deleted = await provider.deleteToken();
         if (!deleted) {
           return { success: false, error: "Not logged in" };

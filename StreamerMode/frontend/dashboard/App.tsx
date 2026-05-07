@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Home, Sliders, Zap } from "lucide-react";
 import { HomePage } from "./pages/HomePage.tsx";
 import { ConfigPage } from "./pages/ConfigPage.tsx";
 import { EffectsPage } from "./pages/EffectsPage.tsx";
@@ -60,18 +61,21 @@ export function App() {
           className={`nav-button${page === "home" ? " is-active" : ""}`}
           onClick={() => navigate("home")}
         >
+          <Home size={16} className="nav-button-icon" aria-hidden="true" />
           Home
         </button>
         <button
           className={`nav-button${page === "config" ? " is-active" : ""}`}
           onClick={() => navigate("config")}
         >
+          <Sliders size={16} className="nav-button-icon" aria-hidden="true" />
           Config
         </button>
         <button
           className={`nav-button${page === "effects" ? " is-active" : ""}`}
           onClick={() => navigate("effects")}
         >
+          <Zap size={16} className="nav-button-icon" aria-hidden="true" />
           Effects
         </button>
       </aside>

@@ -5,12 +5,26 @@ interface SectionProps {
   description?: string;
   children: ReactNode;
   id?: string;
+  icon?: ReactNode;
 }
 
-export function Section({ title, description, children, id }: SectionProps) {
+export function Section({
+  title,
+  description,
+  children,
+  id,
+  icon,
+}: SectionProps) {
   return (
     <div className="section" id={id}>
-      {title !== undefined && <h3 className="section-title">{title}</h3>}
+      {title !== undefined && (
+        <h3 className="section-title">
+          {icon !== undefined && (
+            <span className="section-title-icon">{icon}</span>
+          )}
+          {title}
+        </h3>
+      )}
       {description !== undefined && <p className="section-desc">{description}</p>}
       <div className="section-body">{children}</div>
     </div>
