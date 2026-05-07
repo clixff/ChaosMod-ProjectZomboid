@@ -232,19 +232,15 @@ You can edit the mod configuration in:
 config.json
 ```
 
-Config file locations:
+`config.json` is generated automatically the first time the mod runs, by copying `default_config.json` from the mod folder. **Launch the game with the mod enabled at least once (or run `ZomboidStreamerApp.exe` once) so the file is created**, then edit it.
 
-### Steam Workshop Installation
-
-```txt
-YOUR_STEAM_FOLDER\steamapps\workshop\content\108600\3717082142\mods\ChaosMod\common\config.json
-```
-
-### Manual Installation
+Config file location:
 
 ```txt
-%UserProfile%/Zomboid/Workshop/ChaosModPZ/Contents/mods/ChaosMod/common/config.json
+%UserProfile%\Zomboid\Lua\ChaosMod\config.json
 ```
+
+If the file is missing keys after a mod update, the mod fills them in from `default_config.json` automatically the next time it starts.
 
 After changing the config, you need to:
 
@@ -298,19 +294,15 @@ You can edit effect settings in:
 effects.json
 ```
 
-Effects file locations:
+`effects.json` is generated automatically the first time the mod runs, by copying `default_effects.json` from the mod folder. **Launch the game with the mod enabled at least once (or run `ZomboidStreamerApp.exe` once) so the file is created**, then edit it.
 
-### Steam Workshop Installation
-
-```txt
-YOUR_STEAM_FOLDER\steamapps\workshop\content\108600\3717082142\mods\ChaosMod\common\effects.json
-```
-
-### Manual Installation
+Effects file location:
 
 ```txt
-%UserProfile%/Zomboid/Workshop/ChaosModPZ/Contents/mods/ChaosMod/common/effects.json
+%UserProfile%\Zomboid\Lua\ChaosMod\effects.json
 ```
+
+If the mod ships new effects in a later update, they are appended to your `effects.json` automatically the next time the mod starts.
 
 After changing `effects.json`, you need to:
 

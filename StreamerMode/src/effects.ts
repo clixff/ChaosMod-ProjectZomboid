@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { logger } from "./utils/logger.ts";
 
@@ -31,34 +31,99 @@ function parseEffect(raw: unknown): EffectEntry | null {
   };
 }
 
-export function loadEffects(modFolder: string): EffectEntry[] {
-  const effectsPath = join(modFolder, "common", "effects.json");
+interface EffectsRoot {
+  effects: unknown[];
+  [key: string]: unknown;
+}
 
-  if (!existsSync(effectsPath)) {
-    logger.warn(`effects.json not found at ${effectsPath}`);
-    return [];
-  }
-
+function readEffectsRoot(path: string): EffectsRoot | null {
+  if (!existsSync(path)) return null;
   let parsed: unknown;
   try {
-    parsed = JSON.parse(readFileSync(effectsPath, "utf-8"));
-    logger.debug(`Loaded effects from ${effectsPath}`);
+    parsed = JSON.parse(readFileSync(path, "utf-8"));
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    logger.error(`Failed to parse effects.json: ${msg}`);
-    return [];
+    logger.error(`Failed to parse ${path}: ${msg}`);
+    return null;
+  }
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return null;
+  }
+  const root = parsed as Record<string, unknown>;
+  const effects = Array.isArray(root["effects"]) ? root["effects"] : [];
+  return { ...root, effects };
+}
+
+export function loadEffects(modFolder: string, luaFolder: string): EffectEntry[] {
+  const userPath = join(luaFolder, "effects.json");
+  const defaultPath = join(modFolder, "common", "default_effects.json");
+
+  const defaultRoot = readEffectsRoot(defaultPath);
+
+  let userRoot = readEffectsRoot(userPath);
+  if (!userRoot) {
+    if (defaultRoot) {
+      logger.info(
+        `effects.json not found at ${userPath}; copying default_effects.json`,
+      );
+      try {
+        writeFileSync(
+          userPath,
+          JSON.stringify(defaultRoot, null, 4),
+          "utf-8",
+        );
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.error(`Failed to write effects.json: ${msg}`);
+      }
+      userRoot = defaultRoot;
+    } else {
+      logger.warn(
+        `effects.json not found at ${userPath} and default_effects.json missing`,
+      );
+      return [];
+    }
+  } else if (defaultRoot) {
+    const existingIds = new Set<string>();
+    for (const item of userRoot.effects) {
+      if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+        const r = item as Record<string, unknown>;
+        if (typeof r["id"] === "string") existingIds.add(r["id"]);
+      }
+    }
+    let added = 0;
+    for (const item of defaultRoot.effects) {
+      if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+        const r = item as Record<string, unknown>;
+        if (typeof r["id"] === "string" && !existingIds.has(r["id"])) {
+          userRoot.effects.push(item);
+          existingIds.add(r["id"]);
+          added++;
+        }
+      }
+    }
+    if (added > 0) {
+      logger.info(
+        `Added ${added} missing effect(s) from default_effects.json; saving effects.json`,
+      );
+      try {
+        writeFileSync(
+          userPath,
+          JSON.stringify(userRoot, null, 4),
+          "utf-8",
+        );
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.error(`Failed to save merged effects.json: ${msg}`);
+      }
+    }
   }
 
-  const root =
-    parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)
-      ? (parsed as Record<string, unknown>)
-      : {};
-
-  const arr = Array.isArray(root["effects"]) ? root["effects"] : [];
   const effects: EffectEntry[] = [];
-  for (const item of arr) {
+  for (const item of userRoot.effects) {
     const entry = parseEffect(item);
     if (entry) effects.push(entry);
   }
+  logger.debug(`Loaded ${effects.length} effects from ${userPath}`);
   return effects;
 }

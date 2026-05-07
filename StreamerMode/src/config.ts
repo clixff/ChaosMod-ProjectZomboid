@@ -269,8 +269,56 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
   };
 }
 
-export function saveConfig(modFolder: string, config: ModConfig): void {
-  const configPath = join(modFolder, "common", "config.json");
+function userConfigPath(luaFolder: string): string {
+  return join(luaFolder, "config.json");
+}
+
+function defaultConfigPath(modFolder: string): string {
+  return join(modFolder, "common", "default_config.json");
+}
+
+function readJsonObject(path: string): Record<string, unknown> | null {
+  if (!existsSync(path)) return null;
+  try {
+    return obj(JSON.parse(readFileSync(path, "utf-8")));
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.error(`Failed to parse ${path}: ${msg}`);
+    return null;
+  }
+}
+
+function isPlainObjectVal(val: unknown): val is Record<string, unknown> {
+  return val !== null && typeof val === "object" && !Array.isArray(val);
+}
+
+/**
+ * Recursively add keys from `defaults` into `existing` when missing. Returns
+ * true if any key was added. Arrays are treated as opaque values (not merged).
+ */
+function addMissingKeysDeep(
+  existing: Record<string, unknown>,
+  defaults: Record<string, unknown>,
+): boolean {
+  let changed = false;
+  for (const [key, defValue] of Object.entries(defaults)) {
+    if (!(key in existing)) {
+      existing[key] = JSON.parse(JSON.stringify(defValue)) as unknown;
+      changed = true;
+      continue;
+    }
+    const cur = existing[key];
+    if (isPlainObjectVal(cur) && isPlainObjectVal(defValue)) {
+      if (addMissingKeysDeep(cur, defValue)) {
+        changed = true;
+      }
+    }
+  }
+  return changed;
+}
+
+export function saveConfig(luaFolder: string, config: ModConfig): void {
+  const configPath = userConfigPath(luaFolder);
   try {
     let existingRaw: Record<string, unknown> = {};
     if (existsSync(configPath)) {
@@ -285,23 +333,49 @@ export function saveConfig(modFolder: string, config: ModConfig): void {
   }
 }
 
-export function loadConfig(modFolder: string): ModConfig {
-  const configPath = join(modFolder, "common", "config.json");
+export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
+  const configPath = userConfigPath(luaFolder);
+  const defaultPath = defaultConfigPath(modFolder);
 
-  if (!existsSync(configPath)) {
-    logger.warn(`config.json not found at ${configPath}, using defaults`);
-    return cloneConfig(DEFAULT_CONFIG);
-  }
+  const defaultRaw = readJsonObject(defaultPath);
 
-  let raw: Record<string, unknown>;
-  try {
-    raw = obj(JSON.parse(readFileSync(configPath, "utf-8")));
-    logger.debug(`Loaded config from ${configPath}`);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    logger.error(`Failed to parse config.json: ${msg}`);
-    return cloneConfig(DEFAULT_CONFIG);
+  let raw = readJsonObject(configPath);
+  if (!raw) {
+    if (defaultRaw) {
+      logger.info(
+        `config.json not found at ${configPath}; copying default_config.json`,
+      );
+      try {
+        writeFileSync(
+          configPath,
+          JSON.stringify(defaultRaw, null, 4),
+          "utf-8",
+        );
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.error(`Failed to write config.json: ${msg}`);
+      }
+      raw = defaultRaw;
+    } else {
+      logger.warn(
+        `config.json not found at ${configPath} and default_config.json missing; using built-in defaults`,
+      );
+      raw = {};
+    }
+  } else if (defaultRaw) {
+    if (addMissingKeysDeep(raw, defaultRaw)) {
+      logger.info(
+        `Added missing keys from default_config.json; saving config.json`,
+      );
+      try {
+        writeFileSync(configPath, JSON.stringify(raw, null, 4), "utf-8");
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.error(`Failed to save merged config.json: ${msg}`);
+      }
+    }
   }
+  logger.debug(`Loaded config from ${configPath}`);
 
   const d = DEFAULT_CONFIG;
   return {
@@ -329,9 +403,10 @@ export function loadConfig(modFolder: string): ModConfig {
 
 export function resetConfigToDefaultsPreservingUnknowns(
   modFolder: string,
+  luaFolder: string,
 ): ModConfig | null {
-  const configPath = join(modFolder, "common", "config.json");
-  const backupPath = join(modFolder, "common", "config_backup.json");
+  const configPath = userConfigPath(luaFolder);
+  const backupPath = join(luaFolder, "config_backup.json");
 
   let existingRaw: Record<string, unknown> = {};
   if (existsSync(configPath)) {
@@ -377,5 +452,5 @@ export function resetConfigToDefaultsPreservingUnknowns(
     return null;
   }
 
-  return loadConfig(modFolder);
+  return loadConfig(modFolder, luaFolder);
 }

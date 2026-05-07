@@ -12,7 +12,7 @@ if (!effectId) {
 }
 
 const rootDir = join(import.meta.dir, "..");
-const effectsPath = join(rootDir, "Contents", "mods", "ChaosMod", "common", "effects.json");
+const effectsPath = join(rootDir, "Contents", "mods", "ChaosMod", "common", "default_effects.json");
 const langDir = join(rootDir, "Contents", "mods", "ChaosMod", "common", "lang");
 
 function fail(message) {
@@ -35,10 +35,10 @@ const effects = Array.isArray(effectsJson.effects) ? effectsJson.effects : [];
 const effectIndex = effects.findIndex((effect) => effect?.id === effectId);
 
 if (effectIndex === -1) {
-    fail(`Effect not found in effects.json: ${effectId}`);
+    fail(`Effect not found in default_effects.json: ${effectId}`);
     hasErrors = true;
 } else if (effectIndex !== effects.length - 1) {
-    fail(`Effect is not the latest entry in effects.json: ${effectId}`);
+    fail(`Effect is not the latest entry in default_effects.json: ${effectId}`);
     hasErrors = true;
 }
 

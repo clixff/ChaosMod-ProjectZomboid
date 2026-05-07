@@ -121,9 +121,69 @@ function ChaosConfig.HexToRGB(hex)
     }
 end
 
+---@param existing any
+---@param defaults any
+---@return any, boolean -- merged value, true if any keys were added
+local function mergeMissingKeys(existing, defaults)
+    if type(defaults) ~= "table" or type(existing) ~= "table" then
+        return existing, false
+    end
+
+    -- Treat arrays as opaque values; do not merge their elements
+    local function isArr(t)
+        if type(t) ~= "table" then return false end
+        local count = 0
+        for _ in pairs(t) do count = count + 1 end
+        if count == 0 then return true end
+        for i = 1, count do
+            if t[i] == nil then return false end
+        end
+        return true
+    end
+
+    if isArr(defaults) or isArr(existing) then
+        return existing, false
+    end
+
+    local changed = false
+    for key, defValue in pairs(defaults) do
+        if existing[key] == nil then
+            existing[key] = defValue
+            changed = true
+        else
+            local merged, subChanged = mergeMissingKeys(existing[key], defValue)
+            existing[key] = merged
+            if subChanged then changed = true end
+        end
+    end
+    return existing, changed
+end
+
+ChaosConfig._mergeMissingKeys = mergeMissingKeys
+
 function ChaosConfig.LoadConfigFromDisk()
+    ---@type table | nil
+    local defaultConfig = ChaosFileReader.ReadJsonFile("default_config.json")
+    if not defaultConfig then
+        print("[ChaosConfig] Failed to load default_config.json")
+    end
+
     ---@type ChaosConfig | nil
-    local configData = ChaosFileReader.ReadJsonFile("config.json")
+    local configData = ChaosFileReader.ReadJsonFromCache("ChaosMod/config.json")
+    if not configData then
+        if defaultConfig then
+            print("[ChaosConfig] config.json not found in user folder; copying default_config.json")
+            ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", defaultConfig)
+            configData = defaultConfig
+        end
+    elseif defaultConfig then
+        local _, changed = mergeMissingKeys(configData, defaultConfig)
+        if changed then
+            print("[ChaosConfig] Added missing keys from default_config.json; saving config.json")
+            ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", configData)
+        end
+    end
+
     if not configData then
         print("[ChaosConfig] Failed to load config from disk")
         return

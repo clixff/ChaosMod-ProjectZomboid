@@ -265,7 +265,7 @@ async function promptForModFolder(dataRoot: string): Promise<string> {
 
       if (!isValidModFolderPath(answer)) {
         logger.warn(
-          `Invalid mod folder path. Expected a ChaosMod folder containing ${colors.cyan("common/config.json")} and ${colors.cyan("common/effects.json")}.`,
+          `Invalid mod folder path. Expected a ChaosMod folder containing ${colors.cyan("common/default_config.json")} and ${colors.cyan("common/default_effects.json")}.`,
         );
         continue;
       }
@@ -313,8 +313,8 @@ async function main(): Promise<void> {
   if (!modFolder) {
     modFolder = await promptForModFolder(dataRoot);
   }
-  const config = modFolder ? loadConfig(modFolder) : null;
-  const effects = modFolder ? loadEffects(modFolder) : [];
+  const config = modFolder && luaFolder ? loadConfig(modFolder, luaFolder) : null;
+  const effects = modFolder && luaFolder ? loadEffects(modFolder, luaFolder) : [];
 
   if (modFolder && config) {
     applyLoadedConfig(config, config, modFolder);
@@ -471,22 +471,22 @@ async function main(): Promise<void> {
       );
       connectChat(token, user);
     }
-    if (config && modFolder) {
+    if (config && luaFolder) {
       config.streamer_mode.streamer_mode_enabled = true;
       config.streamer_mode.voting_enabled = true;
-      saveConfig(modFolder, config);
+      saveConfig(luaFolder, config);
       logger.info("Streamer mode and voting enabled.");
     }
   }
 
   function reloadRuntimeConfig(): boolean {
-    if (!config || !modFolder) {
+    if (!config || !modFolder || !luaFolder) {
       logger.warn("Config not available.");
       return false;
     }
 
-    const nextConfig = loadConfig(modFolder);
-    const nextEffects = loadEffects(modFolder);
+    const nextConfig = loadConfig(modFolder, luaFolder);
+    const nextEffects = loadEffects(modFolder, luaFolder);
     applyLoadedConfig(config, nextConfig, modFolder);
     nicknamesManager?.setRenderChatMessages(
       config.streamer_mode.render_chat_messages,
@@ -589,11 +589,11 @@ async function main(): Promise<void> {
 
   let activeServer = startServer(buildServerCtx(host));
 
-  if (modFolder && config) {
-    registerLangCommand(app, modFolder, config);
+  if (modFolder && luaFolder && config) {
+    registerLangCommand(app, modFolder, luaFolder, config);
   }
 
-  registerDonateCommand(app, port, daProvider, modFolder, config);
+  registerDonateCommand(app, port, daProvider, luaFolder, config);
 
   app.registerCommand(
     "login",
@@ -665,7 +665,7 @@ async function main(): Promise<void> {
     [],
     [{ name: "on|off", required: true }],
     (args) => {
-      if (!config || !modFolder) {
+      if (!config || !luaFolder) {
         logger.warn("Config not available.");
         return;
       }
@@ -676,7 +676,7 @@ async function main(): Promise<void> {
       }
       const useLocalhostNew = val === "on";
       config.streamer_mode.use_localhost_ip = useLocalhostNew;
-      saveConfig(modFolder, config);
+      saveConfig(luaFolder, config);
 
       const newHost = hostOverride ?? (useLocalhostNew ? "127.0.0.1" : "0.0.0.0");
       activeServer.stop(true);
@@ -791,12 +791,12 @@ async function main(): Promise<void> {
     [],
     [],
     () => {
-      if (!config || !modFolder) {
+      if (!config || !modFolder || !luaFolder) {
         logger.warn("Config not available.");
         return;
       }
 
-      const nextConfig = resetConfigToDefaultsPreservingUnknowns(modFolder);
+      const nextConfig = resetConfigToDefaultsPreservingUnknowns(modFolder, luaFolder);
       if (!nextConfig) {
         logger.warn("Failed to reset config.");
         return;
@@ -815,7 +815,7 @@ async function main(): Promise<void> {
     [],
     [{ name: "on|off", required: true }],
     (args) => {
-      if (!config || !modFolder) {
+      if (!config || !luaFolder) {
         logger.warn("Config not available.");
         return;
       }
@@ -825,7 +825,7 @@ async function main(): Promise<void> {
         return;
       }
       config.streamer_mode.voting_enabled = val === "on";
-      saveConfig(modFolder, config);
+      saveConfig(luaFolder, config);
       logger.info(`Voting ${val === "on" ? "enabled" : "disabled"}.`);
     },
     "Enable or disable voting",
@@ -841,7 +841,7 @@ async function main(): Promise<void> {
     [],
     [{ name: "0|1" }],
     (args) => {
-      if (!config || !modFolder) {
+      if (!config || !luaFolder) {
         logger.warn("Config not available.");
         return;
       }
@@ -867,7 +867,7 @@ async function main(): Promise<void> {
         return;
       }
       config.streamer_mode.voting_mode = val;
-      saveConfig(modFolder, config);
+      saveConfig(luaFolder, config);
       logger.info(
         `Voting mode set to ${colors.cyan(String(val))} — ${VOTING_MODES[val]}`,
       );
@@ -880,7 +880,7 @@ async function main(): Promise<void> {
     [],
     [{ name: "on|off", required: true }],
     (args) => {
-      if (!config || !modFolder) {
+      if (!config || !luaFolder) {
         logger.warn("Config not available.");
         return;
       }
@@ -890,7 +890,7 @@ async function main(): Promise<void> {
         return;
       }
       config.streamer_mode.enable_donate = val === "on";
-      saveConfig(modFolder, config);
+      saveConfig(luaFolder, config);
       logger.info(`Donate mode ${val === "on" ? "enabled" : "disabled"}.`);
     },
     "Enable or disable donate mode",
@@ -901,7 +901,7 @@ async function main(): Promise<void> {
     [],
     [{ name: "on|off", required: true }],
     (args) => {
-      if (!config || !modFolder) {
+      if (!config || !luaFolder) {
         logger.warn("Config not available.");
         return;
       }
@@ -911,7 +911,7 @@ async function main(): Promise<void> {
         return;
       }
       config.streamer_mode.streamer_mode_enabled = val === "on";
-      saveConfig(modFolder, config);
+      saveConfig(luaFolder, config);
       logger.info(`Streamer Mode ${val === "on" ? "enabled" : "disabled"}.`);
     },
     "Enable or disable streamer mode",

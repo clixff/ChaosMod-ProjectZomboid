@@ -18,6 +18,7 @@ function getAvailableLanguages(modFolder: string): string[] {
 export function registerLangCommand(
   app: App,
   modFolder: string,
+  luaFolder: string,
   config: ModConfig,
 ): void {
   app.registerCommand(
@@ -52,7 +53,7 @@ export function registerLangCommand(
       }
 
       config.lang = target;
-      saveConfig(modFolder, config);
+      saveConfig(luaFolder, config);
       setLang(target);
       logger.info(`Language changed to ${colors.cyan(target)}`);
     },

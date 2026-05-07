@@ -35,7 +35,42 @@ function ChaosEffectsRegistry.Initialize()
 
     local enabledEffects = 0;
     local totalEffects = 0;
-    local effectsData = ChaosFileReader.ReadJsonFile("effects.json")
+
+    ---@type table | nil
+    local defaultEffectsData = ChaosFileReader.ReadJsonFile("default_effects.json")
+
+    ---@type table | nil
+    local effectsData = ChaosFileReader.ReadJsonFromCache("ChaosMod/effects.json")
+    if not effectsData then
+        if defaultEffectsData then
+            print("[ChaosEffectsRegistry] effects.json not found in user folder; copying default_effects.json")
+            ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", defaultEffectsData)
+            effectsData = defaultEffectsData
+        end
+    elseif defaultEffectsData and type(defaultEffectsData.effects) == "table" then
+        if type(effectsData.effects) ~= "table" then
+            effectsData.effects = {}
+        end
+        local existingIds = {}
+        for _, effect in ipairs(effectsData.effects) do
+            if type(effect) == "table" and type(effect.id) == "string" then
+                existingIds[effect.id] = true
+            end
+        end
+        local addedCount = 0
+        for _, defEffect in ipairs(defaultEffectsData.effects) do
+            if type(defEffect) == "table" and type(defEffect.id) == "string" and not existingIds[defEffect.id] then
+                table.insert(effectsData.effects, defEffect)
+                existingIds[defEffect.id] = true
+                addedCount = addedCount + 1
+            end
+        end
+        if addedCount > 0 then
+            print("[ChaosEffectsRegistry] Added " .. tostring(addedCount) .. " missing effect(s) from default_effects.json; saving effects.json")
+            ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", effectsData)
+        end
+    end
+
     if not effectsData then
         print("[ChaosEffectsRegistry] Failed to load effects data")
         return

@@ -39,8 +39,8 @@ export function isValidModFolderPath(modPath: string): boolean {
   return (
     existsSync(modPath) &&
     existsSync(join(modPath, "common")) &&
-    existsSync(join(modPath, "common", "config.json")) &&
-    existsSync(join(modPath, "common", "effects.json"))
+    existsSync(join(modPath, "common", "default_config.json")) &&
+    existsSync(join(modPath, "common", "default_effects.json"))
   );
 }
 
