@@ -370,6 +370,16 @@ a:focus-visible {
   background: #2a2a2a;
 }
 
+a.btn,
+a.btn:link,
+a.btn:visited,
+a.btn:active,
+a.btn:hover {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-strong);
+}
+
 .btn--primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -379,6 +389,19 @@ a:focus-visible {
 .btn--primary:hover {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
+}
+
+a.btn--primary,
+a.btn--primary:link,
+a.btn--primary:visited,
+a.btn--primary:active,
+a.btn--primary:hover {
+  color: white;
+  border-bottom-color: var(--accent);
+}
+
+a.btn--primary:hover {
+  border-bottom-color: var(--accent-hover);
 }
 
 .btn--danger {
@@ -548,6 +571,10 @@ a:focus-visible {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 18px;
+}
+
+.cards--top {
+  margin-bottom: 18px;
 }
 
 .card {

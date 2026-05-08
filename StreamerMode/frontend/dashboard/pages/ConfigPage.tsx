@@ -10,6 +10,7 @@ import {
   type ModConfig,
   type DonatePriceGroup,
 } from "../api.ts";
+import { formatLanguageLabel } from "../languageLabels.ts";
 
 interface ConfigPageProps {
   onNotify: (message: string, isError?: boolean) => void;
@@ -122,7 +123,7 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
           <Select
             value={config.lang}
             options={(languages.length > 0 ? languages : [config.lang]).map(
-              (code) => ({ value: code, label: code }),
+              (code) => ({ value: code, label: formatLanguageLabel(code) }),
             )}
             onChange={(v) => setField("lang", v)}
           />

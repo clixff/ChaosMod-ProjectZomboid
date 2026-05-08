@@ -119,6 +119,12 @@ export interface HomeStatus {
   voting: { active: boolean };
   twitch_chat: { connected: boolean };
   recent_activity: ActivityEvent[];
+  version: {
+    current: string;
+    latest: string | null;
+    update_available: boolean;
+    releases_url: string;
+  };
 }
 
 export async function getHomeStatus(): Promise<HomeStatus> {

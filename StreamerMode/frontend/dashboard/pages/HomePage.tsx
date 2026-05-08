@@ -6,20 +6,28 @@ import {
   DollarSign,
   FileDown,
   Info,
+  Link as LinkIcon,
   LogIn,
   LogOut,
   Pencil,
   Settings,
+  Star,
+  TriangleAlert,
 } from "lucide-react";
 import twitchLogo from "../assets/twitch_logo.webp";
-import donationAlertsLogo from "../assets/donationalerts_logo.png";
-import obsLogo from "../assets/obs_logo.png";
-import googleSheetsLogo from "../assets/google_sheets_logo.png";
+import donationAlertsLogo from "../assets/donationalerts_logo.webp";
+import obsLogo from "../assets/obs_logo.webp";
+import googleSheetsLogo from "../assets/google_sheets_logo.webp";
+import steamLogo from "../assets/steam_logo.webp";
+
+const STEAM_WORKSHOP_URL =
+  "https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142";
 import { Modal } from "../components/Modal.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
 import { Select } from "../components/Select.tsx";
 import { TextInput, NumberInput } from "../components/Input.tsx";
 import { Section, FieldRow } from "../components/Section.tsx";
+import { formatLanguageLabel } from "../languageLabels.ts";
 import {
   getHomeStatus,
   twitchLogin,
@@ -181,6 +189,36 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
 
   return (
     <>
+      {status.version.update_available && status.version.latest && (
+        <div className="cards cards--top">
+          <div className="card">
+            <div className="card-head">
+              <h3 className="card-title">
+                <span className="card-title-icon">
+                  <TriangleAlert size={18} color="#f5b301" aria-hidden="true" />
+                </span>
+                New Update Available
+              </h3>
+            </div>
+            <div className="card-row">
+              <span className="card-row-value">
+                Update {status.version.latest} is available
+              </span>
+            </div>
+            <div className="card-actions">
+              <a
+                className="btn btn--primary"
+                href={status.version.releases_url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <LinkIcon size={14} aria-hidden="true" />
+                Download
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="top-row">
         {config && (
           <Section
@@ -194,7 +232,10 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                   options={(languages.length > 0
                     ? languages
                     : [config.lang]
-                  ).map((code) => ({ value: code, label: code }))}
+                  ).map((code) => ({
+                    value: code,
+                    label: formatLanguageLabel(code),
+                  }))}
                   onChange={(v) => setConfigField("lang", v)}
                 />
               </FieldRow>
@@ -459,6 +500,25 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             </button>
           </div>
         </div>
+        <div className="card">
+          <div className="card-head" style={{ marginBottom: 20 }}>
+            <h3 className="card-title">
+              <img src={steamLogo} alt="" className="card-title-logo" />
+              Rate Mod On Steam
+            </h3>
+          </div>
+          <div className="card-actions">
+            <a
+              className="btn btn--primary"
+              href={STEAM_WORKSHOP_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Star size={16} strokeWidth={3} aria-hidden="true" />
+              Open Steam Workshop
+            </a>
+          </div>
+        </div>
       </div>
 
       {obsModal && (
@@ -485,8 +545,8 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           </ol>
           <p>
             <b>OBS on a different PC?</b> Enable the checkbox{" "}
-            <i>"OBS runs on a different PC"</i>, then restart the StreamerApp so
-            it binds to your LAN address. Use the LAN URL shown on the OBS card.
+            <i>"OBS runs on a different PC" </i>
+            and use the new LAN URL shown on the OBS card.
           </p>
         </Modal>
       )}

@@ -43,6 +43,12 @@ import { DonationManager } from "./src/donations/DonationManager.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
 import type { EffectEntry } from "./src/effects.ts";
 import { ActivityLog } from "./src/activityLog.ts";
+import {
+  buildStatus as buildVersionStatus,
+  fetchLatestVersion,
+  RELEASES_URL,
+  type VersionStatus,
+} from "./src/versionCheck.ts";
 
 function getBestLocalIPv4(): {
   interfaceName: string;
@@ -436,6 +442,16 @@ async function main(): Promise<void> {
 
   const votingManager = new VotingManager(effects, config);
   const activityLog = new ActivityLog();
+
+  let versionStatus: VersionStatus = buildVersionStatus(VERSION, null);
+  void fetchLatestVersion().then((latest) => {
+    versionStatus = buildVersionStatus(VERSION, latest);
+    if (versionStatus.update_available && latest) {
+      logger.info(
+        `${colors.yellow(`New version v${latest} is available.`)} Download: ${colors.cyan(RELEASES_URL)}`,
+      );
+    }
+  });
 
   const bridge = luaFolder ? new Bridge(luaFolder) : null;
   let modEnabled = false;
@@ -862,6 +878,7 @@ async function main(): Promise<void> {
             connected: chatConnected,
           },
           recent_activity: activityLog.list(),
+          version: versionStatus,
         };
       },
       twitchLogin: async () => {

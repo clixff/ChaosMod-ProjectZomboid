@@ -109,6 +109,12 @@ export interface HomeStatus {
     connected: boolean;
   };
   recent_activity: ActivityEvent[];
+  version: {
+    current: string;
+    latest: string | null;
+    update_available: boolean;
+    releases_url: string;
+  };
 }
 
 export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
