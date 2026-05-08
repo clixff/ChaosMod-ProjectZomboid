@@ -149,6 +149,16 @@ function ChaosSettingsConfigPanel:rebuild()
     table.insert(children, self.controls.effects_interval)
     y = y + rowH + rowGap
 
+    addLabelled("effects_duration_multiplier")
+    self.controls.effects_duration_multiplier = W.MakeNumberInput(self, controlX, y, controlW, cfg.effects_duration_multiplier or 1.0, { float = true, maxLen = 8 })
+    table.insert(children, self.controls.effects_duration_multiplier)
+    y = y + rowH + rowGap
+
+    addLabelled("recent_effects_block_buffer")
+    self.controls.recent_effects_block_buffer = W.MakeNumberInput(self, controlX, y, controlW, cfg.recent_effects_block_buffer or 90, { float = false, maxLen = 6 })
+    table.insert(children, self.controls.recent_effects_block_buffer)
+    y = y + rowH + rowGap
+
     addLabelled("hide_progress_bar")
     self.controls.hide_progress_bar = W.MakeCheckbox(self, controlX, y, "", cfg.hide_progress_bar == true, function(checked)
         cfg.hide_progress_bar = checked
@@ -401,6 +411,16 @@ function ChaosSettingsConfigPanel:CommitWorkingState()
 
     if self.controls.effects_interval then
         cfg.effects_interval = W.GetIntFromBox(self.controls.effects_interval, cfg.effects_interval or 45)
+    end
+    if self.controls.effects_duration_multiplier then
+        local v = W.GetFloatFromBox(self.controls.effects_duration_multiplier, cfg.effects_duration_multiplier or 1.0)
+        if v <= 0 then v = 1.0 end
+        cfg.effects_duration_multiplier = v
+    end
+    if self.controls.recent_effects_block_buffer then
+        local v = W.GetIntFromBox(self.controls.recent_effects_block_buffer, cfg.recent_effects_block_buffer or 90)
+        if v < 0 then v = 0 end
+        cfg.recent_effects_block_buffer = v
     end
     if self.controls.vote_start_time then
         cfg.vote_start_time = W.GetIntFromBox(self.controls.vote_start_time, cfg.vote_start_time or 10)

@@ -389,6 +389,8 @@
         "lang": "语言",
         "effects_interval_enabled": "效果间隔",
         "effects_interval": "效果间隔时间",
+        "effects_duration_multiplier": "效果持续时间倍数",
+        "recent_effects_block_buffer": "最近效果屏蔽缓冲",
         "hide_progress_bar": "隐藏进度条",
         "ui_sounds_enabled": "启用界面音效",
         "ignore_effect_chances": "忽略效果概率",

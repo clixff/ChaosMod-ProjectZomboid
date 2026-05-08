@@ -108,15 +108,28 @@ end
 
 ---@alias ChaosEffectPickType "default" | "donate"
 
-local RECENT_EFFECTS_MAX = 30
 ---@type table<string, boolean>
 local recentEffectsSet = {}
 ---@type string[]
 local recentEffectsQueue = {}
 
+---@return integer
+local function getRecentEffectsMax()
+    local v = ChaosConfig.recent_effects_block_buffer
+    if type(v) ~= "number" or v < 0 then return 90 end
+    return math.floor(v)
+end
+
 ---@param id string
 local function addToBlocklist(id)
-    if #recentEffectsQueue >= RECENT_EFFECTS_MAX then
+    local maxBuffer = getRecentEffectsMax()
+    while #recentEffectsQueue >= maxBuffer do
+        if maxBuffer <= 0 then
+            -- Buffer disabled: clear and skip insertion below.
+            for k in pairs(recentEffectsSet) do recentEffectsSet[k] = nil end
+            for i = #recentEffectsQueue, 1, -1 do recentEffectsQueue[i] = nil end
+            return
+        end
         local evicted = table.remove(recentEffectsQueue, 1)
         recentEffectsSet[evicted] = nil
     end

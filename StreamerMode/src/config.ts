@@ -44,6 +44,8 @@ export interface ModConfig {
   lang: string;
   effects_interval_enabled: boolean;
   effects_interval: number;
+  effects_duration_multiplier: number;
+  recent_effects_block_buffer: number;
   vote_start_time: number;
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
@@ -148,6 +150,8 @@ const DEFAULT_CONFIG: ModConfig = {
   lang: "en",
   effects_interval_enabled: true,
   effects_interval: 45,
+  effects_duration_multiplier: 1.0,
+  recent_effects_block_buffer: 90,
   vote_start_time: 15,
   hide_progress_bar: false,
   use_voting_progress_bar_color: false,
@@ -384,6 +388,14 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
       d.effects_interval_enabled,
     ),
     effects_interval: num(raw["effects_interval"], d.effects_interval),
+    effects_duration_multiplier: num(
+      raw["effects_duration_multiplier"],
+      d.effects_duration_multiplier,
+    ),
+    recent_effects_block_buffer: num(
+      raw["recent_effects_block_buffer"],
+      d.recent_effects_block_buffer,
+    ),
     vote_start_time: num(raw["vote_start_time"], d.vote_start_time),
     hide_progress_bar: bool(raw["hide_progress_bar"], d.hide_progress_bar),
     use_voting_progress_bar_color: bool(

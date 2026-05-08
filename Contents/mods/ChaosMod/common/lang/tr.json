@@ -389,6 +389,8 @@
         "lang": "Dil",
         "effects_interval_enabled": "Etki Aralığı",
         "effects_interval": "Etki Aralık Süresi",
+        "effects_duration_multiplier": "Etki Süresi Çarpanı",
+        "recent_effects_block_buffer": "Son Etkiler Engelleme Tamponu",
         "hide_progress_bar": "İlerleme çubuğunu gizle",
         "ui_sounds_enabled": "Arayüz sesleri açık",
         "ignore_effect_chances": "Etki şanslarını yoksay",

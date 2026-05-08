@@ -389,6 +389,8 @@
         "lang": "Idioma",
         "effects_interval_enabled": "Intervalo de Efeitos",
         "effects_interval": "Tempo do Intervalo",
+        "effects_duration_multiplier": "Multiplicador de Duração dos Efeitos",
+        "recent_effects_block_buffer": "Buffer de Bloqueio de Efeitos Recentes",
         "hide_progress_bar": "Ocultar barra de progresso",
         "ui_sounds_enabled": "Sons da interface",
         "ignore_effect_chances": "Ignorar chances de efeitos",

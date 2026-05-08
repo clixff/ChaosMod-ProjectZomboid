@@ -2,12 +2,22 @@ import type { EffectEntry } from "./effects.ts";
 
 export type EffectPickType = "default" | "donate";
 
-const RECENT_EFFECTS_MAX = 90;
+let RECENT_EFFECTS_MAX = 90;
 const recentSet = new Set<string>();
 const recentQueue: string[] = [];
 
+export function setRecentEffectsMax(n: number): void {
+  if (typeof n !== "number" || !isFinite(n) || n < 0) return;
+  RECENT_EFFECTS_MAX = Math.floor(n);
+  while (recentQueue.length > RECENT_EFFECTS_MAX) {
+    const evicted = recentQueue.shift();
+    if (evicted !== undefined) recentSet.delete(evicted);
+  }
+}
+
 function pushToBlocklist(id: string): void {
   if (recentSet.has(id)) return;
+  if (RECENT_EFFECTS_MAX <= 0) return;
   if (recentQueue.length >= RECENT_EFFECTS_MAX) {
     const evicted = recentQueue.shift();
     if (evicted !== undefined) recentSet.delete(evicted);

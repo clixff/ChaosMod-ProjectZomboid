@@ -65,7 +65,12 @@ function ChaosEffectsManager.StartEffect(effectId, effectNickname)
     end
 
     local effectClass = effectData.class
-    local newEffect = effectClass:new(effectId, effectData.name, effectData.duration, effectData.withDuration,
+    local durationMultiplier = ChaosConfig.effects_duration_multiplier
+    if type(durationMultiplier) ~= "number" or durationMultiplier <= 0 then
+        durationMultiplier = 1
+    end
+    local scaledDuration = (effectData.duration or 0) * durationMultiplier
+    local newEffect = effectClass:new(effectId, effectData.name, scaledDuration, effectData.withDuration,
         effectNickname)
     if not newEffect then return end
 

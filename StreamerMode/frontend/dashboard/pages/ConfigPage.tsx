@@ -141,6 +141,27 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setField("effects_interval", v)}
           />
         </FieldRow>
+        <FieldRow
+          label="Effects duration multiplier"
+          hint="Multiplies every effect's duration. 1.0 = unchanged, 2.0 = double duration."
+        >
+          <NumberInput
+            value={config.effects_duration_multiplier}
+            min={0.1}
+            step={0.1}
+            onChange={(v) => setField("effects_duration_multiplier", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Recent effects block buffer"
+          hint="How many of the most recently triggered effects are blocked from being picked again."
+        >
+          <NumberInput
+            value={config.recent_effects_block_buffer}
+            min={0}
+            onChange={(v) => setField("recent_effects_block_buffer", v)}
+          />
+        </FieldRow>
         <FieldRow label="Vote start time (seconds)">
           <NumberInput
             value={config.vote_start_time}

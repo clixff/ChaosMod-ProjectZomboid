@@ -26,6 +26,7 @@ import {
   getAvailableLanguages,
 } from "./src/commands/lang.ts";
 import { loadEffects, saveEffects } from "./src/effects.ts";
+import { setRecentEffectsMax } from "./src/effectsRegistry.ts";
 import { startServer } from "./src/server.ts";
 import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
@@ -329,6 +330,12 @@ function applyLoadedConfig(
   targetConfig.ui_sounds_enabled = nextConfig.ui_sounds_enabled;
   targetConfig.ignore_effect_chances = nextConfig.ignore_effect_chances;
   targetConfig.streamer_mode = nextConfig.streamer_mode;
+  targetConfig.effects_duration_multiplier =
+    nextConfig.effects_duration_multiplier;
+  targetConfig.recent_effects_block_buffer =
+    nextConfig.recent_effects_block_buffer;
+
+  setRecentEffectsMax(targetConfig.recent_effects_block_buffer);
 
   initLocalization(modFolder, targetConfig.lang);
 }

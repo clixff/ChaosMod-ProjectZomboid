@@ -390,6 +390,8 @@
         "lang": "Язык",
         "effects_interval_enabled": "Интервал эффектов",
         "effects_interval": "Время интервала эффектов",
+        "effects_duration_multiplier": "Множитель длительности эффектов",
+        "recent_effects_block_buffer": "Размер буфера недавних эффектов",
         "hide_progress_bar": "Скрыть прогресс-бар",
         "ui_sounds_enabled": "Звуки интерфейса",
         "ignore_effect_chances": "Игнорировать шансы эффектов",

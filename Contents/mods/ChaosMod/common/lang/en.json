@@ -389,6 +389,8 @@
         "lang": "Language",
         "effects_interval_enabled": "Effects Interval",
         "effects_interval": "Effects Interval Time",
+        "effects_duration_multiplier": "Effects Duration Multiplier",
+        "recent_effects_block_buffer": "Recent Effects Block Buffer",
         "hide_progress_bar": "Hide Progress Bar",
         "ui_sounds_enabled": "UI Sounds Enabled",
         "ignore_effect_chances": "Ignore Effect Chances",

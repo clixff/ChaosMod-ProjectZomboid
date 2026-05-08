@@ -44,6 +44,8 @@
 ---@field lang string -- Language code (e.g. "en", "fr")
 ---@field effects_interval_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
 ---@field effects_interval number
+---@field effects_duration_multiplier number -- multiplier applied to every effect's duration
+---@field recent_effects_block_buffer number -- size of the recently-used effects blocklist
 ---@field vote_start_time number
 ---@field hide_progress_bar boolean
 ---@field use_voting_progress_bar_color boolean
@@ -55,6 +57,8 @@ ChaosConfig = ChaosConfig or {
     lang = "en",
     effects_interval_enabled = true,
     effects_interval = 45,
+    effects_duration_multiplier = 1.0,
+    recent_effects_block_buffer = 90,
     vote_start_time = 15,
     hide_progress_bar = false,
     use_voting_progress_bar_color = false,
@@ -211,6 +215,14 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.effects_interval) == "number" then
         ChaosConfig.effects_interval = configData.effects_interval
+    end
+
+    if type(configData.effects_duration_multiplier) == "number" and configData.effects_duration_multiplier > 0 then
+        ChaosConfig.effects_duration_multiplier = configData.effects_duration_multiplier
+    end
+
+    if type(configData.recent_effects_block_buffer) == "number" and configData.recent_effects_block_buffer >= 0 then
+        ChaosConfig.recent_effects_block_buffer = math.floor(configData.recent_effects_block_buffer)
     end
 
     if type(configData.vote_start_time) == "number" then
@@ -482,6 +494,8 @@ function ChaosConfig.BuildJsonSnapshot()
         lang = ChaosConfig.lang,
         effects_interval_enabled = ChaosConfig.effects_interval_enabled,
         effects_interval = ChaosConfig.effects_interval,
+        effects_duration_multiplier = ChaosConfig.effects_duration_multiplier,
+        recent_effects_block_buffer = ChaosConfig.recent_effects_block_buffer,
         vote_start_time = ChaosConfig.vote_start_time,
         hide_progress_bar = ChaosConfig.hide_progress_bar,
         use_voting_progress_bar_color = ChaosConfig.use_voting_progress_bar_color,

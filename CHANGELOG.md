@@ -13,6 +13,8 @@
 - Added `streamer_mode.voting_options_number` config (default 4, range 4-8) to control how many voting options are shown each round; chat vote remap range now scales with this value.
 - StreamerApp now checks GitHub for the latest version on startup; when a newer version is available it logs the version and download link to the CLI, and exposes the result to the dashboard
 - Random Effect voting option now rolls its hidden effect when voting starts (kept secret from `/obs` via a `hidden` API flag) and reveals the rolled effect's localized name on the OBS overlay once voting ends, even if Random Effect didn't win. The hidden effect only enters the recent-effects blocklist if Random Effect actually wins.
+- Added `recent_effects_block_buffer` config option (default 90) to control the size of the recently-used effects blocklist in both the mod and StreamerApp.
+- Added `effects_duration_multiplier` config option (default 1.0) that scales every effect's duration in game.
 
 ### Mod fixes
 

@@ -40,6 +40,8 @@ export interface ModConfig {
   lang: string;
   effects_interval_enabled: boolean;
   effects_interval: number;
+  effects_duration_multiplier: number;
+  recent_effects_block_buffer: number;
   vote_start_time: number;
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
