@@ -4,6 +4,10 @@ local SEARCH_RADIUS = 60
 
 function EffectBlowUpNearbyCorpses:OnStart()
     ChaosEffectBase:OnStart()
+end
+
+function EffectBlowUpNearbyCorpses:OnEnd()
+    ChaosEffectBase:OnEnd()
 
     local player = getPlayer()
     if not player then return end

@@ -13,16 +13,17 @@
 - Added `streamer_mode.voting_options_number` config (default 4, range 4-8) to control how many voting options are shown each round; chat vote remap range now scales with this value.
 - StreamerApp now checks GitHub for the latest version on startup; when a newer version is available it logs the version and download link to the CLI, and exposes the result to the dashboard
 - Random Effect voting option now rolls its hidden effect when voting starts (kept secret from `/obs` via a `hidden` API flag) and reveals the rolled effect's localized name on the OBS overlay once voting ends, even if Random Effect didn't win. The hidden effect only enters the recent-effects blocklist if Random Effect actually wins.
-- Added `recent_effects_block_buffer` config option (default 90) to control the size of the recently-used effects blocklist in both the mod and StreamerApp.
+- Added `recent_effects_block_buffer` config option (default 60) to control the size of the recently-used effects blocklist in both the mod and StreamerApp.
 - Added `effects_duration_multiplier` config option (default 1.0) that scales every effect's duration in game.
 - StreamerApp donation parser now also recognizes effect numbers in the donation message via `№<number>`, `!<number>`, and bare `<number>` in addition to `#<id>`.
-- StreamerApp can now export effects to a formatted `.xlsx` Excel workbook via `export xlsx` (CLI) and the dashboard's Export card; columns are color-coded (`Enabled`, `Price Group`, `Duration`, `Price`), names and descriptions are taken from the active language file, and the Price Group column uses a green→red gradient interpolated from the group tier.
+- StreamerApp can now export effects to a formatted `.xlsx` Excel workbook via `export xlsx` (CLI) and the dashboard's Export card
 
 ### Mod fixes
 
 - Updated `obs` command to show the new instructions for setting up the OBS browser source with LAN IP.
 - `ChaosUtils.TriggerExplosionAt` now accepts an optional `shouldRemoveProps` parameter (default `true`); when enabled, smashes nearby windows and scatters container items before the explosion
-- Increased recent effects cache size from 30 to 90 to prevent duplicates in voting
+- Increased recent effects cache size from 30 to 60 to prevent duplicates in voting
+- Default effect chances are now more balanced and effects have new balanced price groups
 
 ### New Effects
 
@@ -102,5 +103,3 @@
 - "Force Zoom In" and "Force Zoom Out" now set zoom levels to 25-250%
 - Effect "Teleport To Last Used Bed" now uses the saved spawn point if available
 - Effect "Insane Traffic" now causes player to take damage from vehicles
-- Fixed Courier, Food Delivery, and Spawn NPC With Loot NPC movement to use the ChaosNPC AI movement system correctly
-- Increased Courier and Food Delivery spawn distance so they do not appear too close to the player
