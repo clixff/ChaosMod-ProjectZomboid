@@ -39,6 +39,7 @@ export interface VoteOptionStatus {
   index: number;
   effect_name: string;
   votes: number | undefined;
+  hidden?: boolean;
 }
 
 export interface ModStatus {

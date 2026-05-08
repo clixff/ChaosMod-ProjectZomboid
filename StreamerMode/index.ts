@@ -673,14 +673,24 @@ async function main(): Promise<void> {
           total_votes_label: getString("misc", "total_votes"),
           vote_background_color: `#${config?.ui.vote_background_color ?? "9f211f"}`,
           last_winner: votingManager.lastWinnerId,
-          vote_options: options.map((opt, i) => ({
-            effect_id: opt.id,
-            index: i + 1 + offset,
-            effect_name: getString("effects", opt.id),
-            votes: config?.streamer_mode.hide_votes
-              ? undefined
-              : opt.voters.size,
-          })),
+          vote_options: options.map((opt, i) => {
+            const isRandom = opt.id === "random_effect";
+            const revealSecret = isRandom && !votingManager.isActive;
+            const secretId = votingManager.secretRandomEffectId;
+            const effectName =
+              revealSecret && secretId
+                ? getString("effects", secretId)
+                : getString("effects", opt.id);
+            return {
+              effect_id: opt.id,
+              index: i + 1 + offset,
+              effect_name: effectName,
+              votes: config?.streamer_mode.hide_votes
+                ? undefined
+                : opt.voters.size,
+              hidden: isRandom && votingManager.isActive,
+            };
+          }),
           donateEnabled: config?.streamer_mode.enable_donate ?? false,
         };
       },

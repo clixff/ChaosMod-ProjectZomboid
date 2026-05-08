@@ -6,7 +6,8 @@ const RECENT_EFFECTS_MAX = 90;
 const recentSet = new Set<string>();
 const recentQueue: string[] = [];
 
-function addToBlocklist(id: string): void {
+function pushToBlocklist(id: string): void {
+  if (recentSet.has(id)) return;
   if (recentQueue.length >= RECENT_EFFECTS_MAX) {
     const evicted = recentQueue.shift();
     if (evicted !== undefined) recentSet.delete(evicted);
@@ -15,11 +16,16 @@ function addToBlocklist(id: string): void {
   recentSet.add(id);
 }
 
+export function markEffectUsed(id: string): void {
+  pushToBlocklist(id);
+}
+
 export function getRandomEffects(
   effects: EffectEntry[],
   amount: number,
   pickType: EffectPickType,
   ignoreChances: boolean,
+  addToBlocklist: boolean = true,
 ): string[] {
   interface PoolEntry {
     id: string;
@@ -60,7 +66,7 @@ export function getRandomEffects(
 
     const picked = pool[pickedIndex]!;
     result.push(picked.id);
-    addToBlocklist(picked.id);
+    if (addToBlocklist) pushToBlocklist(picked.id);
     totalWeight -= picked.weight;
     pool.splice(pickedIndex, 1);
   }

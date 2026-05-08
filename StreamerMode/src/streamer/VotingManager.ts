@@ -1,7 +1,9 @@
 import { logger } from "../utils/logger.ts";
 import type { EffectEntry } from "../effects.ts";
 import type { ModConfig } from "../config.ts";
-import { getRandomEffects } from "../effectsRegistry.ts";
+import { getRandomEffects, markEffectUsed } from "../effectsRegistry.ts";
+
+export const RANDOM_EFFECT_ID = "random_effect";
 
 export interface VoteOption {
   id: string;
@@ -14,6 +16,7 @@ export class VotingManager {
   private lastOptions: VoteOption[] = [];
   private lastWinner: string | null = null;
   private lastWinnerEffect: string | null = null;
+  private secretRandomEffect: string | null = null;
 
   constructor(
     private readonly effects: EffectEntry[],
@@ -40,6 +43,10 @@ export class VotingManager {
     return this.lastWinnerEffect;
   }
 
+  get secretRandomEffectId(): string | null {
+    return this.secretRandomEffect;
+  }
+
   start(): void {
     if (!this.config) return;
     this.lastWinner = null;
@@ -47,12 +54,17 @@ export class VotingManager {
     this.lastOptions = [];
     const optionsCount = this.config.streamer_mode.voting_options_number;
     const ids = getRandomEffects(this.effects, optionsCount - 1, "default", this.config.ignore_effect_chances);
+    const secretId =
+      getRandomEffects(this.effects, 1, "default", this.config.ignore_effect_chances, false)[0] ?? null;
+    this.secretRandomEffect = secretId;
     this.options = [
       ...ids.map((id) => ({ id, voters: new Set<string>() })),
-      { id: "random_effect", voters: new Set<string>() },
+      { id: RANDOM_EFFECT_ID, voters: new Set<string>() },
     ];
     this.active = true;
-    logger.debug(`Voting started (options: ${this.options.map((o) => o.id).join(", ")})`);
+    logger.debug(
+      `Voting started (options: ${this.options.map((o) => o.id).join(", ")}, secret: ${secretId ?? "none"})`,
+    );
   }
 
   stop(): void {
@@ -83,11 +95,11 @@ export class VotingManager {
     let winnerId: string;
 
     if (totalVotes === 0) {
-      winnerId = "random_effect";
+      winnerId = RANDOM_EFFECT_ID;
     } else if (this.config.streamer_mode.voting_mode === 1) {
       const roll = Math.floor(Math.random() * totalVotes);
       let cumulative = 0;
-      winnerId = "random_effect";
+      winnerId = RANDOM_EFFECT_ID;
       for (const option of this.options) {
         cumulative += option.voters.size;
         if (roll < cumulative) {
@@ -104,9 +116,14 @@ export class VotingManager {
     logger.debug(`Voting winner: ${winnerId}`);
     this.lastWinner = winnerId;
 
-    this.lastWinnerEffect =
-      winnerId === "random_effect"
-        ? (getRandomEffects(this.effects, 1, "default", this.config.ignore_effect_chances)[0] ?? null)
-        : winnerId;
+    if (winnerId === RANDOM_EFFECT_ID) {
+      const secretId =
+        this.secretRandomEffect ??
+        (getRandomEffects(this.effects, 1, "default", this.config.ignore_effect_chances, false)[0] ?? null);
+      this.lastWinnerEffect = secretId;
+      if (secretId) markEffectUsed(secretId);
+    } else {
+      this.lastWinnerEffect = winnerId;
+    }
   }
 }

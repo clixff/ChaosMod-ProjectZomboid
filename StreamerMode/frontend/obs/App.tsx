@@ -5,6 +5,7 @@ interface VoteOption {
   index: number;
   effect_name: string;
   votes: number | undefined;
+  hidden?: boolean;
 }
 
 interface ModStatus {
