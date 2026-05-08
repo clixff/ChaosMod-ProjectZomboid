@@ -3,42 +3,25 @@
 ---@field globalTimerMs number -- current elapsed ms, counts 0 → globalTimerMaxMs
 ---@field globalTimerMaxMs number -- effects_interval in ms
 ---@field iterationIndex integer -- increments each time globalTimer fires
----@field lastVotingActive integer -- last written voting active value (0 or 1)
----@field votingSyncCheckMs number -- accumulator for 1-second voting poll
----@field syncTimestamp string -- line1 value of last written sync file
----@field pendingVoteReadMs number -- countdown ms until effect_votes.txt is read; -1 = inactive
----@field externalEffectsCheckMs number -- accumulator for donate effects poll (every 3 s)
+---@field voteStartedThisInterval boolean -- true after vote_start has been emitted in the current interval
 ChaosEffectsManager = ChaosEffectsManager or {
     activeEffects = {},
     globalTimerMs = 0,
     globalTimerMaxMs = 0,
     iterationIndex = 0,
-    lastVotingActive = 0,
-    votingSyncCheckMs = 0,
-    syncTimestamp = "0",
-    pendingVoteReadMs = -1,
-    externalEffectsCheckMs = 0,
+    voteStartedThisInterval = false,
 }
 
 function ChaosEffectsManager.StartGlobalTimer()
     ChaosEffectsManager.globalTimerMaxMs = math.floor(ChaosConfig.effects_interval * 1000)
     ChaosEffectsManager.globalTimerMs = 0
-    ChaosEffectsManager.votingSyncCheckMs = 0
+    ChaosEffectsManager.voteStartedThisInterval = false
 end
 
 function ChaosEffectsManager.ClearGlobalTimer()
     ChaosEffectsManager.globalTimerMs = 0
     ChaosEffectsManager.globalTimerMaxMs = 0
-end
-
----@return integer
-function ChaosEffectsManager.ComputeVotingActive()
-    local sm = ChaosConfig.streamer_mode
-    if not sm or sm.streamer_mode_enabled ~= true or sm.voting_enabled ~= true then
-        return 0
-    end
-    local voteStartMs = (ChaosConfig.vote_start_time or 0) * 1000
-    return ChaosEffectsManager.globalTimerMs >= voteStartMs and 1 or 0
+    ChaosEffectsManager.voteStartedThisInterval = false
 end
 
 function ChaosEffectsManager.OnGlobalEffectsTimerEnd()
@@ -52,69 +35,8 @@ function ChaosEffectsManager.OnGlobalEffectsTimerEnd()
     end
     if sm and sm.streamer_mode_enabled == true then
         ChaosEffectsManager.iterationIndex = ChaosEffectsManager.iterationIndex + 1
-        local ts = tostring(getTimestampMs())
-        ChaosEffectsManager.syncTimestamp = ts
-        ChaosEffectsManager.lastVotingActive = 0
-        ChaosFileReader.WriteSyncFile(ts, ChaosEffectsManager.iterationIndex, 0)
-        if sm.voting_enabled == true then
-            ChaosEffectsManager.pendingVoteReadMs = 250
-        end
-    end
-end
-
-function ChaosEffectsManager.HandleVoteRead()
-    local reader = getFileReader("ChaosMod/effect_votes.txt", false)
-    if not reader then
-        ChaosEffectsManager.pendingVoteReadMs = 250
-        return
-    end
-    local effectId = reader:readLine()
-    print("[ChaosEffectsManager] Effect ID from vote: " .. tostring(effectId))
-    reader:close()
-    local writer = getFileWriter("ChaosMod/effect_votes.txt", true, false)
-    if writer then
-        writer:write("")
-        writer:close()
-    end
-    if effectId and effectId ~= "" then
-        ChaosEffectsManager.StartEffect(effectId)
-    else
-        ChaosEffectsManager.pendingVoteReadMs = 250
-    end
-end
-
-function ChaosEffectsManager.HandleExternalEffectsRead()
-    local reader = getFileReader("ChaosMod/effects_external.txt", false)
-    if not reader then return end
-
-    ---@type table<integer, {effectId: string, nickname: string}>
-    local entries = {}
-    while true do
-        local line = reader:readLine()
-        if line == nil then break end
-        if line ~= "" then
-            local slashPos = string.find(line, "/", 1, true)
-            if slashPos then
-                local nickname = string.sub(line, 1, slashPos - 1)
-                local effectId = string.sub(line, slashPos + 1)
-                if effectId ~= "" then
-                    if nickname == "" then nickname = "Anonymous" end
-                    table.insert(entries, { effectId = effectId, nickname = nickname })
-                end
-            end
-        end
-    end
-    reader:close()
-
-    local writer = getFileWriter("ChaosMod/effects_external.txt", true, false)
-    if writer then
-        writer:write("")
-        writer:close()
-    end
-
-    for _, entry in ipairs(entries) do
-        ChaosEffectsManager.StartEffect(entry.effectId, entry.nickname)
-        ChaosUIManager.onDonateEffectActivated(entry.nickname, entry.effectId)
+        ChaosEffectsManager.voteStartedThisInterval = false
+        ChaosBridge.Emit("interval_start", { iteration = ChaosEffectsManager.iterationIndex })
     end
 end
 
@@ -143,7 +65,12 @@ function ChaosEffectsManager.StartEffect(effectId, effectNickname)
     end
 
     local effectClass = effectData.class
-    local newEffect = effectClass:new(effectId, effectData.name, effectData.duration, effectData.withDuration,
+    local durationMultiplier = ChaosConfig.effects_duration_multiplier
+    if type(durationMultiplier) ~= "number" or durationMultiplier <= 0 then
+        durationMultiplier = 1
+    end
+    local scaledDuration = (effectData.duration or 0) * durationMultiplier
+    local newEffect = effectClass:new(effectId, effectData.name, scaledDuration, effectData.withDuration,
         effectNickname)
     if not newEffect then return end
 
@@ -172,34 +99,14 @@ function ChaosEffectsManager.OnTick(deltaMs)
             ChaosEffectsManager.OnGlobalEffectsTimerEnd()
             ChaosEffectsManager.globalTimerMs = 0
         end
-    end
-
-    if ChaosMod.enabled then
-        ChaosEffectsManager.votingSyncCheckMs = ChaosEffectsManager.votingSyncCheckMs + deltaMs
-        if ChaosEffectsManager.votingSyncCheckMs >= 1000 then
-            ChaosEffectsManager.votingSyncCheckMs = 0
-            local votingActive = ChaosEffectsManager.ComputeVotingActive()
-            if votingActive ~= ChaosEffectsManager.lastVotingActive then
-                ChaosEffectsManager.lastVotingActive = votingActive
-                ChaosFileReader.WriteSyncFile(ChaosEffectsManager.syncTimestamp, ChaosEffectsManager.iterationIndex,
-                    votingActive)
-            end
-        end
-
-        if ChaosEffectsManager.pendingVoteReadMs >= 0 then
-            ChaosEffectsManager.pendingVoteReadMs = ChaosEffectsManager.pendingVoteReadMs - deltaMs
-            if ChaosEffectsManager.pendingVoteReadMs <= 0 then
-                ChaosEffectsManager.pendingVoteReadMs = -1
-                ChaosEffectsManager.HandleVoteRead()
-            end
-        end
 
         local sm = ChaosConfig.streamer_mode
-        if sm and sm.streamer_mode_enabled == true and sm.enable_donate == true then
-            ChaosEffectsManager.externalEffectsCheckMs = ChaosEffectsManager.externalEffectsCheckMs + deltaMs
-            if ChaosEffectsManager.externalEffectsCheckMs >= 3000 then
-                ChaosEffectsManager.externalEffectsCheckMs = 0
-                ChaosEffectsManager.HandleExternalEffectsRead()
+        if sm and sm.streamer_mode_enabled == true and sm.voting_enabled == true
+            and not ChaosEffectsManager.voteStartedThisInterval then
+            local voteStartMs = (ChaosConfig.vote_start_time or 0) * 1000
+            if ChaosEffectsManager.globalTimerMs >= voteStartMs then
+                ChaosEffectsManager.voteStartedThisInterval = true
+                ChaosBridge.Emit("vote_start", nil)
             end
         end
     end

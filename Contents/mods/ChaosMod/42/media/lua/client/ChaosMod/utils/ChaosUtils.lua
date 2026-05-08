@@ -5,13 +5,19 @@
 ---@field isSleeping boolean -- Whether the player is sleeping this tick
 ---@field lastIsSleeping boolean -- Whether the player was sleeping last tick
 ---@field sleepWorldLocation {x: number, y: number, z: number} | nil -- World position where player last fell asleep
+---@field playerSpawnPoint {x: number, y: number, z: number} | nil -- World position where player first spawned this save
+---@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 2 recorded player world positions, oldest first
+---@field playerPreviousPositionsSampleMs integer
 ChaosUtils = ChaosUtils or {
     lastUsedVehicle = nil,
     playerPositionHistory = {},
     positionSampleMs = 0,
     isSleeping = false,
     lastIsSleeping = false,
-    sleepWorldLocation = nil
+    sleepWorldLocation = nil,
+    playerSpawnPoint = nil,
+    playerPreviousPositions = {},
+    playerPreviousPositionsSampleMs = 0
 }
 
 local SLEEP_MOD_DATA_KEY = "ChaosMod_SleepData"
@@ -63,6 +69,8 @@ end
 
 local POSITION_SAMPLE_INTERVAL_MS = 1000
 local POSITION_HISTORY_MAX = 60
+local PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS = 60000
+local PREVIOUS_LOCATION_MAX = 2
 
 --- Records the local player's position once per second (call only when ChaosMod is enabled).
 ---@param deltaMs integer
@@ -86,10 +94,87 @@ function ChaosUtils.TrackPlayerPosition(deltaMs)
     end
 end
 
+--- Records the player's location every 60 seconds, keeping only the last 2 entries (oldest first).
+---@param deltaMs integer
+function ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
+    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs + deltaMs
+    if ChaosUtils.playerPreviousPositionsSampleMs < PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS then return end
+    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs - PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS
+
+    local player = getPlayer()
+    if not player then return end
+    if not player:getSquare() then return end
+
+    table.insert(ChaosUtils.playerPreviousPositions, {
+        x = player:getX(),
+        y = player:getY(),
+        z = player:getZ()
+    })
+
+    while #ChaosUtils.playerPreviousPositions > PREVIOUS_LOCATION_MAX do
+        table.remove(ChaosUtils.playerPreviousPositions, 1)
+    end
+end
+
+---@param obj IsoObject
+function ChaosUtils.RemovePropExplosion(obj)
+    if not obj then return end
+
+    if instanceof(obj, "IsoWindow") then
+        ---@type IsoWindow
+        local window = obj
+        if not window:isSmashed() then
+            window:smashWindow()
+        end
+        return
+    end
+
+    local containerCount = obj:getContainerCount()
+    if not containerCount or containerCount == 0 then return end
+    local sq = obj:getSquare()
+    if not sq then return end
+    for i = 0, containerCount - 1 do
+        local container = obj:getContainerByIndex(i)
+        if container then
+            local items = container:getItems()
+            ---@type InventoryItem[]
+            local snapshot = {}
+            for j = 0, items:size() - 1 do
+                table.insert(snapshot, items:get(j))
+            end
+            for _, item in ipairs(snapshot) do
+                local ox = ChaosUtils.RandFloat(0.15, 0.85)
+                local oy = ChaosUtils.RandFloat(0.15, 0.85)
+                sq:AddWorldInventoryItem(item, ox, oy, 0.0)
+            end
+        end
+    end
+
+    local square = obj:getSquare()
+    if square then
+        square:RemoveTileObject(obj)
+    end
+    obj:removeFromSquare()
+    obj:removeFromWorld()
+end
+
 ---@param square IsoGridSquare
 ---@param explosionRange integer | nil defaults to 5
-function ChaosUtils.TriggerExplosionAt(square, explosionRange)
+---@param shouldRemoveProps boolean | nil defaults to true
+function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps)
     explosionRange = explosionRange or 5
+    if shouldRemoveProps == nil then shouldRemoveProps = true end
+
+    if shouldRemoveProps then
+        local x, y, z = square:getX(), square:getY(), square:getZ()
+        ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
+            if sq then
+                ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                    ChaosUtils.RemovePropExplosion(obj)
+                end)
+            end
+        end, 0, explosionRange, false, false, true, z, z)
+    end
 
     local weapon = instanceItem("Base.PipeBomb")
     local fakeZombie = getFakeAttacker()
@@ -654,11 +739,11 @@ function ChaosUtils.GetShortTextureIconName(item)
     return string.sub(textureIconName, 6, -1)
 end
 
----@param item string
+---@param itemId string
 ---@return string
-function ChaosUtils.GetShortTextureIconNameByString(item)
-    if not item then return "" end
-    local item = instanceItem(item)
+function ChaosUtils.GetShortTextureIconNameByString(itemId)
+    if not itemId then return "" end
+    local item = instanceItem(itemId)
     if not item then return "" end
     return ChaosUtils.GetShortTextureIconName(item)
 end
@@ -738,7 +823,7 @@ function ChaosUtils.ForAllObjectsInSquare(square, callback)
     if not callback then return false end
     local objects = square:getObjects()
     if not objects then return false end
-    for i = 0, objects:size() - 1 do
+    for i = objects:size() - 1, 0, -1 do
         local obj = objects:get(i)
         if obj then
             local result = callback(obj)
@@ -772,7 +857,7 @@ function ChaosUtils.ForAllWorldObjectsOnSquare(square, callback)
     if not callback then return false end
     local worldObjects = square:getWorldObjects()
     if not worldObjects then return false end
-    for i = 0, worldObjects:size() - 1 do
+    for i = worldObjects:size() - 1, 0, -1 do
         local obj = worldObjects:get(i)
         if obj then
             local result = callback(obj)
@@ -782,4 +867,71 @@ function ChaosUtils.ForAllWorldObjectsOnSquare(square, callback)
         end
     end
     return false
+end
+
+---Returns a pseudorandom integer between 0 and max - 1.
+---@param max number Exclusive upper bound of the integer value.
+---@return integer
+function ChaosUtils.RandInteger(max)
+    return math.floor(ZombRand(max))
+end
+
+---Returns a pseudorandom integer between min and max - 1.
+---@param min number Inclusive lower bound of the random integer.
+---@param max number Exclusive upper bound of the random integer.
+---@return integer
+function ChaosUtils.RandIntegerRange(min, max)
+    return math.floor(ZombRand(min, max))
+end
+
+---Returns a pseudorandom float between min and max.
+---@param min number Lower bound of the random float.
+---@param max number Upper bound of the random float.
+---@return number
+function ChaosUtils.RandFloat(min, max)
+    return ZombRandFloat(min, max)
+end
+
+---Returns a pseudorandom valid index into the given table (1-based).
+---@param array table
+---@return integer
+function ChaosUtils.RandArrayIndex(array)
+    return math.floor(ZombRand(#array)) + 1
+end
+
+---@param worldObject IsoWorldInventoryObject
+---@param removeInventoryItem boolean | nil
+---@return InventoryItem | nil
+function ChaosUtils.RemoveWorldObject(worldObject, removeInventoryItem)
+    if not worldObject then return nil end
+
+    local square = worldObject:getSquare()
+    if not square then return nil end
+
+    if removeInventoryItem == nil then
+        removeInventoryItem = true
+    end
+
+    local item = nil
+    if worldObject.getItem then
+        item = worldObject:getItem()
+    end
+
+    -- Detach item from world object first, otherwise Lua can keep a stale worldItem ref.
+    if item then
+        ---@diagnostic disable-next-line: param-type-mismatch
+        item:setWorldItem(nil)
+    end
+
+    -- Proper removal path (handles MP sync too)
+    square:transmitRemoveItemFromSquare(worldObject)
+
+    if removeInventoryItem then
+        if item then
+            item:Remove()
+        end
+        return nil
+    end
+
+    return item
 end

@@ -143,7 +143,29 @@ function ChaosNPC:update(deltaMs)
         end
     end
 
-    if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil then
+    if not self.isAttacking and self.actionType == nil and self:HasTag("effect_move_to_square") then
+        local targetSquare = self.effectMoveTargetLocation
+        local zombieSquare = zombie:getSquare()
+        local isOnTargetSquare = targetSquare and zombieSquare and
+            zombieSquare:getX() == targetSquare:getX() and
+            zombieSquare:getY() == targetSquare:getY() and
+            zombieSquare:getZ() == targetSquare:getZ()
+
+        if self.moveTargetCharacter then
+            self.moveTargetCharacter = nil
+            shouldUpdatePathfind = true
+        end
+
+        if isOnTargetSquare then
+            self:StopMoving(true, "effect_move_to_square_reached")
+        elseif targetSquare and (shouldUpdatePathfind or not self.moving) then
+            self:MoveToLocation(targetSquare)
+            shouldUpdatePathfind = false
+        end
+    end
+
+    if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil and
+        not self:HasTag("effect_move_to_square") then
         self:UpdateNextTargetMoveCharacter()
         shouldUpdatePathfind = true
     end
@@ -154,7 +176,8 @@ function ChaosNPC:update(deltaMs)
         end
     end
 
-    local shouldFindGroundWeapon = self.enemy == nil and self.actionType == nil and not self:HasEquippedWeapon()
+    local shouldFindGroundWeapon = self.enemy == nil and self.actionType == nil and not self:HasEquippedWeapon() and
+        not self:HasTag("effect_move_to_square")
     if shouldFindGroundWeapon and canFindGroundWeaponThisFrame and zombie:getVehicle() == nil then
         self.findGroundWeaponTimeoutMs = 0
 
@@ -238,6 +261,8 @@ function ChaosNPC:update(deltaMs)
                 self:StopMoving(true, "nearby_finished")
             elseif self.actionType == "pickup_ground_weapon" then
                 self:StopMoving(true, "pickup_ground_weapon_reached")
+            elseif not self.moveTargetCharacter and self:HasTag("effect_move_to_square") then
+                self:StopMoving(true, "effect_move_to_square_finished")
             elseif not self.moveTargetCharacter and self:HasTag("item_robber") then
                 self:StopMoving(true, "wander_reached")
             end

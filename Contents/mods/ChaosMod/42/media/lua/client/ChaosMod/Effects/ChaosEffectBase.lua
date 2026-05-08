@@ -7,6 +7,7 @@
 ---@field activationTimeMs integer -- At what time the effect was activated (in milliseconds)
 ---@field ticksActiveTime integer -- How many ticks the effect has been active for (in milliseconds)
 ---@field maxTicks integer -- How many ticks the effect will be active for (in milliseconds)
+---@field showNameAlways boolean?
 ChaosEffectBase = {}
 ChaosEffectBase.__index = ChaosEffectBase
 

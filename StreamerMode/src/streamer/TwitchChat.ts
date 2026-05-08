@@ -64,6 +64,8 @@ export class TwitchChat {
   private serverReconnect = false;
 
   onMessage: ((chat: ChatEvent) => void) | null = null;
+  onConnect: (() => void) | null = null;
+  onDisconnect: (() => void) | null = null;
 
   constructor(params: TwitchChatParams) {
     this.params = params;
@@ -88,6 +90,7 @@ export class TwitchChat {
 
     ws.addEventListener("open", () => {
       logger.info(`${this.coloredName} Connected to chat`);
+      this.onConnect?.();
     });
 
     ws.addEventListener("message", (event: MessageEvent) => {
@@ -97,6 +100,9 @@ export class TwitchChat {
     ws.addEventListener("close", (event: CloseEvent) => {
       if (this.ws === ws) this.ws = null;
       logger.info(`${this.coloredName} Disconnected from chat`);
+      if (!this.serverReconnect) {
+        this.onDisconnect?.();
+      }
 
       if (this.serverReconnect) {
         this.serverReconnect = false;

@@ -20,10 +20,7 @@ local MAX_TRIES = 50
 
 ---@param animal IsoAnimal
 local function addAnimalFollower(animal)
-    table.insert(ChaosMod.specialAnimalsFollowers, {
-        animal = animal,
-        repathTicks = 20
-    })
+    SpecialAnimal:new(animal)
 end
 
 ---@param animal IsoAnimal
@@ -45,6 +42,7 @@ local function killAnimal(animal)
     end
 
     if animal.DoDeath then
+        ---@diagnostic disable-next-line: param-type-mismatch
         animal:DoDeath(nil, nil)
     else
         animal:removeFromWorld()

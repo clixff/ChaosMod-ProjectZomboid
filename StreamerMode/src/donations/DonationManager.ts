@@ -13,8 +13,38 @@ interface EffectsApiResponse {
   effects: EffectEntry[];
 }
 
+export type DonationActivationFailure =
+  | {
+      type: "price_too_low";
+      effect_id: string;
+      nickname: string;
+      donation_amount: number;
+      required_price: number;
+    }
+  | {
+      type: "donations_disabled";
+      effect_id: string;
+      nickname: string;
+      donation_amount: number;
+    };
+
+function parseEffectTag(message: string): string | null {
+  const hashMatch = message.match(/#(\w+)/);
+  if (hashMatch && hashMatch[1]) return hashMatch[1];
+
+  const prefixedNumberMatch = message.match(/(?:№|!)\s*(\d+)/);
+  if (prefixedNumberMatch && prefixedNumberMatch[1]) return prefixedNumberMatch[1];
+
+  const bareNumberMatch = message.match(/(?:^|\s)(\d+)(?=\s|$|\D)/);
+  if (bareNumberMatch && bareNumberMatch[1]) return bareNumberMatch[1];
+
+  return null;
+}
+
 export class DonationManager {
   private readonly providers: DonationAlertsProvider[] = [];
+
+  onActivationFailed: ((info: DonationActivationFailure) => void) | null = null;
 
   constructor(private readonly port: number) {}
 
@@ -54,12 +84,10 @@ export class DonationManager {
       return;
     }
 
-    const match = donation.message.match(/#([\w]+)/);
-    if (!match) return;
-    const effectTag = match[1];
+    const effectTag = parseEffectTag(donation.message);
     if (!effectTag) return;
 
-    logger.debug(`[DonationAlerts] Effect tag found: #${effectTag}`);
+    logger.debug(`[DonationAlerts] Effect tag found: ${effectTag}`);
 
     let effectsData: EffectsApiResponse;
     try {
@@ -82,13 +110,34 @@ export class DonationManager {
 
       return entry.id === Number.parseInt(effectTag, 10);
     });
-    if (!effect || !effect.enabled_donate || effect.price_result == null)
+    if (!effect) return;
+
+    if (!effect.enabled_donate) {
+      logger.debug(
+        `[DonationAlerts] Effect ${effect.effect_id} has donations disabled (donation amount ${donation.amount} from ${donation.username})`,
+      );
+      this.onActivationFailed?.({
+        type: "donations_disabled",
+        effect_id: effect.effect_id,
+        nickname: donation.username ?? "",
+        donation_amount: donation.amount,
+      });
       return;
+    }
+
+    if (effect.price_result == null) return;
 
     if (donation.amount < effect.price_result) {
       logger.debug(
         `[DonationAlerts] Donation amount ${donation.amount} < required ${effect.price_result} for effect ${effect.effect_id}`,
       );
+      this.onActivationFailed?.({
+        type: "price_too_low",
+        effect_id: effect.effect_id,
+        nickname: donation.username ?? "",
+        donation_amount: donation.amount,
+        required_price: effect.price_result,
+      });
       return;
     }
 

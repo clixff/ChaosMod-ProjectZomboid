@@ -171,7 +171,7 @@ function ChaosAnimals.GetRandomAnimal()
     for k in pairs(ChaosAnimals.ANIMALS_LIST) do
         table.insert(mainTypes, k)
     end
-    local mainType = mainTypes[math.floor(ZombRand(1, #mainTypes + 1))]
+    local mainType = mainTypes[ChaosUtils.RandArrayIndex(mainTypes)]
     ---@type ChaosAnimalStageMap
     local stageMap = ChaosAnimals.ANIMALS_LIST[mainType]
 
@@ -180,11 +180,11 @@ function ChaosAnimals.GetRandomAnimal()
     for k in pairs(stageMap) do
         table.insert(stages, k)
     end
-    local stage = stages[math.floor(ZombRand(1, #stages + 1))]
+    local stage = stages[ChaosUtils.RandArrayIndex(stages)]
     ---@type ChaosAnimalBreedList
     local breeds = stageMap[stage]
 
-    local breed = breeds[math.floor(ZombRand(1, #breeds + 1))]
+    local breed = breeds[ChaosUtils.RandArrayIndex(breeds)]
     return stage or "", breed or ""
 end
 
@@ -204,13 +204,13 @@ function ChaosAnimals.SpawnAnimal(x, y, z, type, breed)
         return nil
     end
 
-    local breed = animalDef:getBreedByName(breed)
-    if not breed then
+    local breedObject = animalDef:getBreedByName(breed)
+    if not breedObject then
         print("[ChaosAnimals.SpawnAnimal] Failed to get breed")
         return nil
     end
 
-    local animal = addAnimal(getCell(), x, y, z, type, breed)
+    local animal = addAnimal(getCell(), x, y, z, type, breedObject)
     if not animal then
         print("[ChaosAnimals.SpawnAnimal] Failed to spawn animal")
         return nil

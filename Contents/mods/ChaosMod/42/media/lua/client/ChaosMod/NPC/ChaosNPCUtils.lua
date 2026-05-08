@@ -23,7 +23,6 @@ function ChaosNPCUtils.OnTick(deltaMs)
     end
 end
 
-
 ---@param npc ChaosNPC
 ---@return IsoGameCharacter?
 function ChaosNPCUtils.FindNewTargetForNPC(npc)
@@ -202,7 +201,7 @@ function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
                 targetZombie:setHitFromBehind(isBehind)
                 targetZombie:setHitReaction("Bite")
                 targetZombie:setVariable("hitreaction", "Bite")
-                targetZombie:setVariable("hashitreaction", true)
+                -- targetZombie:setVariable("hashitreaction", true)
                 targetZombie:reportEvent("wasHit")
                 targetZombie:setHitForce(1.0)
 

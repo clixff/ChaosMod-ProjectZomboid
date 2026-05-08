@@ -9,8 +9,9 @@ export function registerDonateCommand(
   app: App,
   port: number,
   daProvider: DonationAlertsProvider,
-  modFolder: string | null,
+  luaFolder: string | null,
   config: ModConfig | null,
+  onConfigSaved?: () => void,
 ): void {
   app.registerCommand(
     "donate",
@@ -84,10 +85,11 @@ export function registerDonateCommand(
         }
 
         await daProvider.saveCredentials(appId, clientSecret, currency);
-        if (config && modFolder) {
+        if (config && luaFolder) {
           if (!config.streamer_mode.donate_providers.includes("donationalerts")) {
             config.streamer_mode.donate_providers.push("donationalerts");
-            saveConfig(modFolder, config);
+            saveConfig(luaFolder, config);
+            onConfigSaved?.();
           }
         }
         logger.info(`[DonationAlerts] App credentials saved with currency ${currency}. Opening login...`);
@@ -100,11 +102,12 @@ export function registerDonateCommand(
         daProvider.disconnect();
         await daProvider.deleteTokens();
         await daProvider.deleteCredentials();
-        if (config && modFolder) {
+        if (config && luaFolder) {
           config.streamer_mode.donate_providers = config.streamer_mode.donate_providers.filter(
             (p) => p !== "donationalerts",
           );
-          saveConfig(modFolder, config);
+          saveConfig(luaFolder, config);
+          onConfigSaved?.();
         }
         logger.info(`[DonationAlerts] Logged out and credentials removed.`);
         return;

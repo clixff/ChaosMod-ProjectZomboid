@@ -25,8 +25,6 @@ function EffectReplaceZombiesWithChickens:OnStart()
             if animal then
                 animal:changeStress(80)
                 animal:updateStress()
-
-                animal:getData():setSize(500.0)
             end
         end
     end, true, nil)

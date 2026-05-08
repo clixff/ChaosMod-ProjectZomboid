@@ -1,7 +1,7 @@
 EffectSpawnLootbox = ChaosEffectBase:derive("EffectSpawnLootbox", "spawn_lootbox")
 
 ---@type table<string, table<integer, string>>
-local ITEMS = {
+LOOTBOX_ITEMS = {
     common = {
         "Base.Bandage",
         "Base.BandageDirty",
@@ -51,7 +51,7 @@ local ITEMS = {
 -- Roll rarity: 60% common, 25% uncommon, 12% rare, 3% legendary
 ---@return string
 local function rollRarity()
-    local roll = ZombRand(100)
+    local roll = ChaosUtils.RandInteger(100)
     if roll < 60 then
         return "common"
     elseif roll < 85 then
@@ -61,6 +61,13 @@ local function rollRarity()
     else
         return "legendary"
     end
+end
+
+---@return string
+function GetRandomLootboxItem()
+    local rarity = rollRarity()
+    local pool = LOOTBOX_ITEMS[rarity]
+    return pool[ChaosUtils.RandArrayIndex(pool)]
 end
 
 function EffectSpawnLootbox:OnStart()
@@ -92,10 +99,10 @@ function EffectSpawnLootbox:OnStart()
 
     ---@type string
     local rarity = rollRarity()
-    local pool = ITEMS[rarity]
+    local pool = LOOTBOX_ITEMS[rarity]
     if not pool then return end
     ---@type string
-    local itemId = pool[math.floor(ZombRand(#pool) + 1)]
+    local itemId = pool[ChaosUtils.RandArrayIndex(pool)]
     if not itemId then return end
 
     container:AddItem(itemId)

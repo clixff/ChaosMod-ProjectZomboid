@@ -46,6 +46,7 @@ function ChaosEffectsWindow:createChildren()
     local searchBarH = ChaosUIManager.GetScaledWidth(22)
     self.searchBox = ISTextEntryBox:new("", pad, searchBarY, listW, searchBarH)
     self.searchBox.font = UIFont.NewSmall
+    self.searchBox:setPlaceholderText(ChaosLocalization.GetString("core", "search_placeholder"))
     self.searchBox:initialise()
     self.searchBox:instantiate()
     self.searchBox:setClearButton(true)

@@ -2,11 +2,22 @@ import type { EffectEntry } from "./effects.ts";
 
 export type EffectPickType = "default" | "donate";
 
-const RECENT_EFFECTS_MAX = 30;
+let RECENT_EFFECTS_MAX = 90;
 const recentSet = new Set<string>();
 const recentQueue: string[] = [];
 
-function addToBlocklist(id: string): void {
+export function setRecentEffectsMax(n: number): void {
+  if (typeof n !== "number" || !isFinite(n) || n < 0) return;
+  RECENT_EFFECTS_MAX = Math.floor(n);
+  while (recentQueue.length > RECENT_EFFECTS_MAX) {
+    const evicted = recentQueue.shift();
+    if (evicted !== undefined) recentSet.delete(evicted);
+  }
+}
+
+function pushToBlocklist(id: string): void {
+  if (recentSet.has(id)) return;
+  if (RECENT_EFFECTS_MAX <= 0) return;
   if (recentQueue.length >= RECENT_EFFECTS_MAX) {
     const evicted = recentQueue.shift();
     if (evicted !== undefined) recentSet.delete(evicted);
@@ -15,11 +26,16 @@ function addToBlocklist(id: string): void {
   recentSet.add(id);
 }
 
+export function markEffectUsed(id: string): void {
+  pushToBlocklist(id);
+}
+
 export function getRandomEffects(
   effects: EffectEntry[],
   amount: number,
   pickType: EffectPickType,
   ignoreChances: boolean,
+  addToBlocklist: boolean = true,
 ): string[] {
   interface PoolEntry {
     id: string;
@@ -30,7 +46,8 @@ export function getRandomEffects(
   let totalWeight = 0;
 
   for (const effect of effects) {
-    const eligible = pickType === "donate" ? effect.enabled_donate : effect.enabled;
+    const eligible =
+      pickType === "donate" ? effect.enabled_donate : effect.enabled;
     if (eligible && effect.chance > 0 && !recentSet.has(effect.id)) {
       const weight = ignoreChances ? 1 : effect.chance;
       pool.push({ id: effect.id, weight });
@@ -59,7 +76,7 @@ export function getRandomEffects(
 
     const picked = pool[pickedIndex]!;
     result.push(picked.id);
-    addToBlocklist(picked.id);
+    if (addToBlocklist) pushToBlocklist(picked.id);
     totalWeight -= picked.weight;
     pool.splice(pickedIndex, 1);
   }

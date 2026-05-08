@@ -8,7 +8,7 @@ function EffectTeleportToLastUsedBed:OnStart()
     local player = getPlayer()
     if not player then return end
 
-    local loc = ChaosUtils.sleepWorldLocation
+    local loc = ChaosUtils.sleepWorldLocation or ChaosUtils.playerSpawnPoint
     if not loc then
         player:Say(ChaosLocalization.GetString("misc", "no_sleep_location"))
         return

@@ -37,7 +37,8 @@ function ChaosNPC:UpdateStalker(deltaMs)
     end
 
     local dist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), player:getX(), player:getY())
-    if dist < CHAOS_NPC_STALKER_MIN_DIST or dist > CHAOS_NPC_STALKER_MAX_DIST then
+    local tooClose = dist < CHAOS_NPC_STALKER_MIN_DIST
+    if tooClose or dist > CHAOS_NPC_STALKER_MAX_DIST then
         local square = ChaosPlayer.GetRandomSquareAroundPlayer(
             player,
             0,
@@ -52,6 +53,14 @@ function ChaosNPC:UpdateStalker(deltaMs)
             zombie:teleportTo(square:getX(), square:getY(), square:getZ())
             self:StopMoving(true, "stalker_teleport")
             self.stalkerTeleportCooldownMs = 0
+
+            if tooClose then
+                self.stalkerInteractionCount = (self.stalkerInteractionCount or 0) + 1
+                if self.stalkerInteractionCount >= 2 then
+                    self:RemoveTag("stalker")
+                    self.npcGroup = ChaosNPCGroupID.RAIDERS
+                end
+            end
         end
     end
 end

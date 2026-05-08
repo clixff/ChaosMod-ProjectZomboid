@@ -25,10 +25,11 @@ export interface StreamerModeConfig {
   streamer_mode_enabled: boolean;
   voting_enabled: boolean;
   voting_mode: number;
+  voting_options_number: number;
   type: string;
   use_localhost_ip: boolean;
-  advanced_voting_numbers: boolean;
   use_zombie_nicknames: boolean;
+  use_animals_nicknames: boolean;
   render_chat_messages: boolean;
   say_killed_zombie_name: boolean;
   zombie_nicknames_buffer: number;
@@ -43,6 +44,8 @@ export interface ModConfig {
   lang: string;
   effects_interval_enabled: boolean;
   effects_interval: number;
+  effects_duration_multiplier: number;
+  recent_effects_block_buffer: number;
   vote_start_time: number;
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
@@ -108,24 +111,31 @@ const DEFAULT_DONATE_PRICE_GROUPS: DonatePriceGroup[] = [
   { group: "positive_2", price: 2.5 },
   { group: "positive_3", price: 5 },
   { group: "positive_4", price: 7.5 },
+  { group: "positive_5", price: 8 },
+  { group: "positive_6", price: 10 },
   { group: "negative_1", price: 1 },
   { group: "negative_2", price: 2.5 },
   { group: "negative_3", price: 5 },
   { group: "negative_4", price: 7.5 },
+  { group: "negative_5", price: 8 },
+  { group: "negative_6", price: 10 },
   { group: "neutral_1", price: 1 },
   { group: "neutral_2", price: 2.5 },
   { group: "neutral_3", price: 5 },
   { group: "neutral_4", price: 7.5 },
+  { group: "neutral_5", price: 8 },
+  { group: "neutral_6", price: 10 },
 ];
 
 const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   streamer_mode_enabled: true,
   voting_enabled: false,
   voting_mode: 0,
+  voting_options_number: 4,
   type: "twitch",
   use_localhost_ip: true,
-  advanced_voting_numbers: true,
   use_zombie_nicknames: true,
+  use_animals_nicknames: true,
   render_chat_messages: true,
   say_killed_zombie_name: true,
   zombie_nicknames_buffer: 150,
@@ -140,6 +150,8 @@ const DEFAULT_CONFIG: ModConfig = {
   lang: "en",
   effects_interval_enabled: true,
   effects_interval: 45,
+  effects_duration_multiplier: 1.0,
+  recent_effects_block_buffer: 90,
   vote_start_time: 15,
   hide_progress_bar: false,
   use_voting_progress_bar_color: false,
@@ -224,15 +236,22 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
     ),
     voting_enabled: bool(raw["voting_enabled"], d.voting_enabled),
     voting_mode: num(raw["voting_mode"], d.voting_mode),
+    voting_options_number: Math.min(
+      8,
+      Math.max(
+        4,
+        Math.floor(num(raw["voting_options_number"], d.voting_options_number)),
+      ),
+    ),
     type: str(raw["type"], d.type),
     use_localhost_ip: bool(raw["use_localhost_ip"], d.use_localhost_ip),
-    advanced_voting_numbers: bool(
-      raw["advanced_voting_numbers"],
-      d.advanced_voting_numbers,
-    ),
     use_zombie_nicknames: bool(
       raw["use_zombie_nicknames"],
       d.use_zombie_nicknames,
+    ),
+    use_animals_nicknames: bool(
+      raw["use_animals_nicknames"],
+      d.use_animals_nicknames,
     ),
     render_chat_messages: bool(
       raw["render_chat_messages"],
@@ -257,8 +276,56 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
   };
 }
 
-export function saveConfig(modFolder: string, config: ModConfig): void {
-  const configPath = join(modFolder, "common", "config.json");
+function userConfigPath(luaFolder: string): string {
+  return join(luaFolder, "config.json");
+}
+
+function defaultConfigPath(modFolder: string): string {
+  return join(modFolder, "common", "default_config.json");
+}
+
+function readJsonObject(path: string): Record<string, unknown> | null {
+  if (!existsSync(path)) return null;
+  try {
+    return obj(JSON.parse(readFileSync(path, "utf-8")));
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.error(`Failed to parse ${path}: ${msg}`);
+    return null;
+  }
+}
+
+function isPlainObjectVal(val: unknown): val is Record<string, unknown> {
+  return val !== null && typeof val === "object" && !Array.isArray(val);
+}
+
+/**
+ * Recursively add keys from `defaults` into `existing` when missing. Returns
+ * true if any key was added. Arrays are treated as opaque values (not merged).
+ */
+function addMissingKeysDeep(
+  existing: Record<string, unknown>,
+  defaults: Record<string, unknown>,
+): boolean {
+  let changed = false;
+  for (const [key, defValue] of Object.entries(defaults)) {
+    if (!(key in existing)) {
+      existing[key] = JSON.parse(JSON.stringify(defValue)) as unknown;
+      changed = true;
+      continue;
+    }
+    const cur = existing[key];
+    if (isPlainObjectVal(cur) && isPlainObjectVal(defValue)) {
+      if (addMissingKeysDeep(cur, defValue)) {
+        changed = true;
+      }
+    }
+  }
+  return changed;
+}
+
+export function saveConfig(luaFolder: string, config: ModConfig): void {
+  const configPath = userConfigPath(luaFolder);
   try {
     let existingRaw: Record<string, unknown> = {};
     if (existsSync(configPath)) {
@@ -273,23 +340,45 @@ export function saveConfig(modFolder: string, config: ModConfig): void {
   }
 }
 
-export function loadConfig(modFolder: string): ModConfig {
-  const configPath = join(modFolder, "common", "config.json");
+export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
+  const configPath = userConfigPath(luaFolder);
+  const defaultPath = defaultConfigPath(modFolder);
 
-  if (!existsSync(configPath)) {
-    logger.warn(`config.json not found at ${configPath}, using defaults`);
-    return cloneConfig(DEFAULT_CONFIG);
-  }
+  const defaultRaw = readJsonObject(defaultPath);
 
-  let raw: Record<string, unknown>;
-  try {
-    raw = obj(JSON.parse(readFileSync(configPath, "utf-8")));
-    logger.debug(`Loaded config from ${configPath}`);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    logger.error(`Failed to parse config.json: ${msg}`);
-    return cloneConfig(DEFAULT_CONFIG);
+  let raw = readJsonObject(configPath);
+  if (!raw) {
+    if (defaultRaw) {
+      logger.info(
+        `config.json not found at ${configPath}; copying default_config.json`,
+      );
+      try {
+        writeFileSync(configPath, JSON.stringify(defaultRaw, null, 4), "utf-8");
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.error(`Failed to write config.json: ${msg}`);
+      }
+      raw = defaultRaw;
+    } else {
+      logger.warn(
+        `config.json not found at ${configPath} and default_config.json missing; using built-in defaults`,
+      );
+      raw = {};
+    }
+  } else if (defaultRaw) {
+    if (addMissingKeysDeep(raw, defaultRaw)) {
+      logger.info(
+        `Added missing keys from default_config.json; saving config.json`,
+      );
+      try {
+        writeFileSync(configPath, JSON.stringify(raw, null, 4), "utf-8");
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.error(`Failed to save merged config.json: ${msg}`);
+      }
+    }
   }
+  logger.debug(`Loaded config from ${configPath}`);
 
   const d = DEFAULT_CONFIG;
   return {
@@ -299,6 +388,14 @@ export function loadConfig(modFolder: string): ModConfig {
       d.effects_interval_enabled,
     ),
     effects_interval: num(raw["effects_interval"], d.effects_interval),
+    effects_duration_multiplier: num(
+      raw["effects_duration_multiplier"],
+      d.effects_duration_multiplier,
+    ),
+    recent_effects_block_buffer: num(
+      raw["recent_effects_block_buffer"],
+      d.recent_effects_block_buffer,
+    ),
     vote_start_time: num(raw["vote_start_time"], d.vote_start_time),
     hide_progress_bar: bool(raw["hide_progress_bar"], d.hide_progress_bar),
     use_voting_progress_bar_color: bool(
@@ -317,9 +414,10 @@ export function loadConfig(modFolder: string): ModConfig {
 
 export function resetConfigToDefaultsPreservingUnknowns(
   modFolder: string,
+  luaFolder: string,
 ): ModConfig | null {
-  const configPath = join(modFolder, "common", "config.json");
-  const backupPath = join(modFolder, "common", "config_backup.json");
+  const configPath = userConfigPath(luaFolder);
+  const backupPath = join(luaFolder, "config_backup.json");
 
   let existingRaw: Record<string, unknown> = {};
   if (existsSync(configPath)) {
@@ -365,5 +463,5 @@ export function resetConfigToDefaultsPreservingUnknowns(
     return null;
   }
 
-  return loadConfig(modFolder);
+  return loadConfig(modFolder, luaFolder);
 }

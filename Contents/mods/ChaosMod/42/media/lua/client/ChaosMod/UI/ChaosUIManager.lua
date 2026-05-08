@@ -2,12 +2,14 @@
 ---@field hud ChaosHUD
 ---@field effectsWindow ChaosEffectsWindow
 ---@field chaosEffectsUI ChaosEffectsUI
+---@field settingsWindow ChaosSettingsWindow
 ---@field cachedWidth number
 ---@field cachedHeight number
 ChaosUIManager = ChaosUIManager or {
     hud = nil,
     effectsWindow = nil,
     chaosEffectsUI = nil,
+    settingsWindow = nil,
     cachedWidth = 0,
     cachedHeight = 0,
 }
@@ -89,4 +91,23 @@ function ChaosUIManager:ToggleEffectsWindow()
     self.effectsWindow:initialise()
     self.effectsWindow:addToUIManager()
     self.effectsWindow:setVisible(true)
+end
+
+function ChaosUIManager:ToggleSettingsWindow()
+    if self.settingsWindow and self.settingsWindow:getIsVisible() then
+        self.settingsWindow:setVisible(false)
+        self.settingsWindow:removeFromUIManager()
+        self.settingsWindow = nil
+        return
+    end
+
+    local windowWidth = ChaosUIManager.GetScaledWidth(1100)
+    local windowHeight = ChaosUIManager.GetScaledHeight(720)
+    local windowX = math.floor((ChaosUIManager.cachedWidth - windowWidth) / 2)
+    local windowY = math.floor((ChaosUIManager.cachedHeight - windowHeight) / 2)
+
+    self.settingsWindow = ChaosSettingsWindow:new(windowX, windowY, windowWidth, windowHeight)
+    self.settingsWindow:initialise()
+    self.settingsWindow:addToUIManager()
+    self.settingsWindow:setVisible(true)
 end

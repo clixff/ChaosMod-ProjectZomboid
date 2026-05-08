@@ -5,7 +5,7 @@
 ---@field modData ChooseGameInfo.Mod? -- Internal mod data such as ID, version, etc.
 ---@field lastTimeTickMs integer -- Last time tick milliseconds
 ---@field wallhack boolean -- If wallhack is enabled
----@field specialAnimalsFollowers table<integer, {animal: IsoAnimal, repathTicks: integer}>
+---@field specialAnimalsFollowers table<integer, SpecialAnimal>
 ChaosMod = ChaosMod or {
     mapLoaded = false,
     enabled = false,
@@ -15,6 +15,9 @@ ChaosMod = ChaosMod or {
     wallhack = false,
     specialAnimalsFollowers = {}
 }
+
+local LoadSpawnPointFromModData
+local SaveSpawnPointIfMissing
 
 function ChaosMod.StartMod()
     -- Return early if mod is already enabled
@@ -41,6 +44,10 @@ function ChaosMod.StartMod()
     ChaosMod.specialAnimalsFollowers = {}
     -- Load last sleep position from global mod data
     ChaosUtils.LoadSleepData()
+    -- Save spawn point when enabling the mod the first time for this save
+    if SaveSpawnPointIfMissing then
+        SaveSpawnPointIfMissing()
+    end
     -- Set mod enabled flag to true
     ChaosMod.enabled = true;
     -- Set last time tick milliseconds to current time for next tick function call
@@ -68,11 +75,10 @@ function ChaosMod.StartMod()
     end
 
     if ChaosConfig.streamer_mode and ChaosConfig.streamer_mode.streamer_mode_enabled == true then
-        local ts = tostring(getTimestampMs())
         ChaosEffectsManager.iterationIndex = 0
-        ChaosEffectsManager.syncTimestamp = ts
-        ChaosEffectsManager.lastVotingActive = 0
-        ChaosFileReader.WriteSyncFile(ts, 0, 0)
+        ChaosBridge.Init()
+        ChaosBridge.Emit("mod_change_status", { enabled = true })
+        ChaosBridge.Emit("interval_start", { iteration = 0 })
     end
 
     ChaosUIManager.hud:AddMessage("Chaos Mod started")
@@ -91,11 +97,11 @@ function ChaosMod.StopMod()
     ChaosUIManager.hud:OnModStatusChanged(false)
     ChaosUIManager:HideEffectsUI()
     ChaosEffectsManager.iterationIndex = 0
-    ChaosEffectsManager.syncTimestamp = "0"
-    ChaosEffectsManager.lastVotingActive = 0
-    ChaosEffectsManager.pendingVoteReadMs = -1
     ChaosMod.specialAnimalsFollowers = {}
-    ChaosFileReader.WriteSyncFile("0", 0, 0)
+    if ChaosBridge.enabled then
+        ChaosBridge.Emit("mod_change_status", { enabled = false })
+        ChaosBridge.Shutdown()
+    end
 end
 
 ---@param key integer
@@ -117,16 +123,56 @@ function ChaosMod.OnKeyPressed(key)
     end
 end
 
+local SPAWN_POINT_MOD_DATA_KEY = "ChaosMod_SpawnPoint"
+
+LoadSpawnPointFromModData = function()
+    local md = ModData.getOrCreate(SPAWN_POINT_MOD_DATA_KEY)
+    if not (md["x"] and md["y"] and md["z"]) then
+        return false
+    end
+
+    ChaosUtils.playerSpawnPoint = {
+        x = md["x"] --[[@as number]],
+        y = md["y"] --[[@as number]],
+        z = md["z"] --[[@as number]]
+    }
+    print(string.format("[ChaosMod] Loaded spawn point: %.1f, %.1f, %.1f", md["x"], md["y"], md["z"]))
+    return true
+end
+
+SaveSpawnPointIfMissing = function()
+    if LoadSpawnPointFromModData() then
+        return true
+    end
+
+    local player = getPlayer()
+    if not player then
+        return false
+    end
+
+    local x, y, z = player:getX(), player:getY(), player:getZ()
+    ChaosUtils.playerSpawnPoint = { x = x, y = y, z = z }
+
+    local md = ModData.getOrCreate(SPAWN_POINT_MOD_DATA_KEY)
+    md["x"] = x
+    md["y"] = y
+    md["z"] = z
+    ModData.transmit(SPAWN_POINT_MOD_DATA_KEY)
+    print(string.format("[ChaosMod] Saved spawn point: %.1f, %.1f, %.1f", x, y, z))
+    return true
+end
+
 -- When world loads first time per session
 function ChaosMod.OnInitWorld()
     print("[ChaosMod] OnInitWorld")
     ChaosMod.mapLoaded = true;
     ChaosMod.specialAnimalsFollowers = {}
     ChaosEffectsManager.iterationIndex = 0
-    ChaosEffectsManager.syncTimestamp = "0"
-    ChaosEffectsManager.lastVotingActive = 0
-    ChaosEffectsManager.pendingVoteReadMs = -1
-    ChaosFileReader.WriteSyncFile("0", 0, 0)
+
+    ChaosUtils.playerPreviousPositionsSampleMs = 0
+    ChaosUtils.playerPreviousPositions = {}
+
+    LoadSpawnPointFromModData()
 end
 
 ---@param attacker IsoGameCharacter
@@ -149,6 +195,8 @@ function ChaosMod.OnGameStart()
     ChaosUIManager.hud:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
+
+    ChaosMod.RegisterBridgeHandlers()
 
     -- Custom fix for fishing equip event
     -- By default it runs even if zombie equips a weapon
@@ -217,9 +265,38 @@ function ChaosMod.OnTick()
     if ChaosMod.enabled then
         ChaosUtils.AdjustVisibleZombiesForNPCs()
         ChaosUtils.TrackPlayerPosition(deltaMs)
+        ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
         ChaosUtils.sleepHandleTick()
         ChaosNPCUtils.OnTick(deltaMs)
+        ChaosBridge.Tick(deltaMs)
     end
+end
+
+function ChaosMod.RegisterBridgeHandlers()
+    ChaosBridge.On("reload_config", function(_payload)
+        print("[ChaosMod] Reloading config and effects via bridge")
+        ChaosConfig.LoadConfigFromDisk()
+        ChaosLocalization.ReloadLanguages()
+        if ChaosUIManager and ChaosUIManager.hud then
+            ChaosUIManager.hud:OnLanguageLoaded()
+        end
+        ChaosEffectsRegistry.Initialize()
+    end)
+
+    ChaosBridge.On("activate_effects", function(payload)
+        if type(payload) ~= "table" then return end
+        local effects = payload.effects
+        if type(effects) ~= "table" then return end
+        for _, e in ipairs(effects) do
+            if type(e) == "table" and type(e.id) == "string" and e.id ~= "" then
+                local nickname = type(e.nickname) == "string" and e.nickname ~= "" and e.nickname or nil
+                ChaosEffectsManager.StartEffect(e.id, nickname)
+                if e.type == "donate" and ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
+                    ChaosUIManager.onDonateEffectActivated(nickname or "Anonymous", e.id)
+                end
+            end
+        end
+    end)
 end
 
 function ChaosMod.OnSpecialAnimalsTick()
@@ -227,24 +304,12 @@ function ChaosMod.OnSpecialAnimalsTick()
         return
     end
 
-    local player = getPlayer()
-    if not player then return end
-
     for i = #ChaosMod.specialAnimalsFollowers, 1, -1 do
-        local followState = ChaosMod.specialAnimalsFollowers[i]
-        local animal = followState and followState.animal
-
-        if not animal or animal:isDead() then
+        local specialAnimal = ChaosMod.specialAnimalsFollowers[i]
+        if not specialAnimal or specialAnimal:isDead() then
             table.remove(ChaosMod.specialAnimalsFollowers, i)
         else
-            followState.repathTicks = followState.repathTicks - 1
-            if followState.repathTicks <= 0 then
-                followState.repathTicks = 20
-
-                if animal:DistToProper(player) > 2.0 then
-                    animal:pathToCharacter(player)
-                end
-            end
+            specialAnimal:tick()
         end
     end
 end

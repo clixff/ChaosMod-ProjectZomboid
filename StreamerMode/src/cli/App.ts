@@ -7,31 +7,23 @@ import {
 } from "./CommandRegistry.ts";
 import { logger } from "../utils/logger.ts";
 import type { ModConfig } from "../config.ts";
-import { ModSyncWatcher } from "../modSync.ts";
 
 export interface AppOptions {
   modFolder: string | null;
   luaFolder: string | null;
   config: ModConfig | null;
   effectCount: number;
-  onModEnabled?: () => void;
-  onIterationChanged?: (votingActive: boolean) => void;
-  onVotingActiveChanged?: (votingActive: boolean) => void;
+  onShutdown?: () => void;
 }
 
 export class App {
   private readonly registry: CommandRegistry;
   private rl: readline.Interface | null = null;
   private isShuttingDown = false;
-  private modSyncWatcher: ModSyncWatcher | null = null;
 
   constructor(private readonly options: AppOptions) {
     this.registry = new CommandRegistry();
     this.registerBuiltins();
-  }
-
-  getModSyncWatcher(): ModSyncWatcher | null {
-    return this.modSyncWatcher;
   }
 
   registerCommand(
@@ -48,16 +40,6 @@ export class App {
     logger.info(
       `${colors.yellow("ChaosMod")} ${colors.cyan("Streamer Mode")} initialized. Loaded ${colors.green(this.options.effectCount.toString())} effects. Type ${colors.cyan("help")} for all commands.`,
     );
-
-    if (this.options.luaFolder) {
-      this.modSyncWatcher = new ModSyncWatcher(this.options.luaFolder);
-      this.modSyncWatcher.onModEnabled = this.options.onModEnabled ?? null;
-      this.modSyncWatcher.onIterationChanged =
-        this.options.onIterationChanged ?? null;
-      this.modSyncWatcher.onVotingActiveChanged =
-        this.options.onVotingActiveChanged ?? null;
-      this.modSyncWatcher.start();
-    }
 
     // Tab completion: complete command names at first word, nothing for args
     const completer = (line: string): [string[], string] => {
@@ -119,7 +101,7 @@ export class App {
   private shutdown(): void {
     if (this.isShuttingDown) return;
     this.isShuttingDown = true;
-    this.modSyncWatcher?.stop();
+    this.options.onShutdown?.();
     console.log(colors.gray("Goodbye!"));
     this.rl?.close();
     process.exit(0);

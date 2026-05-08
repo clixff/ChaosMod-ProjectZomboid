@@ -6,7 +6,8 @@ local function handleItemRemove(item)
 
     local fullType = item:getFullType()
 
-    if fullType == "Base.Bandage" or fullType == "Base.BandageDirty" or fullType == "Base.AlcoholBandage" then
+    if fullType == "Base.Bandage" or fullType == "Base.BandageDirty" or fullType == "Base.AlcoholBandage"
+        or fullType == "Base.RippedSheets" or fullType == "Base.RippedSheetsDirty" or fullType == "Base.AlcoholRippedSheets" then
         ChaosPlayer.SayLineRemovedItem(getPlayer(), item)
         item:Remove()
         return

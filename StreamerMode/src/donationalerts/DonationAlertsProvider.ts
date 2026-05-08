@@ -14,6 +14,8 @@ export class DonationAlertsProvider {
 
   private ws: WebSocket | null = null;
   onDonation: ((donation: DonationAlertsDonation) => void) | null = null;
+  onConnect: (() => void) | null = null;
+  onDisconnect: (() => void) | null = null;
   currentUser: DonationAlertsUser | null = null;
 
   get isConnected(): boolean {
@@ -154,6 +156,16 @@ export class DonationAlertsProvider {
           logger.error(`[DonationAlerts] WebSocket error: ${msg}`);
         },
       });
+      if (this.ws) {
+        const ws = this.ws;
+        ws.addEventListener("close", () => {
+          if (this.ws === ws) {
+            this.ws = null;
+            this.onDisconnect?.();
+          }
+        });
+        this.onConnect?.();
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       logger.error(`[DonationAlerts] Failed to connect to realtime: ${msg}`);
@@ -164,6 +176,7 @@ export class DonationAlertsProvider {
     if (this.ws) {
       try { this.ws.close(); } catch { /* ignore */ }
       this.ws = null;
+      this.onDisconnect?.();
     }
     this.currentUser = null;
   }

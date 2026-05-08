@@ -37,6 +37,10 @@ function ChaosHUD:RefreshButtonLayout()
     self.btn:setWidth(mainButtonWidth)
     self.secondBtn:setWidth(secondButtonWidth)
     self.secondBtn:setX(self.btn:getX() + mainButtonWidth + buttonGap)
+
+    if self.settingsBtn then
+        self.settingsBtn:setX(self.secondBtn:getX() + secondButtonWidth + buttonGap)
+    end
 end
 
 function ChaosHUD:initialise()
@@ -89,6 +93,18 @@ function ChaosHUD:createChildren()
     self.secondBtn:initialise()
     self.secondBtn:instantiate()
     self:addChild(self.secondBtn)
+
+    local settingsButtonX = secondButtonX + secondButtonWidth + ChaosUIManager.GetScaledWidth(6)
+    self.settingsBtn = ISButton:new(settingsButtonX, buttonY, buttonHeight, buttonHeight, "",
+        self,
+        ChaosHUD.OnSettingsButtonClick)
+    self.settingsBtn:initialise()
+    self.settingsBtn:instantiate()
+    self.settingsBtn:setImage(getTexture("media/ui/chaos_gear.png"))
+    local iconSize = math.floor(buttonHeight * 0.6)
+    self.settingsBtn:forceImageSize(iconSize, iconSize)
+    self:addChild(self.settingsBtn)
+
     self:RefreshButtonLayout()
 end
 
@@ -127,7 +143,7 @@ function ChaosHUD:prerender()
         if fgWidth > 0 then
             local c = uiCfg.progress_bar_rgb
             local sm = ChaosConfig.streamer_mode
-            if ChaosConfig.use_voting_progress_bar_color and sm and sm.streamer_mode_enabled == true and sm.voting_enabled == true and ChaosEffectsManager.lastVotingActive == 1 then
+            if ChaosConfig.use_voting_progress_bar_color and sm and sm.streamer_mode_enabled == true and sm.voting_enabled == true and ChaosEffectsManager.voteStartedThisInterval then
                 c = uiCfg.progress_bar_voting_rgb
             end
             self:drawRect(0, barY, fgWidth, barHeight, uiCfg.progress_bar_opacity, c.r, c.g, c.b)
@@ -217,4 +233,8 @@ end
 function ChaosHUD:OnSecondButtonClick()
     print("Second button clicked")
     ChaosUIManager:ToggleEffectsWindow()
+end
+
+function ChaosHUD:OnSettingsButtonClick()
+    ChaosUIManager:ToggleSettingsWindow()
 end

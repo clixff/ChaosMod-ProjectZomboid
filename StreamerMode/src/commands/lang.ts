@@ -7,7 +7,7 @@ import { logger } from "../utils/logger.ts";
 import { setLang } from "../localization.ts";
 import colors from "colors";
 
-function getAvailableLanguages(modFolder: string): string[] {
+export function getAvailableLanguages(modFolder: string): string[] {
   const langDir = join(modFolder, "common", "lang");
   if (!existsSync(langDir)) return [];
   return readdirSync(langDir)
@@ -18,7 +18,9 @@ function getAvailableLanguages(modFolder: string): string[] {
 export function registerLangCommand(
   app: App,
   modFolder: string,
+  luaFolder: string,
   config: ModConfig,
+  onConfigSaved?: () => void,
 ): void {
   app.registerCommand(
     "lang",
@@ -52,7 +54,8 @@ export function registerLangCommand(
       }
 
       config.lang = target;
-      saveConfig(modFolder, config);
+      saveConfig(luaFolder, config);
+      onConfigSaved?.();
       setLang(target);
       logger.info(`Language changed to ${colors.cyan(target)}`);
     },

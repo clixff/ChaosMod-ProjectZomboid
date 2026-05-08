@@ -216,6 +216,31 @@ function ChaosPlayer.SetRandomBodyDamageByMeleeWeapon(character, baseDamage, wea
     character:playWeaponHitArmourSound(bodyPartIndex, false)
 end
 
+---@param container ItemContainer
+---@param out InventoryItem[]
+---@param useDeepLookup boolean?
+function ChaosPlayer.CollectAllItems(container, out, useDeepLookup)
+    if not container then return end
+    if not container.getItems then return end
+    if useDeepLookup == nil then
+        useDeepLookup = true
+    end
+    local items = container:getItems()
+    if not items then return end
+    for i = 0, items:size() - 1 do
+        local item = items:get(i)
+        if item then
+            if item:IsInventoryContainer() and useDeepLookup then
+                ---@type InventoryContainer
+                local inner = item
+                ChaosPlayer.CollectAllItems(inner:getInventory(), out)
+            else
+                table.insert(out, item)
+            end
+        end
+    end
+end
+
 ---@param inventory ItemContainer
 ---@param useDeepLookup boolean
 ---@param skipContainers boolean
@@ -306,7 +331,8 @@ end
 
 ---@param player IsoPlayer
 ---@param item InventoryItem
-function ChaosPlayer.SayLineRemovedItem(player, item)
+---@param amount integer?
+function ChaosPlayer.SayLineRemovedItem(player, item, amount)
     if not player then return end
     if not item then return end
 
@@ -317,6 +343,10 @@ function ChaosPlayer.SayLineRemovedItem(player, item)
     if not imgCode then return end
 
     local str = string.format(ChaosLocalization.GetString("misc", "removed_item"), imgCode, itemDisplayName)
+
+    if amount and amount > 1 then
+        str = str .. string.format(" (x%d)", amount)
+    end
 
     player:addLineChatElement(
         str,
@@ -334,13 +364,44 @@ function ChaosPlayer.SayLineRemovedItem(player, item)
 end
 
 ---@param player IsoPlayer
----@param item string
+---@param item InventoryItem
 ---@param amount integer?
-function ChaosPlayer.SayLineNewItemByString(player, item, amount)
+function ChaosPlayer.SayLineRemoveItem(player, item, amount)
+    ChaosPlayer.SayLineRemovedItem(player, item, amount)
+end
+
+---@param player IsoPlayer
+function ChaosPlayer.UnequipAllClothes(player)
+    if not player then return end
+    local worn = player:getWornItems()
+    if not worn then return end
+
+    for i = worn:size() - 1, 0, -1 do
+        local item = worn:getItemByIndex(i)
+        if item then
+            player:removeWornItem(item, false)
+        end
+    end
+end
+
+---@param player IsoPlayer
+---@param item InventoryItem
+function ChaosPlayer.EquipClothes(player, item)
     if not player then return end
     if not item then return end
+    if item:getBodyLocation() then
+        player:setWornItem(item:getBodyLocation(), item, false)
+    end
+end
 
-    local item = instanceItem(item)
+---@param player IsoPlayer
+---@param itemId string
+---@param amount integer?
+function ChaosPlayer.SayLineNewItemByString(player, itemId, amount)
+    if not player then return end
+    if not itemId then return end
+
+    local item = instanceItem(itemId)
     if item then
         ChaosPlayer.SayLineNewItem(player, item, amount)
     end

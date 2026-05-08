@@ -16,6 +16,7 @@ function EffectRandomControls:OnStart()
         }
     end
 
+    ---@type string[]
     local shuffled = {}
     for i, v in ipairs(MOVEMENT_KEYS) do
         shuffled[i] = v
@@ -27,7 +28,10 @@ function EffectRandomControls:OnStart()
 
     for i, name in ipairs(MOVEMENT_KEYS) do
         local src = shuffled[i]
-        core:addKeyBinding(name, self.savedBindings[src].key, self.savedBindings[src].alt, false, false, false)
+
+        if self.savedBindings[src] then
+            core:addKeyBinding(name, self.savedBindings[src].key, self.savedBindings[src].alt, false, false, false)
+        end
     end
 end
 

@@ -26,7 +26,7 @@ CHAOS_PRPOPS_LIST = {
 
 ---@return string
 function ChaosProps.GetRandomPropName()
-    local randomIndex = math.floor(ZombRandBetween(1, #CHAOS_PRPOPS_LIST + 1))
+    local randomIndex = ChaosUtils.RandArrayIndex(CHAOS_PRPOPS_LIST)
     local propName = CHAOS_PRPOPS_LIST[randomIndex]
     if not propName then return "" end
     return propName
