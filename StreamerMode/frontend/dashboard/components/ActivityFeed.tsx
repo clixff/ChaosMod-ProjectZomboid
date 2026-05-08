@@ -47,6 +47,34 @@ function renderText(event: ActivityEvent): {
         ),
       };
     }
+    case "donate_failed_price":
+      return {
+        className: "activity-row activity-row--warn",
+        message: (
+          <>
+            <span className="activity-nickname">
+              {event.nickname || "Anonymous"}
+            </span>{" "}
+            tried to activate{" "}
+            <span className="activity-effect">{event.effect_name}</span> for{" "}
+            {event.donation_amount}, but effect price is {event.required_price}
+          </>
+        ),
+      };
+    case "donate_failed_disabled":
+      return {
+        className: "activity-row activity-row--warn",
+        message: (
+          <>
+            <span className="activity-nickname">
+              {event.nickname || "Anonymous"}
+            </span>{" "}
+            tried to activate{" "}
+            <span className="activity-effect">{event.effect_name}</span> for{" "}
+            {event.donation_amount}, but effect donation status is false
+          </>
+        ),
+      };
     case "chat_connected":
       return {
         className: "activity-row activity-row--ok",

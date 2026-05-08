@@ -423,6 +423,40 @@ a.btn--primary:hover {
   justify-content: flex-end;
 }
 
+.price-groups-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.price-groups-table th,
+.price-groups-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: middle;
+}
+
+.price-groups-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.price-groups-table td:last-child,
+.price-groups-table th:last-child {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.price-groups-table td:nth-child(2) {
+  width: 1%;
+  white-space: nowrap;
+}
+
 .section--highlight {
   animation: section-flash 1.6s ease-out;
 }

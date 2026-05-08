@@ -12,6 +12,63 @@ import {
 } from "../api.ts";
 import { formatLanguageLabel } from "../languageLabels.ts";
 
+const PRICE_GROUP_CATEGORY_ORDER: readonly string[] = [
+  "negative",
+  "positive",
+  "neutral",
+];
+
+function formatPriceGroupName(name: string): string {
+  return name
+    .split("_")
+    .filter((part) => part.length > 0)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function parsePriceGroupName(name: string): {
+  prefix: string;
+  trailingNumber: number | null;
+} {
+  const match = name.match(/^(.*?)_?(\d+)$/);
+  if (match && match[2] != null) {
+    return {
+      prefix: (match[1] ?? "").toLowerCase(),
+      trailingNumber: Number.parseInt(match[2], 10),
+    };
+  }
+  return { prefix: name.toLowerCase(), trailingNumber: null };
+}
+
+function categoryRank(prefix: string): number {
+  const idx = PRICE_GROUP_CATEGORY_ORDER.indexOf(prefix);
+  return idx === -1 ? PRICE_GROUP_CATEGORY_ORDER.length : idx;
+}
+
+function getSortedPriceGroupIndices(
+  groups: readonly { group: string; price: number }[],
+): number[] {
+  return groups
+    .map((g, idx) => ({ idx, ...parsePriceGroupName(g.group), name: g.group }))
+    .sort((a, b) => {
+      const aHas = a.trailingNumber != null;
+      const bHas = b.trailingNumber != null;
+      if (aHas && bHas) {
+        if (a.trailingNumber !== b.trailingNumber) {
+          return (a.trailingNumber ?? 0) - (b.trailingNumber ?? 0);
+        }
+      } else if (aHas !== bHas) {
+        return aHas ? -1 : 1;
+      }
+      const ar = categoryRank(a.prefix);
+      const br = categoryRank(b.prefix);
+      if (ar !== br) return ar - br;
+      if (a.prefix !== b.prefix) return a.prefix.localeCompare(b.prefix);
+      return a.name.localeCompare(b.name);
+    })
+    .map((entry) => entry.idx);
+}
+
 interface ConfigPageProps {
   onNotify: (message: string, isError?: boolean) => void;
   scrollTarget?: string | null;
@@ -309,41 +366,61 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
         title="Donation Price Groups"
         description="Each group sets the minimum donation amount required for effects assigned to it. Effects pick a group on the Effects page."
       >
-        {sm.donate_price_groups.map((g, idx) => (
-          <FieldRow key={`${g.group}-${idx}`} label={g.group}>
-            <div className="inline-controls">
-              <NumberInput
-                value={g.price}
-                min={0}
-                step={0.5}
-                onChange={(v) => {
-                  const next = sm.donate_price_groups.map((x, i) =>
-                    i === idx ? { ...x, price: v } : x,
-                  );
-                  setPriceGroups(next);
-                }}
-              />
-              <button
-                className="btn btn--danger"
-                title={`Remove price group "${g.group}"`}
-                onClick={() => {
-                  if (
-                    !confirm(
-                      `Remove price group "${g.group}"? Effects using it will fall back to no group.`,
-                    )
-                  ) {
-                    return;
-                  }
-                  setPriceGroups(
-                    sm.donate_price_groups.filter((_, i) => i !== idx),
-                  );
-                }}
-              >
-                Remove
-              </button>
-            </div>
-          </FieldRow>
-        ))}
+        {sm.donate_price_groups.length > 0 && (
+          <table className="price-groups-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th aria-label="Actions" />
+              </tr>
+            </thead>
+            <tbody>
+              {getSortedPriceGroupIndices(sm.donate_price_groups).map((idx) => {
+                const g = sm.donate_price_groups[idx];
+                if (!g) return null;
+                return (
+                  <tr key={`${g.group}-${idx}`}>
+                    <td>{formatPriceGroupName(g.group)}</td>
+                    <td>
+                      <NumberInput
+                        value={g.price}
+                        min={0}
+                        step={0.5}
+                        onChange={(v) => {
+                          const next = sm.donate_price_groups.map((x, i) =>
+                            i === idx ? { ...x, price: v } : x,
+                          );
+                          setPriceGroups(next);
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn--danger"
+                        title={`Remove price group "${g.group}"`}
+                        onClick={() => {
+                          if (
+                            !confirm(
+                              `Remove price group "${g.group}"? Effects using it will fall back to no group.`,
+                            )
+                          ) {
+                            return;
+                          }
+                          setPriceGroups(
+                            sm.donate_price_groups.filter((_, i) => i !== idx),
+                          );
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
         {sm.donate_price_groups.length === 0 && (
           <span className="field-hint">No price groups configured.</span>
         )}

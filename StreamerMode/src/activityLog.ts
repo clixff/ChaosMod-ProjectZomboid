@@ -10,6 +10,21 @@ export type ActivityEventInput =
       price: number | null;
       price_group: string;
     }
+  | {
+      type: "donate_failed_price";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      donation_amount: number;
+      required_price: number;
+    }
+  | {
+      type: "donate_failed_disabled";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      donation_amount: number;
+    }
   | { type: "chat_connected" }
   | { type: "chat_disconnected" }
   | { type: "donationalerts_connected" }

@@ -112,17 +112,18 @@ Supported tag formats:
 
 - `#numeric_id` — uses the numeric ID from `/export csv` and `/mod/effects`
 - `#effect_name_id` — uses the internal string effect ID
+- `№<number>` — numeric ID prefixed with `№`
+- `!<number>` — numeric ID prefixed with `!`
+- `<number>` — bare numeric ID anywhere in the message
 
-Example donation message:
+Example donation messages:
 
 ```txt
 Hello! #spawn_zombie_nearby
-```
-
-or:
-
-```txt
 Hello! #17
+Hello! №17
+Hello! !17
+Hello! 17
 ```
 
 ### DonationAlerts Setup

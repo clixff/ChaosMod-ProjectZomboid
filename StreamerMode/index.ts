@@ -519,6 +519,27 @@ async function main(): Promise<void> {
     activityLog.add({ type: "donationalerts_disconnected" });
   };
   const donationManager = new DonationManager(port);
+  donationManager.onActivationFailed = (info) => {
+    const effectName = getString("effects", info.effect_id);
+    if (info.type === "price_too_low") {
+      activityLog.add({
+        type: "donate_failed_price",
+        effect_id: info.effect_id,
+        effect_name: effectName,
+        nickname: info.nickname,
+        donation_amount: info.donation_amount,
+        required_price: info.required_price,
+      });
+    } else {
+      activityLog.add({
+        type: "donate_failed_disabled",
+        effect_id: info.effect_id,
+        effect_name: effectName,
+        nickname: info.nickname,
+        donation_amount: info.donation_amount,
+      });
+    }
+  };
   donationManager.addProvider(daProvider);
 
   // Auto-login donation providers on startup
