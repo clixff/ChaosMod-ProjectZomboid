@@ -16,12 +16,8 @@ function EffectZombiesAreComing:OnStart()
 
     ChaosZombie.ForEachZombieInRange(x1, y1, 80, function(zombie)
         if zombie and zombie:isAlive() then
-            zombie:getPathFindBehavior2():cancel()
-            zombie:getPathFindBehavior2():reset()
-            ---@diagnostic disable-next-line: param-type-mismatch
-            zombie:setPath2(nil)
-            zombie:setTurnAlertedValues(x1, y1)
-            zombie:getPathFindBehavior2():pathToLocation(x1, y1, z1)
+            ChaosZombie.MoveToLocation(zombie, x1, y1, z1, true, true, true, true)
+            zombie:setTarget(player)
             counter = counter + 1
         end
     end, true, nil)

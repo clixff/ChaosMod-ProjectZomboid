@@ -9,7 +9,7 @@ function EffectCloneZombies:OnStart()
     if not square then return end
 
     local x, y, z = square:getX(), square:getY(), square:getZ()
-    local radius = 35
+    local radius = 60
 
     local cloneCount = 0
 
