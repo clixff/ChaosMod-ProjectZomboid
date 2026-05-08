@@ -16,6 +16,7 @@
 - Added `recent_effects_block_buffer` config option (default 90) to control the size of the recently-used effects blocklist in both the mod and StreamerApp.
 - Added `effects_duration_multiplier` config option (default 1.0) that scales every effect's duration in game.
 - StreamerApp donation parser now also recognizes effect numbers in the donation message via `№<number>`, `!<number>`, and bare `<number>` in addition to `#<id>`.
+- StreamerApp can now export effects to a formatted `.xlsx` Excel workbook via `export xlsx` (CLI) and the dashboard's Export card; columns are color-coded (`Enabled`, `Price Group`, `Duration`, `Price`), names and descriptions are taken from the active language file, and the Price Group column uses a green→red gradient interpolated from the group tier.
 
 ### Mod fixes
 

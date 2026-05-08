@@ -4,7 +4,7 @@ A single-player chaos mod for **Project Zomboid Build 42**.
 
 The mod adds a random effect system to the game. Every 45 seconds, a new effect is activated. Effects can be helpful, harmful, or just completely random.
 
-The mod currently includes **230+ effects**, such as:
+The mod currently includes **310+ effects**, such as:
 
 - Spawn a Zombie Nearby
 - Give Random Tool

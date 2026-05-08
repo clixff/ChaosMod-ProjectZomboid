@@ -404,6 +404,26 @@ a.btn--primary:hover {
   border-bottom-color: var(--accent-hover);
 }
 
+.btn--success {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+
+.btn--success:hover:not(:disabled) {
+  background: #43a047;
+  border-color: #43a047;
+}
+
+a.btn--success,
+a.btn--success:link,
+a.btn--success:visited,
+a.btn--success:active,
+a.btn--success:hover {
+  color: white;
+  border-bottom-color: var(--success);
+}
+
 .btn--danger {
   background: rgba(239, 83, 80, 0.15);
   border-color: rgba(239, 83, 80, 0.4);

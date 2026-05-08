@@ -68,3 +68,13 @@ export function getString(lib: string, key: string): string {
   if (val !== undefined) return val;
   return `${lib}_${key}`;
 }
+
+export function getStringOrNull(lib: string, key: string): string | null {
+  if (currentLang !== "en") {
+    const val = data[currentLang]?.[lib]?.[key];
+    if (val !== undefined) return val;
+  }
+  const val = data["en"]?.[lib]?.[key];
+  if (val !== undefined) return val;
+  return null;
+}

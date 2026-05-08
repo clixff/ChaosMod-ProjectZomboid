@@ -445,6 +445,21 @@
         "confirm_reset_title": "Сбросить к настройкам по умолчанию?",
         "confirm_reset_text": "Все изменения будут потеряны. Продолжить?"
     },
+    "export": {
+        "title": "Chaos Mod Project Zomboid",
+        "col_name": "Название",
+        "col_enabled": "Состояние",
+        "col_duration": "Длительность (сек)",
+        "col_chance": "Шанс",
+        "col_price_group": "Группа цены",
+        "col_price": "Цена",
+        "col_description": "Описание",
+        "status_enabled": "Включено",
+        "status_disabled": "Выключено",
+        "status_voting_only": "Только голосование",
+        "status_donations_only": "Только донат",
+        "donate_hint": "Чтобы активировать эффект через донат, напишите ID эффекта (колонка ID) в тексте сообщения и укажите сумму, указанную в колонке \"Цена\""
+    },
     "descriptions": {
         "spawn_friendly_npc": "Компаньон для защиты игрока",
         "turn_power_off": "Перманентно отключает электричество в мире",

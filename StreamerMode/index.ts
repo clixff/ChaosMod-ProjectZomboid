@@ -30,6 +30,7 @@ import { setRecentEffectsMax } from "./src/effectsRegistry.ts";
 import { startServer } from "./src/server.ts";
 import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
+import { writeEffectsXlsx } from "./src/exportXlsx.ts";
 import { TwitchChat, type ChatEvent } from "./src/streamer/TwitchChat.ts";
 import { NicknamesManager } from "./src/streamer/NicknamesManager.ts";
 import { VotingManager } from "./src/streamer/VotingManager.ts";
@@ -994,14 +995,25 @@ async function main(): Promise<void> {
         }
         return { success: true, url: loginUrl };
       },
-      exportEffects: (kind: string) => {
-        if (kind !== "csv") {
+      exportEffects: async (kind: string) => {
+        if (kind !== "csv" && kind !== "xlsx") {
           return { success: false, error: `Unsupported export type: ${kind}` };
         }
         if (!luaFolder) {
           return { success: false, error: "Lua folder not available" };
         }
-        const outputPath = writeEffectsCsv(luaFolder);
+        const outputPath =
+          kind === "xlsx"
+            ? await writeEffectsXlsx(
+                luaFolder,
+                effects,
+                config?.streamer_mode.donate_price_groups ?? [],
+                Boolean(
+                  config?.streamer_mode.enable_donate &&
+                    daProvider.isConnected,
+                ),
+              )
+            : writeEffectsCsv(luaFolder);
         revealInExplorer(outputPath);
         logger.info(`Exported to ${colors.cyan(outputPath)}`);
         return { success: true, path: outputPath };
@@ -1203,34 +1215,49 @@ async function main(): Promise<void> {
   app.registerCommand(
     "export",
     [],
-    [{ name: "csv", required: true }],
-    (args) => {
-      if (args[0]?.toLowerCase() !== "csv") {
-        logger.warn(`Usage: ${colors.cyan("export csv")}`);
+    [{ name: "csv|xlsx", required: true }],
+    async (args) => {
+      const kind = args[0]?.toLowerCase();
+      if (kind !== "csv" && kind !== "xlsx") {
+        logger.warn(`Usage: ${colors.cyan("export csv|xlsx")}`);
         return;
       }
       if (!luaFolder) {
         logger.warn("Lua folder not available.");
         return;
       }
-      const outputPath = writeEffectsCsv(luaFolder);
+      const outputPath =
+        kind === "xlsx"
+          ? await writeEffectsXlsx(
+              luaFolder,
+              effects,
+              config?.streamer_mode.donate_price_groups ?? [],
+              Boolean(
+                config?.streamer_mode.enable_donate &&
+                  daProvider.isConnected,
+              ),
+            )
+          : writeEffectsCsv(luaFolder);
       logger.info(`Exported to ${colors.cyan(outputPath)}`);
       console.log("");
       logger.info(colors.bold("Google Sheets:"));
       logger.info(
-        `1. Open ${colors.cyan("https://docs.google.com/spreadsheets/")}.`,
+        `1. Open ${colors.cyan("https://sheets.new")} to create a new spreadsheet.`,
       );
+      logger.info(`2. Open ${colors.yellow("File -> Import -> Upload")}.`);
+      logger.info(`3. Upload ${colors.cyan(outputPath)}.`);
+      if (kind === "csv") {
+        logger.info(`4. Open ${colors.yellow("Format -> Convert to table")}.`);
+      } else {
+        logger.info(
+          `4. In the import dialog choose ${colors.yellow("Replace spreadsheet")} and click ${colors.green("Import data")}.`,
+        );
+      }
       logger.info(
-        `2. Press ${colors.green("Plus")} to create a new spreadsheet.`,
-      );
-      logger.info(`3. Open ${colors.yellow("File -> Import -> Upload")}.`);
-      logger.info(`4. Upload ${colors.cyan(outputPath)}.`);
-      logger.info(`5. Open ${colors.yellow("Format -> Convert to table")}.`);
-      logger.info(
-        `6. Open ${colors.green("Share")} in the top-right corner, then set ${colors.yellow("General access -> Anyone with the link -> Viewer")}.`,
+        `5. Open ${colors.green("Share")} in the top-right corner, then set ${colors.yellow("General access -> Anyone with the link -> Viewer")}.`,
       );
     },
-    "Export effects to a CSV file in the Lua folder",
+    "Export effects to a CSV or XLSX file in the Lua folder",
   );
 
   app.registerCommand(

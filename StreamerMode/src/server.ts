@@ -79,7 +79,11 @@ export interface ServerContext {
     clientSecret: string;
     currency: string;
   }) => Promise<{ success: boolean; error?: string; url?: string }>;
-  exportEffects?: (kind: string) => { success: boolean; error?: string; path?: string };
+  exportEffects?: (
+    kind: string,
+  ) =>
+    | { success: boolean; error?: string; path?: string }
+    | Promise<{ success: boolean; error?: string; path?: string }>;
 }
 
 export interface HomeStatus {
@@ -296,7 +300,7 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           if (!ctx.exportEffects) return new Response("Not available", { status: 503 });
           const url = new URL(req.url);
           const kind = url.searchParams.get("type") ?? "csv";
-          const r = ctx.exportEffects(kind);
+          const r = await ctx.exportEffects(kind);
           if (!r.success) {
             return new Response(r.error ?? "Export failed", { status: 400 });
           }

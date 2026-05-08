@@ -88,7 +88,10 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [obsModal, setObsModal] = useState(false);
   const [exportModal, setExportModal] = useState(false);
   const [exportResultPath, setExportResultPath] = useState<string | null>(null);
-  const [exportType, setExportType] = useState("csv");
+  const [exportResultKind, setExportResultKind] = useState<"csv" | "xlsx">(
+    "xlsx",
+  );
+  const [exportType, setExportType] = useState("xlsx");
   const [busy, setBusy] = useState(false);
   const [daModal, setDaModal] = useState(false);
   const [daAppId, setDaAppId] = useState("");
@@ -476,7 +479,10 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             <span className="card-row-label">Format</span>
             <Select
               value={exportType}
-              options={[{ value: "csv", label: "CSV (.csv)" }]}
+              options={[
+                { value: "xlsx", label: "Excel (.xlsx)" },
+                { value: "csv", label: "CSV (.csv)" },
+              ]}
               onChange={setExportType}
             />
           </div>
@@ -486,7 +492,10 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
               disabled={busy}
               onClick={() =>
                 void wrap(async () => {
-                  const r = await exportEffects(exportType);
+                  const kind: "csv" | "xlsx" =
+                    exportType === "csv" ? "csv" : "xlsx";
+                  const r = await exportEffects(kind);
+                  setExportResultKind(kind);
                   setExportResultPath(r.path);
                 })
               }
@@ -556,33 +565,28 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           title="Google Sheets import"
           onClose={() => setExportModal(false)}
         >
-          <ol>
-            <li>
-              Open{" "}
-              <a
-                href="https://docs.google.com/spreadsheets/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                docs.google.com/spreadsheets
-              </a>
-              .
-            </li>
-            <li>
-              Press <b>+</b> to create a new spreadsheet.
-            </li>
-            <li>
-              Open <code>File → Import → Upload</code>.
-            </li>
-            <li>Upload the exported CSV file.</li>
-            <li>
-              Open <code>Format → Convert to table</code>.
-            </li>
-            <li>
-              Open <b>Share</b> in the top-right corner, then set{" "}
-              <i>General access → Anyone with the link → Viewer</i>.
-            </li>
-          </ol>
+          <GoogleSheetsInstructions kind={exportType === "csv" ? "csv" : "xlsx"} />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: 16,
+            }}
+          >
+            <a
+              className="btn btn--success"
+              href="https://sheets.new"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                src={googleSheetsLogo}
+                alt=""
+                style={{ width: 14, height: 14 }}
+              />
+              Open Google Sheets
+            </a>
+          </div>
         </Modal>
       )}
 
@@ -619,28 +623,97 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           onClose={() => setExportResultPath(null)}
         >
           <p>The effects file was written to:</p>
-          <div className="card-link">{exportResultPath}</div>
+          <div
+            className="card-link"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span style={{ flex: 1, wordBreak: "break-all" }}>
+              {exportResultPath}
+            </span>
+            <CopyButton
+              value={exportResultPath}
+              onCopied={() => onNotify("Path copied to clipboard.")}
+              onError={(msg) => onNotify(msg, true)}
+            />
+          </div>
           <p style={{ marginTop: 12 }}>
-            Explorer should open with the file selected. Use it directly, or see
-            the <i>Show instructions</i> button to import it into Google Sheets.
+            Explorer should open with the file selected. Use it directly or
+            import it into Google Sheets:
           </p>
+          <GoogleSheetsInstructions kind={exportResultKind} />
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
+              gap: 8,
               marginTop: 16,
             }}
           >
             <button
-              className="btn btn--primary"
+              className="btn"
               onClick={() => setExportResultPath(null)}
             >
               Close
             </button>
+            <a
+              className="btn btn--success"
+              href="https://sheets.new"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                src={googleSheetsLogo}
+                alt=""
+                style={{ width: 14, height: 14 }}
+              />
+              Open Google Sheets
+            </a>
           </div>
         </Modal>
       )}
     </>
+  );
+}
+
+interface GoogleSheetsInstructionsProps {
+  kind: "csv" | "xlsx";
+}
+
+function GoogleSheetsInstructions({ kind }: GoogleSheetsInstructionsProps) {
+  const fileLabel = kind === "csv" ? "CSV" : "XLSX";
+  return (
+    <ol>
+      <li>
+        Open{" "}
+        <a href="https://sheets.new" target="_blank" rel="noreferrer">
+          sheets.new
+        </a>{" "}
+        to create a new spreadsheet.
+      </li>
+      <li>
+        Open <code>File → Import → Upload</code>.
+      </li>
+      <li>Upload the exported {fileLabel} file.</li>
+      {kind === "csv" ? (
+        <li>
+          Open <code>Format → Convert to table</code>.
+        </li>
+      ) : (
+        <li>
+          In the import dialog, choose <b>Replace spreadsheet</b> (or{" "}
+          <b>Insert new sheet</b>) and click <b>Import data</b>; column widths,
+          colors, and merged cells are preserved.
+        </li>
+      )}
+      <li>
+        Open <b>Share</b> in the top-right corner, then set{" "}
+        <i>General access → Anyone with the link → Viewer</i>.
+      </li>
+    </ol>
   );
 }
 
