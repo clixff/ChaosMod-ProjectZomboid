@@ -1,94 +1,92 @@
 version=1
 id=3717082142
-title=Chaos Mod [B42 + Twitch Integration]
-description=[h1]Project Zomboid Chaos Mod[/h1]
-
-description=
-
-description=[b]A single-player chaos mod for Project Zomboid B42 with Twitch integration.[/b]
-
-description=
-
-description=This mod triggers a random effect every 45 seconds. There are currently [b]230+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
-
-description=
-
-description=[h2]Game Version[/h2]
-
-description=
-
-description=This mod requires the [b]B42 version[/b] of Project Zomboid.
-
-description=To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
-
-description=
-
-description=Latest tested version: [b]42.17.0[/b]
-
-description=
-
-description=[h2]Examples of effects[/h2]
-
-description=
-
-description=[list]
-
-description=[*]Spawn Zombie Nearby
-
-description=[*]Give Random Tool
-
-description=[*]Enable Rain
-
-description=[*]Spawn Vehicle Nearby
-
-description=[*]Turn Power Off
-
-description=[/list]
-
-description=
-
-description=[h2]Twitch Support[/h2]
-
-description=
-
-description=Viewers can vote for the next effect, and Twitch nicknames can appear above zombies.
-
-description=You can read more about Twitch integration on the mod's GitHub page.
-
-description=
-
-description=[h2]Languages[/h2]
-
-description=
-
-description=The mod supports [b]9 languages[/b].
-
-description=You can read more about supported languages on the mod's GitHub page.
-
-description=
-
-description=[h2]Multiplayer[/h2]
-
-description=
-
-description=This mod does [b]not[/b] support multiplayer.
-
-description=It is designed for single-player only.
-
-description=
-
-description=[h2]Configuration[/h2]
-
-description=
-
-description=You can read more about changing the mod's settings on the mod's GitHub page.
-
-description=
-
-description=[h2]Links[/h2]
-
-description=
-
+title=Chaos Mod + Twitch [B42/SP]
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_1.png[/img]
+description=
+description=[b]A single-player Chaos Mod for Project Zomboid B42 with Twitch integration.[/b]
+description=
+description=This mod triggers a random effect every 45 seconds. There are currently [b]310+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
+description=
+description=[b]Twitch integration[/b] is optional and allows your viewers to vote for the next effect. You can play without Twitch integration.
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_2.png[/img]
+description=
+description=[quote]This mod requires the [b]B42 version[/b] of Project Zomboid.
+description=To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
+description=Latest tested version: [b]42.17.0[/b]
+description=This mod [b]will not[/b] work in multiplayer[/quote]
+description=
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_3.png[/img]
+description=[h2]Examples of effects[/h2]
+description=
+description=[list]
+description=[*]Spawn Zombie Nearby
+description=[*]Give Random Tool
+description=[*]Enable Rain
+description=[*]Spawn Vehicle Nearby
+description=[*]Turn Power Off
+description=[/list]
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_5.png[/img]
+description=
+description=Full list of effects: [url=https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I]Google Sheets[/url]
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_4.png[/img]
+description=
+description=Viewers can vote for the next effect, and Twitch nicknames can appear above zombies.
+description=To enable Twitch support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
+description=
+description=You can read more about Twitch integration on the mod's GitHub page.
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_7.png[/img]
+description=
+description=You can edit the mod settings (effect interval time, vote start time, effect settings, language) in mod settings. You can open mod settings window by pressing button with gear icon in game (bottom-left corner). Also settings are available in StreamerApp dashboard.
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_6.png[/img]
+description=
+description=[b]Mod does not work. What should I do?[/b]
+description=Make sure you are using the unstable branch of Project Zomboid on Steam.
+description=
+description=
+description=
+description=[b]How can to disable some effect or change effect settings?[/b]
+description=You can edit settings of every effect in the mod settings windows (bottom-left corner)
+description=
+description=[b]I only want to display Twitch nicknames above zombies, without random effects and without voting. How can I do this?[/b]
+description=In StreamerApp dashboard set these settings:
+description=[i]Effects interval enabled: false[/i]
+description=[i]- Streamer mode enabled: true[/i]
+description=[i]- Voting enabled: false[/i]
+description=[i]- Donations enabled: false[/i]
+description=[i]- Use zombie nicknames: true[/i]
+description=
+description=
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_8.png[/img]
+description=
+description=The mod supports [b]9 languages[/b]
+description=[list]
+description=[*]English
+description=[*]Russian
+description=[*]French
+description=[*]German
+description=[*]Spanish
+description=[*]Portuguese
+description=[*]Polish
+description=[*]Turkish
+description=[*]Simplified Chinese
+description=[/list]
+description=
+description=You can change language on the mod settings window or in StreamerApp dashboard.
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_9.png[/img]
+description=
+description=This mod does [b]not[/b] support multiplayer.
+description=It is designed for single-player only.
+description=
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_10.png[/img]
+description=
 description=[url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Repository[/url]
 tags=Build 42;Misc
 visibility=public

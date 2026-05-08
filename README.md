@@ -248,6 +248,13 @@ No. Chaos Mod is designed for single-player only.
 To start make edits in Lua, you will need to install [EmmyLua](https://github.com/EmmyLua/VSCode-EmmyLua) and [Project Zomboid Umbrella](https://github.com/PZ-Umbrella/Umbrella).
 After installing Umbrella, set environment variable _PZ_UMBRELLA_ to the path of the Umbrella folder.
 
+## How to compile ZomboidStreamerApp.exe by yourself
+
+This is not required if you use precompiled **ZomboidStreamerApp.exe** from releases.
+
+1. Install Bun: [bun.com](https://bun.com/)
+2. Use command `bun build --compile --minify index.ts --outfile dist/ZomboidStreamerApp.exe` in StreamerMode folder
+
 ## Disclaimer
 
 This mod uses the [json.lua](https://github.com/rxi/json.lua) library.
