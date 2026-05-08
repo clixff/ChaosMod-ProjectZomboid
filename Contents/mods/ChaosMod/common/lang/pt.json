@@ -321,7 +321,9 @@
         "spawn_courier": "Invocar Entregador",
         "food_delivery": "Entrega de Comida",
         "spawn_npc_with_loot": "Invocar NPC com Saque",
-        "bounty_on_player_head": "Recompensa pela Cabeça do Jogador"
+        "bounty_on_player_head": "Recompensa pela Cabeça do Jogador",
+        "all_zombies_are_skeletons": "Todos os Zumbis são Esqueletos",
+        "spawn_griefer_skeleton": "Gerar Esqueleto Griefer"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

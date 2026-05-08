@@ -83,6 +83,8 @@
 - Food Delivery
 - Spawn NPC With Loot
 - Bounty On Player Head
+- All Zombies Are Skeletons
+- Spawn Griefer Skeleton
 
 ### Effect Fixes
 
@@ -103,3 +105,4 @@
 - "Force Zoom In" and "Force Zoom Out" now set zoom levels to 25-250%
 - Effect "Teleport To Last Used Bed" now uses the saved spawn point if available
 - Effect "Insane Traffic" now causes player to take damage from vehicles
+- "God Mode" now continuously refreshes invulnerability, heals wounds, resets negative stats, and cures zombie infection every player update

@@ -321,7 +321,9 @@
         "spawn_courier": "Spawn Courier",
         "food_delivery": "Food Delivery",
         "spawn_npc_with_loot": "Spawn NPC With Loot",
-        "bounty_on_player_head": "Bounty On Player Head"
+        "bounty_on_player_head": "Bounty On Player Head",
+        "all_zombies_are_skeletons": "All Zombies Are Skeletons",
+        "spawn_griefer_skeleton": "Spawn Griefer Skeleton"
     },
     "core": {
         "start_mod": "Start ChaosMod",

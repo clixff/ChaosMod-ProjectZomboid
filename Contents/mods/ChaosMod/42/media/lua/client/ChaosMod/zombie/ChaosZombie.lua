@@ -140,6 +140,24 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice)
 end
 
 ---@param zombie IsoZombie
+function ChaosZombie.MakeZombieSkeleton(zombie)
+    if not zombie then return end
+    if not instanceof(zombie, "IsoZombie") then return end
+    if zombie:isSkeleton() then return end
+
+    zombie:setSkeleton(true)
+
+    local visual = zombie:getHumanVisual()
+    if visual then
+        visual:setSkinTextureIndex(2)
+    end
+
+    zombie:clearWornItems()
+
+    zombie:resetModel()
+end
+
+---@param zombie IsoZombie
 function ChaosZombie.HumanizeZombie(zombie)
     if not zombie then return end
 

@@ -322,7 +322,9 @@
         "spawn_courier": "Курьер",
         "food_delivery": "Доставка еды",
         "spawn_npc_with_loot": "NPC с лутом",
-        "bounty_on_player_head": "Награда за голову игрока"
+        "bounty_on_player_head": "Награда за голову игрока",
+        "all_zombies_are_skeletons": "Все зомби — скелеты",
+        "spawn_griefer_skeleton": "Заспавнить скелета-грифера"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

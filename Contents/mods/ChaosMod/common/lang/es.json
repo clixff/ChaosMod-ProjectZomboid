@@ -321,7 +321,9 @@
         "spawn_courier": "Generar Repartidor",
         "food_delivery": "Entrega de Comida",
         "spawn_npc_with_loot": "Generar NPC con Botín",
-        "bounty_on_player_head": "Recompensa por la Cabeza del Jugador"
+        "bounty_on_player_head": "Recompensa por la Cabeza del Jugador",
+        "all_zombies_are_skeletons": "Todos los zombis son esqueletos",
+        "spawn_griefer_skeleton": "Generar esqueleto Griefer"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

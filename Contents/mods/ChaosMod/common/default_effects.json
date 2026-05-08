@@ -2883,6 +2883,22 @@
             ],
             "enabled_donate": true,
             "price_group": "negative_5"
+        },
+        {
+            "id": "all_zombies_are_skeletons",
+            "enabled": true,
+            "chance": 45,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_2"
+        },
+        {
+            "id": "spawn_griefer_skeleton",
+            "enabled": true,
+            "chance": 45,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
         }
     ]
 }

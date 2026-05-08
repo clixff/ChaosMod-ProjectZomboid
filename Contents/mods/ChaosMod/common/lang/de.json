@@ -321,7 +321,9 @@
         "spawn_courier": "Kurier spawnen",
         "food_delivery": "Essenslieferung",
         "spawn_npc_with_loot": "NPC mit Beute spawnen",
-        "bounty_on_player_head": "Kopfgeld auf den Spieler"
+        "bounty_on_player_head": "Kopfgeld auf den Spieler",
+        "all_zombies_are_skeletons": "Alle Zombies sind Skelette",
+        "spawn_griefer_skeleton": "Griefer-Skelett spawnen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

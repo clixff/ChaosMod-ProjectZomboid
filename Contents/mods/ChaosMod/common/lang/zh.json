@@ -321,7 +321,9 @@
         "spawn_courier": "生成快递员",
         "food_delivery": "外卖送餐",
         "spawn_npc_with_loot": "生成携带战利品的 NPC",
-        "bounty_on_player_head": "玩家被悬赏"
+        "bounty_on_player_head": "玩家被悬赏",
+        "all_zombies_are_skeletons": "所有僵尸都是骷髅",
+        "spawn_griefer_skeleton": "生成捣蛋鬼骷髅"
     },
     "core": {
         "start_mod": "启动混乱模式",

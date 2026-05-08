@@ -321,7 +321,9 @@
         "spawn_courier": "Faire apparaître un livreur",
         "food_delivery": "Livraison de nourriture",
         "spawn_npc_with_loot": "Faire apparaître un PNJ avec butin",
-        "bounty_on_player_head": "Prime sur la tête du joueur"
+        "bounty_on_player_head": "Prime sur la tête du joueur",
+        "all_zombies_are_skeletons": "Tous les zombies sont des squelettes",
+        "spawn_griefer_skeleton": "Faire apparaître le Squelette Griefer"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

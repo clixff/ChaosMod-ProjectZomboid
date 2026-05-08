@@ -1,15 +1,18 @@
 [h1]Project Zomboid Chaos Mod[/h1]
 
-[b]A single-player chaos mod for Project Zomboid B42 with Twitch integration.[/b]
+[b]A single-player Chaos Mod for Project Zomboid B42 with Twitch integration.[/b]
 
-This mod triggers a random effect every 45 seconds. There are currently [b]230+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
+This mod triggers a random effect every 45 seconds. There are currently [b]310+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
+
+[b]Twitch integration[/b] is optional and allows your viewers to vote for the next effect. You can play without Twitch integration.
 
 [h2]Game Version[/h2]
 
-This mod requires the [b]B42 version[/b] of Project Zomboid.
+[quote]This mod requires the [b]B42 version[/b] of Project Zomboid.
 To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
-
 Latest tested version: [b]42.17.0[/b]
+This mod [b]will not[/b] work in multiplayer[/quote]
+
 
 [h2]Examples of effects[/h2]
 
@@ -21,24 +24,59 @@ Latest tested version: [b]42.17.0[/b]
 [*]Turn Power Off
 [/list]
 
+Full list of effects: [url=https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I]Google Sheets[/url]
 [h2]Twitch Support[/h2]
 
 Viewers can vote for the next effect, and Twitch nicknames can appear above zombies.
+To enable Twitch support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
+
 You can read more about Twitch integration on the mod's GitHub page.
+
+[h2]Configuration[/h2]
+
+You can edit the mod settings (effect interval time, vote start time, effect settings, language) in mod settings. You can open mod settings window by pressing button with gear icon in game (bottom-left corner). Also settings are available in StreamerApp dashboard.
+
+[h2]FAQ[/h2]
+
+[b]Mod does not work. What should I do?[/b]
+Make sure you are using the unstable branch of Project Zomboid on Steam.
+
+
+
+[b]How can to disable some effect or change effect settings?[/b]
+You can edit settings of every effect in the mod settings windows (bottom-left corner)
+
+[b]I only want to display Twitch nicknames above zombies, without random effects and without voting. How can I do this?[/b]
+In StreamerApp dashboard set these settings:
+[i]Effects interval enabled: false[/i]
+[i]- Streamer mode enabled: true[/i]
+[i]- Voting enabled: false[/i]
+[i]- Donations enabled: false[/i]
+[i]- Use zombie nicknames: true[/i]
+
+
 
 [h2]Languages[/h2]
 
-The mod supports [b]9 languages[/b].
-You can read more about supported languages on the mod's GitHub page.
+The mod supports [b]9 languages[/b]
+[list]
+[*]English
+[*]Russian
+[*]French
+[*]German
+[*]Spanish
+[*]Portuguese
+[*]Polish
+[*]Turkish
+[*]Simplified Chinese
+[/list]
+
+You can change language on the mod settings window or in StreamerApp dashboard.
 
 [h2]Multiplayer[/h2]
 
 This mod does [b]not[/b] support multiplayer.
 It is designed for single-player only.
-
-[h2]Configuration[/h2]
-
-You can read more about changing the mod's settings on the mod's GitHub page.
 
 [h2]Links[/h2]
 

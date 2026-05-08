@@ -321,7 +321,9 @@
         "spawn_courier": "Kurye Çağır",
         "food_delivery": "Yemek Teslimatı",
         "spawn_npc_with_loot": "Ganimetli NPC Çağır",
-        "bounty_on_player_head": "Oyuncunun Başına Ödül"
+        "bounty_on_player_head": "Oyuncunun Başına Ödül",
+        "all_zombies_are_skeletons": "Tüm Zombiler İskelet",
+        "spawn_griefer_skeleton": "Griefer İskelet Oluştur"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

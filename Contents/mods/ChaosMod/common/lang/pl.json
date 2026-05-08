@@ -321,7 +321,9 @@
         "spawn_courier": "Przywołaj Kuriera",
         "food_delivery": "Dostawa Jedzenia",
         "spawn_npc_with_loot": "Zespawnuj NPC z Łupem",
-        "bounty_on_player_head": "Nagroda za Głowę Gracza"
+        "bounty_on_player_head": "Nagroda za Głowę Gracza",
+        "all_zombies_are_skeletons": "Wszystkie zombie to szkielety",
+        "spawn_griefer_skeleton": "Zespawnuj Griefera Szkieleta"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",
