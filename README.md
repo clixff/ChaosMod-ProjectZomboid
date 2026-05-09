@@ -59,16 +59,16 @@ With Twitch support enabled:
 
 Twitch integration requires a separate application called **StreamerApp**, which handles the connection between Twitch and the mod.
 
-To vote, viewers can either send the option number in chat or use:
+To vote, viewers send the option number in chat:
 
 ```txt
-!vote <number>
+<number>
 ```
 
 For example:
 
 ```txt
-!vote 2
+2
 ```
 
 The option numbers are displayed in OBS.
