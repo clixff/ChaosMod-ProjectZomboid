@@ -1,3 +1,7 @@
+[1.1.1]
+
+- Fixed removing bandages from player body parts in effects like "Spawn Robber"
+
 [1.1.0]
 
 ### New mod features

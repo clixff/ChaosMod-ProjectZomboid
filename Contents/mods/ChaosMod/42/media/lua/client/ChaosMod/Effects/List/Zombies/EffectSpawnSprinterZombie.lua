@@ -6,7 +6,7 @@ function EffectSpawnSprinterZombie:OnStart()
     local player = getPlayer()
     if not player then return end
 
-    local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 20, 50, 50, true, true, false)
+    local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 10, 20, 50, true, true, false)
     if not randomSquare then return end
 
     local x = randomSquare:getX()
@@ -14,7 +14,8 @@ function EffectSpawnSprinterZombie:OnStart()
     local z = randomSquare:getZ()
     local newZombies = ChaosZombie.SpawnZombieAt(x, y, z, 1, "Tourist")
     local zombie = newZombies:getFirst()
-    if not zombie then
+    if zombie then
+        zombie:setTarget(player)
         return
     end
 end

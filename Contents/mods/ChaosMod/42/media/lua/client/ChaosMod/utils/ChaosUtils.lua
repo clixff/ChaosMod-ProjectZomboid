@@ -99,7 +99,8 @@ end
 function ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
     ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs + deltaMs
     if ChaosUtils.playerPreviousPositionsSampleMs < PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS then return end
-    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs - PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS
+    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs -
+        PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS
 
     local player = getPlayer()
     if not player then return end
@@ -775,7 +776,7 @@ local function _collectItemsFromContainer(container, out)
     if not items then return end
     for i = 0, items:size() - 1 do
         local item = items:get(i)
-        if item then
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             if item:IsInventoryContainer() then
                 ---@type InventoryContainer
                 local inner = item
@@ -934,4 +935,24 @@ function ChaosUtils.RemoveWorldObject(worldObject, removeInventoryItem)
     end
 
     return item
+end
+
+---@param str string
+---@param prefix string
+---@return boolean
+local function startsWith(str, prefix)
+    return string.sub(str, 1, #prefix) == prefix
+end
+
+---@param item InventoryItem
+---@return boolean
+function ChaosUtils.IsItemBandageOnBodyPart(item)
+    if not item then return false end
+
+    local itemName = item:getDisplayName()
+
+    print(string.format("Testing item name: %s (%s)", itemName, item:getID()))
+
+    return startsWith(itemName, "Base.Bandage_")
+        or startsWith(itemName, "Base.Wound_")
 end
