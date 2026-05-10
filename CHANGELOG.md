@@ -1,5 +1,15 @@
 [1.1.1]
 
+### New Mod Features
+
+### Mod Fixes
+
+- Fixed chance for "Crouch Mode" and price group for "Hide Effect Names"
+
+### New effects
+
+### Effect Fixes
+
 - Fixed removing bandages from player body parts in effects like "Spawn Robber"
 
 [1.1.0]

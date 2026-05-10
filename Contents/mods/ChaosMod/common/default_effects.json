@@ -1922,7 +1922,7 @@
         {
             "id": "crouch_mode",
             "enabled": true,
-            "chance": 5400,
+            "chance": 40,
             "withDuration": true,
             "duration": 90,
             "enabled_donate": true,
@@ -2335,7 +2335,7 @@
                 "hide_effect_names"
             ],
             "enabled_donate": true,
-            "price_group": "negaitve_5"
+            "price_group": "negative_5"
         },
         {
             "id": "select_card_remove_items",
