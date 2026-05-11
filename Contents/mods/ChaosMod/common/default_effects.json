@@ -2899,6 +2899,18 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
+        },
+        {
+            "id": "ufo_abduction",
+            "enabled": true,
+            "chance": 30,
+            "withDuration": true,
+            "duration": 15,
+            "disable_effects": [
+                "ufo_abduction"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
         }
     ]
 }
