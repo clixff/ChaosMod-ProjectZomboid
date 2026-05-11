@@ -18,6 +18,7 @@
 - "Zombies Are Coming" is more powerful now
 - "Math Captcha" now adds a calculator to the player's inventory on wrong answer
 - Fixed "Zombies Can't See You" effect
+- Fixed "Spawn Griefer Skeleton" effect
 
 [1.1.0]
 

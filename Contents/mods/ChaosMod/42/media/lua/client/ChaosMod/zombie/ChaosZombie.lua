@@ -145,16 +145,37 @@ function ChaosZombie.MakeZombieSkeleton(zombie)
     if not instanceof(zombie, "IsoZombie") then return end
     if zombie:isSkeleton() then return end
 
-    zombie:setSkeleton(true)
-
-    local visual = zombie:getHumanVisual()
-    if visual then
-        visual:setSkinTextureIndex(2)
+    -- Clear live-zombie outfit visuals too, not only wornItems.
+    local itemVisuals = zombie:getItemVisuals()
+    if itemVisuals then
+        itemVisuals:clear()
     end
 
     zombie:clearWornItems()
+    zombie:clearAttachedItems()
 
-    zombie:resetModel()
+    local visual = zombie:getHumanVisual()
+    if visual then
+        -- Important: HumanizeZombie() sets a named human skin.
+        -- Named skin overrides skinTextureIndex in Java.
+        ---@diagnostic disable-next-line: param-type-mismatch
+        visual:setSkinTextureName(nil)
+
+        -- Vanilla skeleton corpses use 1 or 2.
+        visual:setSkinTextureIndex(ChaosUtils.RandIntegerRange(1, 3))
+
+        visual:setHairModel("")
+        visual:setBeardModel("")
+
+        local bodyVisuals = visual:getBodyVisuals()
+        if bodyVisuals then
+            bodyVisuals:clear()
+        end
+    end
+
+    zombie:setSkeleton(true)
+    zombie:onWornItemsChanged()
+    zombie:resetModelNextFrame()
 end
 
 ---@param zombie IsoZombie
