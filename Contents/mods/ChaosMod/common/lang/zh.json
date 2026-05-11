@@ -1,7 +1,7 @@
 {
     "effects": {
         "random_effect": "随机效果",
-        "spawn_zombie_nearby": "在附近生成僵尸",
+        "spawn_zombies_nearby": "在附近生成僵尸",
         "effect_shout": "大喊",
         "spawn_npc": "生成 NPC",
         "spawn_friendly_npc": "生成友好 NPC",

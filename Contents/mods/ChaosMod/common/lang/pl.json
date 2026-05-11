@@ -1,7 +1,7 @@
 {
     "effects": {
         "random_effect": "Losowy efekt",
-        "spawn_zombie_nearby": "Zespawnuj zombie w pobliżu",
+        "spawn_zombies_nearby": "Zespawnuj zombie w pobliżu",
         "effect_shout": "Krzyk",
         "spawn_npc": "Zespawnuj NPC",
         "spawn_friendly_npc": "Zespawnuj przyjaznego NPC",

@@ -1,7 +1,7 @@
 {
     "effects": {
         "random_effect": "Rastgele Etki",
-        "spawn_zombie_nearby": "Yakınlarda Zombi Oluştur",
+        "spawn_zombies_nearby": "Yakınlarda Zombiler Oluştur",
         "effect_shout": "Bağırma",
         "spawn_npc": "NPC Oluştur",
         "spawn_friendly_npc": "Dost NPC Oluştur",

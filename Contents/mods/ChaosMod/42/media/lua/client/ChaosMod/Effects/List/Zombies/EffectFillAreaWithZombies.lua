@@ -1,8 +1,8 @@
 EffectFillAreaWithZombies = ChaosEffectBase:derive("EffectFillAreaWithZombies", "fill_area_with_zombies")
 
-local ZOMBIES_TO_SPAWN = 50
-local MIN_RADIUS = 15
-local MAX_RADIUS = 40
+local ZOMBIES_TO_SPAWN = 130
+local MIN_RADIUS = 17
+local MAX_RADIUS = 80
 local MAX_TRIES_PER_ZOMBIE = 25
 
 function EffectFillAreaWithZombies:OnStart()

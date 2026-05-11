@@ -1,7 +1,7 @@
 {
     "effects": {
         "random_effect": "Efeito Aleatório",
-        "spawn_zombie_nearby": "Gerar Zumbi Próximo",
+        "spawn_zombies_nearby": "Gerar Zumbis Próximos",
         "effect_shout": "Gritar",
         "spawn_npc": "Gerar NPC",
         "spawn_friendly_npc": "Gerar NPC Amigável",

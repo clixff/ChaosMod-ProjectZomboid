@@ -1,12 +1,13 @@
 {
     "effects": [
         {
-            "id": "spawn_zombie_nearby",
+            "id": "spawn_zombies_nearby",
             "enabled": true,
             "chance": 45,
-            "withDuration": false,
+            "withDuration": true,
+            "duration": 30,
             "enabled_donate": true,
-            "price_group": "negative_2"
+            "price_group": "negative_3"
         },
         {
             "id": "effect_shout",
@@ -964,7 +965,7 @@
             "chance": 60,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "negative_3"
+            "price_group": "negative_4"
         },
         {
             "id": "spawn_generator",
@@ -2750,7 +2751,7 @@
             "chance": 40,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "negative_4"
+            "price_group": "negative_5"
         },
         {
             "id": "spawn_random_l4d2_companion",

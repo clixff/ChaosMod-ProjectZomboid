@@ -1,7 +1,7 @@
 {
     "effects": {
         "random_effect": "Случайный эффект",
-        "spawn_zombie_nearby": "Заспавнить зомби поблизости",
+        "spawn_zombies_nearby": "Заспавнить зомби поблизости",
         "effect_shout": "Крикнуть",
         "spawn_npc": "Заспавнить NPC",
         "spawn_friendly_npc": "Заспавнить дружелюбного NPC",

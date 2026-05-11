@@ -585,3 +585,16 @@ function ChaosZombie.GetNearestZombie(x, y, skipNPC)
     end
     return nearestZombie
 end
+
+---@param zombie IsoZombie
+---@param player IsoPlayer
+function ChaosZombie.MoveToPlayerSpotted(zombie, player)
+    if not zombie or not player then return end
+    local px = math.floor(player:getX())
+    local py = math.floor(player:getY())
+    zombie:clearAggroList()
+    zombie:setTarget(player)
+    zombie:setTurnAlertedValues(px, py)
+    zombie:pathToCharacter(player)
+    zombie:spotted(player, true)
+end

@@ -17,22 +17,29 @@ local function emitSoundAndAggro()
 
     ---@diagnostic disable-next-line: param-type-mismatch
     addSound(nil, px, py, pz, 180, 180)
-
-    ChaosZombie.ForEachZombieInRange(px, py, 120, function(zombie)
-        if zombie and zombie:isAlive() then
-            zombie:clearAggroList()
-            zombie:setTarget(player)
-            zombie:setTurnAlertedValues(px, py)
-            zombie:pathToCharacter(player)
-            zombie:spotted(player, true)
-        end
-    end, true, nil)
 end
 
 function EffectZombiesAreComing:OnStart()
     ChaosEffectBase:OnStart()
 
     self.timerMs = 0
+
+    local player = getPlayer()
+    if not player then return end
+
+    local square = player:getSquare()
+    if not square then return end
+
+    local px = square:getX()
+    local py = square:getY()
+    local pz = square:getZ()
+
+    ChaosZombie.ForEachZombieInRange(px, py, 120, function(zombie)
+        if zombie and zombie:isAlive() then
+            ChaosZombie.MoveToPlayerSpotted(zombie, player)
+        end
+    end, true, nil)
+
     emitSoundAndAggro()
 end
 

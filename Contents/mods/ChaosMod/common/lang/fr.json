@@ -1,7 +1,7 @@
 {
     "effects": {
         "random_effect": "Effet aléatoire",
-        "spawn_zombie_nearby": "Faire apparaître un zombie à proximité",
+        "spawn_zombies_nearby": "Faire apparaître des zombies à proximité",
         "effect_shout": "Crier",
         "spawn_npc": "Faire apparaître un PNJ",
         "spawn_friendly_npc": "Faire apparaître un PNJ amical",

@@ -1,7 +1,7 @@
 {
     "effects": {
         "random_effect": "Random Effect",
-        "spawn_zombie_nearby": "Spawn Zombie Nearby",
+        "spawn_zombies_nearby": "Spawn Zombies Nearby",
         "effect_shout": "Shout",
         "spawn_npc": "Spawn NPC",
         "spawn_friendly_npc": "Spawn Friendly NPC",
