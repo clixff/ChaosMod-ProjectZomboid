@@ -31,6 +31,7 @@
 - "Time Rewind" effect now has a 15s duration and rewinds the player across the last 120s of tracked positions
 - Fixed "Move Or Get Damage" effect incorrectly damaging the player when walking away and back to the previous square within 1 second; total distance traveled per second is now accumulated each tick
 - "DOOM" effect now blocks reloading and unloading rounds on the temporary shotgun for the duration
+- "Zombies Turret" effect - added blocking of grabbing and other weapon actions
 
 [1.1.0]
 
