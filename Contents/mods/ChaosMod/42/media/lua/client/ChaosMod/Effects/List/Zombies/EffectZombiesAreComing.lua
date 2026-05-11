@@ -1,26 +1,45 @@
+---@class EffectZombiesAreComing : ChaosEffectBase
+---@field timerMs integer
 EffectZombiesAreComing = ChaosEffectBase:derive("EffectZombiesAreComing", "zombies_are_coming")
 
-function EffectZombiesAreComing:OnStart()
-    ChaosEffectBase:OnStart()
+local SOUND_INTERVAL_MS = 1000
+
+local function emitSoundAndAggro()
     local player = getPlayer()
     if not player then return end
 
     local square = player:getSquare()
     if not square then return end
 
-    local x1 = square:getX()
-    local y1 = square:getY()
-    local z1 = square:getZ()
+    local px = square:getX()
+    local py = square:getY()
+    local pz = square:getZ()
 
-    local counter = 0
+    ---@diagnostic disable-next-line: param-type-mismatch
+    addSound(nil, px, py, pz, 180, 180)
 
-    ChaosZombie.ForEachZombieInRange(x1, y1, 80, function(zombie)
+    ChaosZombie.ForEachZombieInRange(px, py, 120, function(zombie)
         if zombie and zombie:isAlive() then
-            ChaosZombie.MoveToLocation(zombie, x1, y1, z1, true, true, true, true)
+            zombie:clearAggroList()
             zombie:setTarget(player)
-            counter = counter + 1
+            zombie:setTurnAlertedValues(px, py)
+            zombie:pathToCharacter(player)
+            zombie:spotted(player, true)
         end
     end, true, nil)
+end
 
-    print("[EffectZombiesAreComing] Zombies coming: " .. tostring(counter))
+function EffectZombiesAreComing:OnStart()
+    ChaosEffectBase:OnStart()
+
+    self.timerMs = 0
+    emitSoundAndAggro()
+end
+
+function EffectZombiesAreComing:OnTick(deltaMs)
+    self.timerMs = (self.timerMs or 0) + (deltaMs or 0)
+    while self.timerMs >= SOUND_INTERVAL_MS do
+        self.timerMs = self.timerMs - SOUND_INTERVAL_MS
+        emitSoundAndAggro()
+    end
 end

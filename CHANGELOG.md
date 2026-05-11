@@ -15,6 +15,7 @@
 - Updated localization for "Kamikaze Zombies" effect to clarify nearby zombies become kamikaze
 - Updated localization for "Zombies Turret" effect to clarify the turret targets zombies
 - Fixed "Immortal Zombies" effect
+- "Zombies Are Coming" is more powerful now
 
 [1.1.0]
 
