@@ -86,7 +86,12 @@ local function spawnZombie(square)
         print("[EffectLookBehindYou] Failed to spawn zombie")
         return
     end
-    return zombies:get(0)
+
+    local zombie = zombies:getFirst()
+    if zombie then
+        ChaosZombie.MoveToPlayerSpotted(zombie, getPlayer())
+    end
+    return zombie
 end
 
 function EffectLookBehindYou:OnStart()

@@ -33,5 +33,5 @@ function EffectSpawnPlayerCloneZombie:OnStart()
 
     ChaosZombie.CopyCharacterVisualsAndClothes(player, zombie)
 
-    zombie:setTarget(player)
+    ChaosZombie.MoveToPlayerSpotted(zombie, player)
 end
