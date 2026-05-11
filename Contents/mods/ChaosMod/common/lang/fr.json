@@ -230,7 +230,7 @@
         "player_drops_random_items": "Le joueur lâche des objets aléatoires",
         "zombies_walk_away": "Les zombies s'éloignent",
         "freeze_zombies": "Geler les zombies",
-        "kamikaze_zombies": "Zombies kamikazes",
+        "kamikaze_zombies": "Tous les zombies sont kamikazes",
         "reverse_movement": "Mouvements inversés",
         "spoil_food_nearby": "Périmer la nourriture à proximité",
         "copy_nearest_zombie_clothes": "Copier les vêtements du zombie le plus proche",
@@ -313,7 +313,7 @@
         "spawn_random_l4d2_companion": "Faire apparaître un compagnon L4D2 aléatoire",
         "doom": "DOOM",
         "medieval_times": "Temps médiévaux",
-        "zombies_turret": "Tourelle de zombies",
+        "zombies_turret": "Tourelle contre les zombies",
         "spawn_walter_white": "Faire apparaître Walter White",
         "pig_turret": "Tourelle de cochon",
         "spawn_annoying_pig": "Cochon agaçant",
@@ -323,7 +323,8 @@
         "spawn_npc_with_loot": "Faire apparaître un PNJ avec butin",
         "bounty_on_player_head": "Prime sur la tête du joueur",
         "all_zombies_are_skeletons": "Tous les zombies sont des squelettes",
-        "spawn_griefer_skeleton": "Faire apparaître le Squelette Griefer"
+        "spawn_griefer_skeleton": "Faire apparaître le Squelette Griefer",
+        "ufo_abduction": "Enlèvement par OVNI"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

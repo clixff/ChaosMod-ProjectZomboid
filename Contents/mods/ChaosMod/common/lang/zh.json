@@ -230,7 +230,7 @@
         "player_drops_random_items": "玩家掉落随机物品",
         "zombies_walk_away": "僵尸走开",
         "freeze_zombies": "冻结僵尸",
-        "kamikaze_zombies": "神风特攻队僵尸",
+        "kamikaze_zombies": "所有僵尸都是神风特攻队",
         "reverse_movement": "反转移动控制",
         "spoil_food_nearby": "使附近的食物腐烂",
         "copy_nearest_zombie_clothes": "复制最近僵尸的衣服",
@@ -313,7 +313,7 @@
         "spawn_random_l4d2_companion": "生成随机 L4D2 伙伴",
         "doom": "DOOM",
         "medieval_times": "中世纪时代",
-        "zombies_turret": "丧尸炮塔",
+        "zombies_turret": "对抗丧尸的炮塔",
         "spawn_walter_white": "生成 Walter White",
         "pig_turret": "猪炮塔",
         "spawn_annoying_pig": "烦人的猪",
@@ -323,7 +323,8 @@
         "spawn_npc_with_loot": "生成携带战利品的 NPC",
         "bounty_on_player_head": "玩家被悬赏",
         "all_zombies_are_skeletons": "所有僵尸都是骷髅",
-        "spawn_griefer_skeleton": "生成捣蛋鬼骷髅"
+        "spawn_griefer_skeleton": "生成捣蛋鬼骷髅",
+        "ufo_abduction": "UFO绑架"
     },
     "core": {
         "start_mod": "启动混乱模式",

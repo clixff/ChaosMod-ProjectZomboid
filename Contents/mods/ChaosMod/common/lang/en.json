@@ -230,7 +230,7 @@
         "player_drops_random_items": "Player Drops Random Items",
         "zombies_walk_away": "Zombies Walk Away",
         "freeze_zombies": "Freeze Zombies",
-        "kamikaze_zombies": "Kamikaze Zombies",
+        "kamikaze_zombies": "All Zombies Are Kamikaze",
         "reverse_movement": "Reverse Movement",
         "spoil_food_nearby": "Spoil Food Nearby",
         "copy_nearest_zombie_clothes": "Copy Nearest Zombie Clothes",
@@ -313,7 +313,7 @@
         "spawn_random_l4d2_companion": "Spawn Random L4D2 Companion",
         "doom": "DOOM",
         "medieval_times": "Medieval Times",
-        "zombies_turret": "Zombies Turret",
+        "zombies_turret": "Turret Against Zombies",
         "spawn_walter_white": "Spawn Walter White",
         "pig_turret": "Pig Turret",
         "spawn_annoying_pig": "Spawn Annoying Pig",
@@ -323,7 +323,8 @@
         "spawn_npc_with_loot": "Spawn NPC With Loot",
         "bounty_on_player_head": "Bounty On Player Head",
         "all_zombies_are_skeletons": "All Zombies Are Skeletons",
-        "spawn_griefer_skeleton": "Spawn Griefer Skeleton"
+        "spawn_griefer_skeleton": "Spawn Griefer Skeleton",
+        "ufo_abduction": "UFO Abduction"
     },
     "core": {
         "start_mod": "Start ChaosMod",

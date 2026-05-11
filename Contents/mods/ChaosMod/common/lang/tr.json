@@ -230,7 +230,7 @@
         "player_drops_random_items": "Oyuncu Rastgele Eşyalar Düşürür",
         "zombies_walk_away": "Zombiler Uzaklaşır",
         "freeze_zombies": "Zombileri Dondur",
-        "kamikaze_zombies": "Kamikaze Zombiler",
+        "kamikaze_zombies": "Tüm Zombiler Kamikaze",
         "reverse_movement": "Ters Hareket",
         "spoil_food_nearby": "Yakındaki Yemekleri Boz",
         "copy_nearest_zombie_clothes": "En Yakın Zombinin Kıyafetlerini Kopyala",
@@ -313,7 +313,7 @@
         "spawn_random_l4d2_companion": "Rastgele L4D2 Yoldaşı Oluştur",
         "doom": "DOOM",
         "medieval_times": "Orta Çağ",
-        "zombies_turret": "Zombi Taret",
+        "zombies_turret": "Zombilere Karşı Taret",
         "spawn_walter_white": "Walter White Oluştur",
         "pig_turret": "Domuz Taret",
         "spawn_annoying_pig": "Sinir Bozucu Domuz",
@@ -323,7 +323,8 @@
         "spawn_npc_with_loot": "Ganimetli NPC Çağır",
         "bounty_on_player_head": "Oyuncunun Başına Ödül",
         "all_zombies_are_skeletons": "Tüm Zombiler İskelet",
-        "spawn_griefer_skeleton": "Griefer İskelet Oluştur"
+        "spawn_griefer_skeleton": "Griefer İskelet Oluştur",
+        "ufo_abduction": "UFO Kaçırması"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

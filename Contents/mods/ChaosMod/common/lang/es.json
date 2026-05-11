@@ -230,7 +230,7 @@
         "player_drops_random_items": "El jugador suelta objetos aleatorios",
         "zombies_walk_away": "Los zombis se alejan",
         "freeze_zombies": "Congelar zombis",
-        "kamikaze_zombies": "Zombis kamikazes",
+        "kamikaze_zombies": "Todos los zombis son kamikazes",
         "reverse_movement": "Movimiento invertido",
         "spoil_food_nearby": "Podrir comida cercana",
         "copy_nearest_zombie_clothes": "Copiar ropa del zombi más cercano",
@@ -313,7 +313,7 @@
         "spawn_random_l4d2_companion": "Generar compañero aleatorio de L4D2",
         "doom": "DOOM",
         "medieval_times": "Tiempos medievales",
-        "zombies_turret": "Torreta de zombis",
+        "zombies_turret": "Torreta contra zombis",
         "spawn_walter_white": "Generar a Walter White",
         "pig_turret": "Torreta de cerdo",
         "spawn_annoying_pig": "Cerdo Molesto",
@@ -323,7 +323,8 @@
         "spawn_npc_with_loot": "Generar NPC con Botín",
         "bounty_on_player_head": "Recompensa por la Cabeza del Jugador",
         "all_zombies_are_skeletons": "Todos los zombis son esqueletos",
-        "spawn_griefer_skeleton": "Generar esqueleto Griefer"
+        "spawn_griefer_skeleton": "Generar esqueleto Griefer",
+        "ufo_abduction": "Abducción OVNI"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
