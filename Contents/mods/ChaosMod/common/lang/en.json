@@ -11,7 +11,7 @@
         "enable_fog": "Enable Fog",
         "enable_rain": "Enable Rain",
         "enable_snow": "Enable Snow",
-        "spawn_sprinter_zombie_random_radius": "Spawn Sprinter Zombie (Random Radius)",
+        "spawn_sprinter_zombies": "Spawn Sprinter Zombies",
         "spawn_david_the_gnome": "Spawn David the Gnome",
         "look_behind_you": "Look Behind You",
         "remove_shoes": "Remove Player's Shoes",

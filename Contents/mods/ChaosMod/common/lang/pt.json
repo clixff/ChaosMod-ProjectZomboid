@@ -11,7 +11,7 @@
         "enable_fog": "Ativar Neblina",
         "enable_rain": "Ativar Chuva",
         "enable_snow": "Ativar Neve",
-        "spawn_sprinter_zombie_random_radius": "Gerar Zumbi Corredor (Raio Aleatório)",
+        "spawn_sprinter_zombies": "Gerar Zumbis Corredores",
         "spawn_david_the_gnome": "Gerar David, o Gnomo",
         "look_behind_you": "Olhe Para Trás",
         "remove_shoes": "Remover Sapatos do Jogador",

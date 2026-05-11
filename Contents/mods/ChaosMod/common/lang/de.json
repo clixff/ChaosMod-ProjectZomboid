@@ -11,7 +11,7 @@
         "enable_fog": "Nebel aktivieren",
         "enable_rain": "Regen aktivieren",
         "enable_snow": "Schnee aktivieren",
-        "spawn_sprinter_zombie_random_radius": "Sprinter-Zombie spawnen (Zufälliger Radius)",
+        "spawn_sprinter_zombies": "Sprinter-Zombies spawnen",
         "spawn_david_the_gnome": "David den Gartenzwerg spawnen",
         "look_behind_you": "Schau hinter dich",
         "remove_shoes": "Schuhe des Spielers entfernen",

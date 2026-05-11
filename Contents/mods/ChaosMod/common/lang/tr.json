@@ -11,7 +11,7 @@
         "enable_fog": "Sisi Etkinleştir",
         "enable_rain": "Yağmuru Etkinleştir",
         "enable_snow": "Karı Etkinleştir",
-        "spawn_sprinter_zombie_random_radius": "Koşucu Zombi Oluştur (Rastgele Yarıçap)",
+        "spawn_sprinter_zombies": "Koşucu Zombiler Oluştur",
         "spawn_david_the_gnome": "Cüce David'i Oluştur",
         "look_behind_you": "Arkana Bak",
         "remove_shoes": "Oyuncunun Ayakkabılarını Çıkar",

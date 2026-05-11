@@ -11,7 +11,7 @@
         "enable_fog": "开启雾天",
         "enable_rain": "开启雨天",
         "enable_snow": "开启雪天",
-        "spawn_sprinter_zombie_random_radius": "在随机半径内生成短跑僵尸",
+        "spawn_sprinter_zombies": "生成短跑僵尸",
         "spawn_david_the_gnome": "生成大卫侏儒",
         "look_behind_you": "回头看看",
         "remove_shoes": "移除玩家的鞋子",

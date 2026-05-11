@@ -11,7 +11,7 @@
         "enable_fog": "Activar niebla",
         "enable_rain": "Activar lluvia",
         "enable_snow": "Activar nieve",
-        "spawn_sprinter_zombie_random_radius": "Generar zombi corredor (radio aleatorio)",
+        "spawn_sprinter_zombies": "Generar zombis corredores",
         "spawn_david_the_gnome": "Generar a David el Gnomo",
         "look_behind_you": "Mira detrás de ti",
         "remove_shoes": "Quitar zapatos del jugador",

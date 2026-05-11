@@ -11,7 +11,7 @@
         "enable_fog": "Включить туман",
         "enable_rain": "Включить дождь",
         "enable_snow": "Включить снег",
-        "spawn_sprinter_zombie_random_radius": "Заспавнить зомби-спринтера (случайный радиус)",
+        "spawn_sprinter_zombies": "Заспавнить зомби-спринтеров",
         "spawn_david_the_gnome": "Заспавнить гнома Дэвида",
         "look_behind_you": "Обернись",
         "remove_shoes": "Удалить обувь игрока",

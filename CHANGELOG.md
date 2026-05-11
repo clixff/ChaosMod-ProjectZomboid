@@ -24,6 +24,7 @@
 - Fixed "Disable Sounds" effect
 - Fixed Ghost Items in effects like "Hide Player Weapons"
 - Effects "Hide Player Clothes", "Hide Player Weapons" now hides items on various locations
+- Renamed "Spawn Sprinter Zombie (Random Radius)" → "Spawn Sprinter Zombies" (`spawn_sprinter_zombies`); now lasts longer and spawns multiple sprinters over its duration
 
 [1.1.0]
 

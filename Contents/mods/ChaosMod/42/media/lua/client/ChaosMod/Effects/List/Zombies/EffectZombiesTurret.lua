@@ -5,6 +5,7 @@
 ---@field currentYRotation number
 ---@field lastShotMs integer
 ---@field killCount integer
+---@field lastTeleportMs integer
 EffectZombiesTurret = ChaosEffectBase:derive("EffectZombiesTurret", "zombies_turret")
 
 ---@type string
@@ -19,6 +20,8 @@ local ROTATION_EPSILON = 10
 local ROTATION_SPEED_DEG_PER_SEC = 90
 ---@type number
 local MISS_CHANCE = 0.3
+---@type integer
+local TELEPORT_INTERVAL_MS = 3000
 ---@type table<string, number>
 local KILL_COUNTER_COLOR = { r = 1.0, g = 0.84, b = 0.0 }
 ---@type boolean
@@ -238,8 +241,54 @@ local function spawnTurret(self)
     self.currentYRotation = 0
     self.lastShotMs = 0
     self.killCount = 0
+    self.lastTeleportMs = getTimestampMs()
 
     applyTurretRotation(self, 0)
+end
+
+---@param self EffectZombiesTurret
+local function teleportTurretToPlayer(self)
+    ---@type IsoPlayer?
+    local player = getPlayer()
+    if not player then return end
+
+    ---@type IsoGridSquare?
+    local targetSquare = player:getSquare()
+    if not targetSquare then return end
+
+    if self.worldGunItem then
+        local container = self.worldGunItem:getContainer()
+        if container then
+            container:Remove(self.worldGunItem)
+        end
+        self.worldGunItem:Remove()
+    end
+
+    if self.worldGunObj then
+        ---@type IsoGridSquare?
+        local currentSquare = self.worldGunObj:getSquare()
+        if currentSquare == targetSquare then return end
+        ChaosUtils.RemoveWorldObject(self.worldGunObj)
+    end
+
+    ---@type InventoryItem?
+    local item = self.worldGunItem
+    if not item then
+        item = instanceItem(WEAPON_ITEM_ID)
+    end
+    if not item then return end
+
+    ---@type InventoryItem?
+    local placedItem = targetSquare:AddWorldInventoryItem(item, 0.5, 0.5, 0.5, false)
+    if not placedItem then return end
+
+    placedItem:setWorldXRotation(270)
+    placedItem:setWorldZRotation(0)
+
+    self.worldGunItem = placedItem
+    self.worldGunObj = placedItem:getWorldItem()
+
+    applyTurretRotation(self, self.currentYRotation or 0)
 end
 
 ---@param self EffectZombiesTurret
@@ -340,6 +389,14 @@ end
 function EffectZombiesTurret:OnTick(deltaMs)
     if not self.worldGunItem or not self.worldGunObj then return end
 
+    ---@type integer
+    local nowMs = getTimestampMs()
+    if nowMs - (self.lastTeleportMs or 0) >= TELEPORT_INTERVAL_MS then
+        self.lastTeleportMs = nowMs
+        teleportTurretToPlayer(self)
+        if not self.worldGunItem or not self.worldGunObj then return end
+    end
+
     ---@type IsoGridSquare?
     local worldGunSquare = self.worldGunObj:getSquare()
     if not worldGunSquare then return end
@@ -399,6 +456,14 @@ end
 
 function EffectZombiesTurret:OnEnd()
     ChaosEffectBase:OnEnd()
+
+    if self.worldGunItem then
+        local container = self.worldGunItem:getContainer()
+        if container then
+            container:Remove(self.worldGunItem)
+        end
+        self.worldGunItem:Remove()
+    end
 
     if self.worldGunObj then
         ChaosUtils.RemoveWorldObject(self.worldGunObj)

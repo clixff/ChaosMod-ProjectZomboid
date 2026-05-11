@@ -87,12 +87,13 @@
             "price_group": "neutral_3"
         },
         {
-            "id": "spawn_sprinter_zombie_random_radius",
+            "id": "spawn_sprinter_zombies",
             "enabled": true,
             "chance": 45,
-            "withDuration": false,
+            "withDuration": true,
+            "duration": 30,
             "enabled_donate": true,
-            "price_group": "negative_3"
+            "price_group": "negative_4"
         },
         {
             "id": "spawn_david_the_gnome",

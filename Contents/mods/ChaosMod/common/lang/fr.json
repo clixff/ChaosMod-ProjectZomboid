@@ -11,7 +11,7 @@
         "enable_fog": "Activer le brouillard",
         "enable_rain": "Activer la pluie",
         "enable_snow": "Activer la neige",
-        "spawn_sprinter_zombie_random_radius": "Apparition de zombie sprinter (rayon aléatoire)",
+        "spawn_sprinter_zombies": "Apparition de zombies sprinters",
         "spawn_david_the_gnome": "Faire apparaître David le Gnome",
         "look_behind_you": "Regarde derrière toi",
         "remove_shoes": "Retirer les chaussures du joueur",
