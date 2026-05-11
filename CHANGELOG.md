@@ -19,6 +19,7 @@
 - "Math Captcha" now adds a calculator to the player's inventory on wrong answer
 - Fixed "Zombies Can't See You" effect
 - Fixed "Spawn Griefer Skeleton" effect
+- "Zombies Rain" effect now spawns zombies more frequently
 
 [1.1.0]
 
