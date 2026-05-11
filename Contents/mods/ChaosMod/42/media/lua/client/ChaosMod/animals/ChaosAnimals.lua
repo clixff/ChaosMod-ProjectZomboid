@@ -193,11 +193,13 @@ end
 ---@param z number
 ---@param type string
 ---@param breed string
+---@param shouldBeSkeleton boolean?
 ---@return IsoAnimal?
-function ChaosAnimals.SpawnAnimal(x, y, z, type, breed)
+function ChaosAnimals.SpawnAnimal(x, y, z, type, breed, shouldBeSkeleton)
     x = math.floor(x)
     y = math.floor(y)
     z = math.floor(z)
+    shouldBeSkeleton = shouldBeSkeleton or false
     local animalDef = AnimalDefinitions.getDef(type)
     if not animalDef then
         print("[ChaosAnimals.SpawnAnimal] Failed to get animal definition")
@@ -210,7 +212,7 @@ function ChaosAnimals.SpawnAnimal(x, y, z, type, breed)
         return nil
     end
 
-    local animal = addAnimal(getCell(), x, y, z, type, breedObject)
+    local animal = addAnimal(getCell(), x, y, z, type, breedObject, shouldBeSkeleton)
     if not animal then
         print("[ChaosAnimals.SpawnAnimal] Failed to spawn animal")
         return nil

@@ -8,7 +8,9 @@
 ---@field playerSpawnPoint {x: number, y: number, z: number} | nil -- World position where player first spawned this save
 ---@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 2 recorded player world positions, oldest first
 ---@field playerPreviousPositionsSampleMs integer
+---@field DEBUG_SQUARE_RING_SEARCH boolean -- When true, SquareRingSearchTile_2D prints a per-ring non-null tile count at Z=0
 ChaosUtils = ChaosUtils or {
+    DEBUG_SQUARE_RING_SEARCH = false,
     lastUsedVehicle = nil,
     playerPositionHistory = {},
     positionSampleMs = 0,
@@ -590,10 +592,34 @@ function ChaosUtils.SquareRingSearchTile_2D(x, y, callback, minDistance, maxDist
 
     local maxRing = math.ceil(maxDistance)
 
+    local debugEnabled = ChaosUtils.DEBUG_SQUARE_RING_SEARCH == true
+    ---@type table<integer, integer>
+    local ringValidCounts = {}
+    if debugEnabled then
+        for ring = 0, maxRing do ringValidCounts[ring] = 0 end
+    end
+    local function countZ0(cx, cy, ring)
+        if not debugEnabled then return end
+        local sq = cell:getGridSquare(cx, cy, 0)
+        if sq then
+            ringValidCounts[ring] = (ringValidCounts[ring] or 0) + 1
+        end
+    end
+    local function printDebug()
+        if not debugEnabled then return end
+        print("[ChaosUtils.SquareRingSearchTile_2D] origin=(" .. tostring(x) .. "," .. tostring(y) ..
+            ") maxRing=" .. tostring(maxRing))
+        for ring = 0, maxRing do
+            print("Radius " .. tostring(ring) .. " - " .. tostring(ringValidCounts[ring] or 0) .. " valid")
+        end
+    end
+
     for ring = 0, maxRing do
         if ring == 0 then
+            countZ0(x, y, 0)
             if _checkSquareAcrossZ(cell, x, y, x, y, callback, minDistance, maxDistance, checkFloor, onlyEmpty,
                     allowInteriors, minZ, maxZ) then
+                printDebug()
                 return true
             end
         else
@@ -603,31 +629,40 @@ function ChaosUtils.SquareRingSearchTile_2D(x, y, callback, minDistance, maxDist
             local maxY = y + ring
 
             for currentX = minX, maxX do
+                countZ0(currentX, minY, ring)
                 if _checkSquareAcrossZ(cell, x, y, currentX, minY, callback, minDistance, maxDistance, checkFloor,
                         onlyEmpty, allowInteriors, minZ, maxZ) then
+                    printDebug()
                     return true
                 end
 
+                countZ0(currentX, maxY, ring)
                 if _checkSquareAcrossZ(cell, x, y, currentX, maxY, callback, minDistance, maxDistance, checkFloor,
                         onlyEmpty, allowInteriors, minZ, maxZ) then
+                    printDebug()
                     return true
                 end
             end
 
             for currentY = minY + 1, maxY - 1 do
+                countZ0(minX, currentY, ring)
                 if _checkSquareAcrossZ(cell, x, y, minX, currentY, callback, minDistance, maxDistance, checkFloor,
                         onlyEmpty, allowInteriors, minZ, maxZ) then
+                    printDebug()
                     return true
                 end
 
+                countZ0(maxX, currentY, ring)
                 if _checkSquareAcrossZ(cell, x, y, maxX, currentY, callback, minDistance, maxDistance, checkFloor,
                         onlyEmpty, allowInteriors, minZ, maxZ) then
+                    printDebug()
                     return true
                 end
             end
         end
     end
 
+    printDebug()
     return false
 end
 

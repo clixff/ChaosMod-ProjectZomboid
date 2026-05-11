@@ -11,6 +11,7 @@
 ### Mod Fixes
 
 - Fixed chance for "Crouch Mode" and price group for "Hide Effect Names"
+- Fixed "NPC Died" message to only show if NPC has a nickname
 
 ### New effects
 
