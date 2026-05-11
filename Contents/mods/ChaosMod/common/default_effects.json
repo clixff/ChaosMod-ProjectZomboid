@@ -458,7 +458,8 @@
             "id": "zombies_are_coming",
             "enabled": true,
             "chance": 40,
-            "withDuration": false,
+            "withDuration": true,
+            "duration": 10,
             "enabled_donate": true,
             "price_group": "negative_5"
         },
