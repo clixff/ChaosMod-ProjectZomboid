@@ -1,9 +1,3 @@
-[1.1.2] Pre-release
-
-### New Effects
-
-- UFO Abduction
-
 [1.1.1]
 
 ### New Mod Features
