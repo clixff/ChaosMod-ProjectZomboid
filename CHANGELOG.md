@@ -24,7 +24,7 @@
 - Fixed "Disable Sounds" effect
 - Fixed Ghost Items in effects like "Hide Player Weapons"
 - Effects "Hide Player Clothes", "Hide Player Weapons" now hides items on various locations
-- Renamed "Spawn Sprinter Zombie (Random Radius)" → "Spawn Sprinter Zombies" (`spawn_sprinter_zombies`); now lasts longer and spawns multiple sprinters over its duration
+- Renamed "Spawn Sprinter Zombie (Random Radius)" → "Spawn Sprinter Zombies" (`spawn_sprinter_zombies`); now has a 10s duration and spawns one sprinter on start and one on end
 - Renamed "Spawn Zombie Nearby" → "Spawn Zombies Nearby" (`spawn_zombies_nearby`); now has a 30s duration, spawns multiple zombies over its duration, and spawned zombies path to the player
 - "Spawn Few Zombies" effect now spawns a random number of zombies between 4 and 6
 - "Fill Area With Zombies" effect now spawns more zombies in a random area around the player
