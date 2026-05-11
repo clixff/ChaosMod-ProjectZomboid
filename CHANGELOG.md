@@ -9,13 +9,12 @@
 - Fixed chance for "Crouch Mode" and price group for "Hide Effect Names"
 - Fixed "NPC Died" message to only show if NPC has a nickname
 
-### New effects
-
 ### Effect Fixes
 
 - Fixed removing bandages from player body parts in effects like "Spawn Robber"
 - Updated localization for "Kamikaze Zombies" effect to clarify nearby zombies become kamikaze
 - Updated localization for "Zombies Turret" effect to clarify the turret targets zombies
+- Fixed "Immortal Zombies" effect
 
 [1.1.0]
 

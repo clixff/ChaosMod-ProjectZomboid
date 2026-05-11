@@ -1,5 +1,5 @@
 ---@class EffectImmortalZombies : ChaosEffectBase
----@field immortalZombies table<IsoZombie, boolean>
+---@field immortalZombies table<IsoZombie, { health: number, bodyHealth: number | nil }>
 EffectImmortalZombies = ChaosEffectBase:derive("EffectImmortalZombies", "immortal_zombies")
 
 local RADIUS = 30
@@ -9,7 +9,6 @@ function EffectImmortalZombies:OnStart()
     self.immortalZombies = {}
 end
 
----@param deltaMs integer
 function EffectImmortalZombies:OnTick(deltaMs)
     local player = getPlayer()
     if not player then return end
@@ -21,25 +20,33 @@ function EffectImmortalZombies:OnTick(deltaMs)
     local py = square:getY()
 
     ChaosZombie.ForEachZombieInRange(px, py, RADIUS, function(zombie)
-        if not zombie then return end
-        if not zombie:isAlive() then return end
+        if not zombie or not zombie:isAlive() then return end
 
-        if self.immortalZombies[zombie] == nil then
-            self.immortalZombies[zombie] = true
+        local entry = self.immortalZombies[zombie]
+        if not entry then
+            entry = {
+                health = zombie:getHealth(),
+                bodyHealth = zombie:getBodyDamage() and zombie:getBodyDamage():getOverallBodyHealth() or nil,
+            }
+            self.immortalZombies[zombie] = entry
         end
 
-        zombie:setInvulnerable(true)
+        -- blocks the next normal hit
+        zombie:setNoDamage(true)
+
+        -- backup: restore health if something still got through
+        if zombie:getHealth() < entry.health then
+            zombie:setHealth(entry.health)
+        end
+
+        local bd = zombie:getBodyDamage()
+        if bd and entry.bodyHealth and bd:getOverallBodyHealth() < entry.bodyHealth then
+            bd:setOverallBodyHealth(entry.bodyHealth)
+        end
     end, true, nil)
 end
 
 function EffectImmortalZombies:OnEnd()
     ChaosEffectBase:OnEnd()
-
-    for zombie in pairs(self.immortalZombies) do
-        if zombie then
-            zombie:setInvulnerable(false)
-        end
-    end
-
     self.immortalZombies = {}
 end
