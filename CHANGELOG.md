@@ -23,6 +23,7 @@
 - "Remove Bandages" effect now does not remove bandages from player body
 - Fixed "Disable Sounds" effect
 - Fixed Ghost Items in effects like "Hide Player Weapons"
+- Effects "Hide Player Clothes", "Hide Player Weapons" now hides items on various locations
 
 [1.1.0]
 

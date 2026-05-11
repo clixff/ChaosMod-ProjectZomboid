@@ -37,23 +37,27 @@ function EffectHidePlayerWeapons:OnStart()
 
     if #weapons == 0 then return end
 
-    local sq = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 3, 20, 50, true, true, false)
-    if not sq then return end
-
-    print("[EffectHidePlayerWeapons] X: " ..
-        tostring(sq:getX()) .. " Y: " .. tostring(sq:getY()) .. " Z: " .. tostring(sq:getZ()))
-
+    local hiddenCount = 0
     for _, weapon in ipairs(weapons) do
-        player:removeFromHands(weapon)
+        local sq = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 3, 20, 50, true, true, false)
+        if sq then
+            print("[EffectHidePlayerWeapons] X: " ..
+                tostring(sq:getX()) .. " Y: " .. tostring(sq:getY()) .. " Z: " .. tostring(sq:getZ()))
 
-        local container = weapon:getContainer()
-        if container then
-            container:Remove(weapon)
+            player:removeFromHands(weapon)
+
+            local container = weapon:getContainer()
+            if container then
+                container:Remove(weapon)
+            end
+
+            sq:AddWorldInventoryItem(weapon, 0.5, 0.5, 0)
+            hiddenCount = hiddenCount + 1
         end
-
-        sq:AddWorldInventoryItem(weapon, 0.5, 0.5, 0)
     end
 
-    local str = string.format(ChaosLocalization.GetString("misc", "weapons_hidden"), #weapons)
-    ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
+    if hiddenCount > 0 then
+        local str = string.format(ChaosLocalization.GetString("misc", "weapons_hidden"), hiddenCount)
+        ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
+    end
 end
