@@ -288,7 +288,7 @@ function ChaosNPC:OnZombieDead()
         local player = getPlayer()
         if player then
             local name = ChaosNicknames.ensureZombieNicknameAndColor(self.zombie)
-            if name then
+            if name and name ~= "" and name ~= nil then
                 player:Say(string.format(ChaosLocalization.GetString("misc", "npc_died"), name))
             end
         end
