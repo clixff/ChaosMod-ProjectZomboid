@@ -11,6 +11,8 @@
 ### Effect Fixes
 
 - Fixed removing bandages from player body parts in effects like "Spawn Robber"
+- Updated localization for "Kamikaze Zombies" effect to clarify nearby zombies become kamikaze
+- Updated localization for "Zombies Turret" effect to clarify the turret targets zombies
 
 [1.1.0]
 

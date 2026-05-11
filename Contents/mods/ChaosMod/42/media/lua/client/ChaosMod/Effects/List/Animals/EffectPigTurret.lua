@@ -31,6 +31,8 @@ local SHOT_COOLDOWN_MS = 800
 local ZOMBIE_MISS_CHANCE = 0.3
 ---@type number
 local PLAYER_MISS_CHANCE = 0.8
+---@type number[]
+local FACING_DOT_DEBUG = { 0.0, 0.25, 0.5, 0.8, 1.0 }
 
 ---@param angle number
 ---@return number
@@ -189,7 +191,7 @@ end
 ---@return boolean
 local function isTargetInFrontOfPig(pig, target)
     if not pig or not target then return false end
-    return pig:isFacingLocation(target:getX(), target:getY(), 0.5)
+    return pig:isFacingLocation(target:getX(), target:getY(), 0.8)
 end
 
 ---@param pigSquare IsoGridSquare?
@@ -404,7 +406,7 @@ function EffectPigTurret:OnStart()
     self.specialAnimal = SpecialAnimal:new(pig)
     if self.specialAnimal then
         self.specialAnimal.repathTicks = 500
-        self.specialAnimal.followPlayer = true
+        self.specialAnimal.followPlayer = false
     end
 
     self.pig:changeStress(80)
@@ -417,6 +419,23 @@ end
 ---@param deltaMs integer
 function EffectPigTurret:OnTick(deltaMs)
     if not self.pig or self.pig:isDead() then return end
+
+    -- local debugPlayer = getPlayer()
+    -- if debugPlayer then
+    --     local ux, uy = debugPlayer:getX(), debugPlayer:getY()
+    --     local parts = {}
+    --     for i = 1, #FACING_DOT_DEBUG do
+    --         local dot = FACING_DOT_DEBUG[i]
+    --         local facing = self.pig:isFacingLocation(ux, uy, dot)
+    --         parts[i] = string.format("%.2f=%s", dot, tostring(facing))
+    --     end
+    --     -- print("[EffectPigTurret] pig:isFacingLocation(user): " .. table.concat(parts, ", "))
+    -- end
+
+    if self.worldGunObj then
+        self.worldGunObj:setTargetAlpha(0, 1.0)
+    end
+
 
     PigWeaponAttach.update(self.pig, self)
     firePigTurret(self)

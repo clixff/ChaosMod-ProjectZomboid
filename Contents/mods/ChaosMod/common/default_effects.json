@@ -2810,7 +2810,7 @@
                 "zombies_turret"
             ],
             "enabled_donate": true,
-            "price_group": "positive_5"
+            "price_group": "negative_5"
         },
         {
             "id": "spawn_annoying_pig",
