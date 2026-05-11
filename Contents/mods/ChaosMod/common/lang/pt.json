@@ -122,7 +122,7 @@
         "vehicle_magnet_field": "Campo Magnético de Veículos",
         "remove_player_ammo": "Remover Munição do Jogador",
         "spawn_ammo": "Gerar Munição",
-        "remove_bandages": "Remover Bandagens",
+        "remove_bandages": "Remover Bandagens do Inventário",
         "give_bandages": "Dar Bandagens",
         "give_random_medical_item": "Dar Item Médico Aleatório",
         "give_random_skill_book": "Dar Livro de Habilidade Aleatório",

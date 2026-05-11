@@ -122,7 +122,7 @@
         "vehicle_magnet_field": "Araç Mıknatıs Alanı",
         "remove_player_ammo": "Oyuncunun Mermilerini Kaldır",
         "spawn_ammo": "Mermi Oluştur",
-        "remove_bandages": "Bandajları Kaldır",
+        "remove_bandages": "Envanterden Bandajları Kaldır",
         "give_bandages": "Bandaj Ver",
         "give_random_medical_item": "Rastgele Tıbbi Eşya Ver",
         "give_random_skill_book": "Rastgele Yetenek Kitabı Ver",

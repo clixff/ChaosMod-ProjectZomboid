@@ -20,6 +20,7 @@
 - Fixed "Zombies Can't See You" effect
 - Fixed "Spawn Griefer Skeleton" effect
 - "Zombies Rain" effect now spawns zombies more frequently
+- "Remove Bandages" effect now does not remove bandages from player body
 
 [1.1.0]
 

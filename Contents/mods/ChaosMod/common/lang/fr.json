@@ -122,7 +122,7 @@
         "vehicle_magnet_field": "Champ magnétique de véhicule",
         "remove_player_ammo": "Retirer les munitions du joueur",
         "spawn_ammo": "Faire apparaître des munitions",
-        "remove_bandages": "Retirer les bandages",
+        "remove_bandages": "Retirer les bandages de l'inventaire",
         "give_bandages": "Donner des bandages",
         "give_random_medical_item": "Donner un objet médical aléatoire",
         "give_random_skill_book": "Donner un livre de compétence aléatoire",

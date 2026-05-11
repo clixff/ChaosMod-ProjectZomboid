@@ -122,7 +122,7 @@
         "vehicle_magnet_field": "车辆磁场",
         "remove_player_ammo": "移除玩家弹药",
         "spawn_ammo": "生成弹药",
-        "remove_bandages": "移除绷带",
+        "remove_bandages": "从背包中移除绷带",
         "give_bandages": "给予绷带",
         "give_random_medical_item": "给予随机医疗物品",
         "give_random_skill_book": "给予随机技能书",
