@@ -42,6 +42,14 @@ function EffectMathCaptcha.applyWrongAnswer()
 
     ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "wrong_answer"),
         ChaosPlayerChatColors.removedItem)
+
+    local inventory = player:getInventory()
+    if inventory then
+        local calculator = inventory:AddItem("Base.Calculator")
+        if calculator then
+            ChaosPlayer.SayLineNewItem(player, calculator)
+        end
+    end
 end
 
 function EffectMathCaptcha.applyCorrectAnswer()

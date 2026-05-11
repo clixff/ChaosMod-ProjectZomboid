@@ -16,6 +16,7 @@
 - Updated localization for "Zombies Turret" effect to clarify the turret targets zombies
 - Fixed "Immortal Zombies" effect
 - "Zombies Are Coming" is more powerful now
+- "Math Captcha" now adds a calculator to the player's inventory on wrong answer
 
 [1.1.0]
 
