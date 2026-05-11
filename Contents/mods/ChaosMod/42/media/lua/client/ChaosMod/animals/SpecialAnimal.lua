@@ -2,6 +2,7 @@
 ---@field animal IsoAnimal
 ---@field followPlayer boolean
 ---@field renderNickname boolean
+---@field alwaysRunning boolean
 ---@field repathTicks integer
 SpecialAnimal = SpecialAnimal or {}
 SpecialAnimal.__index = SpecialAnimal
@@ -16,6 +17,7 @@ function SpecialAnimal:new(animal)
         animal = animal,
         followPlayer = true,
         renderNickname = true,
+        alwaysRunning = true,
         repathTicks = 20
     }
     setmetatable(o, self)
@@ -69,6 +71,10 @@ function SpecialAnimal:tick()
         if animal.addLineChatElement then
             animal:addLineChatElement("")
         end
+    end
+
+    if self.alwaysRunning then
+        animal:setVariable("animalRunning", true)
     end
 
     if self.followPlayer then
