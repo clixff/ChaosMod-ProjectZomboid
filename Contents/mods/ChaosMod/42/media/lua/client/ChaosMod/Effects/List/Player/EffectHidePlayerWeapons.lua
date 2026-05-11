@@ -45,7 +45,12 @@ function EffectHidePlayerWeapons:OnStart()
 
     for _, weapon in ipairs(weapons) do
         player:removeFromHands(weapon)
-        inventory:Remove(weapon)
+
+        local container = weapon:getContainer()
+        if container then
+            container:Remove(weapon)
+        end
+
         sq:AddWorldInventoryItem(weapon, 0.5, 0.5, 0)
     end
 

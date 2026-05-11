@@ -846,7 +846,10 @@ function ChaosUtils.RemoveRandomItem(player)
         player:removeWornItem(randomItem.item)
     end
 
-    inventory:Remove(randomItem.item)
+    local container = randomItem.item:getContainer()
+    if container then
+        container:Remove(randomItem.item)
+    end
 
     ChaosPlayer.SayLineRemovedItem(player, randomItem.item)
 end

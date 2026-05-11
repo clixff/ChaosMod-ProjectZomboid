@@ -22,6 +22,7 @@
 - "Zombies Rain" effect now spawns zombies more frequently
 - "Remove Bandages" effect now does not remove bandages from player body
 - Fixed "Disable Sounds" effect
+- Fixed Ghost Items in effects like "Hide Player Weapons"
 
 [1.1.0]
 

@@ -36,7 +36,10 @@ function EffectFoodThief:OnStart()
         if worn and worn:contains(stolenItem) then
             player:removeWornItem(stolenItem)
         end
-        inventory:Remove(stolenItem)
+        local container = stolenItem:getContainer()
+        if container then
+            container:Remove(stolenItem)
+        end
         zombie:addItemToSpawnAtDeath(stolenItem)
 
         local imgCode = ChaosUtils.GetImgCodeByItemTexture(stolenItem)

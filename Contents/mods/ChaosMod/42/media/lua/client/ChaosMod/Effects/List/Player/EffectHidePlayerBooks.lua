@@ -47,7 +47,10 @@ function EffectHidePlayerBooks:OnStart()
         if worn and worn:contains(book) then
             player:removeWornItem(book)
         end
-        inventory:Remove(book)
+        local container = book:getContainer()
+        if container then
+            container:Remove(book)
+        end
         sq:AddWorldInventoryItem(book, 0.5, 0.5, 0)
     end
 
