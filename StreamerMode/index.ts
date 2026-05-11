@@ -26,6 +26,7 @@ import {
   getAvailableLanguages,
 } from "./src/commands/lang.ts";
 import { loadEffects, saveEffects } from "./src/effects.ts";
+import { syncEffectsForModVersion } from "./src/versionFile.ts";
 import { setRecentEffectsMax } from "./src/effectsRegistry.ts";
 import { startServer } from "./src/server.ts";
 import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
@@ -92,7 +93,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.1.0";
+const VERSION = "1.1.1";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -407,6 +408,9 @@ async function main(): Promise<void> {
   }
   const config =
     modFolder && luaFolder ? loadConfig(modFolder, luaFolder) : null;
+  if (modFolder && luaFolder) {
+    syncEffectsForModVersion(modFolder, luaFolder, VERSION);
+  }
   const effects =
     modFolder && luaFolder ? loadEffects(modFolder, luaFolder) : [];
 
@@ -1009,8 +1013,7 @@ async function main(): Promise<void> {
                 effects,
                 config?.streamer_mode.donate_price_groups ?? [],
                 Boolean(
-                  config?.streamer_mode.enable_donate &&
-                    daProvider.isConnected,
+                  config?.streamer_mode.enable_donate && daProvider.isConnected,
                 ),
               )
             : writeEffectsCsv(luaFolder);
@@ -1233,8 +1236,7 @@ async function main(): Promise<void> {
               effects,
               config?.streamer_mode.donate_price_groups ?? [],
               Boolean(
-                config?.streamer_mode.enable_donate &&
-                  daProvider.isConnected,
+                config?.streamer_mode.enable_donate && daProvider.isConnected,
               ),
             )
           : writeEffectsCsv(luaFolder);

@@ -41,6 +41,8 @@ function ChaosEffectsRegistry.Initialize()
     local enabledEffects = 0;
     local totalEffects = 0;
 
+    ChaosEffectsRegistry.SyncEffectsForModVersion()
+
     ---@type table | nil
     local defaultEffectsData = ChaosFileReader.ReadJsonFile("default_effects.json")
 
@@ -104,6 +106,38 @@ function ChaosEffectsRegistry.Initialize()
         enabledEffects)
     print(resultString)
     ChaosEffectsRegistry.effectsEnabledCount = enabledEffects
+end
+
+--- If VERSION.txt is missing, empty or different from the current mod version,
+--- overwrite the user's effects.json with the shipped default_effects.json
+--- and rewrite VERSION.txt. Must run before effects.json is loaded into memory.
+function ChaosEffectsRegistry.SyncEffectsForModVersion()
+    local currentVersion = ""
+    if ChaosMod.modData then
+        currentVersion = ChaosMod.modData:getModVersion() or ""
+    end
+
+    local storedRaw = ChaosFileReader.ReadFileFromCacheAllLines("ChaosMod/VERSION.txt")
+    local storedVersion = ""
+    if storedRaw then
+        storedVersion = storedRaw:match("^%s*(.-)%s*$") or ""
+    end
+
+    if storedVersion == currentVersion then
+        return
+    end
+
+    print(string.format("[ChaosEffectsRegistry] Mod version changed ('%s' -> '%s'); replacing effects.json with defaults",
+        storedVersion, currentVersion))
+
+    local defaults = ChaosFileReader.ReadJsonFile("default_effects.json")
+    if defaults then
+        ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", defaults)
+    else
+        print("[ChaosEffectsRegistry] default_effects.json not found; cannot replace effects.json")
+    end
+
+    ChaosFileReader.WriteTextToCache("ChaosMod/VERSION.txt", currentVersion)
 end
 
 ---@alias ChaosEffectPickType "default" | "donate"

@@ -2,6 +2,8 @@
 
 ### New Mod Features
 
+- On mod version change (tracked via `VERSION.txt` in the Lua folder), both the mod and StreamerApp now fully replace `effects.json` with the shipped defaults to pick up rebalanced chances, durations, and price groups
+
 ### Mod Fixes
 
 - Fixed chance for "Crouch Mode" and price group for "Hide Effect Names"

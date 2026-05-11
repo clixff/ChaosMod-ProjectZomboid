@@ -214,6 +214,20 @@ function ChaosFileReader.EncodeJsonPretty(data)
 end
 
 ---@param filename string
+---@param text string
+---@return boolean
+function ChaosFileReader.WriteTextToCache(filename, text)
+    local writer = getFileWriter(filename, true, false)
+    if not writer then
+        print("[ChaosMod] Failed to open " .. tostring(filename) .. " for writing")
+        return false
+    end
+    writer:write(text or "")
+    writer:close()
+    return true
+end
+
+---@param filename string
 ---@param data any
 ---@return boolean
 function ChaosFileReader.WriteJsonToCache(filename, data)
