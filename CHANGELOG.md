@@ -28,6 +28,7 @@
 - Renamed "Spawn Zombie Nearby" → "Spawn Zombies Nearby" (`spawn_zombies_nearby`); now has a 30s duration, spawns multiple zombies over its duration, and spawned zombies path to the player
 - "Spawn Few Zombies" effect now spawns a random number of zombies between 4 and 6
 - "Fill Area With Zombies" effect now spawns more zombies in a random area around the player
+- "Time Rewind" effect now has a 15s duration and rewinds the player across the last 120s of tracked positions
 
 [1.1.0]
 

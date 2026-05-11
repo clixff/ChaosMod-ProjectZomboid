@@ -268,7 +268,7 @@
             "enabled": true,
             "chance": 35,
             "withDuration": true,
-            "duration": 5,
+            "duration": 15,
             "disable_effects": [
                 "time_rewind"
             ],
