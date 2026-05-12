@@ -1,6 +1,6 @@
 ---@class SpecialAnimal
 ---@field animal IsoAnimal
----@field followPlayer boolean
+---@field followCharacter IsoGameCharacter?
 ---@field renderNickname boolean
 ---@field alwaysRunning boolean
 ---@field repathTicks integer
@@ -15,7 +15,7 @@ SpecialAnimal.modDataColorKey = "ChaosModAnimalNicknameColor"
 function SpecialAnimal:new(animal)
     local o = {
         animal = animal,
-        followPlayer = true,
+        followCharacter = getPlayer(),
         renderNickname = true,
         alwaysRunning = true,
         repathTicks = 20
@@ -77,12 +77,18 @@ function SpecialAnimal:tick()
         animal:setVariable("animalRunning", true)
     end
 
-    if self.followPlayer then
+    local follow = self.followCharacter
+    if follow and not follow:isAlive() then
+        self.followCharacter = nil
+        follow = nil
+    end
+
+    if follow then
         self.repathTicks = self.repathTicks - 1
         if self.repathTicks <= 0 then
             self.repathTicks = 20
-            if player and animal:DistToProper(player) > 2.0 then
-                animal:pathToCharacter(player)
+            if animal:DistToProper(follow) > 2.0 then
+                animal:pathToCharacter(follow)
             end
         end
     end

@@ -35,6 +35,7 @@
 - Fixed "Move Or Get Damage" effect incorrectly damaging the player when walking away and back to the previous square within 1 second; total distance traveled per second is now accumulated each tick
 - "DOOM" effect now blocks reloading and unloading rounds on the temporary shotgun for the duration
 - "Zombies Turret" effect - added blocking of grabbing and other weapon actions
+- "Pig Turret" effect now retargets a nearby zombie every 4 seconds, so the pig rotates to face zombies, and wanders to a random nearby tile every second when no live target is set
 
 [1.1.0]
 

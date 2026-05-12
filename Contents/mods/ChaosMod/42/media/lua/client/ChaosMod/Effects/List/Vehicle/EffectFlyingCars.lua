@@ -50,7 +50,8 @@ local function hitPlayerByVehicle(vehicle, player)
         impactSpeed = 4.0
     end
 
-    player:onHitByVehicle(vehicle, impactSpeed, hitDir, impactPos, true)
+    ---@diagnostic disable-next-line: missing-parameter
+    player:onHitByVehicle(vehicle, impactSpeed, hitDir, impactPos)
 
 
     -- SP bug workaround: force actual damage yourself

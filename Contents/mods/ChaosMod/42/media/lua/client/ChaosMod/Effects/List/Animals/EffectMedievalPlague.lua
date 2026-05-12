@@ -24,7 +24,7 @@ function EffectMedievalPlague:OnStart()
                     breed)
                 if rat then
                     local sa = SpecialAnimal:new(rat)
-                    sa.followPlayer = false
+                    sa.followCharacter = nil
                     spawned = spawned + 1
                     rat:pathToCharacter(player)
                 end
