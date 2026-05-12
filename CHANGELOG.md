@@ -41,6 +41,7 @@
 - Effect "Spawn Barricade Kit": now spawns 9 planks and 9 nails
 - Effect "Necromancy": now does not humanize dead zombies, keeps zombie skin
 - Effect "Teleport To Nearest Basement": now finds better square to teleport
+- Effects "Launch Player Up" and "Launch Everyone Up" now do special actions with custom damage
 
 [1.1.0]
 

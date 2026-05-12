@@ -351,7 +351,7 @@
             "id": "launch_player_up",
             "enabled": true,
             "chance": 30,
-            "withDuration": false,
+            "withDuration": true,
             "enabled_donate": true,
             "price_group": "negative_4"
         },
