@@ -87,6 +87,7 @@ end
 
 function ChaosMod.StopMod()
     ChaosEffectsManager.StopAllEffects()
+    ChaosSpecialAction.StopAll()
     ChaosEffectsManager.ClearGlobalTimer()
     ChaosMod.enabled = false;
     ChaosUIManager.hud:AddMessage("ChaosMod stopped")
@@ -263,6 +264,7 @@ function ChaosMod.OnTick()
     end
 
     if ChaosMod.enabled then
+        ChaosSpecialAction.OnTick(deltaMs)
         ChaosUtils.AdjustVisibleZombiesForNPCs()
         ChaosUtils.TrackPlayerPosition(deltaMs)
         ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
