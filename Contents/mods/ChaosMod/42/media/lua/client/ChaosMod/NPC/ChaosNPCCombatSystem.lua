@@ -230,7 +230,10 @@ function ChaosNPC:OnAttackEnemyHit()
     if minDamage <= 0 then minDamage = 2 end
     if maxDamage <= 0 then maxDamage = 4 end
 
-    local damage = ZombRandFloat(minDamage, maxDamage)
+    local damage = ChaosUtils.RandFloat(minDamage, maxDamage)
+
+    print(string.format("[ChaosNPCCombatSystem] Damage min: %d, max: %d, result: %f", minDamage, maxDamage, damage))
+
     damage = damage * self.DamageMultiplier
     if damage <= 0.1 then
         damage = 0.1
@@ -266,12 +269,26 @@ function ChaosNPC:OnAttackEnemyHit()
         return
     end
 
+    local chanceToKnockDown = 6.25
+
+    -- if has weapon
+    if self.weaponItemCached then
+        chanceToKnockDown = 20
+    end
+
+
     if enemy:isZombie() then
         ---@type table<integer, string>
         local hitReactions = { "HeadLeft", "HeadRight", "HeadTop" }
         fakeAttacker:setVariable("ZombieHitReaction", hitReactions[ChaosUtils.RandArrayIndex(hitReactions)])
         enemy:Hit(self.weaponItemCached, fakeAttacker, damage, false, 1.0)
         enemy:playSound(self.weaponItemCached:getZombieHitSound())
+
+        if enemy:isAlive() and ChaosUtils.RandFloat(0, 100) < chanceToKnockDown and not enemy:isKnockedDown() then
+            ---@type IsoZombie
+            local enemyZombie = enemy
+            enemyZombie:knockDown(false)
+        end
 
         if ChaosNPCUtils.IsNPC(enemy) then
             local otherNPC = ChaosNPCUtils.GetNPCFromZombie(enemy)
@@ -290,7 +307,8 @@ function ChaosNPC:OnAttackEnemyHit()
         local bodyDamage = enemy:getBodyDamage()
         enemy:setAttackedBy(zombie)
 
-        if ZombRand(0, 21) == 0 and not enemy:isKnockedDown() then
+
+        if ChaosUtils.RandFloat(0, 100) < chanceToKnockDown and not enemy:isKnockedDown() then
             enemy:setKnockedDown(true)
         else
             local timeNowMs = ChaosMod.lastTimeTickMs
@@ -305,6 +323,11 @@ function ChaosNPC:OnAttackEnemyHit()
                 ChaosPlayer.hitStunLastTimeMs = timeNowMs
             end
         end
+
+        minDamage, maxDamage = self:GetMinMaxDamageToPlayer()
+        damage = ChaosUtils.RandFloat(minDamage, maxDamage)
+        print(string.format("[ChaosNPCCombatSystem] Damage to player min: %d, max: %d, result: %f", minDamage, maxDamage,
+            damage))
 
         bodyDamage:ReduceGeneralHealth(damage)
         if self.CanAddWounds then
@@ -481,4 +504,27 @@ function ChaosNPC:OnZombieDamagedNPC(otherZombie)
     if rel == ChaosNPCRelationType.ATTACK then
         self:SetAsTargetEnemy(otherZombie)
     end
+end
+
+---@return number, number
+function ChaosNPC:GetMinMaxDamageToPlayer()
+    local minDamage = 4
+    local maxDamage = 8
+
+    if not self.weaponItemCached then
+        return minDamage, maxDamage
+    end
+
+    local weaponType = WeaponType.getWeaponType(self.weaponItemCached)
+    if self.weaponItemCached:getFullType() == "Base.BareHands" then
+        return minDamage, maxDamage
+    elseif weaponType == WeaponType.ONE_HANDED then
+        minDamage = 8
+        maxDamage = 15
+    elseif weaponType == WeaponType.TWO_HANDED or weaponType == WeaponType.HEAVY then
+        minDamage = 15
+        maxDamage = 25
+    end
+
+    return minDamage, maxDamage
 end

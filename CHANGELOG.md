@@ -8,6 +8,9 @@
 
 - Fixed chance for "Crouch Mode" and price group for "Hide Effect Names"
 - Fixed "NPC Died" message to only show if NPC has a nickname
+- NPCs with weapons now have 20% chance to knock down characters
+- NPCs can knock down zombies
+- Increased NPC damage to player
 
 ### Effect Fixes
 
