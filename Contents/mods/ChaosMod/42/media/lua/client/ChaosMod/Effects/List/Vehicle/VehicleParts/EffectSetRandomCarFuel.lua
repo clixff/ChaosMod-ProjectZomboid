@@ -10,6 +10,19 @@ function EffectSetRandomCarFuel:OnStart()
     local vehicle = ChaosUtils.GetPlayerVehicleOrLastUsedVehicle(player)
     if not vehicle then return end
 
+    local gasTankPart = vehicle:getPartById("GasTank")
+    local prevValue = 0.0
+    if gasTankPart then
+        prevValue = gasTankPart:getContainerContentAmount()
+    end
+
     ChaosVehicle.setRandomFuelPercent(vehicle, 0.0, 0.95)
     vehicle:updatePartStats()
+
+    if gasTankPart then
+        local maxValue = math.floor(gasTankPart:getContainerCapacity())
+        local currentValue = gasTankPart:getContainerContentAmount()
+        local color = currentValue >= prevValue and ChaosPlayerChatColors.green or ChaosPlayerChatColors.red
+        ChaosPlayer.SayLineByColor(player, "New fuel: " .. math.floor(currentValue) .. "/" .. maxValue .. "L", color)
+    end
 end

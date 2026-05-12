@@ -36,6 +36,9 @@
 - "DOOM" effect now blocks reloading and unloading rounds on the temporary shotgun for the duration
 - "Zombies Turret" effect - added blocking of grabbing and other weapon actions
 - "Pig Turret" effect now retargets a nearby zombie every 4 seconds, so the pig rotates to face zombies, and wanders to a random nearby tile every second when no live target is set
+- "Refill Car Fuel", "Remove Car Fuel", "Set Random Car Fuel", "Damage Car Engine" effects now display the resulting fuel/engine condition as a green/red chat line on the player
+- Effect "Insane Traffic": fix for 42.18.0 version
+- Effect "Spawn Barricade Kit": now spawns 9 planks and 9 nails
 
 [1.1.0]
 

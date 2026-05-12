@@ -10,7 +10,7 @@ This mod triggers a random effect every 45 seconds. There are currently [b]310+ 
 
 [quote]This mod requires the [b]B42 version[/b] of Project Zomboid.
 To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
-Latest tested version: [b]42.17.0[/b]
+Latest tested version: [b]42.18.0[/b]
 This mod [b]will not[/b] work in multiplayer[/quote]
 
 

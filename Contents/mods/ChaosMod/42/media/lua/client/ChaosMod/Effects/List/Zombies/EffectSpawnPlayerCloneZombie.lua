@@ -5,7 +5,7 @@ function EffectSpawnPlayerCloneZombie:OnStart()
     print("[EffectSpawnPlayerCloneZombie] OnStart" .. tostring(self.effectId))
     local player = getPlayer()
     if not player then return end
-    local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 5, 10, 50, true, true, false)
+    local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 3, 8, 50, true, true, false)
     if not randomSquare then return end
     local x = randomSquare:getX()
     local y = randomSquare:getY()

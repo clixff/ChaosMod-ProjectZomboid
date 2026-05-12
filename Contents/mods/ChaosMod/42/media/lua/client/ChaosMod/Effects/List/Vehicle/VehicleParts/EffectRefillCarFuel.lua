@@ -11,4 +11,12 @@ function EffectRefillCarFuel:OnStart()
     if not vehicle then return end
 
     ChaosVehicle.setFuelPercent(vehicle, 1.0)
+
+    local gasTankPart = vehicle:getPartById("GasTank")
+    if gasTankPart then
+        local maxValue = math.floor(gasTankPart:getContainerCapacity())
+        local currentValue = math.floor(gasTankPart:getContainerContentAmount())
+        ChaosPlayer.SayLineByColor(player, "New fuel: " .. currentValue .. "/" .. maxValue .. "L",
+            ChaosPlayerChatColors.green)
+    end
 end

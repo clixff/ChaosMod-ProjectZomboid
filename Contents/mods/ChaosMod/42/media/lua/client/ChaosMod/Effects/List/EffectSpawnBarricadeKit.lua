@@ -9,8 +9,8 @@ function EffectSpawnBarricadeKit:OnStart()
 
     local itemsToSpawn = {
         { "Base.Hammer", 1 },
-        { "Base.Plank",  3 },
-        { "Base.Nails",  3 },
+        { "Base.Plank",  9 },
+        { "Base.Nails",  9 },
     }
 
     local sq = player:getSquare()

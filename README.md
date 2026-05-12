@@ -41,7 +41,7 @@ Chaos Mod also supports Twitch integration. Viewers can vote for the next effect
 ---
 
 > This mod requires the **unstable** branch of Project Zomboid on Steam.  
-> It has been tested on version **42.17.0**.
+> It has been tested on version **42.18.0**.
 >
 > To enable the unstable branch, open Project Zomboid properties in Steam, go to **Game Versions & Betas**, and select the **unstable** branch.
 
