@@ -39,6 +39,8 @@
 - "Refill Car Fuel", "Remove Car Fuel", "Set Random Car Fuel", "Damage Car Engine" effects now display the resulting fuel/engine condition as a green/red chat line on the player
 - Effect "Insane Traffic": fix for 42.18.0 version
 - Effect "Spawn Barricade Kit": now spawns 9 planks and 9 nails
+- Effect "Necromancy": now does not humanize dead zombies, keeps zombie skin
+- Effect "Teleport To Nearest Basement": now finds better square to teleport
 
 [1.1.0]
 

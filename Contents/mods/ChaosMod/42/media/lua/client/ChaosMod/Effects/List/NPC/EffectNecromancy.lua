@@ -13,7 +13,7 @@ local function MakeZombieCompanion(zombie)
 
     ---@cast zombie IsoZombie
     local npc = ChaosNPC:new(zombie)
-    npc:initializeHuman()
+    npc:initializeHuman(false)
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
     return true
 end

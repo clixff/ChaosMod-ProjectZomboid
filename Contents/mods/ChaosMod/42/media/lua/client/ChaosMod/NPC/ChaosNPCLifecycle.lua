@@ -1,11 +1,18 @@
-function ChaosNPC:initializeHuman()
+---@param shouldHumanize boolean?
+function ChaosNPC:initializeHuman(shouldHumanize)
     if not self.zombie then
         return
     end
 
+    if shouldHumanize == nil then
+        shouldHumanize = true
+    end
+
     local zombie = self.zombie
 
-    ChaosZombie.HumanizeZombie(zombie)
+    if shouldHumanize then
+        ChaosZombie.HumanizeZombie(zombie)
+    end
 
     zombie:setWalkType(self.walkType)
     zombie:setNoTeeth(true)
