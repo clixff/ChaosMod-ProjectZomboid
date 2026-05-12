@@ -4,6 +4,7 @@
 ---@field renderNickname boolean
 ---@field alwaysRunning boolean
 ---@field repathTicks integer
+---@field maxRepathTicks integer
 SpecialAnimal = SpecialAnimal or {}
 SpecialAnimal.__index = SpecialAnimal
 
@@ -18,7 +19,8 @@ function SpecialAnimal:new(animal)
         followCharacter = getPlayer(),
         renderNickname = true,
         alwaysRunning = true,
-        repathTicks = 20
+        repathTicks = 0,
+        maxRepathTicks = 20
     }
     setmetatable(o, self)
     table.insert(ChaosMod.specialAnimalsFollowers, o)
@@ -84,9 +86,9 @@ function SpecialAnimal:tick()
     end
 
     if follow then
-        self.repathTicks = self.repathTicks - 1
-        if self.repathTicks <= 0 then
-            self.repathTicks = 20
+        self.repathTicks = self.repathTicks + 1
+        if self.repathTicks >= self.maxRepathTicks then
+            self.repathTicks = 0
             if animal:DistToProper(follow) > 2.0 then
                 animal:pathToCharacter(follow)
             end

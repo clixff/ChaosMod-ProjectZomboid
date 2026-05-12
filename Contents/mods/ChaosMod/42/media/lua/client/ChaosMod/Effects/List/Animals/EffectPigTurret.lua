@@ -436,7 +436,7 @@ function EffectPigTurret:OnStart()
     self.pig = pig
     self.specialAnimal = SpecialAnimal:new(pig)
     if self.specialAnimal then
-        self.specialAnimal.repathTicks = 500
+        self.specialAnimal.maxRepathTicks = 150
         self.specialAnimal.followCharacter = nil
     end
 

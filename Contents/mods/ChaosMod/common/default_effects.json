@@ -2396,8 +2396,7 @@
             "id": "spawn_explosive_spiffos",
             "enabled": true,
             "chance": 45,
-            "withDuration": true,
-            "duration": 8,
+            "withDuration": false,
             "disable_effects": [
                 "spawn_explosive_spiffos"
             ],
@@ -2644,8 +2643,7 @@
             "id": "add_bomb_to_player_inventory",
             "enabled": true,
             "chance": 35,
-            "withDuration": true,
-            "duration": 8,
+            "withDuration": false,
             "disable_effects": [
                 "add_bomb_to_player_inventory"
             ],

@@ -42,6 +42,7 @@
 - Effect "Necromancy": now does not humanize dead zombies, keeps zombie skin
 - Effect "Teleport To Nearest Basement": now finds better square to teleport
 - Effects "Launch Player Up" and "Launch Everyone Up" now do special actions with custom damage
+- Effects "Add Bomb To Player Inventory", "Random Item Bomb", and "Spawn Explosive Spiffos" now show a progress bar countdown to detonation via UI
 
 [1.1.0]
 
