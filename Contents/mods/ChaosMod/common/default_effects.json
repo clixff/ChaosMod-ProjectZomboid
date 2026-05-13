@@ -351,7 +351,7 @@
             "id": "launch_player_up",
             "enabled": true,
             "chance": 30,
-            "withDuration": true,
+            "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
         },
@@ -2615,8 +2615,7 @@
             "id": "random_item_bomb",
             "enabled": true,
             "chance": 35,
-            "withDuration": true,
-            "duration": 8,
+            "withDuration": false,
             "disable_effects": [
                 "random_item_bomb"
             ],
