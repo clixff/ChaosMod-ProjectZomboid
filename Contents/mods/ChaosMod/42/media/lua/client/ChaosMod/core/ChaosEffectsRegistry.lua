@@ -2,7 +2,7 @@
 ---@field id string
 ---@field name string
 ---@field enabled boolean
----@field chance integer
+---@field chance number
 ---@field withDuration boolean
 ---@field duration number
 ---@field disableEffects table<integer, string>
@@ -14,7 +14,7 @@
 ---@field id string?
 ---@field name string?
 ---@field enabled boolean?
----@field chance integer?
+---@field chance number?
 ---@field withDuration boolean?
 ---@field duration number?
 ---@field disable_effects table<integer, string>?
@@ -197,7 +197,7 @@ end
 function ChaosEffectsRegistry.GetRandomEffects(amount, pickType, addToBlock)
     local shouldBlock = addToBlock ~= false
     local pool = {}
-    local totalWeight = 0
+    local totalWeight = 0.0
 
     local ignoreChances = ChaosConfig.ignore_effect_chances == true
     for id, effect in pairs(ChaosEffectsRegistry.effects) do
@@ -214,7 +214,7 @@ function ChaosEffectsRegistry.GetRandomEffects(amount, pickType, addToBlock)
     for _ = 1, amount do
         if totalWeight <= 0 then break end
 
-        local roll = ChaosUtils.RandInteger(totalWeight) + 1
+        local roll = ChaosUtils.RandFloat(0, totalWeight)
         local cumulative = 0
         local picked = nil
         local pickedIndex = nil
@@ -264,7 +264,7 @@ function ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
         id = effectId,
         name = ChaosLocalization.GetString("effects", effectId),
         enabled = effectJsonData.enabled or false,
-        chance = math.floor(effectJsonData.chance or 0),
+        chance = tonumber(effectJsonData.chance) or 0,
         withDuration = effectJsonData.withDuration or false,
         duration = effectJsonData.duration or 0,
         class = effectClass,

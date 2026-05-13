@@ -1042,7 +1042,7 @@ async function main(): Promise<void> {
           name,
           entry.effect_id,
           String(e.enabled),
-          `${e.chance}%`,
+          String(e.chance),
           duration,
           entry.price_group,
           entry.price_result != null ? String(entry.price_result) : "",

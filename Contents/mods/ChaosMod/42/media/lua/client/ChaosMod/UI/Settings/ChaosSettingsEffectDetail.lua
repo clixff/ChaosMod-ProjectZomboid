@@ -43,7 +43,7 @@ function ChaosSettingsEffectDetail:CommitWorkingState()
     local effect = self.parentWindow.workingEffects[self.currentId]
     if not effect then return end
     if self.controls.chance then
-        effect.chance = math.floor(W.Clamp(W.GetIntFromBox(self.controls.chance, effect.chance or 0), 0, 100))
+        effect.chance = math.max(0, W.GetFloatFromBox(self.controls.chance, effect.chance or 0))
     end
     if self.controls.duration and effect.withDuration then
         effect.duration = math.floor(math.max(0, W.GetIntFromBox(self.controls.duration, effect.duration or 0)))
@@ -120,7 +120,7 @@ function ChaosSettingsEffectDetail:LoadEffect(id)
     y = y + rowH + rowGap
 
     addLabelled("effect_chance")
-    self.controls.chance = W.MakeNumberInput(self, controlX, y, controlW, effect.chance or 0, { float = false, maxLen = 4 })
+    self.controls.chance = W.MakeNumberInput(self, controlX, y, controlW, effect.chance or 0, { float = true, maxLen = 10 })
     y = y + rowH + rowGap
 
     -- Has Duration label (read-only)

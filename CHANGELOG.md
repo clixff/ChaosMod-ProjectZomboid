@@ -13,6 +13,7 @@
 - NPCs can knock down zombies
 - Increased NPC damage to player
 - StreamerApp now does not generate effects in JavaScript, and get random effects for vote from Lua.
+- Effect `chance` is now a floating-point weight (min `0.0`, no max cap; `0.0` disables the effect). The in-game settings UI, StreamerApp dashboard, and CSV/XLSX exports no longer treat it as a 0-100 percentage and no longer render a `%` suffix.
 
 ### Effect Fixes
 

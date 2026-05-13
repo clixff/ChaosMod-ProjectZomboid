@@ -320,7 +320,7 @@ export async function writeEffectsXlsx(
 
     // Chance
     if (enabled) {
-      setCell(row.getCell(5), `${e.chance}%`, {
+      setCell(row.getCell(5), e.chance, {
         bg: "FFFFFFFF",
         fontColor: "FF000000",
       });

@@ -150,6 +150,7 @@ export function EffectsPage({ onNotify }: EffectsPageProps) {
               <NumberInput
                 value={selected.chance}
                 min={0}
+                step={0.1}
                 onChange={(v) => patchEffect(selected.id, { chance: v })}
               />
             </FieldRow>
