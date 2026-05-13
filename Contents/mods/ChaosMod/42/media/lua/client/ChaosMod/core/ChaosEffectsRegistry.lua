@@ -171,12 +171,31 @@ local function addToBlocklist(id)
     recentEffectsSet[id] = true
 end
 
+--- Adds an effect id to the recent-effects blocklist if it isn't already in it.
+---@param id string
+function ChaosEffectsRegistry.AddToBlocklist(id)
+    if type(id) ~= "string" or id == "" then return end
+    if recentEffectsSet[id] then return end
+    addToBlocklist(id)
+end
+
+---@param id string
+---@return boolean
+function ChaosEffectsRegistry.IsInBlocklist(id)
+    return recentEffectsSet[id] == true
+end
+
 --- Returns an array of randomly selected effect IDs using weighted random selection.
---- Picked effects are added to a rolling blocklist of 12 and cannot be re-selected until evicted.
+--- Picked effects are added to a rolling blocklist (size = `recent_effects_block_buffer`)
+--- and cannot be re-selected until evicted. Pass `addToBlock = false` to roll an
+--- effect without inserting it into the blocklist (used for the secret random_effect
+--- backing in streamer-mode voting).
 ---@param amount integer
 ---@param pickType ChaosEffectPickType
+---@param addToBlock boolean | nil -- default true
 ---@return string[]
-function ChaosEffectsRegistry.GetRandomEffects(amount, pickType)
+function ChaosEffectsRegistry.GetRandomEffects(amount, pickType, addToBlock)
+    local shouldBlock = addToBlock ~= false
     local pool = {}
     local totalWeight = 0
 
@@ -211,7 +230,9 @@ function ChaosEffectsRegistry.GetRandomEffects(amount, pickType)
 
         if picked then
             table.insert(result, picked)
-            addToBlocklist(picked)
+            if shouldBlock then
+                addToBlocklist(picked)
+            end
             totalWeight = totalWeight - pool[pickedIndex].chance
             table.remove(pool, pickedIndex)
         end

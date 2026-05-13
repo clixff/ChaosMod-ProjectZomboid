@@ -12,6 +12,7 @@
 - NPCs with weapons now have 20% chance to knock down characters
 - NPCs can knock down zombies
 - Increased NPC damage to player
+- StreamerApp now does not generate effects in JavaScript, and get random effects for vote from Lua.
 
 ### Effect Fixes
 

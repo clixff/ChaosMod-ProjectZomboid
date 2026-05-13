@@ -27,7 +27,6 @@ import {
 } from "./src/commands/lang.ts";
 import { loadEffects, saveEffects } from "./src/effects.ts";
 import { syncEffectsForModVersion } from "./src/versionFile.ts";
-import { setRecentEffectsMax } from "./src/effectsRegistry.ts";
 import { startServer } from "./src/server.ts";
 import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
@@ -337,8 +336,6 @@ function applyLoadedConfig(
   targetConfig.recent_effects_block_buffer =
     nextConfig.recent_effects_block_buffer;
 
-  setRecentEffectsMax(targetConfig.recent_effects_block_buffer);
-
   initLocalization(modFolder, targetConfig.lang);
 }
 
@@ -501,11 +498,16 @@ async function main(): Promise<void> {
       }
     });
 
-    bridge.on("vote_start", () => {
+    bridge.on("vote_start", (payload) => {
       logger.debug("[Bridge] vote_start");
-      if (config?.streamer_mode.voting_enabled) {
-        votingManager.start();
-      }
+      if (!config?.streamer_mode.voting_enabled) return;
+      const rawEffects = payload["effects"];
+      const visibleEffectIds = Array.isArray(rawEffects)
+        ? rawEffects.filter((id): id is string => typeof id === "string")
+        : [];
+      const rawSecret = payload["secret_effect"];
+      const secretEffectId = typeof rawSecret === "string" && rawSecret !== "" ? rawSecret : null;
+      votingManager.start(visibleEffectIds, secretEffectId);
     });
 
     bridge.on("reload_config", () => {

@@ -1,7 +1,6 @@
 import { logger } from "../utils/logger.ts";
 import type { EffectEntry } from "../effects.ts";
 import type { ModConfig } from "../config.ts";
-import { getRandomEffects, markEffectUsed } from "../effectsRegistry.ts";
 
 export const RANDOM_EFFECT_ID = "random_effect";
 
@@ -47,23 +46,21 @@ export class VotingManager {
     return this.secretRandomEffect;
   }
 
-  start(): void {
+  start(visibleEffectIds: readonly string[], secretEffectId: string | null): void {
     if (!this.config) return;
     this.lastWinner = null;
     this.lastWinnerEffect = null;
     this.lastOptions = [];
-    const optionsCount = this.config.streamer_mode.voting_options_number;
-    const ids = getRandomEffects(this.effects, optionsCount - 1, "default", this.config.ignore_effect_chances);
-    const secretId =
-      getRandomEffects(this.effects, 1, "default", this.config.ignore_effect_chances, false)[0] ?? null;
-    this.secretRandomEffect = secretId;
+    this.secretRandomEffect = secretEffectId;
+    const knownIds = new Set(this.effects.map((e) => e.id));
+    const filteredIds = visibleEffectIds.filter((id) => knownIds.has(id));
     this.options = [
-      ...ids.map((id) => ({ id, voters: new Set<string>() })),
+      ...filteredIds.map((id) => ({ id, voters: new Set<string>() })),
       { id: RANDOM_EFFECT_ID, voters: new Set<string>() },
     ];
     this.active = true;
     logger.debug(
-      `Voting started (options: ${this.options.map((o) => o.id).join(", ")}, secret: ${secretId ?? "none"})`,
+      `Voting started (options: ${this.options.map((o) => o.id).join(", ")}, secret: ${secretEffectId ?? "none"})`,
     );
   }
 
@@ -117,11 +114,7 @@ export class VotingManager {
     this.lastWinner = winnerId;
 
     if (winnerId === RANDOM_EFFECT_ID) {
-      const secretId =
-        this.secretRandomEffect ??
-        (getRandomEffects(this.effects, 1, "default", this.config.ignore_effect_chances, false)[0] ?? null);
-      this.lastWinnerEffect = secretId;
-      if (secretId) markEffectUsed(secretId);
+      this.lastWinnerEffect = this.secretRandomEffect;
     } else {
       this.lastWinnerEffect = winnerId;
     }

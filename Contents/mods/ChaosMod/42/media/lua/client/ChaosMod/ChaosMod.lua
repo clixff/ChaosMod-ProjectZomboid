@@ -299,6 +299,9 @@ function ChaosMod.RegisterBridgeHandlers()
                     activationType = ChaosEffectActivationType.VOTE
                 end
                 ChaosEffectsManager.StartEffect(e.id, nickname, activationType)
+                if activationType == ChaosEffectActivationType.VOTE then
+                    ChaosEffectsRegistry.AddToBlocklist(e.id)
+                end
                 if activationType == ChaosEffectActivationType.DONATE
                     and ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
                     ChaosUIManager.onDonateEffectActivated(nickname or "Anonymous", e.id)
