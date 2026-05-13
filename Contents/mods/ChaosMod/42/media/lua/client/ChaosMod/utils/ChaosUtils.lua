@@ -193,7 +193,8 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
     trap:setInstantExplosion(false)
     trap:setExplosionSound("BigExplosion")
 
-    trap:triggerExplosion(false)
+    ---@diagnostic disable-next-line: deprecated
+    trap:triggerExplosion()
 end
 
 ---@type table<integer, PerkFactory.Perk>
@@ -408,7 +409,7 @@ end
 local function _normalizeBFSZOffset(value)
     if type(value) ~= "number" then return 0 end
     if value % 1 ~= 0 then return 0 end
-    return value
+    return math.floor(value)
 end
 
 ---@param square IsoGridSquare | nil
@@ -808,9 +809,9 @@ end
 ---@return string
 function ChaosUtils.GetImgCodeByItemTextureByString(item)
     if not item then return "" end
-    local item = instanceItem(item)
-    if not item then return "" end
-    return ChaosUtils.GetImgCodeByItemTexture(item)
+    local itemInstance = instanceItem(item)
+    if not itemInstance then return "" end
+    return ChaosUtils.GetImgCodeByItemTexture(itemInstance)
 end
 
 ---@param container ItemContainer

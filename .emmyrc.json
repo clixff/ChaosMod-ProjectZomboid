@@ -4,7 +4,8 @@
     "disable": [
       "unnecessary-if",
       "invert-if",
-      "unused"
+      "unused",
+      "unresolved-require"
     ]
   },
   "runtime": {

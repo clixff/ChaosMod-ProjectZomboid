@@ -169,7 +169,7 @@ end
 
 ---@param entry ChaosNicknameEntry|nil
 ---@param nowMs integer
----@return string|nil, integer, integer
+---@return string|nil, integer, number
 local function resolveChatMessageState(entry, nowMs)
     if not entry or not entry.chatMessage or entry.chatMessage == "" then
         return nil, 0, 0
@@ -341,6 +341,7 @@ end
 
 ---@param zombie IsoZombie
 local function trackZombieLabel(zombie)
+    ---@type integer|string
     local id = zombie:getOnlineID()
     if not id or id < 0 then
         id = tostring(zombie)
@@ -422,7 +423,7 @@ end
 
 ---@param zombie IsoZombie
 ---@param nowMs integer
----@return string|nil, integer, integer
+---@return string|nil, integer, number
 local function resolveInternalChatLineState(zombie, nowMs)
     if ChaosMod.enabled == false or not zombie then
         return nil, 0, 0
@@ -437,6 +438,8 @@ local function resolveInternalChatLineState(zombie, nowMs)
     if not timestampMs or timestampMs <= 0 then
         return nil, 0, 0
     end
+
+    timestampMs = math.floor(timestampMs)
 
     local chatLine = formatChatMessage(md[ChaosZombie.modDataChatLineKey])
     if not chatLine then
@@ -462,7 +465,7 @@ end
 
 ---@param zombie IsoZombie
 ---@param nowMs integer
----@return string|nil, integer, integer
+---@return string|nil, integer, number
 local function resolveExternalChatLineState(zombie, nowMs)
     if not zombie or not ChaosConfig.IsZombieNicknamesEnabled() then
         return nil, 0, 0
@@ -474,13 +477,15 @@ local function resolveExternalChatLineState(zombie, nowMs)
     end
 
     local nickname = md[ChaosNicknames.modDataNameKey] or ""
+    ---@diagnostic disable-next-line: need-check-nil
+    ---@type ChaosNicknameEntry|nil
     local entry = getNicknameEntryByName(nickname)
     return resolveChatMessageState(entry, nowMs)
 end
 
 ---@param zombie IsoZombie
 ---@param nowMs integer
----@return string|nil, integer, integer, number, number, number
+---@return string|nil, integer, number, number, number, number
 local function resolveZombieRenderedMessage(zombie, nowMs)
     local externalMessage, externalElapsedMs, externalAlpha = resolveExternalChatLineState(zombie, nowMs)
     if externalMessage and externalAlpha > 0 then

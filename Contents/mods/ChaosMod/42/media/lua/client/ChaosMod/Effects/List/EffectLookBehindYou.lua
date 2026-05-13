@@ -156,6 +156,8 @@ function EffectLookBehindYou:OnTick(deltaMs)
             if shouldSpawnZombie(self.spawnedObjectCount) then
                 self.isFakeSpawn = false
                 self.status = EffectLookBehindYouStatus.SPAWNED_ZOMBIE
+                -- emmylua_check fix
+                if not self.squareToSpawnOn then return end
                 spawnZombie(self.squareToSpawnOn)
                 return
             end
@@ -164,6 +166,8 @@ function EffectLookBehindYou:OnTick(deltaMs)
 
             -- Spawn the object
             if self.objectSpawned == nil then
+                -- emmylua_check fix
+                if not self.squareToSpawnOn then return end
                 self.objectSpawned = spawnNewObject(self.squareToSpawnOn)
             end
 
@@ -171,6 +175,10 @@ function EffectLookBehindYou:OnTick(deltaMs)
                 return
             end
 
+            --- emmylua_check fix
+            if not self.squareToSpawnOn then
+                return
+            end
             self.objectSpawned:setSquare(self.squareToSpawnOn)
             self.objectSpawned:addToWorld()
             self.squareToSpawnOn:AddTileObject(self.objectSpawned)
@@ -202,7 +210,9 @@ function EffectLookBehindYou:OnTick(deltaMs)
                 self.objectSpawned:removeFromSquare()
                 print("[EffectLookBehindYou] Removed object")
                 self.isObjectSpawned = false
-                self.squareToSpawnOn = getRandomSquareNearby(self.squareToSpawnOn)
+                if self.squareToSpawnOn then
+                    self.squareToSpawnOn = getRandomSquareNearby(self.squareToSpawnOn)
+                end
                 self.respawnObjectTimerMs = 0
             end
         end

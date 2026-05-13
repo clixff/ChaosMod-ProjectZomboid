@@ -278,8 +278,8 @@ function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
         end
 
         if zombie:isFacingObject(zombieNPC, 0.3) then
-            local bumpType = zombie:getBumpType()
-            if bumpType ~= "ZombieBite" then
+            local newBumpType = zombie:getBumpType()
+            if newBumpType ~= "ZombieBite" then
                 zombie:setBumpType("ZombieBite")
                 zombie:setTarget(zombieNPC)
                 -- zombie:changeState(AttackState.instance())

@@ -379,9 +379,9 @@ local function firePigTurret(self)
     if now - (self.lastShotMs or 0) < SHOT_COOLDOWN_MS then return end
     self.lastShotMs = now
 
-    if self.pig then
-        self.pig:changeStress(80)
-        self.pig:updateStress()
+    if pig then
+        pig:changeStress(80)
+        pig:updateStress()
     end
 
     local pigSquare = pig:getCurrentSquare()

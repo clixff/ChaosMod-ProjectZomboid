@@ -201,6 +201,7 @@ function EffectDOOM:OnStart()
         if self:IsBlockedWeapon(weapon) then
             return
         end
+        ---@diagnostic disable-next-line: need-check-nil
         return self._oldOnUnloadBulletsFromFirearm(playerObj, weapon)
     end
 
@@ -208,6 +209,7 @@ function EffectDOOM:OnStart()
         if self:IsBlockedWeapon(weapon) then
             return
         end
+        ---@diagnostic disable-next-line: need-check-nil
         return self._oldOnRackGun(playerObj, weapon)
     end
 

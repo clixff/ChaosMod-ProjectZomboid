@@ -78,7 +78,7 @@ function ChaosZombie.SpawnZombieAt(x, y, z, totalZombies, outfit, femaleChance)
     local x1 = math.floor(x)
     local y1 = math.floor(y)
     local z1 = math.floor(z)
-    local femaleChance = femaleChance or 50
+    femaleChance = femaleChance or 50
     local zombies = addZombiesInOutfit(x1, y1, z1, totalZombies, outfit, femaleChance)
     return zombies
 end
