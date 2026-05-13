@@ -195,6 +195,30 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
 
     ---@diagnostic disable-next-line: deprecated
     trap:triggerExplosion()
+
+    local expX = square:getX()
+    local expY = square:getY()
+    local expZ = square:getZ()
+
+    local player = getPlayer()
+    if player then
+        local square = player:getSquare()
+
+        local playerX = player:getX()
+        local playerY = player:getY()
+        local playerZ = player:getZ()
+        local isSameZ = expZ == playerZ
+        if square and isSameZ and ChaosUtils.isInRange(expX, expY, playerX, playerY, explosionRange) then
+            player:setKnockedDown(true)
+        end
+    end
+
+    ChaosZombie.ForEachZombieInRange(expX, expY, explosionRange, function(zombie)
+        if zombie and zombie:isAlive() then
+            local isBehindZombie = ChaosUtils.IsSquareBehindZombie(square, zombie)
+            zombie:knockDown(isBehindZombie)
+        end
+    end, false, expZ)
 end
 
 ---@type table<integer, PerkFactory.Perk>
@@ -1005,4 +1029,33 @@ function ChaosUtils.IsItemBandageOnBodyPart(item)
 
     return startsWith(itemName, "Base.Bandage_")
         or startsWith(itemName, "Base.Wound_")
+end
+
+---@param square IsoGridSquare
+---@param character IsoGameCharacter
+function ChaosUtils.IsSquareBehindZombie(square, character)
+    if not square or not character then return false end
+
+    -- Optional: require same floor
+    if square:getZ() ~= math.floor(character:getZ()) then
+        return false
+    end
+
+    -- Square center relative to zombie
+    local dx = square:getX() + 0.5 - character:getX()
+    local dy = square:getY() + 0.5 - character:getY()
+
+    local len = math.sqrt(dx * dx + dy * dy)
+    if len == 0 then return false end
+
+    dx = dx / len
+    dy = dy / len
+
+    local fx = character:getForwardDirectionX()
+    local fy = character:getForwardDirectionY()
+
+    local dot = dx * fx + dy * fy
+
+    -- Behind zombie = opposite its forward direction
+    return dot < -0.6
 end

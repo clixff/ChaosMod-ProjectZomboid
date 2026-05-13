@@ -56,7 +56,6 @@ function EffectMoveOrGetDamage:OnTick(deltaMs)
     if not square then return end
 
     ChaosUtils.TriggerExplosionAt(square, 3)
-    player:setKnockedDown(true)
 
     ChaosPlayer.SayLineByColor(player, "BOOM!", ChaosPlayerChatColors.red)
 end

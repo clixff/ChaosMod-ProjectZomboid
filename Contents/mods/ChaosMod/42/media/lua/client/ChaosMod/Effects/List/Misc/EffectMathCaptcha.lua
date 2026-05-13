@@ -38,8 +38,6 @@ function EffectMathCaptcha.applyWrongAnswer()
         stats:set(CharacterStat.ENDURANCE, 0.5)
     end
 
-    player:setKnockedDown(true)
-
     ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "wrong_answer"),
         ChaosPlayerChatColors.removedItem)
 

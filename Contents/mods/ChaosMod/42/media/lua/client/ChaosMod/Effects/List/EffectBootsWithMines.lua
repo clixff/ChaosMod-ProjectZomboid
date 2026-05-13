@@ -102,8 +102,6 @@ function EffectBootsWithMines:OnTick(deltaMs)
         ChaosVehicle.ExitVehicle(player)
         ChaosUtils.TriggerExplosionAt(square, 3)
 
-        player:setKnockedDown(true)
-
         self.visitedTiles = {}
         self:ClearSpawnedObjects()
     end

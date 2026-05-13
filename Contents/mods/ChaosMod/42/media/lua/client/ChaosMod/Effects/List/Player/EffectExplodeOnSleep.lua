@@ -19,7 +19,6 @@ function EffectExplodeOnSleep:OnTick(_deltaMs)
     if not square then return end
 
     ChaosUtils.TriggerExplosionAt(square, 3)
-    player:setKnockedDown(true)
 end
 
 function EffectExplodeOnSleep:OnEnd()
