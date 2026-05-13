@@ -2,6 +2,7 @@
 ---@field effectId string
 ---@field effectName string
 ---@field effectNickname string | nil
+---@field activationType ChaosEffectActivationType -- How the effect was activated (vote | interval | donate | cheat)
 ---@field duration number
 ---@field withDuration boolean
 ---@field activationTimeMs integer -- At what time the effect was activated (in milliseconds)
@@ -38,14 +39,16 @@ end
 ---@param duration number
 ---@param withDuration boolean
 ---@param effectNickname string | nil
+---@param activationType ChaosEffectActivationType | nil
 ---@return ChaosEffectBase
-function ChaosEffectBase:new(effectId, effectName, duration, withDuration, effectNickname)
+function ChaosEffectBase:new(effectId, effectName, duration, withDuration, effectNickname, activationType)
     ---@type ChaosEffectBase
     local o = setmetatable({}, self)
     self.__index = self
     o.effectId = effectId
     o.effectName = effectName or ""
     o.effectNickname = effectNickname
+    o.activationType = activationType or ChaosEffectActivationType.INTERVAL
     o.duration = duration or 0
     o.withDuration = withDuration
     o.activationTimeMs = 0

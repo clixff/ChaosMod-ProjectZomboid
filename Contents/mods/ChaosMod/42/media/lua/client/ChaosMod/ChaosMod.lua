@@ -292,8 +292,15 @@ function ChaosMod.RegisterBridgeHandlers()
         for _, e in ipairs(effects) do
             if type(e) == "table" and type(e.id) == "string" and e.id ~= "" then
                 local nickname = type(e.nickname) == "string" and e.nickname ~= "" and e.nickname or nil
-                ChaosEffectsManager.StartEffect(e.id, nickname)
-                if e.type == "donate" and ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
+                local activationType = ChaosEffectActivationType.VOTE
+                if e.type == ChaosEffectActivationType.DONATE then
+                    activationType = ChaosEffectActivationType.DONATE
+                elseif e.type == ChaosEffectActivationType.VOTE then
+                    activationType = ChaosEffectActivationType.VOTE
+                end
+                ChaosEffectsManager.StartEffect(e.id, nickname, activationType)
+                if activationType == ChaosEffectActivationType.DONATE
+                    and ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
                     ChaosUIManager.onDonateEffectActivated(nickname or "Anonymous", e.id)
                 end
             end

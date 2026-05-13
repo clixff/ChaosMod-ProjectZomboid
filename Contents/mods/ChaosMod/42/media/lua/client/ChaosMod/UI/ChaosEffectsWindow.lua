@@ -143,12 +143,12 @@ function ChaosEffectsWindow:onActivateClicked()
     if self.selectedEffect == RANDOM_EFFECT_ITEM then
         local picked = ChaosEffectsRegistry.GetRandomEffects(1, "default")
         if picked[1] then
-            ChaosEffectsManager.StartEffect(picked[1])
+            ChaosEffectsManager.StartEffect(picked[1], nil, ChaosEffectActivationType.CHEAT)
         end
         return
     end
 
-    ChaosEffectsManager.StartEffect(self.selectedEffect.id)
+    ChaosEffectsManager.StartEffect(self.selectedEffect.id, nil, ChaosEffectActivationType.CHEAT)
 end
 
 --- @param target ChaosEffectDataEntry
