@@ -33,7 +33,7 @@ function EffectSelectRandomCard:activateRandomCardEffect()
 
     self.selectedCardIndex = randomIndex
     self.selectedEffectId = effectId
-    ChaosEffectsManager.StartEffect(effectId)
+    ChaosEffectsManager.StartEffect(effectId, self.effectNickname, self.activationType)
 end
 
 function EffectSelectRandomCard:OnStart()
@@ -65,7 +65,7 @@ function EffectSelectRandomCard:onCardSelected(cardIndex)
 
     setGameSpeed(1)
 
-    ChaosEffectsManager.StartEffect(self.selectedEffectId)
+    ChaosEffectsManager.StartEffect(self.selectedEffectId, self.effectNickname, self.activationType)
 end
 
 ---@param deltaMs integer

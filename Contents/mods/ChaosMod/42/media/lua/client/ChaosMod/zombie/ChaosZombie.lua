@@ -78,7 +78,7 @@ function ChaosZombie.SpawnZombieAt(x, y, z, totalZombies, outfit, femaleChance)
     local x1 = math.floor(x)
     local y1 = math.floor(y)
     local z1 = math.floor(z)
-    local femaleChance = femaleChance or 50
+    femaleChance = femaleChance or 50
     local zombies = addZombiesInOutfit(x1, y1, z1, totalZombies, outfit, femaleChance)
     return zombies
 end
@@ -145,16 +145,37 @@ function ChaosZombie.MakeZombieSkeleton(zombie)
     if not instanceof(zombie, "IsoZombie") then return end
     if zombie:isSkeleton() then return end
 
-    zombie:setSkeleton(true)
-
-    local visual = zombie:getHumanVisual()
-    if visual then
-        visual:setSkinTextureIndex(2)
+    -- Clear live-zombie outfit visuals too, not only wornItems.
+    local itemVisuals = zombie:getItemVisuals()
+    if itemVisuals then
+        itemVisuals:clear()
     end
 
     zombie:clearWornItems()
+    zombie:clearAttachedItems()
 
-    zombie:resetModel()
+    local visual = zombie:getHumanVisual()
+    if visual then
+        -- Important: HumanizeZombie() sets a named human skin.
+        -- Named skin overrides skinTextureIndex in Java.
+        ---@diagnostic disable-next-line: param-type-mismatch
+        visual:setSkinTextureName(nil)
+
+        -- Vanilla skeleton corpses use 1 or 2.
+        visual:setSkinTextureIndex(ChaosUtils.RandIntegerRange(1, 3))
+
+        visual:setHairModel("")
+        visual:setBeardModel("")
+
+        local bodyVisuals = visual:getBodyVisuals()
+        if bodyVisuals then
+            bodyVisuals:clear()
+        end
+    end
+
+    zombie:setSkeleton(true)
+    zombie:onWornItemsChanged()
+    zombie:resetModelNextFrame()
 end
 
 ---@param zombie IsoZombie
@@ -563,4 +584,17 @@ function ChaosZombie.GetNearestZombie(x, y, skipNPC)
         end
     end
     return nearestZombie
+end
+
+---@param zombie IsoZombie
+---@param player IsoPlayer
+function ChaosZombie.MoveToPlayerSpotted(zombie, player)
+    if not zombie or not player then return end
+    local px = math.floor(player:getX())
+    local py = math.floor(player:getY())
+    zombie:clearAggroList()
+    zombie:setTarget(player)
+    zombie:setTurnAlertedValues(px, py)
+    zombie:pathToCharacter(player)
+    zombie:spotted(player, true)
 end

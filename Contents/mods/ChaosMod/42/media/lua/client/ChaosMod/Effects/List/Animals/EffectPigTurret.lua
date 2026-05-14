@@ -5,7 +5,18 @@
 ---@field worldGunItem InventoryItem?
 ---@field worldGunObj IsoWorldInventoryObject?
 ---@field lastShotMs integer
+---@field lastRetargetMs integer
+---@field lastWanderMs integer
 EffectPigTurret = ChaosEffectBase:derive("EffectPigTurret", "pig_turret")
+
+---@type integer
+local RETARGET_INTERVAL_MS = 4000
+---@type integer
+local WANDER_INTERVAL_MS = 1000
+---@type integer
+local WANDER_RADIUS = 4
+---@type integer
+local WANDER_MAX_TRIES = 10
 
 ---@type string[]
 local PIG_BREEDS = { "landrace", "largeblack" }
@@ -31,6 +42,22 @@ local SHOT_COOLDOWN_MS = 800
 local ZOMBIE_MISS_CHANCE = 0.3
 ---@type number
 local PLAYER_MISS_CHANCE = 0.8
+---@param dist number
+---@return number
+local function getPlayerHitChanceForDist(dist)
+    if dist <= 1.0 then return 0.45 end
+    if dist <= 10.0 then
+        local t = (dist - 1.0) / (10.0 - 1.0)
+        return 0.45 + (0.1 - 0.45) * t
+    end
+    if dist <= 15.0 then
+        local t = (dist - 10.0) / (15.0 - 10.0)
+        return 0.1 + (0.0 - 0.1) * t
+    end
+    return 0.0
+end
+---@type number[]
+local FACING_DOT_DEBUG = { 0.0, 0.25, 0.5, 0.8, 1.0 }
 
 ---@param angle number
 ---@return number
@@ -189,7 +216,7 @@ end
 ---@return boolean
 local function isTargetInFrontOfPig(pig, target)
     if not pig or not target then return false end
-    return pig:isFacingLocation(target:getX(), target:getY(), 0.5)
+    return pig:isFacingLocation(target:getX(), target:getY(), 0.8)
 end
 
 ---@param pigSquare IsoGridSquare?
@@ -352,9 +379,9 @@ local function firePigTurret(self)
     if now - (self.lastShotMs or 0) < SHOT_COOLDOWN_MS then return end
     self.lastShotMs = now
 
-    if self.pig then
-        self.pig:changeStress(80)
-        self.pig:updateStress()
+    if pig then
+        pig:changeStress(80)
+        pig:updateStress()
     end
 
     local pigSquare = pig:getCurrentSquare()
@@ -375,7 +402,13 @@ local function firePigTurret(self)
         weapon:setAttackTargetSquare(target:getSquare())
     end
 
-    local missChance = instanceof(target, "IsoPlayer") and PLAYER_MISS_CHANCE or ZOMBIE_MISS_CHANCE
+    local missChance
+    if instanceof(target, "IsoPlayer") then
+        local dist = ChaosUtils.distTo(pigSquare:getX(), pigSquare:getY(), target:getX(), target:getY())
+        missChance = 1.0 - getPlayerHitChanceForDist(dist)
+    else
+        missChance = ZOMBIE_MISS_CHANCE
+    end
     if ChaosUtils.RandFloat(0, 1) <= missChance then
         return
     end
@@ -403,20 +436,130 @@ function EffectPigTurret:OnStart()
     self.pig = pig
     self.specialAnimal = SpecialAnimal:new(pig)
     if self.specialAnimal then
-        self.specialAnimal.repathTicks = 500
-        self.specialAnimal.followPlayer = true
+        self.specialAnimal.maxRepathTicks = 150
+        self.specialAnimal.followCharacter = nil
     end
 
     self.pig:changeStress(80)
     self.pig:updateStress()
     self.lastShotMs = 0
+    self.lastRetargetMs = 0
+    self.lastWanderMs = 0
 
     PigWeaponAttach.update(self.pig, self)
+end
+
+---@param pigSquare IsoGridSquare
+---@return IsoZombie?
+local function findRetargetZombie(pigSquare)
+    local zombies = ChaosZombie.GetNearestZombies(
+        pigSquare:getX(),
+        pigSquare:getY(),
+        MAX_ATTACK_DIST,
+        true,
+        pigSquare:getZ()
+    )
+
+    local nearestZombie = nil
+    local nearestDist = math.huge
+
+    for i = 0, zombies:size() - 1 do
+        local zombie = zombies:get(i)
+        if zombie and zombie:isAlive() then
+            local zSquare = zombie:getSquare()
+            if zSquare and zSquare:getZ() == pigSquare:getZ() then
+                local dist = ChaosUtils.distTo(pigSquare:getX(), pigSquare:getY(), zombie:getX(), zombie:getY())
+                if dist < nearestDist then
+                    nearestDist = dist
+                    nearestZombie = zombie
+                end
+            end
+        end
+    end
+
+    return nearestZombie
+end
+
+---@param self EffectPigTurret
+local function updateRetarget(self)
+    if not self.specialAnimal or not self.pig then return end
+
+    local now = getTimestampMs()
+    if now - (self.lastRetargetMs or 0) < RETARGET_INTERVAL_MS then return end
+    self.lastRetargetMs = now
+
+    local pigSquare = self.pig:getCurrentSquare()
+    if not pigSquare then return end
+
+    self.specialAnimal.followCharacter = findRetargetZombie(pigSquare)
+end
+
+---@param pig IsoAnimal
+---@param pigSquare IsoGridSquare
+local function pathPigToRandomNearbyLocation(pig, pigSquare)
+    local cell = getCell()
+    if not cell then return end
+
+    local pigZ = pigSquare:getZ()
+    local baseX = pigSquare:getX()
+    local baseY = pigSquare:getY()
+
+    for _ = 1, WANDER_MAX_TRIES do
+        local dx = ChaosUtils.RandIntegerRange(-WANDER_RADIUS, WANDER_RADIUS + 1)
+        local dy = ChaosUtils.RandIntegerRange(-WANDER_RADIUS, WANDER_RADIUS + 1)
+        if dx ~= 0 or dy ~= 0 then
+            local tx = baseX + dx
+            local ty = baseY + dy
+            local sq = cell:getGridSquare(tx, ty, pigZ)
+            if sq and sq:getFloor() and not sq:isSolid() and not sq:isSolidTrans() then
+                pig:pathToLocation(tx, ty, pigZ)
+                return
+            end
+        end
+    end
+end
+
+---@param self EffectPigTurret
+local function updateWander(self)
+    local pig = self.pig
+    if not pig or not self.specialAnimal then return end
+
+    local follow = self.specialAnimal.followCharacter
+    if follow and follow:isAlive() then return end
+
+    local now = getTimestampMs()
+    if now - (self.lastWanderMs or 0) < WANDER_INTERVAL_MS then return end
+    self.lastWanderMs = now
+
+    local pigSquare = pig:getCurrentSquare()
+    if not pigSquare then return end
+
+    pathPigToRandomNearbyLocation(pig, pigSquare)
 end
 
 ---@param deltaMs integer
 function EffectPigTurret:OnTick(deltaMs)
     if not self.pig or self.pig:isDead() then return end
+
+    updateRetarget(self)
+    updateWander(self)
+
+    -- local debugPlayer = getPlayer()
+    -- if debugPlayer then
+    --     local ux, uy = debugPlayer:getX(), debugPlayer:getY()
+    --     local parts = {}
+    --     for i = 1, #FACING_DOT_DEBUG do
+    --         local dot = FACING_DOT_DEBUG[i]
+    --         local facing = self.pig:isFacingLocation(ux, uy, dot)
+    --         parts[i] = string.format("%.2f=%s", dot, tostring(facing))
+    --     end
+    --     -- print("[EffectPigTurret] pig:isFacingLocation(user): " .. table.concat(parts, ", "))
+    -- end
+
+    if self.worldGunObj then
+        self.worldGunObj:setTargetAlpha(0, 1.0)
+    end
+
 
     PigWeaponAttach.update(self.pig, self)
     firePigTurret(self)

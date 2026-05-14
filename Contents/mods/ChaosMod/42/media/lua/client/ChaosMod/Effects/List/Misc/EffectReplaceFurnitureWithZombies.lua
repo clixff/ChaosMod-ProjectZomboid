@@ -39,7 +39,7 @@ function EffectReplaceFurnitureWithZombies:OnStart()
                 local zombie = zombies:getFirst()
                 if zombie then
                     zombie:dressInRandomOutfit()
-                    zombie:setTurnAlertedValues(px, py)
+                    ChaosZombie.MoveToPlayerSpotted(zombie, player)
                 end
             end
             count = count + 1

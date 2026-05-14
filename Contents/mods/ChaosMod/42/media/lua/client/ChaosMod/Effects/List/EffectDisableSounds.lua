@@ -5,6 +5,12 @@ function EffectDisableSounds:OnStart()
     pauseSoundAndMusic()
 end
 
+function EffectDisableSounds:OnTick(deltaMs)
+    ChaosEffectBase:OnTick(deltaMs)
+
+    pauseSoundAndMusic()
+end
+
 function EffectDisableSounds:OnEnd()
     ChaosEffectBase:OnEnd()
     resumeSoundAndMusic()

@@ -8,6 +8,8 @@ const LANGUAGE_LABELS: Record<string, string> = {
   ru: "Russian",
   tr: "Turkish",
   zh: "Chinese",
+  ko: "Korean",
+  ja: "Japanese",
 };
 
 export function formatLanguageLabel(code: string): string {

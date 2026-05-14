@@ -83,6 +83,14 @@ function ChaosNPC:update(deltaMs)
         self.enemy = nil
     end
 
+    if self.enemy and ChaosNPCUtils.IsTargetGrappled(self.enemy) then
+        if self.enemy == self.moveTargetCharacter then
+            self.moveTargetCharacter = nil
+            self:StopMoving(true, "enemy_grappled")
+        end
+        self.enemy = nil
+    end
+
     local shouldFindNewEnemy = self.enemy == nil and not self.isAttacking
     if shouldFindNewEnemy and canFindNewEnemyThisFrame then
         self:UpdateNextEnemyTarget()

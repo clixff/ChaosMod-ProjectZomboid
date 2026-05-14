@@ -109,12 +109,12 @@ ChaosConfig = ChaosConfig or {
             { group = "negative_4", price = 7 },
             { group = "negative_5", price = 8 },
             { group = "negative_6", price = 10 },
-            { group = "neutral_1", price = 1 },
-            { group = "neutral_2", price = 2.5 },
-            { group = "neutral_3", price = 4.5 },
-            { group = "neutral_4", price = 7 },
-            { group = "neutral_5", price = 8 },
-            { group = "neutral_6", price = 10 },
+            { group = "neutral_1",  price = 1 },
+            { group = "neutral_2",  price = 2.5 },
+            { group = "neutral_3",  price = 4.5 },
+            { group = "neutral_4",  price = 7 },
+            { group = "neutral_5",  price = 8 },
+            { group = "neutral_6",  price = 10 },
         },
         vote_start_time = 15,
         allow_vote_command = true,
@@ -205,8 +205,11 @@ function ChaosConfig.LoadConfigFromDisk()
         return
     end
 
-    if type(configData.lang) == "string" and configData.lang ~= "" then
-        ChaosConfig.lang = configData.lang
+    if configData.lang and type(configData.lang) == "string" and configData.lang ~= "" then
+        ---@diagnostic disable-next-line: assign-type-mismatch
+        ---@type string
+        local lang = configData.lang
+        ChaosConfig.lang = lang
     end
 
     if type(configData.effects_interval_enabled) == "boolean" then

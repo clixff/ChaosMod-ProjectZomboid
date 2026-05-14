@@ -46,7 +46,7 @@ function ChaosEffectsWindow:createChildren()
     local searchBarH = ChaosUIManager.GetScaledWidth(22)
     self.searchBox = ISTextEntryBox:new("", pad, searchBarY, listW, searchBarH)
     self.searchBox.font = UIFont.NewSmall
-    self.searchBox:setPlaceholderText(ChaosLocalization.GetString("core", "search_placeholder"))
+    self.searchBox:setPlaceholderText("Search")
     self.searchBox:initialise()
     self.searchBox:instantiate()
     self.searchBox:setClearButton(true)
@@ -143,12 +143,12 @@ function ChaosEffectsWindow:onActivateClicked()
     if self.selectedEffect == RANDOM_EFFECT_ITEM then
         local picked = ChaosEffectsRegistry.GetRandomEffects(1, "default")
         if picked[1] then
-            ChaosEffectsManager.StartEffect(picked[1])
+            ChaosEffectsManager.StartEffect(picked[1], nil, ChaosEffectActivationType.CHEAT)
         end
         return
     end
 
-    ChaosEffectsManager.StartEffect(self.selectedEffect.id)
+    ChaosEffectsManager.StartEffect(self.selectedEffect.id, nil, ChaosEffectActivationType.CHEAT)
 end
 
 --- @param target ChaosEffectDataEntry

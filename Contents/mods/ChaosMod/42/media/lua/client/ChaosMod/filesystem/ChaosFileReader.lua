@@ -65,7 +65,7 @@ function ChaosFileReader.ReadJsonFile(filename)
 
     ---@type table | nil
     local data = nil
-    local ok, err = pcall(function()
+    local ok, err = pcall(function ()
         data = json.Decode(content)
         return data
     end)
@@ -88,7 +88,7 @@ function ChaosFileReader.ReadJsonFromCache(filename)
 
     ---@type table | nil
     local data = nil
-    local ok, err = pcall(function()
+    local ok, err = pcall(function ()
         data = json.Decode(content)
         return data
     end)
@@ -137,9 +137,9 @@ local function escapeJsonString(s)
     return s
 end
 
----@param value any
+---@param value  any
 ---@param indent integer
----@param out table<integer, string>
+---@param out    table<integer, string>
 local function encodePretty(value, indent, out)
     local valueType = type(value)
     if value == nil then
@@ -214,7 +214,21 @@ function ChaosFileReader.EncodeJsonPretty(data)
 end
 
 ---@param filename string
----@param data any
+---@param text     string
+---@return boolean
+function ChaosFileReader.WriteTextToCache(filename, text)
+    local writer = getFileWriter(filename, true, false)
+    if not writer then
+        print("[ChaosMod] Failed to open " .. tostring(filename) .. " for writing")
+        return false
+    end
+    writer:write(text or "")
+    writer:close()
+    return true
+end
+
+---@param filename string
+---@param data     any
 ---@return boolean
 function ChaosFileReader.WriteJsonToCache(filename, data)
     if not json.Encode then

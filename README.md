@@ -41,7 +41,7 @@ Chaos Mod also supports Twitch integration. Viewers can vote for the next effect
 ---
 
 > This mod requires the **unstable** branch of Project Zomboid on Steam.  
-> It has been tested on version **42.17.0**.
+> It has been tested on version **42.18.0**.
 >
 > To enable the unstable branch, open Project Zomboid properties in Steam, go to **Game Versions & Betas**, and select the **unstable** branch.
 
@@ -144,7 +144,7 @@ http://127.0.0.1:3959/mod/effects
 Each effect entry includes:
 
 - `id` — numeric ID starting from `1`
-- `effect_id` — internal string effect ID such as `spawn_zombie_nearby`
+- `effect_id` — internal string effect ID such as `spawn_zombies_nearby`
 - `price_result` — resolved donation price for that effect
 
 To activate an effect, send a request to:
@@ -158,7 +158,7 @@ The `effect` query parameter accepts either the numeric `id` or the string `effe
 Example:
 
 ```txt
-http://127.0.0.1:3959/mod/activate-effect?effect=spawn_zombie_nearby&nickname=ViewerName
+http://127.0.0.1:3959/mod/activate-effect?effect=spawn_zombies_nearby&nickname=ViewerName
 ```
 
 or:
@@ -204,6 +204,8 @@ Supported languages:
 - Polish (`pl`)
 - Turkish (`tr`)
 - Simplified Chinese (`zh`)
+- Korean (`ko`)
+- Japanese (`ja`)
 
 ## FAQ
 

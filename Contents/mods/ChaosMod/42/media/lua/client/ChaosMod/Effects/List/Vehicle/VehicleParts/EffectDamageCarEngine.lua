@@ -16,6 +16,8 @@ function EffectDamageCarEngine:OnStart()
     if part then
         part:damage(35)
         vehicle:transmitEngine()
+        ChaosPlayer.SayLineByColor(player, "Engine health: " .. part:getCondition() .. "/100",
+            ChaosPlayerChatColors.red)
     end
 
     vehicle:updatePartStats()

@@ -26,8 +26,7 @@ function EffectSpawnGrieferSkeleton:OnStart()
     npc:initializeHuman()
 
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
+    ChaosZombie.MakeZombieSkeleton(zombie)
 
     npc:SetWeapon("Base.Cudgel_Spike")
-
-    ChaosZombie.MakeZombieSkeleton(zombie)
 end

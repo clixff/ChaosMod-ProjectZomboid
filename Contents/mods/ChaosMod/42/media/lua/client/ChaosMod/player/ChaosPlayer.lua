@@ -32,7 +32,7 @@ function ChaosPlayer.DropAllItemsOnGround(player, dropHandItems)
     for i = #list, 1, -1 do
         local item = list[i]
 
-        if item then
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             player:removeFromHands(item)
             player:removeWornItem(item, false)
         end
@@ -44,7 +44,7 @@ function ChaosPlayer.DropAllItemsOnGround(player, dropHandItems)
 
     for i = 1, #list do
         local item = list[i]
-        if item and item:getContainer() == inv then
+        if item and item:getContainer() == inv and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             inv:Remove(item)
             sq:AddWorldInventoryItem(item, 0.5, 0.5, 0.0)
         end
@@ -229,7 +229,7 @@ function ChaosPlayer.CollectAllItems(container, out, useDeepLookup)
     if not items then return end
     for i = 0, items:size() - 1 do
         local item = items:get(i)
-        if item then
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             if item:IsInventoryContainer() and useDeepLookup then
                 ---@type InventoryContainer
                 local inner = item

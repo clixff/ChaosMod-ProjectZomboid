@@ -1,3 +1,55 @@
+[1.1.1]
+
+### New Mod Features
+
+- On mod version change (tracked via `VERSION.txt` in the Lua folder), both the mod and StreamerApp now fully replace `effects.json` with the shipped defaults to pick up rebalanced chances, durations, and price groups
+- Added player knockdown for all explosion effects
+- Added Korean and Japanese translations
+
+### Mod Fixes
+
+- Fixed chance for "Crouch Mode" and price group for "Hide Effect Names"
+- Fixed "NPC Died" message to only show if NPC has a nickname
+- NPCs with weapons now have 20% chance to knock down characters
+- NPCs can knock down zombies
+- Increased NPC damage to player
+- StreamerApp now does not generate effects in JavaScript, and get random effects for vote from Lua.
+- Effect `chance` is now a floating-point weight (min `0.0`, no max cap; `0.0` disables the effect). The in-game settings UI, StreamerApp dashboard, and CSV/XLSX exports no longer treat it as a 0-100 percentage and no longer render a `%` suffix.
+- Changing the in-game language now immediately updates effect names in the in-game effect selection window, the settings effects list, and currently active effects — previously the names only refreshed after toggling the mod off and on.
+- NPCs no longer target zombies that are being grappled by the player (or were reanimated for grapple only)
+
+### Effect Fixes
+
+- Fixed removing bandages from player body parts in effects like "Spawn Robber"
+- Updated localization for "Kamikaze Zombies" effect to clarify nearby zombies become kamikaze
+- Updated localization for "Zombies Turret" effect to clarify the turret targets zombies
+- Fixed "Immortal Zombies" effect
+- "Zombies Are Coming" is more powerful now
+- "Math Captcha" now adds a calculator to the player's inventory on wrong answer
+- Fixed "Zombies Can't See You" effect
+- Fixed "Spawn Griefer Skeleton" effect
+- "Zombies Rain" effect now spawns zombies more frequently
+- "Remove Bandages" effect now does not remove bandages from player body
+- Fixed "Disable Sounds" effect
+- Fixed Ghost Items in effects like "Hide Player Weapons"
+- Effects "Hide Player Clothes", "Hide Player Weapons" now hides items on various locations
+- Renamed "Spawn Sprinter Zombie (Random Radius)" → "Spawn Sprinter Zombies" (`spawn_sprinter_zombies`); now has a 10s duration and spawns one sprinter on start and one on end
+- Renamed "Spawn Zombie Nearby" → "Spawn Zombies Nearby" (`spawn_zombies_nearby`); now has a 30s duration, spawns multiple zombies over its duration, and spawned zombies path to the player
+- "Spawn Few Zombies" effect now spawns a random number of zombies between 4 and 6
+- "Fill Area With Zombies" effect now spawns more zombies in a random area around the player
+- "Time Rewind" effect now has a 15s duration and rewinds the player across the last 120s of tracked positions
+- Fixed "Move Or Get Damage" effect incorrectly damaging the player when walking away and back to the previous square within 1 second; total distance traveled per second is now accumulated each tick
+- "DOOM" effect now blocks reloading and unloading rounds on the temporary shotgun for the duration
+- "Zombies Turret" effect - added blocking of grabbing and other weapon actions
+- "Pig Turret" effect now retargets a nearby zombie every 4 seconds, so the pig rotates to face zombies, and wanders to a random nearby tile every second when no live target is set
+- "Refill Car Fuel", "Remove Car Fuel", "Set Random Car Fuel", "Damage Car Engine" effects now display the resulting fuel/engine condition as a green/red chat line on the player
+- Effect "Insane Traffic": fix for 42.18.0 version
+- Effect "Spawn Barricade Kit": now spawns 9 planks and 9 nails
+- Effect "Necromancy": now does not humanize dead zombies, keeps zombie skin
+- Effect "Teleport To Nearest Basement": now finds better square to teleport
+- Effects "Launch Player Up" and "Launch Everyone Up" now do special actions with custom damage
+- Effects "Add Bomb To Player Inventory", "Random Item Bomb", and "Spawn Explosive Spiffos" now show a progress bar countdown to detonation via UI
+
 [1.1.0]
 
 ### New mod features

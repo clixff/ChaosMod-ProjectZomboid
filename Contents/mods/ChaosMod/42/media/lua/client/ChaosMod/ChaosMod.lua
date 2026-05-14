@@ -35,7 +35,7 @@ function ChaosMod.StartMod()
     ChaosConfig.LoadConfigFromDisk()
     -- Reload localization files for configured language
     ChaosLocalization.ReloadLanguages()
-    ChaosUIManager.hud:OnLanguageLoaded()
+    ChaosUIManager:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
     -- Clear position history so it starts fresh from this session
@@ -87,6 +87,7 @@ end
 
 function ChaosMod.StopMod()
     ChaosEffectsManager.StopAllEffects()
+    ChaosSpecialAction.StopAll()
     ChaosEffectsManager.ClearGlobalTimer()
     ChaosMod.enabled = false;
     ChaosUIManager.hud:AddMessage("ChaosMod stopped")
@@ -192,7 +193,7 @@ function ChaosMod.OnGameStart()
     ChaosConfig.LoadConfigFromDisk()
     -- Reload localization files for configured language
     ChaosLocalization.ReloadLanguages()
-    ChaosUIManager.hud:OnLanguageLoaded()
+    ChaosUIManager:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
 
@@ -263,6 +264,7 @@ function ChaosMod.OnTick()
     end
 
     if ChaosMod.enabled then
+        ChaosSpecialAction.OnTick(deltaMs)
         ChaosUtils.AdjustVisibleZombiesForNPCs()
         ChaosUtils.TrackPlayerPosition(deltaMs)
         ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
@@ -276,11 +278,11 @@ function ChaosMod.RegisterBridgeHandlers()
     ChaosBridge.On("reload_config", function(_payload)
         print("[ChaosMod] Reloading config and effects via bridge")
         ChaosConfig.LoadConfigFromDisk()
-        ChaosLocalization.ReloadLanguages()
-        if ChaosUIManager and ChaosUIManager.hud then
-            ChaosUIManager.hud:OnLanguageLoaded()
-        end
         ChaosEffectsRegistry.Initialize()
+        ChaosLocalization.ReloadLanguages()
+        if ChaosUIManager and ChaosUIManager.OnLanguageLoaded then
+            ChaosUIManager:OnLanguageLoaded()
+        end
     end)
 
     ChaosBridge.On("activate_effects", function(payload)
@@ -290,8 +292,18 @@ function ChaosMod.RegisterBridgeHandlers()
         for _, e in ipairs(effects) do
             if type(e) == "table" and type(e.id) == "string" and e.id ~= "" then
                 local nickname = type(e.nickname) == "string" and e.nickname ~= "" and e.nickname or nil
-                ChaosEffectsManager.StartEffect(e.id, nickname)
-                if e.type == "donate" and ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
+                local activationType = ChaosEffectActivationType.VOTE
+                if e.type == ChaosEffectActivationType.DONATE then
+                    activationType = ChaosEffectActivationType.DONATE
+                elseif e.type == ChaosEffectActivationType.VOTE then
+                    activationType = ChaosEffectActivationType.VOTE
+                end
+                ChaosEffectsManager.StartEffect(e.id, nickname, activationType)
+                if activationType == ChaosEffectActivationType.VOTE then
+                    ChaosEffectsRegistry.AddToBlocklist(e.id)
+                end
+                if activationType == ChaosEffectActivationType.DONATE
+                    and ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
                     ChaosUIManager.onDonateEffectActivated(nickname or "Anonymous", e.id)
                 end
             end

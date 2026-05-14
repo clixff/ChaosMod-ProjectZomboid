@@ -1,3 +1,25 @@
+---@alias ChaosEffectActivationType "vote" | "interval" | "donate" | "cheat"
+
+---@type { VOTE: ChaosEffectActivationType, INTERVAL: ChaosEffectActivationType, DONATE: ChaosEffectActivationType, CHEAT: ChaosEffectActivationType }
+ChaosEffectActivationType = {
+    VOTE = "vote",         -- Streamer-mode vote winner
+    INTERVAL = "interval", -- Triggered automatically by the global effects timer
+    DONATE = "donate",     -- Activated by a donation through StreamerMode
+    CHEAT = "cheat",       -- Activated manually from the in-game effects window UI
+}
+
+---@param activationType any
+---@return ChaosEffectActivationType
+local function NormalizeActivationType(activationType)
+    if activationType == ChaosEffectActivationType.VOTE
+        or activationType == ChaosEffectActivationType.INTERVAL
+        or activationType == ChaosEffectActivationType.DONATE
+        or activationType == ChaosEffectActivationType.CHEAT then
+        return activationType
+    end
+    return ChaosEffectActivationType.INTERVAL
+end
+
 ---@class ChaosEffectsManager
 ---@field activeEffects table<integer, ChaosEffectBase>
 ---@field globalTimerMs number -- current elapsed ms, counts 0 → globalTimerMaxMs
@@ -30,7 +52,7 @@ function ChaosEffectsManager.OnGlobalEffectsTimerEnd()
     if not sm or sm.streamer_mode_enabled == false or sm.voting_enabled == false then
         local effectIds = ChaosEffectsRegistry.GetRandomEffects(1, "default")
         if effectIds and effectIds[1] then
-            ChaosEffectsManager.StartEffect(effectIds[1])
+            ChaosEffectsManager.StartEffect(effectIds[1], nil, ChaosEffectActivationType.INTERVAL)
         end
     end
     if sm and sm.streamer_mode_enabled == true then
@@ -42,8 +64,9 @@ end
 
 ---@param effectId string
 ---@param effectNickname string | nil
+---@param activationType ChaosEffectActivationType | nil
 ---@return ChaosEffectBase | nil
-function ChaosEffectsManager.StartEffect(effectId, effectNickname)
+function ChaosEffectsManager.StartEffect(effectId, effectNickname, activationType)
     if not effectId or effectId == "" then
         print("[ChaosEffectsManager] Effect ID is required")
         return
@@ -70,8 +93,9 @@ function ChaosEffectsManager.StartEffect(effectId, effectNickname)
         durationMultiplier = 1
     end
     local scaledDuration = (effectData.duration or 0) * durationMultiplier
+    local resolvedActivationType = NormalizeActivationType(activationType)
     local newEffect = effectClass:new(effectId, effectData.name, scaledDuration, effectData.withDuration,
-        effectNickname)
+        effectNickname, resolvedActivationType)
     if not newEffect then return end
 
     newEffect:OnStart()
@@ -106,7 +130,15 @@ function ChaosEffectsManager.OnTick(deltaMs)
             local voteStartMs = (ChaosConfig.vote_start_time or 0) * 1000
             if ChaosEffectsManager.globalTimerMs >= voteStartMs then
                 ChaosEffectsManager.voteStartedThisInterval = true
-                ChaosBridge.Emit("vote_start", nil)
+                local optionsCount = sm.voting_options_number or 4
+                local visibleCount = math.max(0, math.floor(optionsCount) - 1)
+                local visibleEffects = ChaosEffectsRegistry.GetRandomEffects(visibleCount, "default", true)
+                local secretEffects = ChaosEffectsRegistry.GetRandomEffects(1, "default", false)
+                local payload = { effects = visibleEffects }
+                if secretEffects[1] then
+                    payload.secret_effect = secretEffects[1]
+                end
+                ChaosBridge.Emit("vote_start", payload)
             end
         end
     end
@@ -160,6 +192,17 @@ function ChaosEffectsManager.DisableSpecificEffects(effectIds)
                 -- Remove effect from activeEffects table
                 table.remove(ChaosEffectsManager.activeEffects, i)
             end
+        end
+    end
+end
+
+--- Refreshes the localized `effectName` field on every currently active effect, so the
+--- active effects UI shows the new translation immediately after a language change.
+function ChaosEffectsManager.RefreshActiveEffectNames()
+    if not ChaosEffectsManager.activeEffects then return end
+    for _, effect in ipairs(ChaosEffectsManager.activeEffects) do
+        if effect and effect.effectId then
+            effect.effectName = ChaosLocalization.GetString("effects", effect.effectId)
         end
     end
 end

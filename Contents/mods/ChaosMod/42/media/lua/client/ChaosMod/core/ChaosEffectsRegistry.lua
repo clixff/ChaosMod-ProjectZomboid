@@ -2,7 +2,7 @@
 ---@field id string
 ---@field name string
 ---@field enabled boolean
----@field chance integer
+---@field chance number
 ---@field withDuration boolean
 ---@field duration number
 ---@field disableEffects table<integer, string>
@@ -14,7 +14,7 @@
 ---@field id string?
 ---@field name string?
 ---@field enabled boolean?
----@field chance integer?
+---@field chance number?
 ---@field withDuration boolean?
 ---@field duration number?
 ---@field disable_effects table<integer, string>?
@@ -40,6 +40,8 @@ function ChaosEffectsRegistry.Initialize()
 
     local enabledEffects = 0;
     local totalEffects = 0;
+
+    ChaosEffectsRegistry.SyncEffectsForModVersion()
 
     ---@type table | nil
     local defaultEffectsData = ChaosFileReader.ReadJsonFile("default_effects.json")
@@ -106,6 +108,38 @@ function ChaosEffectsRegistry.Initialize()
     ChaosEffectsRegistry.effectsEnabledCount = enabledEffects
 end
 
+--- If VERSION.txt is missing, empty or different from the current mod version,
+--- overwrite the user's effects.json with the shipped default_effects.json
+--- and rewrite VERSION.txt. Must run before effects.json is loaded into memory.
+function ChaosEffectsRegistry.SyncEffectsForModVersion()
+    local currentVersion = ""
+    if ChaosMod.modData then
+        currentVersion = ChaosMod.modData:getModVersion() or ""
+    end
+
+    local storedRaw = ChaosFileReader.ReadFileFromCacheAllLines("ChaosMod/VERSION.txt")
+    local storedVersion = ""
+    if storedRaw then
+        storedVersion = storedRaw:match("^%s*(.-)%s*$") or ""
+    end
+
+    if storedVersion == currentVersion then
+        return
+    end
+
+    print(string.format("[ChaosEffectsRegistry] Mod version changed ('%s' -> '%s'); replacing effects.json with defaults",
+        storedVersion, currentVersion))
+
+    local defaults = ChaosFileReader.ReadJsonFile("default_effects.json")
+    if defaults then
+        ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", defaults)
+    else
+        print("[ChaosEffectsRegistry] default_effects.json not found; cannot replace effects.json")
+    end
+
+    ChaosFileReader.WriteTextToCache("ChaosMod/VERSION.txt", currentVersion)
+end
+
 ---@alias ChaosEffectPickType "default" | "donate"
 
 ---@type table<string, boolean>
@@ -137,14 +171,33 @@ local function addToBlocklist(id)
     recentEffectsSet[id] = true
 end
 
+--- Adds an effect id to the recent-effects blocklist if it isn't already in it.
+---@param id string
+function ChaosEffectsRegistry.AddToBlocklist(id)
+    if type(id) ~= "string" or id == "" then return end
+    if recentEffectsSet[id] then return end
+    addToBlocklist(id)
+end
+
+---@param id string
+---@return boolean
+function ChaosEffectsRegistry.IsInBlocklist(id)
+    return recentEffectsSet[id] == true
+end
+
 --- Returns an array of randomly selected effect IDs using weighted random selection.
---- Picked effects are added to a rolling blocklist of 12 and cannot be re-selected until evicted.
+--- Picked effects are added to a rolling blocklist (size = `recent_effects_block_buffer`)
+--- and cannot be re-selected until evicted. Pass `addToBlock = false` to roll an
+--- effect without inserting it into the blocklist (used for the secret random_effect
+--- backing in streamer-mode voting).
 ---@param amount integer
 ---@param pickType ChaosEffectPickType
+---@param addToBlock boolean | nil -- default true
 ---@return string[]
-function ChaosEffectsRegistry.GetRandomEffects(amount, pickType)
+function ChaosEffectsRegistry.GetRandomEffects(amount, pickType, addToBlock)
+    local shouldBlock = addToBlock ~= false
     local pool = {}
-    local totalWeight = 0
+    local totalWeight = 0.0
 
     local ignoreChances = ChaosConfig.ignore_effect_chances == true
     for id, effect in pairs(ChaosEffectsRegistry.effects) do
@@ -161,7 +214,7 @@ function ChaosEffectsRegistry.GetRandomEffects(amount, pickType)
     for _ = 1, amount do
         if totalWeight <= 0 then break end
 
-        local roll = ChaosUtils.RandInteger(totalWeight) + 1
+        local roll = ChaosUtils.RandFloat(0, totalWeight)
         local cumulative = 0
         local picked = nil
         local pickedIndex = nil
@@ -177,7 +230,9 @@ function ChaosEffectsRegistry.GetRandomEffects(amount, pickType)
 
         if picked then
             table.insert(result, picked)
-            addToBlocklist(picked)
+            if shouldBlock then
+                addToBlocklist(picked)
+            end
             totalWeight = totalWeight - pool[pickedIndex].chance
             table.remove(pool, pickedIndex)
         end
@@ -209,7 +264,7 @@ function ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
         id = effectId,
         name = ChaosLocalization.GetString("effects", effectId),
         enabled = effectJsonData.enabled or false,
-        chance = math.floor(effectJsonData.chance or 0),
+        chance = tonumber(effectJsonData.chance) or 0,
         withDuration = effectJsonData.withDuration or false,
         duration = effectJsonData.duration or 0,
         class = effectClass,
@@ -226,6 +281,17 @@ function ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
     end
 
     return newEffectData
+end
+
+--- Refreshes the cached localized `name` on every registered effect using the currently
+--- loaded language data. Call after `ChaosLocalization.ReloadLanguages()` so UI that reads
+--- `effect.name` (e.g. the in-game effect selection window) shows the new translations
+--- without requiring the mod to be restarted.
+function ChaosEffectsRegistry.RefreshEffectNames()
+    if not ChaosEffectsRegistry.effects then return end
+    for id, effect in pairs(ChaosEffectsRegistry.effects) do
+        effect.name = ChaosLocalization.GetString("effects", id)
+    end
 end
 
 ---@return table

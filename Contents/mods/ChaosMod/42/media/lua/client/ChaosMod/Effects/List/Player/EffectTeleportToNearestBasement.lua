@@ -19,7 +19,7 @@ function EffectTeleportToNearestBasement:OnStart()
     local bestDistSq = math.huge
 
     ChaosUtils.SquareRingSearchTile_2D(px, py, function(sq)
-        if sq then
+        if sq and sq:getWall() == nil then
             bestSq = sq
             return true
         end

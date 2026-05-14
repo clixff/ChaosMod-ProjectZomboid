@@ -48,8 +48,10 @@ function EffectHidePlayerClothes:OnStart()
         if worn and worn:contains(clothing) then
             player:removeWornItem(clothing)
         end
-
-        inventory:Remove(clothing)
+        local container = clothing:getContainer()
+        if container then
+            container:Remove(clothing)
+        end
         sq:AddWorldInventoryItem(clothing, 0.5, 0.5, 0)
     end
 

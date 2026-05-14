@@ -8,7 +8,9 @@
 ---@field playerSpawnPoint {x: number, y: number, z: number} | nil -- World position where player first spawned this save
 ---@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 2 recorded player world positions, oldest first
 ---@field playerPreviousPositionsSampleMs integer
+---@field DEBUG_SQUARE_RING_SEARCH boolean -- When true, SquareRingSearchTile_2D prints a per-ring non-null tile count at Z=0
 ChaosUtils = ChaosUtils or {
+    DEBUG_SQUARE_RING_SEARCH = false,
     lastUsedVehicle = nil,
     playerPositionHistory = {},
     positionSampleMs = 0,
@@ -68,7 +70,7 @@ function ChaosUtils.sleepHandleTick()
 end
 
 local POSITION_SAMPLE_INTERVAL_MS = 1000
-local POSITION_HISTORY_MAX = 60
+local POSITION_HISTORY_MAX = 120
 local PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS = 60000
 local PREVIOUS_LOCATION_MAX = 2
 
@@ -99,7 +101,8 @@ end
 function ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
     ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs + deltaMs
     if ChaosUtils.playerPreviousPositionsSampleMs < PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS then return end
-    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs - PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS
+    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs -
+        PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS
 
     local player = getPlayer()
     if not player then return end
@@ -190,7 +193,32 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
     trap:setInstantExplosion(false)
     trap:setExplosionSound("BigExplosion")
 
-    trap:triggerExplosion(false)
+    ---@diagnostic disable-next-line: deprecated
+    trap:triggerExplosion()
+
+    local expX = square:getX()
+    local expY = square:getY()
+    local expZ = square:getZ()
+
+    local player = getPlayer()
+    if player then
+        local square = player:getSquare()
+
+        local playerX = player:getX()
+        local playerY = player:getY()
+        local playerZ = player:getZ()
+        local isSameZ = expZ == playerZ
+        if square and isSameZ and ChaosUtils.isInRange(expX, expY, playerX, playerY, explosionRange) then
+            player:setKnockedDown(true)
+        end
+    end
+
+    ChaosZombie.ForEachZombieInRange(expX, expY, explosionRange, function(zombie)
+        if zombie and zombie:isAlive() then
+            local isBehindZombie = ChaosUtils.IsSquareBehindZombie(square, zombie)
+            zombie:knockDown(isBehindZombie)
+        end
+    end, false, expZ)
 end
 
 ---@type table<integer, PerkFactory.Perk>
@@ -249,6 +277,17 @@ TOOL_ITEM_IDS = {
 ---@return number
 function ChaosUtils.distTo(x1, y1, x2, y2)
     return math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
+end
+
+---@param x1 number
+---@param y1 number
+---@param z1 number
+---@param x2 number
+---@param y2 number
+---@param z2 number
+---@return number
+function ChaosUtils.distTo3D(x1, y1, z1, x2, y2, z2)
+    return math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2 + (z2 - z1) ^ 2)
 end
 
 ---@param x1 number
@@ -394,7 +433,7 @@ end
 local function _normalizeBFSZOffset(value)
     if type(value) ~= "number" then return 0 end
     if value % 1 ~= 0 then return 0 end
-    return value
+    return math.floor(value)
 end
 
 ---@param square IsoGridSquare | nil
@@ -589,10 +628,34 @@ function ChaosUtils.SquareRingSearchTile_2D(x, y, callback, minDistance, maxDist
 
     local maxRing = math.ceil(maxDistance)
 
+    local debugEnabled = ChaosUtils.DEBUG_SQUARE_RING_SEARCH == true
+    ---@type table<integer, integer>
+    local ringValidCounts = {}
+    if debugEnabled then
+        for ring = 0, maxRing do ringValidCounts[ring] = 0 end
+    end
+    local function countZ0(cx, cy, ring)
+        if not debugEnabled then return end
+        local sq = cell:getGridSquare(cx, cy, 0)
+        if sq then
+            ringValidCounts[ring] = (ringValidCounts[ring] or 0) + 1
+        end
+    end
+    local function printDebug()
+        if not debugEnabled then return end
+        print("[ChaosUtils.SquareRingSearchTile_2D] origin=(" .. tostring(x) .. "," .. tostring(y) ..
+            ") maxRing=" .. tostring(maxRing))
+        for ring = 0, maxRing do
+            print("Radius " .. tostring(ring) .. " - " .. tostring(ringValidCounts[ring] or 0) .. " valid")
+        end
+    end
+
     for ring = 0, maxRing do
         if ring == 0 then
+            countZ0(x, y, 0)
             if _checkSquareAcrossZ(cell, x, y, x, y, callback, minDistance, maxDistance, checkFloor, onlyEmpty,
                     allowInteriors, minZ, maxZ) then
+                printDebug()
                 return true
             end
         else
@@ -602,31 +665,40 @@ function ChaosUtils.SquareRingSearchTile_2D(x, y, callback, minDistance, maxDist
             local maxY = y + ring
 
             for currentX = minX, maxX do
+                countZ0(currentX, minY, ring)
                 if _checkSquareAcrossZ(cell, x, y, currentX, minY, callback, minDistance, maxDistance, checkFloor,
                         onlyEmpty, allowInteriors, minZ, maxZ) then
+                    printDebug()
                     return true
                 end
 
+                countZ0(currentX, maxY, ring)
                 if _checkSquareAcrossZ(cell, x, y, currentX, maxY, callback, minDistance, maxDistance, checkFloor,
                         onlyEmpty, allowInteriors, minZ, maxZ) then
+                    printDebug()
                     return true
                 end
             end
 
             for currentY = minY + 1, maxY - 1 do
+                countZ0(minX, currentY, ring)
                 if _checkSquareAcrossZ(cell, x, y, minX, currentY, callback, minDistance, maxDistance, checkFloor,
                         onlyEmpty, allowInteriors, minZ, maxZ) then
+                    printDebug()
                     return true
                 end
 
+                countZ0(maxX, currentY, ring)
                 if _checkSquareAcrossZ(cell, x, y, maxX, currentY, callback, minDistance, maxDistance, checkFloor,
                         onlyEmpty, allowInteriors, minZ, maxZ) then
+                    printDebug()
                     return true
                 end
             end
         end
     end
 
+    printDebug()
     return false
 end
 
@@ -761,9 +833,9 @@ end
 ---@return string
 function ChaosUtils.GetImgCodeByItemTextureByString(item)
     if not item then return "" end
-    local item = instanceItem(item)
-    if not item then return "" end
-    return ChaosUtils.GetImgCodeByItemTexture(item)
+    local itemInstance = instanceItem(item)
+    if not itemInstance then return "" end
+    return ChaosUtils.GetImgCodeByItemTexture(itemInstance)
 end
 
 ---@param container ItemContainer
@@ -775,7 +847,7 @@ local function _collectItemsFromContainer(container, out)
     if not items then return end
     for i = 0, items:size() - 1 do
         local item = items:get(i)
-        if item then
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             if item:IsInventoryContainer() then
                 ---@type InventoryContainer
                 local inner = item
@@ -810,7 +882,10 @@ function ChaosUtils.RemoveRandomItem(player)
         player:removeWornItem(randomItem.item)
     end
 
-    inventory:Remove(randomItem.item)
+    local container = randomItem.item:getContainer()
+    if container then
+        container:Remove(randomItem.item)
+    end
 
     ChaosPlayer.SayLineRemovedItem(player, randomItem.item)
 end
@@ -934,4 +1009,53 @@ function ChaosUtils.RemoveWorldObject(worldObject, removeInventoryItem)
     end
 
     return item
+end
+
+---@param str string
+---@param prefix string
+---@return boolean
+local function startsWith(str, prefix)
+    return string.sub(str, 1, #prefix) == prefix
+end
+
+---@param item InventoryItem
+---@return boolean
+function ChaosUtils.IsItemBandageOnBodyPart(item)
+    if not item then return false end
+
+    local itemName = item:getDisplayName()
+
+    print(string.format("Testing item name: %s (%s)", itemName, item:getID()))
+
+    return startsWith(itemName, "Base.Bandage_")
+        or startsWith(itemName, "Base.Wound_")
+end
+
+---@param square IsoGridSquare
+---@param character IsoGameCharacter
+function ChaosUtils.IsSquareBehindZombie(square, character)
+    if not square or not character then return false end
+
+    -- Optional: require same floor
+    if square:getZ() ~= math.floor(character:getZ()) then
+        return false
+    end
+
+    -- Square center relative to zombie
+    local dx = square:getX() + 0.5 - character:getX()
+    local dy = square:getY() + 0.5 - character:getY()
+
+    local len = math.sqrt(dx * dx + dy * dy)
+    if len == 0 then return false end
+
+    dx = dx / len
+    dy = dy / len
+
+    local fx = character:getForwardDirectionX()
+    local fy = character:getForwardDirectionY()
+
+    local dot = dx * fx + dy * fy
+
+    -- Behind zombie = opposite its forward direction
+    return dot < -0.6
 end

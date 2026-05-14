@@ -51,8 +51,7 @@ function EffectSpawnAnnoyingPig:OnStart()
     if not self.pig then return end
 
     self.specialAnimal = SpecialAnimal:new(self.pig)
-    self.specialAnimal.repathTicks = 400
-    self.specialAnimal.followPlayer = true
+    self.specialAnimal.maxRepathTicks = 20
 end
 
 ---@param deltaMs integer

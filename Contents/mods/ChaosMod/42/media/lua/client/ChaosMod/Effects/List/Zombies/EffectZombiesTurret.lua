@@ -5,6 +5,7 @@
 ---@field currentYRotation number
 ---@field lastShotMs integer
 ---@field killCount integer
+---@field lastTeleportMs integer
 EffectZombiesTurret = ChaosEffectBase:derive("EffectZombiesTurret", "zombies_turret")
 
 ---@type string
@@ -19,6 +20,8 @@ local ROTATION_EPSILON = 10
 local ROTATION_SPEED_DEG_PER_SEC = 90
 ---@type number
 local MISS_CHANCE = 0.3
+---@type integer
+local TELEPORT_INTERVAL_MS = 3000
 ---@type table<string, number>
 local KILL_COUNTER_COLOR = { r = 1.0, g = 0.84, b = 0.0 }
 ---@type boolean
@@ -84,6 +87,52 @@ local function getAngleToSquare(fromSquare, toSquare)
     ---@type number
     local angle = normalizeAngle(math.deg(radians))
     return angle, dx, dy
+end
+
+---@param item InventoryItem | nil
+---@return boolean
+local function isBlockedAssaultRifle(item)
+    return item ~= nil and item:getFullType() == WEAPON_ITEM_ID
+end
+
+---@param items any[] | nil
+---@return boolean
+local function hasBlockedInventoryItem(items)
+    if not items then return false end
+
+    for _, entry in ipairs(items) do
+        local item = entry
+
+        if type(entry) == "table" and entry.items then
+            for _, subItem in ipairs(entry.items) do
+                if isBlockedAssaultRifle(subItem) then
+                    return true
+                end
+            end
+        elseif isBlockedAssaultRifle(item) then
+            return true
+        end
+    end
+
+    return false
+end
+
+---@param witem IsoWorldInventoryObject | nil
+---@return boolean
+local function isBlockedWorldItem(witem)
+    return witem ~= nil and witem:getItem() ~= nil and isBlockedAssaultRifle(witem:getItem())
+end
+
+---@param witems table | nil
+---@return boolean
+local function hasBlockedWorldItem(witems)
+    if not witems then return false end
+    for _, witem in ipairs(witems) do
+        if isBlockedWorldItem(witem) then
+            return true
+        end
+    end
+    return false
 end
 
 ---@param square IsoGridSquare?
@@ -238,8 +287,54 @@ local function spawnTurret(self)
     self.currentYRotation = 0
     self.lastShotMs = 0
     self.killCount = 0
+    self.lastTeleportMs = getTimestampMs()
 
     applyTurretRotation(self, 0)
+end
+
+---@param self EffectZombiesTurret
+local function teleportTurretToPlayer(self)
+    ---@type IsoPlayer?
+    local player = getPlayer()
+    if not player then return end
+
+    ---@type IsoGridSquare?
+    local targetSquare = player:getSquare()
+    if not targetSquare then return end
+
+    if self.worldGunItem then
+        local container = self.worldGunItem:getContainer()
+        if container then
+            container:Remove(self.worldGunItem)
+        end
+        self.worldGunItem:Remove()
+    end
+
+    if self.worldGunObj then
+        ---@type IsoGridSquare?
+        local currentSquare = self.worldGunObj:getSquare()
+        if currentSquare == targetSquare then return end
+        ChaosUtils.RemoveWorldObject(self.worldGunObj)
+    end
+
+    ---@type InventoryItem?
+    local item = self.worldGunItem
+    if not item then
+        item = instanceItem(WEAPON_ITEM_ID)
+    end
+    if not item then return end
+
+    ---@type InventoryItem?
+    local placedItem = targetSquare:AddWorldInventoryItem(item, 0.5, 0.5, 0.5, false)
+    if not placedItem then return end
+
+    placedItem:setWorldXRotation(270)
+    placedItem:setWorldZRotation(0)
+
+    self.worldGunItem = placedItem
+    self.worldGunObj = placedItem:getWorldItem()
+
+    applyTurretRotation(self, self.currentYRotation or 0)
 end
 
 ---@param self EffectZombiesTurret
@@ -334,11 +429,89 @@ end
 function EffectZombiesTurret:OnStart()
     ChaosEffectBase:OnStart()
     spawnTurret(self)
+
+    self._old_onGrabItems = ISInventoryPaneContextMenu.onGrabItems
+    self._old_onGrabOneItems = ISInventoryPaneContextMenu.onGrabOneItems
+    self._old_onUpgradeWeapon = ISInventoryPaneContextMenu.onUpgradeWeapon
+    self._old_onRackGun = ISInventoryPaneContextMenu.onRackGun
+    self._old_OnTwoHandsEquip = ISInventoryPaneContextMenu.OnTwoHandsEquip
+
+    self._old_onGrabWItem = ISWorldObjectContextMenu.onGrabWItem
+    self._old_onGrabHalfWItems = ISWorldObjectContextMenu.onGrabHalfWItems
+    self._old_onGrabAllWItems = ISWorldObjectContextMenu.onGrabAllWItems
+
+    ISInventoryPaneContextMenu.onGrabItems = function(items, player)
+        if hasBlockedInventoryItem(items) then
+            return
+        end
+        return self._old_onGrabItems(items, player)
+    end
+
+    ISInventoryPaneContextMenu.onGrabOneItems = function(items, player)
+        if hasBlockedInventoryItem(items) then
+            return
+        end
+        return self._old_onGrabOneItems(items, player)
+    end
+
+    ISInventoryPaneContextMenu.onUpgradeWeapon = function(weapon, part, player)
+        if isBlockedAssaultRifle(weapon) then
+            return
+        end
+        return self._old_onUpgradeWeapon(weapon, part, player)
+    end
+
+    ISInventoryPaneContextMenu.onRackGun = function(playerObj, weapon)
+        if isBlockedAssaultRifle(weapon) then
+            return
+        end
+        return self._old_onRackGun(playerObj, weapon)
+    end
+
+    ISInventoryPaneContextMenu.OnTwoHandsEquip = function(items, player)
+        if hasBlockedInventoryItem(items) then
+            return
+        end
+        return self._old_OnTwoHandsEquip(items, player)
+    end
+
+    ISWorldObjectContextMenu.onGrabWItem = function(worldobjects, WItem, player)
+        if isBlockedWorldItem(WItem) then
+            return
+        end
+        return self._old_onGrabWItem(worldobjects, WItem, player)
+    end
+
+    ISWorldObjectContextMenu.onGrabHalfWItems = function(worldobjects, WItems, player)
+        if hasBlockedWorldItem(WItems) then
+            return
+        end
+        return self._old_onGrabHalfWItems(worldobjects, WItems, player)
+    end
+
+    ISWorldObjectContextMenu.onGrabAllWItems = function(worldobjects, WItems, player)
+        if hasBlockedWorldItem(WItems) then
+            return
+        end
+        return self._old_onGrabAllWItems(worldobjects, WItems, player)
+    end
 end
 
 ---@param deltaMs integer
 function EffectZombiesTurret:OnTick(deltaMs)
     if not self.worldGunItem or not self.worldGunObj then return end
+
+    ---@type integer
+    local nowMs = getTimestampMs()
+    if nowMs - (self.lastTeleportMs or 0) >= TELEPORT_INTERVAL_MS then
+        self.lastTeleportMs = nowMs
+        teleportTurretToPlayer(self)
+        if not self.worldGunItem or not self.worldGunObj then return end
+    end
+
+    if self.worldGunObj then
+        self.worldGunObj:setTargetAlpha(0, 1.0)
+    end
 
     ---@type IsoGridSquare?
     local worldGunSquare = self.worldGunObj:getSquare()
@@ -400,6 +573,14 @@ end
 function EffectZombiesTurret:OnEnd()
     ChaosEffectBase:OnEnd()
 
+    if self.worldGunItem then
+        local container = self.worldGunItem:getContainer()
+        if container then
+            container:Remove(self.worldGunItem)
+        end
+        self.worldGunItem:Remove()
+    end
+
     if self.worldGunObj then
         ChaosUtils.RemoveWorldObject(self.worldGunObj)
     end
@@ -407,4 +588,44 @@ function EffectZombiesTurret:OnEnd()
     self.worldGunItem = nil
     self.worldGunObj = nil
     self.target = nil
+
+    if self._old_onGrabItems then
+        ISInventoryPaneContextMenu.onGrabItems = self._old_onGrabItems
+        self._old_onGrabItems = nil
+    end
+
+    if self._old_onGrabOneItems then
+        ISInventoryPaneContextMenu.onGrabOneItems = self._old_onGrabOneItems
+        self._old_onGrabOneItems = nil
+    end
+
+    if self._old_onUpgradeWeapon then
+        ISInventoryPaneContextMenu.onUpgradeWeapon = self._old_onUpgradeWeapon
+        self._old_onUpgradeWeapon = nil
+    end
+
+    if self._old_onRackGun then
+        ISInventoryPaneContextMenu.onRackGun = self._old_onRackGun
+        self._old_onRackGun = nil
+    end
+
+    if self._old_OnTwoHandsEquip then
+        ISInventoryPaneContextMenu.OnTwoHandsEquip = self._old_OnTwoHandsEquip
+        self._old_OnTwoHandsEquip = nil
+    end
+
+    if self._old_onGrabWItem then
+        ISWorldObjectContextMenu.onGrabWItem = self._old_onGrabWItem
+        self._old_onGrabWItem = nil
+    end
+
+    if self._old_onGrabHalfWItems then
+        ISWorldObjectContextMenu.onGrabHalfWItems = self._old_onGrabHalfWItems
+        self._old_onGrabHalfWItems = nil
+    end
+
+    if self._old_onGrabAllWItems then
+        ISWorldObjectContextMenu.onGrabAllWItems = self._old_onGrabAllWItems
+        self._old_onGrabAllWItems = nil
+    end
 end

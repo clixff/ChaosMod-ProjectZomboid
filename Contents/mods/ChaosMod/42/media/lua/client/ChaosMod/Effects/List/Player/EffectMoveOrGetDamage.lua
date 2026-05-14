@@ -1,6 +1,7 @@
 ---@class EffectMoveOrGetDamage : ChaosEffectBase
 ---@field checkIntervalMs integer
 ---@field cooldownMs integer
+---@field accumulatedDist number
 ---@field lastX number
 ---@field lastY number
 ---@field lastZ number
@@ -14,6 +15,7 @@ function EffectMoveOrGetDamage:OnStart()
     ChaosEffectBase:OnStart()
     self.checkIntervalMs = 0
     self.cooldownMs = DAMAGE_COOLDOWN_MS
+    self.accumulatedDist = 0
 
     ChaosPlayer.SayLineByColor(getPlayer(), "Move or get damage", ChaosPlayerChatColors.red)
 
@@ -33,17 +35,17 @@ function EffectMoveOrGetDamage:OnTick(deltaMs)
     self.cooldownMs = self.cooldownMs - deltaMs
     self.checkIntervalMs = self.checkIntervalMs + deltaMs
 
-    if self.checkIntervalMs < CHECK_INTERVAL_MS then return end
-    self.checkIntervalMs = self.checkIntervalMs - CHECK_INTERVAL_MS
-
     local x, y, z = player:getX(), player:getY(), player:getZ()
-
-    local dist = ChaosUtils.distTo(x, y, self.lastX, self.lastY)
-    local movedEnough = dist >= MOVE_THRESHOLD or z ~= self.lastZ
-
+    self.accumulatedDist = self.accumulatedDist + ChaosUtils.distTo3D(x, y, z, self.lastX, self.lastY, self.lastZ)
     self.lastX = x
     self.lastY = y
     self.lastZ = z
+
+    if self.checkIntervalMs < CHECK_INTERVAL_MS then return end
+    self.checkIntervalMs = self.checkIntervalMs - CHECK_INTERVAL_MS
+
+    local movedEnough = self.accumulatedDist >= MOVE_THRESHOLD
+    self.accumulatedDist = 0
 
     if movedEnough then return end
     if self.cooldownMs > 0 then return end
@@ -54,7 +56,6 @@ function EffectMoveOrGetDamage:OnTick(deltaMs)
     if not square then return end
 
     ChaosUtils.TriggerExplosionAt(square, 3)
-    player:setKnockedDown(true)
 
     ChaosPlayer.SayLineByColor(player, "BOOM!", ChaosPlayerChatColors.red)
 end

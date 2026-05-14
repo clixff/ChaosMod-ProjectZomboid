@@ -26,7 +26,7 @@ import {
   getAvailableLanguages,
 } from "./src/commands/lang.ts";
 import { loadEffects, saveEffects } from "./src/effects.ts";
-import { setRecentEffectsMax } from "./src/effectsRegistry.ts";
+import { syncEffectsForModVersion } from "./src/versionFile.ts";
 import { startServer } from "./src/server.ts";
 import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
@@ -92,7 +92,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.1.0";
+const VERSION = "1.1.1";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -336,8 +336,6 @@ function applyLoadedConfig(
   targetConfig.recent_effects_block_buffer =
     nextConfig.recent_effects_block_buffer;
 
-  setRecentEffectsMax(targetConfig.recent_effects_block_buffer);
-
   initLocalization(modFolder, targetConfig.lang);
 }
 
@@ -407,6 +405,9 @@ async function main(): Promise<void> {
   }
   const config =
     modFolder && luaFolder ? loadConfig(modFolder, luaFolder) : null;
+  if (modFolder && luaFolder) {
+    syncEffectsForModVersion(modFolder, luaFolder, VERSION);
+  }
   const effects =
     modFolder && luaFolder ? loadEffects(modFolder, luaFolder) : [];
 
@@ -497,11 +498,16 @@ async function main(): Promise<void> {
       }
     });
 
-    bridge.on("vote_start", () => {
+    bridge.on("vote_start", (payload) => {
       logger.debug("[Bridge] vote_start");
-      if (config?.streamer_mode.voting_enabled) {
-        votingManager.start();
-      }
+      if (!config?.streamer_mode.voting_enabled) return;
+      const rawEffects = payload["effects"];
+      const visibleEffectIds = Array.isArray(rawEffects)
+        ? rawEffects.filter((id): id is string => typeof id === "string")
+        : [];
+      const rawSecret = payload["secret_effect"];
+      const secretEffectId = typeof rawSecret === "string" && rawSecret !== "" ? rawSecret : null;
+      votingManager.start(visibleEffectIds, secretEffectId);
     });
 
     bridge.on("reload_config", () => {
@@ -1009,8 +1015,7 @@ async function main(): Promise<void> {
                 effects,
                 config?.streamer_mode.donate_price_groups ?? [],
                 Boolean(
-                  config?.streamer_mode.enable_donate &&
-                    daProvider.isConnected,
+                  config?.streamer_mode.enable_donate && daProvider.isConnected,
                 ),
               )
             : writeEffectsCsv(luaFolder);
@@ -1037,7 +1042,7 @@ async function main(): Promise<void> {
           name,
           entry.effect_id,
           String(e.enabled),
-          `${e.chance}%`,
+          String(e.chance),
           duration,
           entry.price_group,
           entry.price_result != null ? String(entry.price_result) : "",
@@ -1233,8 +1238,7 @@ async function main(): Promise<void> {
               effects,
               config?.streamer_mode.donate_price_groups ?? [],
               Boolean(
-                config?.streamer_mode.enable_donate &&
-                  daProvider.isConnected,
+                config?.streamer_mode.enable_donate && daProvider.isConnected,
               ),
             )
           : writeEffectsCsv(luaFolder);

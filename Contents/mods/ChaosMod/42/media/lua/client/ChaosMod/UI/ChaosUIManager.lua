@@ -75,6 +75,23 @@ function ChaosUIManager.onDonateEffectActivated(username, effectId)
     end
 end
 
+--- Refresh visible UI after a language reload so effect names and labels switch immediately.
+function ChaosUIManager:OnLanguageLoaded()
+    if self.hud and self.hud.OnLanguageLoaded then
+        self.hud:OnLanguageLoaded()
+    end
+    if self.effectsWindow and self.effectsWindow:getIsVisible() and self.effectsWindow.fillWithEffects then
+        self.effectsWindow.title = ChaosLocalization.GetString("core", "effects")
+        self.effectsWindow:fillWithEffects()
+    end
+    if self.settingsWindow then
+        self.settingsWindow.title = ChaosLocalization.GetString("settings", "title")
+        if self.settingsWindow.effectsPanel and self.settingsWindow.effectsPanel.RefillList then
+            self.settingsWindow.effectsPanel:RefillList()
+        end
+    end
+end
+
 function ChaosUIManager:ToggleEffectsWindow()
     if self.effectsWindow and self.effectsWindow:getIsVisible() then
         self.effectsWindow:setVisible(false)

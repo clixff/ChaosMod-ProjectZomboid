@@ -2,7 +2,7 @@
 ---@field spawnTimerMs integer
 EffectZombiesRain = ChaosEffectBase:derive("EffectZombiesRain", "zombies_rain")
 
-local SPAWN_INTERVAL_MS = 2000
+local SPAWN_INTERVAL_MS = 1000
 local MIN_SPAWN_RADIUS = 6
 local MAX_SPAWN_RADIUS = 25
 

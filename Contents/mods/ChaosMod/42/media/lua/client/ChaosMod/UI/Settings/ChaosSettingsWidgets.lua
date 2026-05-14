@@ -7,14 +7,14 @@ require "ISUI/ISComboBox"
 ---@class ChaosSettingsWidgets
 ChaosSettingsWidgets = ChaosSettingsWidgets or {}
 
-local W = ChaosSettingsWidgets
+local W              = ChaosSettingsWidgets
 
-W.LABEL_WIDTH      = 280
-W.CONTROL_WIDTH    = 240
-W.ROW_HEIGHT       = 22
-W.ROW_GAP          = 8
-W.SECTION_GAP      = 14
-W.SECTION_HEADER_H = 24
+W.LABEL_WIDTH        = 280
+W.CONTROL_WIDTH      = 240
+W.ROW_HEIGHT         = 22
+W.ROW_GAP            = 8
+W.SECTION_GAP        = 14
+W.SECTION_HEADER_H   = 24
 
 ---@param value any
 ---@return number | nil
@@ -35,7 +35,8 @@ W.toFloatOrNil = toFloatOrNil
 ---@param text string
 ---@return ISLabel
 function W.MakeLabel(parent, x, y, w, text)
-    local label = ISLabel:new(x, y, ChaosUIManager.GetScaledWidth(W.ROW_HEIGHT), text or "", 1, 1, 1, 1, UIFont.Small, true)
+    local label = ISLabel:new(x, y, ChaosUIManager.GetScaledWidth(W.ROW_HEIGHT), text or "", 1, 1, 1, 1, UIFont.Small,
+        true)
     label:initialise()
     label:instantiate()
     parent:addChild(label)
@@ -49,7 +50,8 @@ end
 ---@param text string
 ---@return ISLabel
 function W.MakeSectionHeader(parent, x, y, w, text)
-    local label = ISLabel:new(x, y, ChaosUIManager.GetScaledWidth(W.SECTION_HEADER_H), text or "", 1, 0.85, 0.55, 1, UIFont.Medium, true)
+    local label = ISLabel:new(x, y, ChaosUIManager.GetScaledWidth(W.SECTION_HEADER_H), text or "", 1, 0.85, 0.55, 1,
+        UIFont.Medium, true)
     label:initialise()
     label:instantiate()
     parent:addChild(label)
@@ -97,6 +99,9 @@ function W.MakeNumberInput(parent, x, y, w, initial, opts)
     box.font = UIFont.NewSmall
     box:initialise()
     box:instantiate()
+    if not opts then
+        return box
+    end
     if not opts.float then
         box:setOnlyNumbers(true)
     end
@@ -121,6 +126,11 @@ function W.MakeTextInput(parent, x, y, w, initial, opts)
     box.font = UIFont.NewSmall
     box:initialise()
     box:instantiate()
+
+    if not opts then
+        return box
+    end
+
     if opts.maxLen then
         box:setMaxTextLength(opts.maxLen)
     end

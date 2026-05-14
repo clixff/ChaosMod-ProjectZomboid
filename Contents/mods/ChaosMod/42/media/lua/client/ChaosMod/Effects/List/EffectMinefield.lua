@@ -155,10 +155,6 @@ function EffectMinefield:TriggerMineAtSquare(square, character)
     end
 
     ChaosUtils.TriggerExplosionAt(square, EXPLOSION_RADIUS)
-
-    if instanceof(character, "IsoPlayer") then
-        character:setKnockedDown(true)
-    end
 end
 
 function EffectMinefield:OnStart()

@@ -22,8 +22,8 @@ function EffectPlayerCantOpenDoors:OnStart()
     end
 
     self.originalOnOpenCloseDoor = ISWorldObjectContextMenu.onOpenCloseDoor
-    ISWorldObjectContextMenu.onOpenCloseDoor = function(worldobjects, door, player)
-        playLockedSoundForPlayer(getSpecificPlayer(player))
+    ISWorldObjectContextMenu.onOpenCloseDoor = function(worldobjects, door, playerIndex)
+        playLockedSoundForPlayer(getSpecificPlayer(playerIndex))
     end
 
     self.originalComplete = ISOpenCloseDoor.complete

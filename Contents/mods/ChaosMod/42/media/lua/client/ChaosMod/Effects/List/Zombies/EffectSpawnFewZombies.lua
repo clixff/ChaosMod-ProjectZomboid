@@ -6,7 +6,7 @@ function EffectSpawnFewZombies:OnStart()
     local player = getPlayer()
     if not player then return end
 
-    local zombiesToSpawn = 3
+    local zombiesToSpawn = ChaosUtils.RandIntegerRange(4, 6)
     local x1 = math.floor(player:getX())
     local y1 = math.floor(player:getY())
 
@@ -20,8 +20,8 @@ function EffectSpawnFewZombies:OnStart()
             if zombies and zombies:size() > 0 then
                 local zombie = zombies:getFirst()
                 if zombie then
-                    zombie:setTarget(player)
-                    zombie:setTurnAlertedValues(x1, y1)
+                    zombie:dressInRandomOutfit()
+                    ChaosZombie.MoveToPlayerSpotted(zombie, player)
                 end
             end
         end

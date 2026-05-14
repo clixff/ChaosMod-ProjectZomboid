@@ -12,4 +12,12 @@ function EffectRemoveCarFuel:OnStart()
 
     ChaosVehicle.setFuelPercent(vehicle, 0.0)
     vehicle:updatePartStats()
+
+    local gasTankPart = vehicle:getPartById("GasTank")
+    if gasTankPart then
+        local maxValue = math.floor(gasTankPart:getContainerCapacity())
+        local currentValue = math.floor(gasTankPart:getContainerContentAmount())
+        ChaosPlayer.SayLineByColor(player, "New fuel: " .. currentValue .. "/" .. maxValue .. "L",
+            ChaosPlayerChatColors.red)
+    end
 end

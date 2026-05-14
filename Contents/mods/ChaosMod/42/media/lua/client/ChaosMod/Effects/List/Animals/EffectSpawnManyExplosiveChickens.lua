@@ -24,10 +24,8 @@ function EffectSpawnManyExplosiveChickens:OnStart()
             local chicken = ChaosAnimals.SpawnAnimal(square:getX(), square:getY(), square:getZ(), "hen", "rhodeisland")
             if chicken then
                 local sa = SpecialAnimal:new(chicken)
-                sa.followPlayer = false
+                sa.maxRepathTicks = 250
                 table.insert(self.chickens, chicken)
-                chicken:changeStress(80)
-                chicken:updateStress()
                 spawned = spawned + 1
             end
         end

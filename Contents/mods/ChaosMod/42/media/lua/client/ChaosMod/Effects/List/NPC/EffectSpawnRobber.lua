@@ -20,16 +20,11 @@ function EffectSpawnRobber:OnStart()
     npc:AddTag("item_robber")
     self.npc = npc
 
-    local inventory = player:getInventory()
     ---@type InventoryItem[]
     local allItems = {}
-    local invItems = inventory:getItems()
-    for i = 0, invItems:size() - 1 do
-        local it = invItems:get(i)
-        if it and not it:IsInventoryContainer() then
-            table.insert(allItems, it)
-        end
-    end
+    ChaosPlayer.CollectAllItems(player:getInventory(), allItems, false)
+
+
     if #allItems == 0 then return end
 
     local worn = player:getWornItems()
@@ -42,7 +37,7 @@ function EffectSpawnRobber:OnStart()
         if worn and worn:contains(stolenItem) then
             player:removeWornItem(stolenItem)
         end
-        inventory:Remove(stolenItem)
+        player:getInventory():Remove(stolenItem)
         zombie:addItemToSpawnAtDeath(stolenItem)
 
         local imgCode = ChaosUtils.GetImgCodeByItemTexture(stolenItem)

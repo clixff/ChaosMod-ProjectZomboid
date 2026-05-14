@@ -2,6 +2,10 @@
 ---@field spawnedZombies ArrayList<IsoZombie>
 ---@field shotgun HandWeapon | nil
 ---@field attackFinishedHandler fun(player: IsoPlayer, weapon: HandWeapon) | nil
+---@field _oldOnUnloadBulletsFromFirearm fun(playerObj: IsoPlayer, weapon: HandWeapon) | nil
+---@field _oldOnRackGun fun(playerObj: IsoPlayer, weapon: HandWeapon) | nil
+---@field _oldUnloadIsValid fun(action: any): boolean | nil
+---@field _oldRackIsValid fun(action: any): boolean | nil
 ---@field zombieMoveTimerMs integer
 EffectDOOM = ChaosEffectBase:derive("EffectDOOM", "doom")
 
@@ -139,6 +143,13 @@ function EffectDOOM:SpawnZombiesFromZLevel(player, targetZ, usedSquares)
     end
 end
 
+---@param weapon InventoryItem | nil
+---@return boolean
+function EffectDOOM:IsBlockedWeapon(weapon)
+    if not weapon or not self.shotgun then return false end
+    return weapon:getID() == self.shotgun:getID()
+end
+
 function EffectDOOM:OnStart()
     ChaosEffectBase:OnStart()
 
@@ -173,14 +184,51 @@ function EffectDOOM:OnStart()
         end
     end
 
-    self.attackFinishedHandler = function(attackPlayer, weapon)
+    local attackFinishedHandler = function(attackPlayer, weapon)
         if not attackPlayer or attackPlayer ~= player then return end
         refillShotgun(weapon)
         if self.shotgun then
             refillShotgun(self.shotgun)
         end
     end
-    Events.OnPlayerAttackFinished.Add(self.attackFinishedHandler)
+    self.attackFinishedHandler = attackFinishedHandler
+    Events.OnPlayerAttackFinished.Add(attackFinishedHandler)
+
+    self._oldOnUnloadBulletsFromFirearm = ISInventoryPaneContextMenu.onUnloadBulletsFromFirearm
+    self._oldOnRackGun = ISInventoryPaneContextMenu.onRackGun
+
+    ISInventoryPaneContextMenu.onUnloadBulletsFromFirearm = function(playerObj, weapon)
+        if self:IsBlockedWeapon(weapon) then
+            return
+        end
+        ---@diagnostic disable-next-line: need-check-nil
+        return self._oldOnUnloadBulletsFromFirearm(playerObj, weapon)
+    end
+
+    ISInventoryPaneContextMenu.onRackGun = function(playerObj, weapon)
+        if self:IsBlockedWeapon(weapon) then
+            return
+        end
+        ---@diagnostic disable-next-line: need-check-nil
+        return self._oldOnRackGun(playerObj, weapon)
+    end
+
+    self._oldUnloadIsValid = ISUnloadBulletsFromFirearm.isValid
+    self._oldRackIsValid = ISRackFirearm.isValid
+
+    ISUnloadBulletsFromFirearm.isValid = function(action)
+        if self:IsBlockedWeapon(action.gun) then
+            return false
+        end
+        return self._oldUnloadIsValid(action)
+    end
+
+    ISRackFirearm.isValid = function(action)
+        if self:IsBlockedWeapon(action.gun) then
+            return false
+        end
+        return self._oldRackIsValid(action)
+    end
 
     self.zombieMoveTimerMs = 0
 
@@ -228,6 +276,26 @@ function EffectDOOM:OnEnd()
     if self.attackFinishedHandler then
         Events.OnPlayerAttackFinished.Remove(self.attackFinishedHandler)
         self.attackFinishedHandler = nil
+    end
+
+    if self._oldOnUnloadBulletsFromFirearm then
+        ISInventoryPaneContextMenu.onUnloadBulletsFromFirearm = self._oldOnUnloadBulletsFromFirearm
+        self._oldOnUnloadBulletsFromFirearm = nil
+    end
+
+    if self._oldOnRackGun then
+        ISInventoryPaneContextMenu.onRackGun = self._oldOnRackGun
+        self._oldOnRackGun = nil
+    end
+
+    if self._oldUnloadIsValid then
+        ISUnloadBulletsFromFirearm.isValid = self._oldUnloadIsValid
+        self._oldUnloadIsValid = nil
+    end
+
+    if self._oldRackIsValid then
+        ISRackFirearm.isValid = self._oldRackIsValid
+        self._oldRackIsValid = nil
     end
 
     local player = getPlayer()
