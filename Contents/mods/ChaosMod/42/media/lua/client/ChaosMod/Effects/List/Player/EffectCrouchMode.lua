@@ -10,6 +10,7 @@ end
 
 function EffectCrouchMode:OnStart()
     ChaosEffectBase:OnStart()
+    ChaosVehicle.ExitVehicle(getPlayer())
     Events.OnPlayerUpdate.Add(forceSneak)
 end
 

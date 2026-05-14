@@ -196,6 +196,17 @@ function ChaosEffectsManager.DisableSpecificEffects(effectIds)
     end
 end
 
+--- Refreshes the localized `effectName` field on every currently active effect, so the
+--- active effects UI shows the new translation immediately after a language change.
+function ChaosEffectsManager.RefreshActiveEffectNames()
+    if not ChaosEffectsManager.activeEffects then return end
+    for _, effect in ipairs(ChaosEffectsManager.activeEffects) do
+        if effect and effect.effectId then
+            effect.effectName = ChaosLocalization.GetString("effects", effect.effectId)
+        end
+    end
+end
+
 function ChaosEffectsManager.StopAllEffects()
     for i = #ChaosEffectsManager.activeEffects, 1, -1 do
         local effect = ChaosEffectsManager.activeEffects[i]

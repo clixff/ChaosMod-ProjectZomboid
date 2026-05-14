@@ -283,6 +283,17 @@ function ChaosEffectsRegistry.CreateNewEffectData(effectJsonData)
     return newEffectData
 end
 
+--- Refreshes the cached localized `name` on every registered effect using the currently
+--- loaded language data. Call after `ChaosLocalization.ReloadLanguages()` so UI that reads
+--- `effect.name` (e.g. the in-game effect selection window) shows the new translations
+--- without requiring the mod to be restarted.
+function ChaosEffectsRegistry.RefreshEffectNames()
+    if not ChaosEffectsRegistry.effects then return end
+    for id, effect in pairs(ChaosEffectsRegistry.effects) do
+        effect.name = ChaosLocalization.GetString("effects", id)
+    end
+end
+
 ---@return table
 function ChaosEffectsRegistry.BuildJsonSnapshot()
     local order = ChaosEffectsRegistry.effectOrder or {}

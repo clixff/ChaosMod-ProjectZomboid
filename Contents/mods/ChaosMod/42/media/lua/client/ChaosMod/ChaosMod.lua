@@ -35,7 +35,7 @@ function ChaosMod.StartMod()
     ChaosConfig.LoadConfigFromDisk()
     -- Reload localization files for configured language
     ChaosLocalization.ReloadLanguages()
-    ChaosUIManager.hud:OnLanguageLoaded()
+    ChaosUIManager:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
     -- Clear position history so it starts fresh from this session
@@ -193,7 +193,7 @@ function ChaosMod.OnGameStart()
     ChaosConfig.LoadConfigFromDisk()
     -- Reload localization files for configured language
     ChaosLocalization.ReloadLanguages()
-    ChaosUIManager.hud:OnLanguageLoaded()
+    ChaosUIManager:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
 
@@ -278,11 +278,11 @@ function ChaosMod.RegisterBridgeHandlers()
     ChaosBridge.On("reload_config", function(_payload)
         print("[ChaosMod] Reloading config and effects via bridge")
         ChaosConfig.LoadConfigFromDisk()
-        ChaosLocalization.ReloadLanguages()
-        if ChaosUIManager and ChaosUIManager.hud then
-            ChaosUIManager.hud:OnLanguageLoaded()
-        end
         ChaosEffectsRegistry.Initialize()
+        ChaosLocalization.ReloadLanguages()
+        if ChaosUIManager and ChaosUIManager.OnLanguageLoaded then
+            ChaosUIManager:OnLanguageLoaded()
+        end
     end)
 
     ChaosBridge.On("activate_effects", function(payload)

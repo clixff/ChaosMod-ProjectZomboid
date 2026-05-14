@@ -14,6 +14,7 @@
 - Increased NPC damage to player
 - StreamerApp now does not generate effects in JavaScript, and get random effects for vote from Lua.
 - Effect `chance` is now a floating-point weight (min `0.0`, no max cap; `0.0` disables the effect). The in-game settings UI, StreamerApp dashboard, and CSV/XLSX exports no longer treat it as a 0-100 percentage and no longer render a `%` suffix.
+- Changing the in-game language now immediately updates effect names in the in-game effect selection window, the settings effects list, and currently active effects — previously the names only refreshed after toggling the mod off and on.
 
 ### Effect Fixes
 

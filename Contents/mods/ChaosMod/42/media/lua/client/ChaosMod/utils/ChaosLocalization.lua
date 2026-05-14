@@ -71,4 +71,12 @@ function ChaosLocalization.ReloadLanguages()
     if lang ~= "en" then
         ChaosLocalization.LoadLanguage(lang)
     end
+
+    -- Refresh cached localized names that were captured at registry load / effect start time.
+    if ChaosEffectsRegistry and ChaosEffectsRegistry.RefreshEffectNames then
+        ChaosEffectsRegistry.RefreshEffectNames()
+    end
+    if ChaosEffectsManager and ChaosEffectsManager.RefreshActiveEffectNames then
+        ChaosEffectsManager.RefreshActiveEffectNames()
+    end
 end

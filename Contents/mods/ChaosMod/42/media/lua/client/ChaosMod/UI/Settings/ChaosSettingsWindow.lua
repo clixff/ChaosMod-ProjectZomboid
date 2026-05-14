@@ -162,6 +162,9 @@ function ChaosSettingsWindow:OnSaveClicked()
         ChaosConfig.LoadConfigFromDisk()
     end
 
+    -- Reload language files first so the registry rebuild below picks up the new translations.
+    ChaosLocalization.ReloadLanguages()
+
     -- Persist working effects snapshot
     local effectsSnapshot = self:BuildEffectsSnapshot()
     if not ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", effectsSnapshot) then
@@ -170,10 +173,9 @@ function ChaosSettingsWindow:OnSaveClicked()
         ChaosEffectsRegistry.Initialize()
     end
 
-    -- Re-load language files so HUD labels switch immediately if lang changed
-    ChaosLocalization.ReloadLanguages()
-    if ChaosUIManager and ChaosUIManager.hud and ChaosUIManager.hud.OnLanguageLoaded then
-        ChaosUIManager.hud:OnLanguageLoaded()
+    -- Refresh dependent UI (HUD labels, effects window, settings panels)
+    if ChaosUIManager and ChaosUIManager.OnLanguageLoaded then
+        ChaosUIManager:OnLanguageLoaded()
     end
 
     -- Refresh window title and child panels' visible labels
