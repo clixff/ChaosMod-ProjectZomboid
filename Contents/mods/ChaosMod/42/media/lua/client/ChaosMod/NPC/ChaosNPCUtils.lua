@@ -23,6 +23,18 @@ function ChaosNPCUtils.OnTick(deltaMs)
     end
 end
 
+---@param target? IsoGameCharacter
+---@return boolean
+function ChaosNPCUtils.IsTargetGrappled(target)
+    if not target then return false end
+    if target:isBeingGrappled() then return true end
+    if target:isZombie() then
+        ---@cast target IsoZombie
+        if target:isReanimatedForGrappleOnly() then return true end
+    end
+    return false
+end
+
 ---@param npc ChaosNPC
 ---@return IsoGameCharacter?
 function ChaosNPCUtils.FindNewTargetForNPC(npc)
@@ -47,7 +59,7 @@ function ChaosNPCUtils.FindNewTargetForNPC(npc)
     for i = 0, allZombies:size() - 1 do
         local otherZombie = allZombies:get(i)
         if otherZombie then
-            if otherZombie:isAlive() and otherZombie ~= zombie then
+            if otherZombie:isAlive() and otherZombie ~= zombie and not ChaosNPCUtils.IsTargetGrappled(otherZombie) then
                 local dist = ChaosUtils.distTo(x1, y1, otherZombie:getX(), otherZombie:getY())
                 local z2 = otherZombie:getZ()
 
