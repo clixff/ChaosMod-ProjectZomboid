@@ -12,15 +12,17 @@ ChaosSettingsConfigPanel = ISPanel:derive("ChaosSettingsConfigPanel")
 local W = setmetatable({}, { __index = function(_, k) return ChaosSettingsWidgets[k] end })
 
 local LANG_OPTIONS = {
-    { key = "en", label = "en" },
-    { key = "ru", label = "ru" },
-    { key = "tr", label = "tr" },
-    { key = "pl", label = "pl" },
-    { key = "pt", label = "pt" },
-    { key = "es", label = "es" },
-    { key = "fr", label = "fr" },
-    { key = "zh", label = "zh" },
-    { key = "de", label = "de" },
+    { key = "en", label = "English" },
+    { key = "ru", label = "Russian" },
+    { key = "tr", label = "Turkish" },
+    { key = "pl", label = "Polish" },
+    { key = "pt", label = "Portuguese" },
+    { key = "es", label = "Spanish" },
+    { key = "fr", label = "French" },
+    { key = "zh", label = "Simplified Chinese" },
+    { key = "de", label = "German" },
+    { key = "ko", label = "Korean" },
+    { key = "jp", label = "Japanese" },
 }
 
 ---@param x number
@@ -117,7 +119,8 @@ function ChaosSettingsConfigPanel:rebuild()
 
     local function addHeader(textKey)
         y = y + sectionGap
-        local lbl = W.MakeSectionHeader(self, labelX, y, self.width - pad * 2, ChaosLocalization.GetString("settings", textKey))
+        local lbl = W.MakeSectionHeader(self, labelX, y, self.width - pad * 2,
+            ChaosLocalization.GetString("settings", textKey))
         table.insert(children, lbl)
         y = y + sectionH + rowGap
     end
@@ -138,45 +141,52 @@ function ChaosSettingsConfigPanel:rebuild()
     y = y + rowH + rowGap
 
     addLabelled("effects_interval_enabled")
-    self.controls.effects_interval_enabled = W.MakeCheckbox(self, controlX, y, "", cfg.effects_interval_enabled == true, function(checked)
-        cfg.effects_interval_enabled = checked
-    end)
+    self.controls.effects_interval_enabled = W.MakeCheckbox(self, controlX, y, "", cfg.effects_interval_enabled == true,
+        function(checked)
+            cfg.effects_interval_enabled = checked
+        end)
     table.insert(children, self.controls.effects_interval_enabled)
     y = y + rowH + rowGap
 
     addLabelled("effects_interval")
-    self.controls.effects_interval = W.MakeNumberInput(self, controlX, y, controlW, cfg.effects_interval or 45, { float = false, maxLen = 6 })
+    self.controls.effects_interval = W.MakeNumberInput(self, controlX, y, controlW, cfg.effects_interval or 45,
+        { float = false, maxLen = 6 })
     table.insert(children, self.controls.effects_interval)
     y = y + rowH + rowGap
 
     addLabelled("effects_duration_multiplier")
-    self.controls.effects_duration_multiplier = W.MakeNumberInput(self, controlX, y, controlW, cfg.effects_duration_multiplier or 1.0, { float = true, maxLen = 8 })
+    self.controls.effects_duration_multiplier = W.MakeNumberInput(self, controlX, y, controlW,
+        cfg.effects_duration_multiplier or 1.0, { float = true, maxLen = 8 })
     table.insert(children, self.controls.effects_duration_multiplier)
     y = y + rowH + rowGap
 
     addLabelled("recent_effects_block_buffer")
-    self.controls.recent_effects_block_buffer = W.MakeNumberInput(self, controlX, y, controlW, cfg.recent_effects_block_buffer or 90, { float = false, maxLen = 6 })
+    self.controls.recent_effects_block_buffer = W.MakeNumberInput(self, controlX, y, controlW,
+        cfg.recent_effects_block_buffer or 90, { float = false, maxLen = 6 })
     table.insert(children, self.controls.recent_effects_block_buffer)
     y = y + rowH + rowGap
 
     addLabelled("hide_progress_bar")
-    self.controls.hide_progress_bar = W.MakeCheckbox(self, controlX, y, "", cfg.hide_progress_bar == true, function(checked)
-        cfg.hide_progress_bar = checked
-    end)
+    self.controls.hide_progress_bar = W.MakeCheckbox(self, controlX, y, "", cfg.hide_progress_bar == true,
+        function(checked)
+            cfg.hide_progress_bar = checked
+        end)
     table.insert(children, self.controls.hide_progress_bar)
     y = y + rowH + rowGap
 
     addLabelled("ui_sounds_enabled")
-    self.controls.ui_sounds_enabled = W.MakeCheckbox(self, controlX, y, "", cfg.ui_sounds_enabled == true, function(checked)
-        cfg.ui_sounds_enabled = checked
-    end)
+    self.controls.ui_sounds_enabled = W.MakeCheckbox(self, controlX, y, "", cfg.ui_sounds_enabled == true,
+        function(checked)
+            cfg.ui_sounds_enabled = checked
+        end)
     table.insert(children, self.controls.ui_sounds_enabled)
     y = y + rowH + rowGap
 
     addLabelled("ignore_effect_chances")
-    self.controls.ignore_effect_chances = W.MakeCheckbox(self, controlX, y, "", cfg.ignore_effect_chances == true, function(checked)
-        cfg.ignore_effect_chances = checked
-    end)
+    self.controls.ignore_effect_chances = W.MakeCheckbox(self, controlX, y, "", cfg.ignore_effect_chances == true,
+        function(checked)
+            cfg.ignore_effect_chances = checked
+        end)
     table.insert(children, self.controls.ignore_effect_chances)
     y = y + rowH + rowGap
 
@@ -185,9 +195,10 @@ function ChaosSettingsConfigPanel:rebuild()
     addHeader("section_streamer_mode")
 
     addLabelled("streamer_mode_enabled")
-    self.controls.streamer_mode_enabled = W.MakeCheckbox(self, controlX, y, "", sm.streamer_mode_enabled == true, function(c)
-        sm.streamer_mode_enabled = c
-    end)
+    self.controls.streamer_mode_enabled = W.MakeCheckbox(self, controlX, y, "", sm.streamer_mode_enabled == true,
+        function(c)
+            sm.streamer_mode_enabled = c
+        end)
     table.insert(children, self.controls.streamer_mode_enabled)
     y = y + rowH + rowGap
 
@@ -199,7 +210,8 @@ function ChaosSettingsConfigPanel:rebuild()
     y = y + rowH + rowGap
 
     addLabelled("vote_start_time")
-    self.controls.vote_start_time = W.MakeNumberInput(self, controlX, y, controlW, cfg.vote_start_time or 10, { float = false, maxLen = 6 })
+    self.controls.vote_start_time = W.MakeNumberInput(self, controlX, y, controlW, cfg.vote_start_time or 10,
+        { float = false, maxLen = 6 })
     table.insert(children, self.controls.vote_start_time)
     y = y + rowH + rowGap
 
@@ -243,35 +255,40 @@ function ChaosSettingsConfigPanel:rebuild()
     y = y + rowH + rowGap
 
     addLabelled("use_zombie_nicknames")
-    self.controls.use_zombie_nicknames = W.MakeCheckbox(self, controlX, y, "", sm.use_zombie_nicknames == true, function(c)
-        sm.use_zombie_nicknames = c
-    end)
+    self.controls.use_zombie_nicknames = W.MakeCheckbox(self, controlX, y, "", sm.use_zombie_nicknames == true,
+        function(c)
+            sm.use_zombie_nicknames = c
+        end)
     table.insert(children, self.controls.use_zombie_nicknames)
     y = y + rowH + rowGap
 
     addLabelled("use_animals_nicknames")
-    self.controls.use_animals_nicknames = W.MakeCheckbox(self, controlX, y, "", sm.use_animals_nicknames == true, function(c)
-        sm.use_animals_nicknames = c
-    end)
+    self.controls.use_animals_nicknames = W.MakeCheckbox(self, controlX, y, "", sm.use_animals_nicknames == true,
+        function(c)
+            sm.use_animals_nicknames = c
+        end)
     table.insert(children, self.controls.use_animals_nicknames)
     y = y + rowH + rowGap
 
     addLabelled("render_chat_messages")
-    self.controls.render_chat_messages = W.MakeCheckbox(self, controlX, y, "", sm.render_chat_messages == true, function(c)
-        sm.render_chat_messages = c
-    end)
+    self.controls.render_chat_messages = W.MakeCheckbox(self, controlX, y, "", sm.render_chat_messages == true,
+        function(c)
+            sm.render_chat_messages = c
+        end)
     table.insert(children, self.controls.render_chat_messages)
     y = y + rowH + rowGap
 
     addLabelled("say_killed_zombie_name")
-    self.controls.say_killed_zombie_name = W.MakeCheckbox(self, controlX, y, "", sm.say_killed_zombie_name == true, function(c)
-        sm.say_killed_zombie_name = c
-    end)
+    self.controls.say_killed_zombie_name = W.MakeCheckbox(self, controlX, y, "", sm.say_killed_zombie_name == true,
+        function(c)
+            sm.say_killed_zombie_name = c
+        end)
     table.insert(children, self.controls.say_killed_zombie_name)
     y = y + rowH + rowGap
 
     addLabelled("zombie_nicknames_buffer")
-    self.controls.zombie_nicknames_buffer = W.MakeNumberInput(self, controlX, y, controlW, sm.zombie_nicknames_buffer or 150, { float = false, maxLen = 6 })
+    self.controls.zombie_nicknames_buffer = W.MakeNumberInput(self, controlX, y, controlW,
+        sm.zombie_nicknames_buffer or 150, { float = false, maxLen = 6 })
     table.insert(children, self.controls.zombie_nicknames_buffer)
     y = y + rowH + rowGap
 
@@ -309,7 +326,8 @@ function ChaosSettingsConfigPanel:rebuild()
     for i, group in ipairs(sm.donate_price_groups) do
         local nameBox = W.MakeTextInput(self, labelX, y, nameW, group.group or "", { maxLen = 64 })
         table.insert(children, nameBox)
-        local priceBox = W.MakeNumberInput(self, labelX + nameW + pad, y, priceW, group.price or 0, { float = true, maxLen = 12 })
+        local priceBox = W.MakeNumberInput(self, labelX + nameW + pad, y, priceW, group.price or 0,
+            { float = true, maxLen = 12 })
         table.insert(children, priceBox)
         local removeX = labelX + nameW + pad + priceW + pad
         local btn = ISButton:new(removeX, y, removeBtnW, ChaosUIManager.GetScaledWidth(W.ROW_HEIGHT),
@@ -324,7 +342,8 @@ function ChaosSettingsConfigPanel:rebuild()
         y = y + rowH + rowGap
     end
     -- + Add Group button
-    local addBtn = ISButton:new(labelX, y, ChaosUIManager.GetScaledWidth(160), ChaosUIManager.GetScaledWidth(W.ROW_HEIGHT),
+    local addBtn = ISButton:new(labelX, y, ChaosUIManager.GetScaledWidth(160),
+        ChaosUIManager.GetScaledWidth(W.ROW_HEIGHT),
         ChaosLocalization.GetString("settings", "add_group"), self, ChaosSettingsConfigPanel.OnAddGroup)
     addBtn:initialise()
     addBtn:instantiate()
@@ -337,66 +356,78 @@ function ChaosSettingsConfigPanel:rebuild()
     addHeader("section_ui")
 
     addLabelled("use_voting_progress_bar_color")
-    self.controls.use_voting_progress_bar_color = W.MakeCheckbox(self, controlX, y, "", cfg.use_voting_progress_bar_color == true, function(c)
-        cfg.use_voting_progress_bar_color = c
-    end)
+    self.controls.use_voting_progress_bar_color = W.MakeCheckbox(self, controlX, y, "",
+        cfg.use_voting_progress_bar_color == true, function(c)
+            cfg.use_voting_progress_bar_color = c
+        end)
     table.insert(children, self.controls.use_voting_progress_bar_color)
     y = y + rowH + rowGap
 
     addLabelled("progress_bar_color")
-    self.controls.progress_bar_color = W.MakeTextInput(self, controlX, y, controlW, ui.progress_bar_color or "9f211f", { maxLen = 6 })
+    self.controls.progress_bar_color = W.MakeTextInput(self, controlX, y, controlW, ui.progress_bar_color or "9f211f",
+        { maxLen = 6 })
     table.insert(children, self.controls.progress_bar_color)
     y = y + rowH + rowGap
 
     addLabelled("progress_bar_opacity")
-    self.controls.progress_bar_opacity = W.MakeNumberInput(self, controlX, y, controlW, ui.progress_bar_opacity or 0.9, { float = true, maxLen = 8 })
+    self.controls.progress_bar_opacity = W.MakeNumberInput(self, controlX, y, controlW, ui.progress_bar_opacity or 0.9,
+        { float = true, maxLen = 8 })
     table.insert(children, self.controls.progress_bar_opacity)
     y = y + rowH + rowGap
 
     addLabelled("progress_bar_text_color")
-    self.controls.progress_bar_text_color = W.MakeTextInput(self, controlX, y, controlW, ui.progress_bar_text_color or "ffffff", { maxLen = 6 })
+    self.controls.progress_bar_text_color = W.MakeTextInput(self, controlX, y, controlW,
+        ui.progress_bar_text_color or "ffffff", { maxLen = 6 })
     table.insert(children, self.controls.progress_bar_text_color)
     y = y + rowH + rowGap
 
     addLabelled("progress_bar_height")
-    self.controls.progress_bar_height = W.MakeNumberInput(self, controlX, y, controlW, ui.progress_bar_height or 22, { float = false, maxLen = 6 })
+    self.controls.progress_bar_height = W.MakeNumberInput(self, controlX, y, controlW, ui.progress_bar_height or 22,
+        { float = false, maxLen = 6 })
     table.insert(children, self.controls.progress_bar_height)
     y = y + rowH + rowGap
 
     addLabelled("effect_progress_color")
-    self.controls.effect_progress_color = W.MakeTextInput(self, controlX, y, controlW, ui.effect_progress_color or "9f211f", { maxLen = 6 })
+    self.controls.effect_progress_color = W.MakeTextInput(self, controlX, y, controlW,
+        ui.effect_progress_color or "9f211f", { maxLen = 6 })
     table.insert(children, self.controls.effect_progress_color)
     y = y + rowH + rowGap
 
     addLabelled("effect_progress_text_color")
-    self.controls.effect_progress_text_color = W.MakeTextInput(self, controlX, y, controlW, ui.effect_progress_text_color or "ffffff", { maxLen = 6 })
+    self.controls.effect_progress_text_color = W.MakeTextInput(self, controlX, y, controlW,
+        ui.effect_progress_text_color or "ffffff", { maxLen = 6 })
     table.insert(children, self.controls.effect_progress_text_color)
     y = y + rowH + rowGap
 
     addLabelled("effects_default_x")
-    self.controls.effects_default_x = W.MakeNumberInput(self, controlX, y, controlW, ui.effects_default_x or 1620, { float = false, maxLen = 6 })
+    self.controls.effects_default_x = W.MakeNumberInput(self, controlX, y, controlW, ui.effects_default_x or 1620,
+        { float = false, maxLen = 6 })
     table.insert(children, self.controls.effects_default_x)
     y = y + rowH + rowGap
 
     addLabelled("effects_default_y")
-    self.controls.effects_default_y = W.MakeNumberInput(self, controlX, y, controlW, ui.effects_default_y or 720, { float = false, maxLen = 6 })
+    self.controls.effects_default_y = W.MakeNumberInput(self, controlX, y, controlW, ui.effects_default_y or 720,
+        { float = false, maxLen = 6 })
     table.insert(children, self.controls.effects_default_y)
     y = y + rowH + rowGap
 
     addLabelled("effects_from_bottom_to_top")
-    self.controls.effects_from_bottom_to_top = W.MakeCheckbox(self, controlX, y, "", ui.effects_from_bottom_to_top == true, function(c)
-        ui.effects_from_bottom_to_top = c
-    end)
+    self.controls.effects_from_bottom_to_top = W.MakeCheckbox(self, controlX, y, "",
+        ui.effects_from_bottom_to_top == true, function(c)
+            ui.effects_from_bottom_to_top = c
+        end)
     table.insert(children, self.controls.effects_from_bottom_to_top)
     y = y + rowH + rowGap
 
     addLabelled("progress_bar_voting_color")
-    self.controls.progress_bar_voting_color = W.MakeTextInput(self, controlX, y, controlW, ui.progress_bar_voting_color or "3b8eea", { maxLen = 6 })
+    self.controls.progress_bar_voting_color = W.MakeTextInput(self, controlX, y, controlW,
+        ui.progress_bar_voting_color or "3b8eea", { maxLen = 6 })
     table.insert(children, self.controls.progress_bar_voting_color)
     y = y + rowH + rowGap
 
     addLabelled("vote_background_color")
-    self.controls.vote_background_color = W.MakeTextInput(self, controlX, y, controlW, ui.vote_background_color or "9f211f", { maxLen = 6 })
+    self.controls.vote_background_color = W.MakeTextInput(self, controlX, y, controlW,
+        ui.vote_background_color or "9f211f", { maxLen = 6 })
     table.insert(children, self.controls.vote_background_color)
     y = y + rowH + rowGap
 
@@ -426,16 +457,19 @@ function ChaosSettingsConfigPanel:CommitWorkingState()
         cfg.vote_start_time = W.GetIntFromBox(self.controls.vote_start_time, cfg.vote_start_time or 10)
     end
     if self.controls.zombie_nicknames_buffer then
-        sm.zombie_nicknames_buffer = W.GetIntFromBox(self.controls.zombie_nicknames_buffer, sm.zombie_nicknames_buffer or 150)
+        sm.zombie_nicknames_buffer = W.GetIntFromBox(self.controls.zombie_nicknames_buffer,
+            sm.zombie_nicknames_buffer or 150)
     end
     if self.controls.progress_bar_color then
         ui.progress_bar_color = self.controls.progress_bar_color:getInternalText() or ui.progress_bar_color
     end
     if self.controls.progress_bar_opacity then
-        ui.progress_bar_opacity = W.Clamp(W.GetFloatFromBox(self.controls.progress_bar_opacity, ui.progress_bar_opacity or 0.9), 0, 1)
+        ui.progress_bar_opacity = W.Clamp(
+            W.GetFloatFromBox(self.controls.progress_bar_opacity, ui.progress_bar_opacity or 0.9), 0, 1)
     end
     if self.controls.progress_bar_text_color then
-        ui.progress_bar_text_color = self.controls.progress_bar_text_color:getInternalText() or ui.progress_bar_text_color
+        ui.progress_bar_text_color = self.controls.progress_bar_text_color:getInternalText() or
+            ui.progress_bar_text_color
     end
     if self.controls.progress_bar_height then
         ui.progress_bar_height = W.GetIntFromBox(self.controls.progress_bar_height, ui.progress_bar_height or 22)
@@ -444,7 +478,8 @@ function ChaosSettingsConfigPanel:CommitWorkingState()
         ui.effect_progress_color = self.controls.effect_progress_color:getInternalText() or ui.effect_progress_color
     end
     if self.controls.effect_progress_text_color then
-        ui.effect_progress_text_color = self.controls.effect_progress_text_color:getInternalText() or ui.effect_progress_text_color
+        ui.effect_progress_text_color = self.controls.effect_progress_text_color:getInternalText() or
+            ui.effect_progress_text_color
     end
     if self.controls.effects_default_x then
         ui.effects_default_x = W.GetIntFromBox(self.controls.effects_default_x, ui.effects_default_x or 1620)
@@ -453,7 +488,8 @@ function ChaosSettingsConfigPanel:CommitWorkingState()
         ui.effects_default_y = W.GetIntFromBox(self.controls.effects_default_y, ui.effects_default_y or 720)
     end
     if self.controls.progress_bar_voting_color then
-        ui.progress_bar_voting_color = self.controls.progress_bar_voting_color:getInternalText() or ui.progress_bar_voting_color
+        ui.progress_bar_voting_color = self.controls.progress_bar_voting_color:getInternalText() or
+            ui.progress_bar_voting_color
     end
     if self.controls.vote_background_color then
         ui.vote_background_color = self.controls.vote_background_color:getInternalText() or ui.vote_background_color
