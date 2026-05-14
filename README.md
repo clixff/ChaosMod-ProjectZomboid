@@ -204,6 +204,8 @@ Supported languages:
 - Polish (`pl`)
 - Turkish (`tr`)
 - Simplified Chinese (`zh`)
+- Korean (`ko`)
+- Japanese (`ja`)
 
 ## FAQ
 

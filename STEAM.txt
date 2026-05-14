@@ -62,7 +62,7 @@ In StreamerApp dashboard set these settings:
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_8.png[/img]
 
-The mod supports [b]9 languages[/b]
+The mod supports [b]11 languages[/b]
 [list]
 [*]English
 [*]Russian
@@ -73,6 +73,8 @@ The mod supports [b]9 languages[/b]
 [*]Polish
 [*]Turkish
 [*]Simplified Chinese
+[*]Korean
+[*]Japanese
 [/list]
 
 You can change language on the mod settings window or in StreamerApp dashboard.
