@@ -1,20 +1,31 @@
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_1.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_01.png[/img]
 
-[b]A single-player Chaos Mod for Project Zomboid B42 with Twitch integration.[/b]
+[b]A single-player Chaos Mod v1.1.1 for Project Zomboid B42 with Twitch integration.[/b]
 
 This mod triggers a random effect every 45 seconds. There are currently [b]310+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
 
 [b]Twitch integration[/b] is optional and allows your viewers to vote for the next effect. You can play without Twitch integration.
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_2.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_02.png[/img]
+
+[h3]v1.1.1[/h3]
+
+[list]
+[*]Update to game version 42.18.0
+[*]Bug Fixes
+[*]Korean and Japanese translation
+[*]Updated effect chances
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_03.png[/img]
 
 [quote]This mod requires the [b]B42 version[/b] of Project Zomboid.
 To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
 Latest tested version: [b]42.18.0[/b]
 This mod [b]will not[/b] work in multiplayer[/quote]
 
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_04.png[/img]
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_3.png[/img]
 [h2]Examples of effects[/h2]
 
 [list]
@@ -25,42 +36,42 @@ This mod [b]will not[/b] work in multiplayer[/quote]
 [*]Turn Power Off
 [/list]
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_5.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_google_sheets.png[/img]
 
 Full list of effects: [url=https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I]Google Sheets[/url]
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_4.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_twitch.png[/img]
 
 Viewers can vote for the next effect, and Twitch nicknames can appear above zombies.
 To enable Twitch support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
 
 You can read more about Twitch integration on the mod's GitHub page.
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_7.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_06.png[/img]
 
 You can edit the mod settings (effect interval time, vote start time, effect settings, language) in mod settings. You can open mod settings window by pressing button with gear icon in game (bottom-left corner). Also settings are available in StreamerApp dashboard.
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_6.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_05.png[/img]
 
-[b]Mod does not work. What should I do?[/b]
-Make sure you are using the unstable branch of Project Zomboid on Steam.
-
-
-
-[b]How can to disable some effect or change effect settings?[/b]
-You can edit settings of every effect in the mod settings windows (bottom-left corner)
-
-[b]I only want to display Twitch nicknames above zombies, without random effects and without voting. How can I do this?[/b]
-In StreamerApp dashboard set these settings:
-[i]Effects interval enabled: false[/i]
-[i]- Streamer mode enabled: true[/i]
-[i]- Voting enabled: false[/i]
-[i]- Donations enabled: false[/i]
-[i]- Use zombie nicknames: true[/i]
+[b]Q: Mod does not work. What should I do?[/b]
+A: Make sure you are using the unstable branch of Project Zomboid on Steam.
 
 
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_8.png[/img]
+[b]Q: How can to disable some effect or change effect settings?[/b]
+A: You can edit settings of every effect in the mod settings windows (bottom-left corner)
+
+[b]Q: I only want to display Twitch nicknames above zombies, without random effects and without voting. How can I do this?[/b]
+A: In StreamerApp dashboard set these settings:
+[list]
+[*]Effects interval enabled: [b]false[/b]
+[*]Streamer mode enabled: [b]true[/b]
+[*]Voting enabled: [b]false[/b]
+[*]Donations enabled: [b]false[/b]
+[*]Use zombie nicknames: [b]true[/b]
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_07.png[/img]
 
 The mod supports [b]11 languages[/b]
 [list]
@@ -78,12 +89,60 @@ The mod supports [b]11 languages[/b]
 [/list]
 
 You can change language on the mod settings window or in StreamerApp dashboard.
-
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_9.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_08.png[/img]
 
 This mod does [b]not[/b] support multiplayer.
 It is designed for single-player only.
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_image_10.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_09.png[/img]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_0_1.png[/img]
+
+[list]
+[*]Initial Release
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_0_2.png[/img]
+
+[list]
+[*]New Effects
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_0.png[/img]
+
+[list]
+[*]Dashboard system for StreamerApp
+[*]In-Game Settings
+[*]New Effects
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_1_current.png[/img]
+
+[list]
+[*]Update to game version 42.18.0
+[*]Bug Fixes
+[*]Korean and Japanese translation
+[*]Updated effect chances
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_2_future.png[/img]
+
+[list]
+[*]New effects
+[*]Meta effects system
+[*]Context aware effects system
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_2_0_future.png[/img]
+
+[list]
+[*]Multiplayer support (?)
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_10.png[/img]
+
+This mod will likely not work with mods that change zombie AI or add NPCs to the game.
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_11.png[/img]
 
 [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Repository[/url]
