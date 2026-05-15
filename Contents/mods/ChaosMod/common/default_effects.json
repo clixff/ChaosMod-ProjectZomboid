@@ -2911,6 +2911,18 @@
             ],
             "enabled_donate": true,
             "price_group": "negative_4"
+        },
+        {
+            "id": "supersonic",
+            "enabled": true,
+            "chance": 1.0,
+            "withDuration": true,
+            "duration": 80,
+            "disable_effects": [
+                "supersonic"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
         }
     ]
 }

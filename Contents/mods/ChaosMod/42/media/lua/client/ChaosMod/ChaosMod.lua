@@ -83,6 +83,11 @@ function ChaosMod.StartMod()
 
     ChaosUIManager.hud:AddMessage("Chaos Mod started")
     ChaosUtils.PlayUISound("UIPauseMenuEnter")
+
+    local player = getPlayer()
+    if player then
+        getPlayer():setVariable("ChaosModSuperSonic", false)
+    end
 end
 
 function ChaosMod.StopMod()
@@ -205,6 +210,11 @@ function ChaosMod.OnGameStart()
     if Fishing and Fishing.Handler and Fishing.Handler.onEquipPrimary then
         Events.OnEquipPrimary.Remove(Fishing.Handler.onEquipPrimary)
         Events.OnEquipPrimary.Add(ChaosMod.CustomFishingEquipEvent)
+    end
+
+    local player = getPlayer()
+    if player then
+        getPlayer():setVariable("ChaosModSuperSonic", false)
     end
 end
 

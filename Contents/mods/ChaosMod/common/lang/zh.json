@@ -324,7 +324,8 @@
         "bounty_on_player_head": "玩家被悬赏",
         "all_zombies_are_skeletons": "所有僵尸都是骷髅",
         "spawn_griefer_skeleton": "生成捣蛋鬼骷髅",
-        "ufo_abduction": "UFO绑架"
+        "ufo_abduction": "UFO绑架",
+        "supersonic": "Supersonic"
     },
     "core": {
         "start_mod": "启动混乱模式",
@@ -598,6 +599,7 @@
         "spawn_courier": "快递NPC给玩家递送随机物品",
         "food_delivery": "快递NPC给玩家递送食物",
         "spawn_npc_with_loot": "NPC带着战利品出现并尝试逃离玩家",
-        "bounty_on_player_head": "在效果持续期间生成敌对NPC"
+        "bounty_on_player_head": "在效果持续期间生成敌对NPC",
+        "supersonic": "玩家移动速度提升8倍"
     }
 }

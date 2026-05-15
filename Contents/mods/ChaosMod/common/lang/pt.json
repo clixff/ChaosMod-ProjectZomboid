@@ -324,7 +324,8 @@
         "bounty_on_player_head": "Recompensa pela Cabeça do Jogador",
         "all_zombies_are_skeletons": "Todos os Zumbis são Esqueletos",
         "spawn_griefer_skeleton": "Gerar Esqueleto Griefer",
-        "ufo_abduction": "Abdução por OVNI"
+        "ufo_abduction": "Abdução por OVNI",
+        "supersonic": "Supersonic"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -598,6 +599,7 @@
         "spawn_courier": "Um NPC entregador entrega um item aleatório ao jogador",
         "food_delivery": "Um NPC entregador entrega comida ao jogador",
         "spawn_npc_with_loot": "Um NPC aparece com loot e tenta fugir do jogador",
-        "bounty_on_player_head": "Spawna NPCs hostis durante a duração do efeito"
+        "bounty_on_player_head": "Spawna NPCs hostis durante a duração do efeito",
+        "supersonic": "Acelera o movimento do jogador em 8 vezes"
     }
 }

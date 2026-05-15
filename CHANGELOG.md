@@ -3,6 +3,7 @@
 ### New Effects
 
 - UFO Abduction
+- Supersonic
 
 [1.1.1]
 

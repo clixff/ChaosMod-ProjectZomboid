@@ -325,7 +325,8 @@
         "bounty_on_player_head": "プレイヤーの首に懸賞金",
         "all_zombies_are_skeletons": "すべてのゾンビがスケルトンになる",
         "spawn_griefer_skeleton": "グリーファー・スケルトンをスポーン",
-        "ufo_abduction": "UFOの誘拐"
+        "ufo_abduction": "UFOの誘拐",
+        "supersonic": "Supersonic"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -614,6 +615,7 @@
         "spawn_courier": "クーリエ(運び屋)NPCがプレイヤーにランダムなアイテムを届けます",
         "food_delivery": "クーリエNPCがプレイヤーに食べ物を届けます",
         "spawn_npc_with_loot": "戦利品を持ったNPCが現れ、プレイヤーから逃げようとします",
-        "bounty_on_player_head": "効果が持続している間、敵対的なNPCをスポーンします"
+        "bounty_on_player_head": "効果が持続している間、敵対的なNPCをスポーンします",
+        "supersonic": "プレイヤーの移動速度を8倍にする"
     }
 }

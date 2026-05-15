@@ -324,7 +324,8 @@
         "bounty_on_player_head": "Kopfgeld auf den Spieler",
         "all_zombies_are_skeletons": "Alle Zombies sind Skelette",
         "spawn_griefer_skeleton": "Griefer-Skelett spawnen",
-        "ufo_abduction": "UFO-Entführung"
+        "ufo_abduction": "UFO-Entführung",
+        "supersonic": "Supersonic"
     },
     "core": {
         "start_mod": "ChaosMod starten",
@@ -598,6 +599,7 @@
         "spawn_courier": "Ein Kurier-NPC liefert dem Spieler einen zufälligen Gegenstand",
         "food_delivery": "Ein Kurier-NPC liefert dem Spieler Essen",
         "spawn_npc_with_loot": "Ein NPC erscheint mit Beute und versucht, vor dem Spieler zu fliehen",
-        "bounty_on_player_head": "Spawnt feindliche NPCs während der Effektdauer"
+        "bounty_on_player_head": "Spawnt feindliche NPCs während der Effektdauer",
+        "supersonic": "Beschleunigt die Bewegung des Spielers um das 8-fache"
     }
 }
