@@ -68,6 +68,7 @@ function ChaosMod.StartMod()
     ChaosUIManager:SetMainText(newMainString)
     -- Update UI elements status based on mod enabled flag
     ChaosUIManager.hud:OnModStatusChanged(true)
+    ChaosUIManager.hud:ShowIntro(modVersion, ChaosEffectsRegistry.effectsEnabledCount)
     ChaosUIManager:ShowEffectsUI()
     -- Load zombie nicknames from disk first time if enabled
     if ChaosConfig.IsZombieNicknamesEnabled() then

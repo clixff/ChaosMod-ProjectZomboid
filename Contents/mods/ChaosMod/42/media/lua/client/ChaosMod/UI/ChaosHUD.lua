@@ -5,6 +5,9 @@ require "ISUI/ISButton"
 ---@field text string
 ---@field btn ISButton
 ---@field messages table<integer, {text: string, expireTime: integer}>
+---@field introStartMs integer?
+---@field introModVersion string?
+---@field introEffectsCount number?
 ChaosHUD = ISPanel:derive("ChaosHUD")
 
 local PANEL_HEIGHT = 100
@@ -12,6 +15,12 @@ local MESSAGE_TIMEOUT_MS = 5000
 local BUTTON_HORIZONTAL_PADDING = 24
 local MAIN_BUTTON_MIN_WIDTH = 120
 local SECOND_BUTTON_MIN_WIDTH = 100
+local INTRO_VISIBLE_MS = 8000
+local INTRO_FADEOUT_MS = 1000
+local INTRO_BOTTOM_OFFSET = 100
+local INTRO_BG_PAD_X = 24
+local INTRO_BG_PAD_Y = 12
+local INTRO_BG_OPACITY = 0.7
 
 ---@param button ISButton
 ---@param minWidth number
@@ -123,6 +132,59 @@ function ChaosHUD:AddMessage(text, timeoutMs)
     })
 end
 
+---@param modVersion string
+---@param effectsCount number
+function ChaosHUD:ShowIntro(modVersion, effectsCount)
+    self.introStartMs = getTimestampMs()
+    self.introModVersion = modVersion or "0"
+    self.introEffectsCount = effectsCount or 0
+end
+
+function ChaosHUD:RenderIntro()
+    if not self.introStartMs then return end
+
+    local elapsed = getTimestampMs() - self.introStartMs
+    if elapsed >= INTRO_VISIBLE_MS + INTRO_FADEOUT_MS then
+        self.introStartMs = nil
+        return
+    end
+
+    local alpha = 1.0
+    if elapsed > INTRO_VISIBLE_MS then
+        alpha = 1.0 - ((elapsed - INTRO_VISIBLE_MS) / INTRO_FADEOUT_MS)
+        if alpha < 0 then alpha = 0 end
+    end
+
+    local introFont = UIFont.Intro
+    local textManager = getTextManager()
+    local line1 = string.format("Chaos Mod v%s Started", self.introModVersion or "0")
+    local line2 = string.format("%d effects", self.introEffectsCount or 0)
+    local fontHeight = textManager:getFontHeight(introFont)
+    local line1Width = textManager:MeasureStringX(introFont, line1)
+    local line2Width = textManager:MeasureStringX(introFont, line2)
+
+    local screenW = getCore():getScreenWidth()
+    local screenH = getCore():getScreenHeight()
+    local centerX = screenW / 2 - self:getX()
+    local centerY = screenH / 2 - self:getY() + ChaosUIManager.GetScaledHeight(INTRO_BOTTOM_OFFSET)
+
+    local totalHeight = fontHeight * 2
+    local line1Y = centerY - math.floor(totalHeight / 2)
+    local line2Y = line1Y + fontHeight
+
+    local maxTextWidth = math.max(line1Width, line2Width)
+    local padX = ChaosUIManager.GetScaledWidth(INTRO_BG_PAD_X)
+    local padY = ChaosUIManager.GetScaledHeight(INTRO_BG_PAD_Y)
+    local bgWidth = maxTextWidth + padX * 2
+    local bgHeight = totalHeight + padY * 2
+    local bgX = centerX - math.floor(bgWidth / 2)
+    local bgY = line1Y - padY
+    self:drawRect(bgX, bgY, bgWidth, bgHeight, INTRO_BG_OPACITY * alpha, 0.1, 0.1, 0.1)
+
+    self:drawText(line1, centerX - math.floor(line1Width / 2), line1Y, 1, 1, 1, alpha, introFont)
+    self:drawText(line2, centerX - math.floor(line2Width / 2), line2Y, 1, 1, 1, alpha, introFont)
+end
+
 function ChaosHUD:prerender()
     ISPanel.prerender(self)
 
@@ -176,17 +238,17 @@ function ChaosHUD:prerender()
         end
 
         if #self.messages > 0 then
-            local msgFont = UIFont.Medium
+            local msgFont       = UIFont.Medium
             local msgFontHeight = getTextManager():getFontHeight(msgFont)
-            local msgPadX = ChaosUIManager.GetScaledWidth(12)
-            local msgPadY = ChaosUIManager.GetScaledWidth(6)
-            local msgGap  = ChaosUIManager.GetScaledWidth(4)
+            local msgPadX       = ChaosUIManager.GetScaledWidth(12)
+            local msgPadY       = ChaosUIManager.GetScaledWidth(6)
+            local msgGap        = ChaosUIManager.GetScaledWidth(4)
             local msgLineHeight = msgFontHeight + msgPadY * 2
-            local msgX = ChaosUIManager.GetScaledWidth(10)
+            local msgX          = ChaosUIManager.GetScaledWidth(10)
 
-            local buttonHeight = ChaosUIManager.GetScaledWidth(25)
-            local buttonMargin = ChaosUIManager.GetScaledWidth(6)
-            local buttonY = panelHeight - barHeight - buttonMargin - buttonHeight
+            local buttonHeight  = ChaosUIManager.GetScaledWidth(25)
+            local buttonMargin  = ChaosUIManager.GetScaledWidth(6)
+            local buttonY       = panelHeight - barHeight - buttonMargin - buttonHeight
             local msgAreaBottom = buttonY - ChaosUIManager.GetScaledWidth(10)
 
             for idx = 1, #self.messages do
@@ -199,6 +261,50 @@ function ChaosHUD:prerender()
             end
         end
     end
+
+    -- local fontsTest = {
+    --     "Small",
+    --     "Medium",
+    --     "Large",
+    --     "Massive",
+    --     "MainMenu1",
+    --     "MainMenu2",
+    --     "Cred1",
+    --     "Cred2",
+    --     "NewSmall",
+    --     "NewMedium",
+    --     "NewLarge",
+    --     "Code",
+    --     "CodeSmall",
+    --     "CodeMedium",
+    --     "CodeLarge",
+    --     "MediumNew",
+    --     "AutoNormSmall",
+    --     "AutoNormMedium",
+    --     "AutoNormLarge",
+    --     "Dialogue",
+    --     "Intro",
+    --     "Handwritten",
+    --     "DebugConsole",
+    --     "Title",
+    --     "SdfRegular",
+    --     "SdfBold",
+    --     "SdfItalic",
+    --     "SdfBoldItalic",
+    --     "SdfOldRegular",
+    --     "SdfOldBold",
+    --     "SdfOldItalic",
+    --     "SdfOldBoldItalic",
+    --     "SdfRobertoSans",
+    --     "SdfCaveat",
+    -- }
+
+    -- local i = 0
+    -- for i, fontName in pairs(fontsTest) do
+    --     self:drawText(fontName, 200, 0 - (i * 40), 1, 1, 1, 1, UIFont[fontName])
+    -- end
+
+    self:RenderIntro()
 end
 
 function ChaosHUD:OnMainButtonClick()
