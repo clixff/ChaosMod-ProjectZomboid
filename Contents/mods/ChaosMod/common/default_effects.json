@@ -2903,7 +2903,7 @@
         {
             "id": "ufo_abduction",
             "enabled": true,
-            "chance": 30,
+            "chance": 0.9,
             "withDuration": true,
             "duration": 15,
             "disable_effects": [

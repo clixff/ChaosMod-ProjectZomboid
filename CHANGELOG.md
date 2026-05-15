@@ -1,4 +1,4 @@
-[1.1.2] Pre-release
+[1.1.2]
 
 ### New Effects
 
