@@ -92,7 +92,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.1.1";
+const VERSION = "1.1.2";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -506,7 +506,8 @@ async function main(): Promise<void> {
         ? rawEffects.filter((id): id is string => typeof id === "string")
         : [];
       const rawSecret = payload["secret_effect"];
-      const secretEffectId = typeof rawSecret === "string" && rawSecret !== "" ? rawSecret : null;
+      const secretEffectId =
+        typeof rawSecret === "string" && rawSecret !== "" ? rawSecret : null;
       votingManager.start(visibleEffectIds, secretEffectId);
     });
 
