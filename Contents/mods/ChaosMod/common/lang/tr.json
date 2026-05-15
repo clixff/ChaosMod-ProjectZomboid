@@ -325,7 +325,8 @@
         "all_zombies_are_skeletons": "Tüm Zombiler İskelet",
         "spawn_griefer_skeleton": "Griefer İskelet Oluştur",
         "ufo_abduction": "UFO Kaçırması",
-        "supersonic": "Supersonic"
+        "supersonic": "Supersonic",
+        "ufo_abducts_zombies": "UFO Zombileri Kaçırıyor"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
@@ -600,6 +601,7 @@
         "food_delivery": "Bir kurye NPC oyuncuya yiyecek teslim eder",
         "spawn_npc_with_loot": "Bir NPC ganimetle birlikte belirir ve oyuncudan kaçmaya çalışır",
         "bounty_on_player_head": "Etki süresi boyunca düşman NPC'ler spawnlar",
-        "supersonic": "Oyuncunun hareketini 8 kat hızlandırır"
+        "supersonic": "Oyuncunun hareketini 8 kat hızlandırır",
+        "ufo_abduction": "Oyuncuyu rastgele bir noktaya ışınlar, yaraları iyileştirir, kıyafetleri çıkarır"
     }
 }

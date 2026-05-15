@@ -1,9 +1,14 @@
 [1.1.2]
 
+### New mod features
+
+- Added a centered "ChaosMod v{version} Started / {n} effects" intro overlay that appears for 8 seconds (with a 1-second fade-out) when the mod is started
+
 ### New Effects
 
 - UFO Abduction
 - Supersonic
+- UFO Abducts Zombies
 
 [1.1.1]
 

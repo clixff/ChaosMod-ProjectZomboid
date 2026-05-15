@@ -325,7 +325,8 @@
         "all_zombies_are_skeletons": "所有僵尸都是骷髅",
         "spawn_griefer_skeleton": "生成捣蛋鬼骷髅",
         "ufo_abduction": "UFO绑架",
-        "supersonic": "Supersonic"
+        "supersonic": "Supersonic",
+        "ufo_abducts_zombies": "UFO绑架僵尸"
     },
     "core": {
         "start_mod": "启动混乱模式",
@@ -600,6 +601,7 @@
         "food_delivery": "快递NPC给玩家递送食物",
         "spawn_npc_with_loot": "NPC带着战利品出现并尝试逃离玩家",
         "bounty_on_player_head": "在效果持续期间生成敌对NPC",
-        "supersonic": "玩家移动速度提升8倍"
+        "supersonic": "玩家移动速度提升8倍",
+        "ufo_abduction": "将玩家传送到随机地点，治愈伤口，移除衣物"
     }
 }

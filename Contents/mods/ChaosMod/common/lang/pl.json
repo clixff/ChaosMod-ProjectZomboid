@@ -325,7 +325,8 @@
         "all_zombies_are_skeletons": "Wszystkie zombie to szkielety",
         "spawn_griefer_skeleton": "Zespawnuj Griefera Szkieleta",
         "ufo_abduction": "Uprowadzenie przez UFO",
-        "supersonic": "Supersonic"
+        "supersonic": "Supersonic",
+        "ufo_abducts_zombies": "UFO porywa zombie"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",
@@ -600,6 +601,7 @@
         "food_delivery": "NPC kurier dostarcza graczowi jedzenie",
         "spawn_npc_with_loot": "NPC pojawia się z łupem i próbuje uciec graczowi",
         "bounty_on_player_head": "Spawnuje wrogich NPC podczas trwania efektu",
-        "supersonic": "Przyspiesza ruch gracza 8-krotnie"
+        "supersonic": "Przyspiesza ruch gracza 8-krotnie",
+        "ufo_abduction": "Teleportuje gracza w losowe miejsce, leczy rany, usuwa ubrania"
     }
 }

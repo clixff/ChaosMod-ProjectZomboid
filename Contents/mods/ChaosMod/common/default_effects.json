@@ -2923,6 +2923,18 @@
             ],
             "enabled_donate": true,
             "price_group": "positive_5"
+        },
+        {
+            "id": "ufo_abducts_zombies",
+            "enabled": true,
+            "chance": 1.0,
+            "withDuration": true,
+            "duration": 15,
+            "disable_effects": [
+                "ufo_abducts_zombies"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
         }
     ]
 }

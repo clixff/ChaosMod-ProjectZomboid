@@ -325,7 +325,8 @@
         "all_zombies_are_skeletons": "Tous les zombies sont des squelettes",
         "spawn_griefer_skeleton": "Faire apparaître le Squelette Griefer",
         "ufo_abduction": "Enlèvement par OVNI",
-        "supersonic": "Supersonic"
+        "supersonic": "Supersonic",
+        "ufo_abducts_zombies": "Un OVNI enlève les zombies"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
@@ -600,6 +601,7 @@
         "food_delivery": "Un PNJ coursier livre de la nourriture au joueur",
         "spawn_npc_with_loot": "Un PNJ apparaît avec du butin et essaie de fuir le joueur",
         "bounty_on_player_head": "Fait apparaître des PNJ hostiles pendant la durée de l'effet",
-        "supersonic": "Accélère le déplacement du joueur de 8 fois"
+        "supersonic": "Accélère le déplacement du joueur de 8 fois",
+        "ufo_abduction": "Téléporte le joueur à un point aléatoire, soigne les blessures, retire les vêtements"
     }
 }

@@ -326,7 +326,8 @@
         "all_zombies_are_skeletons": "すべてのゾンビがスケルトンになる",
         "spawn_griefer_skeleton": "グリーファー・スケルトンをスポーン",
         "ufo_abduction": "UFOの誘拐",
-        "supersonic": "Supersonic"
+        "supersonic": "Supersonic",
+        "ufo_abducts_zombies": "UFOがゾンビを誘拐"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -616,6 +617,7 @@
         "food_delivery": "クーリエNPCがプレイヤーに食べ物を届けます",
         "spawn_npc_with_loot": "戦利品を持ったNPCが現れ、プレイヤーから逃げようとします",
         "bounty_on_player_head": "効果が持続している間、敵対的なNPCをスポーンします",
-        "supersonic": "プレイヤーの移動速度を8倍にする"
+        "supersonic": "プレイヤーの移動速度を8倍にする",
+        "ufo_abduction": "プレイヤーをランダムな地点にテレポートし、傷を癒し、衣服を取り除く"
     }
 }

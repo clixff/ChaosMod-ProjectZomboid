@@ -325,7 +325,8 @@
         "all_zombies_are_skeletons": "Todos os Zumbis são Esqueletos",
         "spawn_griefer_skeleton": "Gerar Esqueleto Griefer",
         "ufo_abduction": "Abdução por OVNI",
-        "supersonic": "Supersonic"
+        "supersonic": "Supersonic",
+        "ufo_abducts_zombies": "OVNI Abduz Zumbis"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -600,6 +601,7 @@
         "food_delivery": "Um NPC entregador entrega comida ao jogador",
         "spawn_npc_with_loot": "Um NPC aparece com loot e tenta fugir do jogador",
         "bounty_on_player_head": "Spawna NPCs hostis durante a duração do efeito",
-        "supersonic": "Acelera o movimento do jogador em 8 vezes"
+        "supersonic": "Acelera o movimento do jogador em 8 vezes",
+        "ufo_abduction": "Teletransporta o jogador para um ponto aleatório, cura ferimentos, remove roupas"
     }
 }

@@ -325,7 +325,8 @@
         "all_zombies_are_skeletons": "All Zombies Are Skeletons",
         "spawn_griefer_skeleton": "Spawn Griefer Skeleton",
         "ufo_abduction": "UFO Abduction",
-        "supersonic": "Supersonic"
+        "supersonic": "Supersonic",
+        "ufo_abducts_zombies": "UFO Abducts Zombies"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -615,6 +616,7 @@
         "food_delivery": "A courier NPC delivers food to the player",
         "spawn_npc_with_loot": "An NPC appears with loot and tries to flee from the player",
         "bounty_on_player_head": "Spawns hostile NPCs for the duration of the effect",
-        "supersonic": "Speeds up player movement by 8 times"
+        "supersonic": "Speeds up player movement by 8 times",
+        "ufo_abduction": "Teleports the player to a random point, heals wounds, removes clothes"
     }
 }

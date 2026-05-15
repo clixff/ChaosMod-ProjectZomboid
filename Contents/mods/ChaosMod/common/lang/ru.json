@@ -326,7 +326,8 @@
         "all_zombies_are_skeletons": "Все зомби — скелеты",
         "spawn_griefer_skeleton": "Заспавнить скелета-грифера",
         "ufo_abduction": "Похищение НЛО",
-        "supersonic": "Supersonic"
+        "supersonic": "Supersonic",
+        "ufo_abducts_zombies": "НЛО похищает зомби"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
@@ -616,6 +617,7 @@
         "food_delivery": "Курьер NPC доставляет еду игроку",
         "spawn_npc_with_loot": "NPC появляется с добычей и пытается скрыться от игрока",
         "bounty_on_player_head": "Спавн враждебных NPC в течение времени эффекта",
-        "supersonic": "Ускоряет передвижение игрока в 8 раз"
+        "supersonic": "Ускоряет передвижение игрока в 8 раз",
+        "ufo_abduction": "Телепорт в случайную точку, излечение ран, удаление одежды"
     }
 }
