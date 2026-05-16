@@ -284,6 +284,9 @@ function ChaosBridge.Init()
         return
     end
     ChaosBridge.enabled = true
+    if ChaosBridgeHandshake and ChaosBridgeHandshake.OnBridgeInit then
+        ChaosBridgeHandshake.OnBridgeInit()
+    end
     print("[ChaosBridge] Initialized, sessionId: " .. ChaosBridge.outSessionId)
 end
 
@@ -291,6 +294,9 @@ function ChaosBridge.Shutdown()
     if not ChaosBridge.enabled then return end
     flushPending()
     ChaosBridge.enabled = false
+    if ChaosBridgeHandshake and ChaosBridgeHandshake.OnBridgeShutdown then
+        ChaosBridgeHandshake.OnBridgeShutdown()
+    end
     print("[ChaosBridge] Shutdown")
 end
 
@@ -308,6 +314,10 @@ function ChaosBridge.Tick(deltaMs)
     if ChaosBridge.pollAccumMs >= POLL_INTERVAL_MS then
         ChaosBridge.pollAccumMs = ChaosBridge.pollAccumMs - POLL_INTERVAL_MS
         pollIncoming()
+    end
+
+    if ChaosBridgeHandshake and ChaosBridgeHandshake.Tick then
+        ChaosBridgeHandshake.Tick(deltaMs)
     end
 end
 

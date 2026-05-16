@@ -92,7 +92,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.1.2";
+const VERSION = "1.1.0";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -453,6 +453,50 @@ async function main(): Promise<void> {
   const activityLog = new ActivityLog();
 
   let versionStatus: VersionStatus = buildVersionStatus(VERSION, null);
+
+  const bridge = luaFolder ? new Bridge(luaFolder) : null;
+  let modEnabled = false;
+  let iterationIndex = 0;
+
+  type HandshakePayload = {
+    streamer_mode_version: string;
+    has_new_update: boolean;
+    new_update_version: string;
+  };
+  let lastSentHandshake: HandshakePayload | null = null;
+
+  function buildHandshakePayload(): HandshakePayload {
+    const hasNew = versionStatus.update_available && !!versionStatus.latest;
+    return {
+      streamer_mode_version: VERSION,
+      has_new_update: hasNew,
+      new_update_version: hasNew ? (versionStatus.latest ?? "") : "",
+    };
+  }
+
+  function handshakeEquals(
+    a: HandshakePayload | null,
+    b: HandshakePayload,
+  ): boolean {
+    if (!a) return false;
+    return (
+      a.streamer_mode_version === b.streamer_mode_version &&
+      a.has_new_update === b.has_new_update &&
+      a.new_update_version === b.new_update_version
+    );
+  }
+
+  function emitHandshakeIfChanged(): void {
+    if (!bridge || !modEnabled) return;
+    const next = buildHandshakePayload();
+    if (handshakeEquals(lastSentHandshake, next)) return;
+    lastSentHandshake = next;
+    bridge.emit("streamer_handshake", next);
+    logger.debug(
+      `[Bridge] streamer_handshake: app=${next.streamer_mode_version} update=${next.has_new_update} new=${next.new_update_version || "-"}`,
+    );
+  }
+
   void fetchLatestVersion().then((latest) => {
     versionStatus = buildVersionStatus(VERSION, latest);
     if (versionStatus.update_available && latest) {
@@ -460,21 +504,30 @@ async function main(): Promise<void> {
         `${colors.yellow(`New version v${latest} is available.`)} Download: ${colors.cyan(RELEASES_URL)}`,
       );
     }
+    emitHandshakeIfChanged();
   });
-
-  const bridge = luaFolder ? new Bridge(luaFolder) : null;
-  let modEnabled = false;
-  let iterationIndex = 0;
 
   if (bridge) {
     bridge.on("mod_change_status", (payload) => {
       const enabled = payload.enabled === true;
       modEnabled = enabled;
       logger.debug(`[Bridge] mod_change_status: enabled=${enabled}`);
-      if (!enabled) {
+      if (enabled) {
+        lastSentHandshake = null;
+        emitHandshakeIfChanged();
+      } else {
         votingManager.stop();
+        lastSentHandshake = null;
         bridge.rotateOutbound();
       }
+    });
+
+    bridge.on("open_github", () => {
+      logger.debug("[Bridge] open_github");
+      void open(RELEASES_URL).catch((err) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        logger.debug(`[Bridge] open_github: failed to open browser: ${msg}`);
+      });
     });
 
     bridge.on("interval_start", (payload) => {

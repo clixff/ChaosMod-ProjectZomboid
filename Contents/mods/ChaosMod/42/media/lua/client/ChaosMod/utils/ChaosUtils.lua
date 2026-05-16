@@ -1059,3 +1059,40 @@ function ChaosUtils.IsSquareBehindZombie(square, character)
     -- Behind zombie = opposite its forward direction
     return dot < -0.6
 end
+
+--- Parses a semantic version string into its numeric components.
+--- Mirrors StreamerMode/src/versionCheck.ts:parseSemver: extracts the first three
+--- numeric groups (`MAJOR.MINOR.PATCH`) and ignores any suffix (e.g. `-beta.3`).
+---@param input string
+---@return integer? major
+---@return integer? minor
+---@return integer? patch
+function ChaosUtils.ParseSemver(input)
+    if type(input) ~= "string" then return nil, nil, nil end
+    local trimmed = input:match("^%s*(.-)%s*$") or input
+    local a, b, c = string.match(trimmed, "^(%d+)%.(%d+)%.(%d+)")
+    if not a or not b or not c then return nil, nil, nil end
+    local na = math.floor(tonumber(a) or 0)
+    local nb = math.floor(tonumber(b) or 0)
+    local nc = math.floor(tonumber(c) or 0)
+    return na, nb, nc
+end
+
+--- Compares two semver strings.
+--- Mirrors StreamerMode/src/versionCheck.ts:compareVersions.
+--- Returns 0 when either side cannot be parsed.
+---@param a string
+---@param b string
+---@return integer -- -1 if a<b, 0 if a==b or unparseable, 1 if a>b
+function ChaosUtils.CompareVersions(a, b)
+    local aMaj, aMin, aPat = ChaosUtils.ParseSemver(a)
+    local bMaj, bMin, bPat = ChaosUtils.ParseSemver(b)
+    if not aMaj or not bMaj then return 0 end
+    local pa = { aMaj, aMin, aPat }
+    local pb = { bMaj, bMin, bPat }
+    for i = 1, 3 do
+        if pa[i] < pb[i] then return -1 end
+        if pa[i] > pb[i] then return 1 end
+    end
+    return 0
+end

@@ -262,46 +262,46 @@ function ChaosHUD:prerender()
         end
     end
 
-    -- local fontsTest = {
-    --     "Small",
-    --     "Medium",
-    --     "Large",
-    --     "Massive",
-    --     "MainMenu1",
-    --     "MainMenu2",
-    --     "Cred1",
-    --     "Cred2",
-    --     "NewSmall",
-    --     "NewMedium",
-    --     "NewLarge",
-    --     "Code",
-    --     "CodeSmall",
-    --     "CodeMedium",
-    --     "CodeLarge",
-    --     "MediumNew",
-    --     "AutoNormSmall",
-    --     "AutoNormMedium",
-    --     "AutoNormLarge",
-    --     "Dialogue",
-    --     "Intro",
-    --     "Handwritten",
-    --     "DebugConsole",
-    --     "Title",
-    --     "SdfRegular",
-    --     "SdfBold",
-    --     "SdfItalic",
-    --     "SdfBoldItalic",
-    --     "SdfOldRegular",
-    --     "SdfOldBold",
-    --     "SdfOldItalic",
-    --     "SdfOldBoldItalic",
-    --     "SdfRobertoSans",
-    --     "SdfCaveat",
-    -- }
+    local fontsTest = {
+        "Small",
+        "Medium",
+        "Large",
+        "Massive",
+        "MainMenu1",
+        "MainMenu2",
+        "Cred1",
+        "Cred2",
+        "NewSmall",
+        "NewMedium",
+        "NewLarge",
+        "Code",
+        "CodeSmall",
+        "CodeMedium",
+        "CodeLarge",
+        "MediumNew",
+        "AutoNormSmall",
+        "AutoNormMedium",
+        "AutoNormLarge",
+        "Dialogue",
+        "Intro",
+        "Handwritten",
+        "DebugConsole",
+        "Title",
+        "SdfRegular",
+        "SdfBold",
+        "SdfItalic",
+        "SdfBoldItalic",
+        "SdfOldRegular",
+        "SdfOldBold",
+        "SdfOldItalic",
+        "SdfOldBoldItalic",
+        "SdfRobertoSans",
+        "SdfCaveat",
+    }
 
     -- local i = 0
     -- for i, fontName in pairs(fontsTest) do
-    --     self:drawText(fontName, 200, 0 - (i * 40), 1, 1, 1, 1, UIFont[fontName])
+    --     self:drawText(string.format("%s - Пример", fontName), 200, 0 - (i * 40), 1, 1, 1, 1, UIFont[fontName])
     -- end
 
     self:RenderIntro()

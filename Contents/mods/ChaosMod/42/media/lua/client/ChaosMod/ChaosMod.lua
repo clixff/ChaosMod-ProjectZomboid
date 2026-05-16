@@ -78,7 +78,7 @@ function ChaosMod.StartMod()
     if ChaosConfig.streamer_mode and ChaosConfig.streamer_mode.streamer_mode_enabled == true then
         ChaosEffectsManager.iterationIndex = 0
         ChaosBridge.Init()
-        ChaosBridge.Emit("mod_change_status", { enabled = true })
+        ChaosBridge.Emit("mod_change_status", { enabled = true, version = modVersion })
         ChaosBridge.Emit("interval_start", { iteration = 0 })
     end
 
@@ -106,7 +106,11 @@ function ChaosMod.StopMod()
     ChaosEffectsManager.iterationIndex = 0
     ChaosMod.specialAnimalsFollowers = {}
     if ChaosBridge.enabled then
-        ChaosBridge.Emit("mod_change_status", { enabled = false })
+        local modVersion = "0"
+        if ChaosMod.modData then
+            modVersion = ChaosMod.modData:getModVersion() or "0"
+        end
+        ChaosBridge.Emit("mod_change_status", { enabled = false, version = modVersion })
         ChaosBridge.Shutdown()
     end
 end
@@ -293,6 +297,12 @@ function ChaosMod.RegisterBridgeHandlers()
         ChaosLocalization.ReloadLanguages()
         if ChaosUIManager and ChaosUIManager.OnLanguageLoaded then
             ChaosUIManager:OnLanguageLoaded()
+        end
+    end)
+
+    ChaosBridge.On("streamer_handshake", function(payload)
+        if ChaosBridgeHandshake and ChaosBridgeHandshake.OnHandshake then
+            ChaosBridgeHandshake.OnHandshake(payload)
         end
     end)
 

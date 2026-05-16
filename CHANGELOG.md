@@ -3,6 +3,7 @@
 ### New mod features
 
 - Added a centered "ChaosMod v{version} Started / {n} effects" intro overlay that appears for 8 seconds (with a 1-second fade-out) when the mod is started
+- Added in-game modal about version mismatch between the mod and StreamerApp and new update modal.
 
 ### New Effects
 

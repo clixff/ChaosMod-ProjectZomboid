@@ -21,7 +21,7 @@ function EffectDarkSoulsBonfire:OnStart()
             targetSquare = sq
             return true
         end
-    end, 1, 10, true, true, true, z, z)
+    end, 2, 10, true, true, true, z, z)
 
     if not targetSquare then return end
     if not ChaosProps.SpawnCampfire(targetSquare) then return end
