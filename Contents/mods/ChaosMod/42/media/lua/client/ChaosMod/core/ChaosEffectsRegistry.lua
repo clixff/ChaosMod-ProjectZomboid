@@ -132,6 +132,14 @@ function ChaosEffectsRegistry.SyncEffectsForModVersion()
 
     local defaults = ChaosFileReader.ReadJsonFile("default_effects.json")
     if defaults then
+        local existingRaw = ChaosFileReader.ReadFileFromCacheAllLines("ChaosMod/effects.json")
+        if existingRaw then
+            if ChaosFileReader.WriteTextToCache("ChaosMod/effects.json.backup", existingRaw) then
+                print("[ChaosEffectsRegistry] Backed up effects.json to effects.json.backup")
+            else
+                print("[ChaosEffectsRegistry] Failed to write effects.json.backup; proceeding with overwrite")
+            end
+        end
         ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", defaults)
     else
         print("[ChaosEffectsRegistry] default_effects.json not found; cannot replace effects.json")

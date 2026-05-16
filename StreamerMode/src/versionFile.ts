@@ -37,7 +37,17 @@ export function syncEffectsForModVersion(
 
   const defaultsPath = join(modFolder, "common", "default_effects.json");
   const effectsPath = join(luaFolder, "effects.json");
+  const backupPath = `${effectsPath}.backup`;
   if (existsSync(defaultsPath)) {
+    if (existsSync(effectsPath)) {
+      try {
+        copyFileSync(effectsPath, backupPath);
+        logger.info(`Backed up effects.json to ${backupPath}`);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.warn(`Failed to write effects.json.backup: ${msg}; proceeding with overwrite`);
+      }
+    }
     try {
       copyFileSync(defaultsPath, effectsPath);
     } catch (e) {
