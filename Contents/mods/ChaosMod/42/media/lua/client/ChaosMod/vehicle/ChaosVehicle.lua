@@ -182,6 +182,43 @@ function ChaosVehicle.setRandomFuelPercent(vehicle, min, max)
 end
 
 ---@param vehicle BaseVehicle
+---@param explosionX number
+---@param explosionY number
+---@param explosionZ number
+function ChaosVehicle.AddVehicleImpulseAtExplosion(vehicle, explosionX, explosionY, explosionZ)
+    if not vehicle then return end
+
+    local data = {
+        vehicle = vehicle,
+        explosionX = explosionX,
+        explosionY = explosionY,
+        explosionZ = explosionZ,
+    }
+
+    ChaosSpecialAction.AddNewAction(data, 1000, function(_deltaMs, d)
+        ---@type BaseVehicle
+        local v = d.vehicle
+        if not v then return end
+
+        v:setPhysicsActive(true)
+
+        local dx = v:getX() - d.explosionX
+        local dy = v:getY() - d.explosionY
+        local len = math.sqrt(dx * dx + dy * dy)
+        if len < 0.001 then
+            dx, dy, len = 0, 1, 1
+        end
+        dx = dx / len
+        dy = dy / len
+
+        local strength = 800000.0
+        local impulse = Vector3f.new(dx * strength, dy * strength, 0)
+        local relPos = Vector3f.new(0, 0, 0)
+        v:addImpulse(impulse, relPos)
+    end, function(_d) end)
+end
+
+---@param vehicle BaseVehicle
 ---@param minCondition integer | nil defaults to 0
 ---@param maxCondition integer | nil defaults to 100
 function ChaosVehicle.SetRandomVehiclePartsCondition(vehicle, minCondition, maxCondition)

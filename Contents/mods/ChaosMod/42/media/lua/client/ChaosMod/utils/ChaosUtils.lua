@@ -235,6 +235,7 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
         local nearbyVehicle = nearbyVehicles:get(i)
         if nearbyVehicle then
             ChaosVehicle.DamageVehicleFromExplosion(nearbyVehicle)
+            ChaosVehicle.AddVehicleImpulseAtExplosion(nearbyVehicle, expX, expY, expZ)
         end
     end
 end
