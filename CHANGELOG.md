@@ -6,6 +6,9 @@
 - Added in-game modal about version mismatch between the mod and StreamerApp and new update modal.
 - When a mod version change replaces `effects.json` with the shipped defaults, the previous `effects.json` is now copied to `effects.json.backup` in the same folder first
 - Explosions now damage vehicle parts and kick player out of cars
+- New vehicles now spawn with random part conditions
+
+### Mod Fixes
 
 ### New Effects
 

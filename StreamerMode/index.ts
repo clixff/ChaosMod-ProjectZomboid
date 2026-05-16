@@ -625,6 +625,8 @@ async function main(): Promise<void> {
   function handleChatMessage(chat: ChatEvent): void {
     if (!config?.streamer_mode.streamer_mode_enabled) return;
 
+    console.log(chat);
+
     const text = chat.message.text.trim();
     let voteNum: number | null = null;
 

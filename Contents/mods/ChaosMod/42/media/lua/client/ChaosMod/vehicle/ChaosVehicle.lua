@@ -94,7 +94,8 @@ end
 ---@return BaseVehicle | nil
 ---@param addKey boolean
 ---@param setRandomFuel boolean
-function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKey, setRandomFuel)
+---@param setRandomCondition boolean | nil
+function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKey, setRandomFuel, setRandomCondition)
     local player = getPlayer()
     if not player then return nil end
     local x  = player:getX()
@@ -103,6 +104,9 @@ function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKe
 
     radius   = radius or 12
     maxTries = maxTries or 80
+    if setRandomCondition == nil then
+        setRandomCondition = true
+    end
 
 
     for i = 1, maxTries do
@@ -128,6 +132,9 @@ function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKe
                     end
                     if setRandomFuel then
                         ChaosVehicle.setRandomFuelPercent(vehicle, 0.1, 0.9)
+                    end
+                    if setRandomCondition then
+                        ChaosVehicle.SetRandomVehiclePartsCondition(vehicle)
                     end
                     return vehicle
                 end
@@ -172,6 +179,25 @@ function ChaosVehicle.setRandomFuelPercent(vehicle, min, max)
     if not vehicle then return end
     local percent = ZombRandFloat(min, max)
     ChaosVehicle.setFuelPercent(vehicle, percent)
+end
+
+---@param vehicle BaseVehicle
+---@param minCondition integer | nil defaults to 0
+---@param maxCondition integer | nil defaults to 100
+function ChaosVehicle.SetRandomVehiclePartsCondition(vehicle, minCondition, maxCondition)
+    if not vehicle then return end
+
+    minCondition = minCondition or 0
+    maxCondition = maxCondition or 100
+
+    for i = 0, vehicle:getPartCount() - 1 do
+        local part = vehicle:getPartByIndex(i)
+        if part then
+            local condition = ChaosUtils.RandIntegerRange(minCondition, maxCondition + 1)
+            part:setCondition(condition)
+            vehicle:transmitPartCondition(part)
+        end
+    end
 end
 
 ---@param square IsoGridSquare
