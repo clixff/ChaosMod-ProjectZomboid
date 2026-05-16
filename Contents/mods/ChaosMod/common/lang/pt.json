@@ -326,7 +326,8 @@
         "spawn_griefer_skeleton": "Gerar Esqueleto Griefer",
         "ufo_abduction": "Abdução por OVNI",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "OVNI Abduz Zumbis"
+        "ufo_abducts_zombies": "OVNI Abduz Zumbis",
+        "roll_dice": "Lançar Dado"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -378,7 +379,8 @@
         "water_globally_disabled": "A água foi desativada globalmente",
         "water_globally_enabled": "A água foi ativada globalmente",
         "total_votes": "Total de votos: %d",
-        "unlimited_ammo": "Munição Ilimitada"
+        "unlimited_ammo": "Munição Ilimitada",
+        "modified_zombies": "%d zumbis modificados"
     },
     "meta": {
         "username_activated_effect": "%s ativou %s"
@@ -602,6 +604,7 @@
         "spawn_npc_with_loot": "Um NPC aparece com loot e tenta fugir do jogador",
         "bounty_on_player_head": "Spawna NPCs hostis durante a duração do efeito",
         "supersonic": "Acelera o movimento do jogador em 8 vezes",
-        "ufo_abduction": "Teletransporta o jogador para um ponto aleatório, cura ferimentos, remove roupas"
+        "ufo_abduction": "Teletransporta o jogador para um ponto aleatório, cura ferimentos, remove roupas",
+        "roll_dice": "O jogador rola um dado e ativa um efeito aleatório escolhido entre categorias diferentes"
     }
 }

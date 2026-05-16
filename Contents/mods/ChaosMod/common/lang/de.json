@@ -326,7 +326,8 @@
         "spawn_griefer_skeleton": "Griefer-Skelett spawnen",
         "ufo_abduction": "UFO-Entführung",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "UFO entführt Zombies"
+        "ufo_abducts_zombies": "UFO entführt Zombies",
+        "roll_dice": "Würfeln"
     },
     "core": {
         "start_mod": "ChaosMod starten",
@@ -378,7 +379,8 @@
         "water_globally_disabled": "Wasser wurde weltweit deaktiviert",
         "water_globally_enabled": "Wasser wurde weltweit aktiviert",
         "total_votes": "Stimmen insgesamt: %d",
-        "unlimited_ammo": "Unbegrenzte Munition"
+        "unlimited_ammo": "Unbegrenzte Munition",
+        "modified_zombies": "%d Zombies modifiziert"
     },
     "meta": {
         "username_activated_effect": "%s hat %s aktiviert"
@@ -602,6 +604,7 @@
         "spawn_npc_with_loot": "Ein NPC erscheint mit Beute und versucht, vor dem Spieler zu fliehen",
         "bounty_on_player_head": "Spawnt feindliche NPCs während der Effektdauer",
         "supersonic": "Beschleunigt die Bewegung des Spielers um das 8-fache",
-        "ufo_abduction": "Teleportiert den Spieler an einen zufälligen Ort, heilt Wunden, entfernt Kleidung"
+        "ufo_abduction": "Teleportiert den Spieler an einen zufälligen Ort, heilt Wunden, entfernt Kleidung",
+        "roll_dice": "Der Spieler würfelt und aktiviert einen zufälligen Effekt, ausgewählt aus verschiedenen Kategorien"
     }
 }

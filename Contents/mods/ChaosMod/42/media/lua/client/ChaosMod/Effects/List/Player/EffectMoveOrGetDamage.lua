@@ -17,7 +17,7 @@ function EffectMoveOrGetDamage:OnStart()
     self.cooldownMs = DAMAGE_COOLDOWN_MS
     self.accumulatedDist = 0
 
-    ChaosPlayer.SayLineByColor(getPlayer(), "Move or get damage", ChaosPlayerChatColors.red)
+    ChaosPlayer.SayLineByColor(getPlayer(), "Move Or Take Damage", ChaosPlayerChatColors.red)
 
     local player = getPlayer()
     if player then

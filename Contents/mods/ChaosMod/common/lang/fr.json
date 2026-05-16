@@ -326,7 +326,8 @@
         "spawn_griefer_skeleton": "Faire apparaître le Squelette Griefer",
         "ufo_abduction": "Enlèvement par OVNI",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "Un OVNI enlève les zombies"
+        "ufo_abducts_zombies": "Un OVNI enlève les zombies",
+        "roll_dice": "Lancer de Dé"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
@@ -378,7 +379,8 @@
         "water_globally_disabled": "L'eau a été désactivée mondialement",
         "water_globally_enabled": "L'eau a été activée mondialement",
         "total_votes": "Total des votes : %d",
-        "unlimited_ammo": "Munitions Illimitées"
+        "unlimited_ammo": "Munitions Illimitées",
+        "modified_zombies": "%d zombies modifiés"
     },
     "meta": {
         "username_activated_effect": "%s a activé %s"
@@ -602,6 +604,7 @@
         "spawn_npc_with_loot": "Un PNJ apparaît avec du butin et essaie de fuir le joueur",
         "bounty_on_player_head": "Fait apparaître des PNJ hostiles pendant la durée de l'effet",
         "supersonic": "Accélère le déplacement du joueur de 8 fois",
-        "ufo_abduction": "Téléporte le joueur à un point aléatoire, soigne les blessures, retire les vêtements"
+        "ufo_abduction": "Téléporte le joueur à un point aléatoire, soigne les blessures, retire les vêtements",
+        "roll_dice": "Le joueur lance un dé et active un effet aléatoire choisi parmi différentes catégories"
     }
 }

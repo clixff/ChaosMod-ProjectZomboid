@@ -2935,6 +2935,18 @@
             ],
             "enabled_donate": true,
             "price_group": "positive_5"
+        },
+        {
+            "id": "roll_dice",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "roll_dice"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_3"
         }
     ]
 }

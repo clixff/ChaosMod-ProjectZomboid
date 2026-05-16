@@ -192,7 +192,7 @@
         "random_skill_level_up": "Random Skill Level Up",
         "random_skill_level_lose": "Lose Random Skill Level",
         "add_random_wound": "Add Random Wound",
-        "move_or_get_damage": "Move Or Take Damaged",
+        "move_or_get_damage": "Move Or Take Damage",
         "open_nearby_windows": "Open Nearby Windows",
         "unlock_nearby_doors": "Unlock Nearby Doors",
         "remove_curtains_nearby": "Remove Nearby Curtains",
@@ -326,7 +326,8 @@
         "spawn_griefer_skeleton": "Spawn Griefer Skeleton",
         "ufo_abduction": "UFO Abduction",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "UFO Abducts Zombies"
+        "ufo_abducts_zombies": "UFO Abducts Zombies",
+        "roll_dice": "Roll Dice"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -378,7 +379,8 @@
         "water_globally_disabled": "Water has been disabled globally",
         "water_globally_enabled": "Water has been enabled globally",
         "total_votes": "Total votes: %d",
-        "unlimited_ammo": "Unlimited Ammo"
+        "unlimited_ammo": "Unlimited Ammo",
+        "modified_zombies": "Modified %d zombies"
     },
     "meta": {
         "username_activated_effect": "%s activated %s"
@@ -617,6 +619,7 @@
         "spawn_npc_with_loot": "An NPC appears with loot and tries to flee from the player",
         "bounty_on_player_head": "Spawns hostile NPCs for the duration of the effect",
         "supersonic": "Speeds up player movement by 8 times",
-        "ufo_abduction": "Teleports the player to a random point, heals wounds, removes clothes"
+        "ufo_abduction": "Teleports the player to a random point, heals wounds, removes clothes",
+        "roll_dice": "The player rolls a die and activates one random effect selected from different categories"
     }
 }

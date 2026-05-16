@@ -326,7 +326,8 @@
         "spawn_griefer_skeleton": "Zespawnuj Griefera Szkieleta",
         "ufo_abduction": "Uprowadzenie przez UFO",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "UFO porywa zombie"
+        "ufo_abducts_zombies": "UFO porywa zombie",
+        "roll_dice": "Rzut Kostką"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",
@@ -378,7 +379,8 @@
         "water_globally_disabled": "Woda została wyłączona globalnie",
         "water_globally_enabled": "Woda została włączona globalnie",
         "total_votes": "Łączna liczba głosów: %d",
-        "unlimited_ammo": "Nieskończona Amunicja"
+        "unlimited_ammo": "Nieskończona Amunicja",
+        "modified_zombies": "Zmodyfikowano %d zombie"
     },
     "meta": {
         "username_activated_effect": "%s aktywował %s"
@@ -602,6 +604,7 @@
         "spawn_npc_with_loot": "NPC pojawia się z łupem i próbuje uciec graczowi",
         "bounty_on_player_head": "Spawnuje wrogich NPC podczas trwania efektu",
         "supersonic": "Przyspiesza ruch gracza 8-krotnie",
-        "ufo_abduction": "Teleportuje gracza w losowe miejsce, leczy rany, usuwa ubrania"
+        "ufo_abduction": "Teleportuje gracza w losowe miejsce, leczy rany, usuwa ubrania",
+        "roll_dice": "Gracz rzuca kostką i aktywuje jeden losowy efekt wybrany z różnych kategorii"
     }
 }

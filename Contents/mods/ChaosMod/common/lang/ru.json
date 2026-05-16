@@ -327,7 +327,8 @@
         "spawn_griefer_skeleton": "Заспавнить скелета-грифера",
         "ufo_abduction": "Похищение НЛО",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "НЛО похищает зомби"
+        "ufo_abducts_zombies": "НЛО похищает зомби",
+        "roll_dice": "Бросок Кубика"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
@@ -379,7 +380,8 @@
         "opened_windows": "Открыто окон: %d",
         "removed_barricades": "Убрано баррикад: %d",
         "removed_curtains": "Убрано штор: %d",
-        "unlimited_ammo": "Бесконечные патроны"
+        "unlimited_ammo": "Бесконечные патроны",
+        "modified_zombies": "Изменено зомби: %d"
     },
     "meta": {
         "username_activated_effect": "%s активировал %s"
@@ -618,6 +620,7 @@
         "spawn_npc_with_loot": "NPC появляется с добычей и пытается скрыться от игрока",
         "bounty_on_player_head": "Спавн враждебных NPC в течение времени эффекта",
         "supersonic": "Ускоряет передвижение игрока в 8 раз",
-        "ufo_abduction": "Телепорт в случайную точку, излечение ран, удаление одежды"
+        "ufo_abduction": "Телепорт в случайную точку, излечение ран, удаление одежды",
+        "roll_dice": "Игрок бросает кубик и активирует один случайный эффект, выбранный из разных категорий"
     }
 }

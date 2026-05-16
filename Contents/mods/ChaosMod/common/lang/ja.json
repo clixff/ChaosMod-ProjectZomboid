@@ -327,7 +327,8 @@
         "spawn_griefer_skeleton": "グリーファー・スケルトンをスポーン",
         "ufo_abduction": "UFOの誘拐",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "UFOがゾンビを誘拐"
+        "ufo_abducts_zombies": "UFOがゾンビを誘拐",
+        "roll_dice": "サイコロを振る"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -379,7 +380,8 @@
         "water_globally_disabled": "世界中で水道が停止しました",
         "water_globally_enabled": "世界中で水道が復旧しました",
         "total_votes": "総投票数: %d",
-        "unlimited_ammo": "無限弾薬"
+        "unlimited_ammo": "無限弾薬",
+        "modified_zombies": "%d 体のゾンビを変更"
     },
     "meta": {
         "username_activated_effect": "%sが%sをアクティブにしました"
@@ -618,6 +620,7 @@
         "spawn_npc_with_loot": "戦利品を持ったNPCが現れ、プレイヤーから逃げようとします",
         "bounty_on_player_head": "効果が持続している間、敵対的なNPCをスポーンします",
         "supersonic": "プレイヤーの移動速度を8倍にする",
-        "ufo_abduction": "プレイヤーをランダムな地点にテレポートし、傷を癒し、衣服を取り除く"
+        "ufo_abduction": "プレイヤーをランダムな地点にテレポートし、傷を癒し、衣服を取り除く",
+        "roll_dice": "プレイヤーがサイコロを振り、異なるカテゴリから選ばれたランダムな効果を1つ発動します"
     }
 }

@@ -326,7 +326,8 @@
         "spawn_griefer_skeleton": "Griefer İskelet Oluştur",
         "ufo_abduction": "UFO Kaçırması",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "UFO Zombileri Kaçırıyor"
+        "ufo_abducts_zombies": "UFO Zombileri Kaçırıyor",
+        "roll_dice": "Zar At"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
@@ -378,7 +379,8 @@
         "water_globally_disabled": "Su küresel olarak devre dışı bırakıldı",
         "water_globally_enabled": "Su küresel olarak etkinleştirildi",
         "total_votes": "Toplam oy: %d",
-        "unlimited_ammo": "Sınırsız Cephane"
+        "unlimited_ammo": "Sınırsız Cephane",
+        "modified_zombies": "%d zombi değiştirildi"
     },
     "meta": {
         "username_activated_effect": "%s şunu etkinleştirdi: %s"
@@ -602,6 +604,7 @@
         "spawn_npc_with_loot": "Bir NPC ganimetle birlikte belirir ve oyuncudan kaçmaya çalışır",
         "bounty_on_player_head": "Etki süresi boyunca düşman NPC'ler spawnlar",
         "supersonic": "Oyuncunun hareketini 8 kat hızlandırır",
-        "ufo_abduction": "Oyuncuyu rastgele bir noktaya ışınlar, yaraları iyileştirir, kıyafetleri çıkarır"
+        "ufo_abduction": "Oyuncuyu rastgele bir noktaya ışınlar, yaraları iyileştirir, kıyafetleri çıkarır",
+        "roll_dice": "Oyuncu zar atar ve farklı kategorilerden seçilen rastgele bir efekti etkinleştirir"
     }
 }

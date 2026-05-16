@@ -326,7 +326,8 @@
         "spawn_griefer_skeleton": "生成捣蛋鬼骷髅",
         "ufo_abduction": "UFO绑架",
         "supersonic": "Supersonic",
-        "ufo_abducts_zombies": "UFO绑架僵尸"
+        "ufo_abducts_zombies": "UFO绑架僵尸",
+        "roll_dice": "掷骰子"
     },
     "core": {
         "start_mod": "启动混乱模式",
@@ -378,7 +379,8 @@
         "water_globally_disabled": "全球供水已禁用",
         "water_globally_enabled": "全球供水已启用",
         "total_votes": "总票数: %d",
-        "unlimited_ammo": "无限弹药"
+        "unlimited_ammo": "无限弹药",
+        "modified_zombies": "已修改 %d 只僵尸"
     },
     "meta": {
         "username_activated_effect": "%s 激活了 %s"
@@ -602,6 +604,7 @@
         "spawn_npc_with_loot": "NPC带着战利品出现并尝试逃离玩家",
         "bounty_on_player_head": "在效果持续期间生成敌对NPC",
         "supersonic": "玩家移动速度提升8倍",
-        "ufo_abduction": "将玩家传送到随机地点，治愈伤口，移除衣物"
+        "ufo_abduction": "将玩家传送到随机地点，治愈伤口，移除衣物",
+        "roll_dice": "玩家掷骰子，激活从不同类别中选出的一个随机效果"
     }
 }
