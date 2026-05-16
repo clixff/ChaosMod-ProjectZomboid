@@ -5,6 +5,7 @@
 - Added a centered "ChaosMod v{version} Started / {n} effects" intro overlay that appears for 8 seconds (with a 1-second fade-out) when the mod is started
 - Added in-game modal about version mismatch between the mod and StreamerApp and new update modal.
 - When a mod version change replaces `effects.json` with the shipped defaults, the previous `effects.json` is now copied to `effects.json.backup` in the same folder first
+- Explosions now damage vehicle parts and kick player out of cars
 
 ### New Effects
 

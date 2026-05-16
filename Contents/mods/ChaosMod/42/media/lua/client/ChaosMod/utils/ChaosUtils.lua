@@ -168,6 +168,16 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
     explosionRange = explosionRange or 5
     if shouldRemoveProps == nil then shouldRemoveProps = true end
 
+    local prePlayer = getPlayer()
+    if prePlayer and prePlayer:getVehicle() then
+        local sqX, sqY, sqZ = square:getX(), square:getY(), square:getZ()
+        if math.floor(prePlayer:getZ()) == sqZ
+            and ChaosUtils.isInRange(sqX, sqY, prePlayer:getX(), prePlayer:getY(), explosionRange)
+        then
+            ChaosVehicle.ExitVehicle(prePlayer)
+        end
+    end
+
     if shouldRemoveProps then
         local x, y, z = square:getX(), square:getY(), square:getZ()
         ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
@@ -219,6 +229,14 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
             zombie:knockDown(isBehindZombie)
         end
     end, false, expZ)
+
+    local nearbyVehicles = ChaosVehicle.GetVehiclesNearby(square, explosionRange + 2)
+    for i = 0, nearbyVehicles:size() - 1 do
+        local nearbyVehicle = nearbyVehicles:get(i)
+        if nearbyVehicle then
+            ChaosVehicle.DamageVehicleFromExplosion(nearbyVehicle)
+        end
+    end
 end
 
 ---@type table<integer, PerkFactory.Perk>

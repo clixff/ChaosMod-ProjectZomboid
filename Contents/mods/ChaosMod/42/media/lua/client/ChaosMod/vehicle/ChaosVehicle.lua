@@ -46,6 +46,30 @@ VEHICLE_TIRES = {
     "TireRearRight"
 }
 
+---@type table<integer, string>
+VEHICLE_WINDOWS = {
+    "Windshield",
+    "WindshieldRear",
+    "WindowFrontLeft",
+    "WindowFrontRight",
+    "WindowMiddleLeft",
+    "WindowMiddleRight",
+    "WindowRearLeft",
+    "WindowRearRight",
+}
+
+---@type table<integer, string>
+VEHICLE_DOORS = {
+    "DoorFrontLeft",
+    "DoorFrontRight",
+    "DoorMiddleLeft",
+    "DoorMiddleRight",
+    "DoorRearLeft",
+    "DoorRearRight",
+    "TrunkDoor",
+    "EngineDoor",
+}
+
 ---@param x number
 ---@param y number
 ---@param z number
@@ -196,6 +220,67 @@ function ChaosVehicle.ExitVehicle(character)
     local vehicle = character:getVehicle()
     if not vehicle then return end
     vehicle:exit(character)
+end
+
+---@param vehicle BaseVehicle
+function ChaosVehicle.DamageVehicleFromExplosion(vehicle)
+    if not vehicle then return end
+
+    for _, windowName in ipairs(VEHICLE_WINDOWS) do
+        local part = vehicle:getPartById(windowName)
+        if part and part:getInventoryItem() then
+            ---@diagnostic disable-next-line: param-type-mismatch
+            part:setInventoryItem(nil, 10)
+            vehicle:transmitPartItem(part)
+        end
+    end
+
+    for _, wheelName in ipairs(VEHICLE_TIRES) do
+        local part = vehicle:getPartById(wheelName)
+        if part and part:getInventoryItem() then
+            if ChaosUtils.RandInteger(2) == 0 then
+                local wheelId = part:getWheelIndex()
+                if wheelId then
+                    vehicle:setTireRemoved(wheelId, true)
+                end
+                ---@diagnostic disable-next-line: param-type-mismatch
+                part:setInventoryItem(nil, 10)
+                vehicle:transmitPartItem(part)
+            end
+        end
+    end
+
+    for _, doorName in ipairs(VEHICLE_DOORS) do
+        local part = vehicle:getPartById(doorName)
+        if part and part:getInventoryItem() then
+            if ChaosUtils.RandInteger(2) == 0 then
+                ---@diagnostic disable-next-line: param-type-mismatch
+                part:setInventoryItem(nil, 10)
+                vehicle:transmitPartItem(part)
+            end
+        end
+    end
+
+    local enginePart = vehicle:getPartById("Engine")
+    if enginePart then
+        enginePart:damage(50)
+        vehicle:transmitEngine()
+    end
+
+    local gasTankPart = vehicle:getPartById("GasTank")
+    if gasTankPart then
+        gasTankPart:damage(50)
+        vehicle:transmitPartItem(gasTankPart)
+    end
+
+    local batteryPart = vehicle:getPartById("Battery")
+    if batteryPart then
+        batteryPart:damage(50)
+        vehicle:transmitPartItem(batteryPart)
+    end
+
+    vehicle:crash(50, true)
+    vehicle:updatePartStats()
 end
 
 ---@return string
