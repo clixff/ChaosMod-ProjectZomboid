@@ -92,7 +92,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.1.0";
+const VERSION = "1.1.2";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
