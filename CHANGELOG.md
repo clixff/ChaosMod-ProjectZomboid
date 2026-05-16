@@ -11,6 +11,10 @@
 - UFO Abducts Zombies
 - Roll Dice
 
+### Mod Fixes
+
+- Fixed localization across all language files: corrected typos and missing diacritics translations
+
 [1.1.1]
 
 ### New Mod Features

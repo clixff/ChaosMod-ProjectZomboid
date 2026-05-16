@@ -373,7 +373,7 @@
         "books_hidden": "Books Hidden: %d",
         "item_hidden": "%s Item hidden: %s",
         "clothes_hidden": "Clothes Hidden: %d",
-        "weapons_hidden": "Weapons Hidden: %d", 
+        "weapons_hidden": "Weapons Hidden: %d",
         "electricity_globally_disabled": "Electricity has been disabled globally",
         "electricity_globally_enabled": "Electricity has been enabled globally",
         "water_globally_disabled": "Water has been disabled globally",
