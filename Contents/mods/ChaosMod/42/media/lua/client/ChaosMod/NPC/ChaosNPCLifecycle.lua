@@ -291,7 +291,8 @@ function ChaosNPC:OnZombieDead()
     local isFollowGroup = self.npcGroup == ChaosNPCGroupID.COMPANIONS or
         self.npcGroup == ChaosNPCGroupID.FOLLOWERS
     if isFollowGroup and self.zombie then
-        self.zombie:playSound("deathcrash")
+        ChaosUtils.PlayUISound("deathcrash", false, 0.5)
+
         local player = getPlayer()
         if player then
             local name = ChaosNicknames.ensureZombieNicknameAndColor(self.zombie)

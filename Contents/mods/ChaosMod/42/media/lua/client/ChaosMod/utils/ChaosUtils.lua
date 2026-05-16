@@ -326,18 +326,30 @@ end
 
 ---@param soundname string
 ---@param skipCheck boolean | nil
-function ChaosUtils.PlayUISound(soundname, skipCheck)
+---@param volume number | nil
+function ChaosUtils.PlayUISound(soundname, skipCheck, volume)
     skipCheck = skipCheck or false
     if not skipCheck and not ChaosConfig.IsUISoundsEnabled() then
         return nil
     end
 
+    ---@type SoundManager
     local soundManager = getSoundManager()
     if not soundManager then
         print("[ChaosUtils] Sound manager not found")
         return nil
     end
-    return soundManager:playUISound(soundname)
+
+    local soundId = soundManager:playUISound(soundname)
+
+    if volume ~= nil then
+        local emitter = soundManager:getUIEmitter()
+        if emitter then
+            emitter:setVolume(soundId, volume)
+        end
+    end
+
+    return soundId
 end
 
 ---@param targetHours integer
