@@ -7,6 +7,7 @@
 - When a mod version change replaces `effects.json` with the shipped defaults, the previous `effects.json` is now copied to `effects.json.backup` in the same folder first
 - Explosions now damage vehicle parts and kick player out of cars
 - New vehicles now spawn with random part conditions
+- Added Twitch Bits donation system for effects activation
 
 ### Mod Fixes
 

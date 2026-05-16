@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Check,
   CircleQuestionMark,
@@ -10,6 +10,8 @@ import {
   LogIn,
   LogOut,
   Pencil,
+  Power,
+  PowerOff,
   Settings,
   Star,
   TriangleAlert,
@@ -34,7 +36,7 @@ import {
   twitchLogout,
   donationAlertsLogout,
   donationAlertsSetup,
-  exportEffects,
+  downloadEffectsUrl,
   updateConfig,
   getConfig,
   getLanguages,
@@ -87,9 +89,8 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [loading, setLoading] = useState(true);
   const [obsModal, setObsModal] = useState(false);
   const [exportModal, setExportModal] = useState(false);
-  const [exportResultPath, setExportResultPath] = useState<string | null>(null);
-  const [exportResultKind, setExportResultKind] = useState<"csv" | "xlsx">(
-    "xlsx",
+  const [exportDoneKind, setExportDoneKind] = useState<"csv" | "xlsx" | null>(
+    null,
   );
   const [exportType, setExportType] = useState("xlsx");
   const [busy, setBusy] = useState(false);
@@ -99,6 +100,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [daCurrency, setDaCurrency] = useState("RUB");
   const [config, setConfig] = useState<ModConfig | null>(null);
   const [languages, setLanguages] = useState<string[]>([]);
+  const [bitsOptionsModal, setBitsOptionsModal] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -367,6 +369,146 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             <div className="provider-row-main">
               <span className="provider-row-name">
                 <img
+                  src={twitchLogo}
+                  alt=""
+                  className="provider-row-logo"
+                />
+                Twitch Bits
+              </span>
+              {(() => {
+                const twitchAuthorized =
+                  status.twitch.configured && status.twitch.name !== null;
+                const bitsEnabled =
+                  config?.streamer_mode.donation_systems.twitch_bits.enabled ??
+                  false;
+                if (!twitchAuthorized) {
+                  return (
+                    <span className="badge badge--off">
+                      <span className="badge-dot" />
+                      Not Authorized
+                    </span>
+                  );
+                }
+                return <StatusBadge on={bitsEnabled} labelOn="Enabled" labelOff="Disabled" />;
+              })()}
+            </div>
+            {config && (
+              <div className="provider-row-sub">
+                <span className="card-row-label">1.0 effect cost</span>
+                <span className="card-row-value">
+                  {Math.ceil(
+                    1.0 *
+                      config.streamer_mode.donation_systems.twitch_bits
+                        .price_multiplier,
+                  )}{" "}
+                  bits
+                </span>
+              </div>
+            )}
+            {(() => {
+              const twitchAuthorized =
+                status.twitch.configured && status.twitch.name !== null;
+              if (!twitchAuthorized) return null;
+              const bitsEnabled =
+                config?.streamer_mode.donation_systems.twitch_bits.enabled ??
+                false;
+              return (
+                <div className="card-actions">
+                  {bitsEnabled ? (
+                    <button
+                      className="btn"
+                      disabled={busy}
+                      onClick={() =>
+                        void wrap(async () => {
+                          await updateConfig({
+                            streamer_mode: {
+                              donation_systems: {
+                                twitch_bits: { enabled: false },
+                              },
+                            },
+                          });
+                          setConfig((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  streamer_mode: {
+                                    ...prev.streamer_mode,
+                                    donation_systems: {
+                                      ...prev.streamer_mode.donation_systems,
+                                      twitch_bits: {
+                                        ...prev.streamer_mode.donation_systems
+                                          .twitch_bits,
+                                        enabled: false,
+                                      },
+                                    },
+                                  },
+                                }
+                              : prev,
+                          );
+                          onNotify("Twitch Bits disabled.");
+                        })
+                      }
+                    >
+                      <PowerOff size={14} aria-hidden="true" />
+                      Disable
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn--primary"
+                      disabled={busy}
+                      onClick={() =>
+                        void wrap(async () => {
+                          await updateConfig({
+                            streamer_mode: {
+                              enable_donate: true,
+                              donation_systems: {
+                                twitch_bits: { enabled: true },
+                              },
+                            },
+                          });
+                          setConfig((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  streamer_mode: {
+                                    ...prev.streamer_mode,
+                                    enable_donate: true,
+                                    donation_systems: {
+                                      ...prev.streamer_mode.donation_systems,
+                                      twitch_bits: {
+                                        ...prev.streamer_mode.donation_systems
+                                          .twitch_bits,
+                                        enabled: true,
+                                      },
+                                    },
+                                  },
+                                }
+                              : prev,
+                          );
+                          onNotify("Twitch Bits enabled.");
+                        })
+                      }
+                    >
+                      <Power size={14} aria-hidden="true" />
+                      Enable
+                    </button>
+                  )}
+                  <button
+                    className="btn"
+                    disabled={busy}
+                    onClick={() => setBitsOptionsModal(true)}
+                  >
+                    <Settings size={14} aria-hidden="true" />
+                    Options
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+          <div className="provider-row">
+            <div className="provider-row-main">
+              <span className="provider-row-name">
+                <img
                   src={donationAlertsLogo}
                   alt=""
                   className="provider-row-logo"
@@ -490,15 +632,17 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             <button
               className="btn btn--primary"
               disabled={busy}
-              onClick={() =>
-                void wrap(async () => {
-                  const kind: "csv" | "xlsx" =
-                    exportType === "csv" ? "csv" : "xlsx";
-                  const r = await exportEffects(kind);
-                  setExportResultKind(kind);
-                  setExportResultPath(r.path);
-                })
-              }
+              onClick={() => {
+                const kind: "csv" | "xlsx" =
+                  exportType === "csv" ? "csv" : "xlsx";
+                const a = document.createElement("a");
+                a.href = downloadEffectsUrl(kind);
+                a.rel = "noopener";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setExportDoneKind(kind);
+              }}
             >
               <FileDown size={14} aria-hidden="true" />
               Export
@@ -617,34 +761,49 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
         />
       )}
 
-      {exportResultPath !== null && (
-        <Modal
-          title="Export complete"
-          onClose={() => setExportResultPath(null)}
-        >
-          <p>The effects file was written to:</p>
-          <div
-            className="card-link"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <span style={{ flex: 1, wordBreak: "break-all" }}>
-              {exportResultPath}
-            </span>
-            <CopyButton
-              value={exportResultPath}
-              onCopied={() => onNotify("Path copied to clipboard.")}
-              onError={(msg) => onNotify(msg, true)}
-            />
-          </div>
-          <p style={{ marginTop: 12 }}>
-            Explorer should open with the file selected. Use it directly or
-            import it into Google Sheets:
+      {bitsOptionsModal && config && (
+        <TwitchBitsOptionsModal
+          multiplier={
+            config.streamer_mode.donation_systems.twitch_bits.price_multiplier
+          }
+          priceGroups={config.streamer_mode.donate_price_groups}
+          onChangeMultiplier={(v) => {
+            setConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    streamer_mode: {
+                      ...prev.streamer_mode,
+                      donation_systems: {
+                        ...prev.streamer_mode.donation_systems,
+                        twitch_bits: {
+                          ...prev.streamer_mode.donation_systems.twitch_bits,
+                          price_multiplier: v,
+                        },
+                      },
+                    },
+                  }
+                : prev,
+            );
+            void saveConfigPatch({
+              streamer_mode: {
+                donation_systems: {
+                  twitch_bits: { price_multiplier: v },
+                },
+              },
+            });
+          }}
+          onClose={() => setBitsOptionsModal(false)}
+        />
+      )}
+
+      {exportDoneKind !== null && (
+        <Modal title="Export complete" onClose={() => setExportDoneKind(null)}>
+          <p>
+            The effects file is being downloaded by your browser. Use it
+            directly or import it into Google Sheets:
           </p>
-          <GoogleSheetsInstructions kind={exportResultKind} />
+          <GoogleSheetsInstructions kind={exportDoneKind} />
           <div
             style={{
               display: "flex",
@@ -653,10 +812,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
               marginTop: 16,
             }}
           >
-            <button
-              className="btn"
-              onClick={() => setExportResultPath(null)}
-            >
+            <button className="btn" onClick={() => setExportDoneKind(null)}>
               Close
             </button>
             <a
@@ -748,6 +904,86 @@ function CopyButton({ value, onCopied, onError }: CopyButtonProps) {
     >
       {copied ? <Check size={14} /> : <Copy size={14} />}
     </button>
+  );
+}
+
+interface TwitchBitsOptionsModalProps {
+  multiplier: number;
+  priceGroups: { group: string; price: number }[];
+  onChangeMultiplier: (v: number) => void;
+  onClose: () => void;
+}
+
+function TwitchBitsOptionsModal({
+  multiplier,
+  priceGroups,
+  onChangeMultiplier,
+  onClose,
+}: TwitchBitsOptionsModalProps) {
+  const safeMultiplier =
+    Number.isFinite(multiplier) && multiplier > 0 ? multiplier : 100;
+
+  const groupedHint = useMemo(() => {
+    const byBits = new Map<number, string[]>();
+    for (const pg of priceGroups) {
+      const bits = Math.ceil(pg.price * safeMultiplier);
+      const list = byBits.get(bits) ?? [];
+      list.push(pg.group);
+      byBits.set(bits, list);
+    }
+    const rows = Array.from(byBits.entries())
+      .map(([bits, groups]) => ({ bits, groups }))
+      .sort((a, b) => a.bits - b.bits);
+    return rows;
+  }, [priceGroups, safeMultiplier]);
+
+  return (
+    <Modal title="Twitch Bits Options" onClose={onClose}>
+      <div className="form-grid">
+        <label className="form-field">
+          <span className="form-label">Twitch Bits Multiplier</span>
+          <NumberInput
+            value={multiplier}
+            min={1}
+            step={1}
+            onChange={(v) => onChangeMultiplier(v)}
+          />
+        </label>
+      </div>
+      <p style={{ marginTop: 16, marginBottom: 8, fontWeight: 600 }}>
+        Effect Groups:
+      </p>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          fontFamily: "Roboto Mono, monospace",
+          fontSize: 13,
+        }}
+      >
+        {groupedHint.length === 0 ? (
+          <span style={{ opacity: 0.7 }}>No price groups configured.</span>
+        ) : (
+          groupedHint.map((row) => (
+            <div key={row.bits}>
+              {row.groups.join(", ")} — {row.bits} Bits
+            </div>
+          ))
+        )}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginTop: 18,
+        }}
+      >
+        <button className="btn" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </Modal>
   );
 }
 

@@ -464,7 +464,9 @@
         "status_disabled": "Disabled",
         "status_voting_only": "Voting Only",
         "status_donations_only": "Donations Only",
-        "donate_hint": "To activate an effect via a donation, write the effect ID (ID column) in the message text with the price in the \"Price\" column"
+        "donate_hint": "To activate an effect via a donation, write the effect ID (ID column) in the message text with the price in the \"Price\" column",
+        "col_twitch_bits": "Twitch Bits",
+        "donate_hint_bits": "To activate an effect via Twitch Bits, cheer the message with the effect ID (ID column) and send at least the amount of bits in the \"Twitch Bits\" column"
     },
     "descriptions": {
         "spawn_friendly_npc": "A companion to protect the player",

@@ -21,6 +21,20 @@ export interface DonatePriceGroup {
   price: number;
 }
 
+export interface DonationSystemDonationAlerts {
+  enabled: boolean;
+}
+
+export interface DonationSystemTwitchBits {
+  enabled: boolean;
+  price_multiplier: number;
+}
+
+export interface DonationSystemsConfig {
+  donationalerts: DonationSystemDonationAlerts;
+  twitch_bits: DonationSystemTwitchBits;
+}
+
 export interface StreamerModeConfig {
   streamer_mode_enabled: boolean;
   voting_enabled: boolean;
@@ -34,7 +48,7 @@ export interface StreamerModeConfig {
   say_killed_zombie_name: boolean;
   zombie_nicknames_buffer: number;
   enable_donate: boolean;
-  donate_providers: string[];
+  donation_systems: DonationSystemsConfig;
   donate_price_groups: DonatePriceGroup[];
   allow_vote_command: boolean;
   hide_votes: boolean;
@@ -69,11 +83,6 @@ function bool(val: unknown, def: boolean): boolean {
 }
 function num(val: unknown, def: number): number {
   return typeof val === "number" ? val : def;
-}
-function strArr(val: unknown, def: string[]): string[] {
-  return Array.isArray(val)
-    ? val.filter((v): v is string => typeof v === "string")
-    : def;
 }
 function priceGroupArr(
   val: unknown,
@@ -127,6 +136,11 @@ const DEFAULT_DONATE_PRICE_GROUPS: DonatePriceGroup[] = [
   { group: "neutral_6", price: 10 },
 ];
 
+const DEFAULT_DONATION_SYSTEMS: DonationSystemsConfig = {
+  donationalerts: { enabled: false },
+  twitch_bits: { enabled: false, price_multiplier: 100.0 },
+};
+
 const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   streamer_mode_enabled: true,
   voting_enabled: false,
@@ -140,7 +154,7 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   say_killed_zombie_name: true,
   zombie_nicknames_buffer: 150,
   enable_donate: false,
-  donate_providers: [],
+  donation_systems: DEFAULT_DONATION_SYSTEMS,
   donate_price_groups: DEFAULT_DONATE_PRICE_GROUPS,
   allow_vote_command: true,
   hide_votes: false,
@@ -227,6 +241,24 @@ function parseUI(raw: Record<string, unknown>): UIConfig {
   };
 }
 
+function parseDonationSystems(
+  raw: Record<string, unknown>,
+): DonationSystemsConfig {
+  const d = DEFAULT_DONATION_SYSTEMS;
+  const da = obj(raw["donationalerts"]);
+  const bits = obj(raw["twitch_bits"]);
+  const multiplier = num(bits["price_multiplier"], d.twitch_bits.price_multiplier);
+  return {
+    donationalerts: {
+      enabled: bool(da["enabled"], d.donationalerts.enabled),
+    },
+    twitch_bits: {
+      enabled: bool(bits["enabled"], d.twitch_bits.enabled),
+      price_multiplier: multiplier > 0 ? multiplier : d.twitch_bits.price_multiplier,
+    },
+  };
+}
+
 function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
   const d = DEFAULT_STREAMER_MODE;
   return {
@@ -266,7 +298,7 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
       d.zombie_nicknames_buffer,
     ),
     enable_donate: bool(raw["enable_donate"], d.enable_donate),
-    donate_providers: strArr(raw["donate_providers"], d.donate_providers),
+    donation_systems: parseDonationSystems(obj(raw["donation_systems"])),
     donate_price_groups: priceGroupArr(
       raw["donate_price_groups"],
       d.donate_price_groups,

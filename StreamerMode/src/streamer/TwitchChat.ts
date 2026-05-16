@@ -48,6 +48,9 @@ export interface ChatEvent {
   badges: unknown[];
   message_type: string;
   timestamp_ms: number;
+  cheer?: {
+    bits: number;
+  };
 }
 
 export interface TwitchChatParams {

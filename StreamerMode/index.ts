@@ -30,7 +30,10 @@ import { syncEffectsForModVersion } from "./src/versionFile.ts";
 import { startServer } from "./src/server.ts";
 import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
-import { writeEffectsXlsx } from "./src/exportXlsx.ts";
+import {
+  buildEffectsXlsxBuffer,
+  writeEffectsXlsx,
+} from "./src/exportXlsx.ts";
 import { TwitchChat, type ChatEvent } from "./src/streamer/TwitchChat.ts";
 import { NicknamesManager } from "./src/streamer/NicknamesManager.ts";
 import { VotingManager } from "./src/streamer/VotingManager.ts";
@@ -42,6 +45,7 @@ import { startDebugVotes } from "./src/debugVotes.ts";
 import { Bridge } from "./src/bridge/Bridge.ts";
 import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
 import { DonationManager } from "./src/donations/DonationManager.ts";
+import { handleBitsCheer } from "./src/donations/BitsHandler.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
 import type { EffectEntry } from "./src/effects.ts";
 import { ActivityLog } from "./src/activityLog.ts";
@@ -622,24 +626,95 @@ async function main(): Promise<void> {
     startDebugVotes(votingManager);
   }
 
+  function handleBitsForChat(chat: ChatEvent): void {
+    if (!config) return;
+    const bits = chat.cheer?.bits ?? 0;
+    if (bits <= 0) return;
+    const nickname = chat.chatter_user_name || chat.chatter_user_login || "";
+    const result = handleBitsCheer({
+      message: chat.message.text,
+      bits,
+      nickname,
+      config,
+      effects,
+    });
+
+    switch (result.type) {
+      case "ignored":
+        return;
+      case "no_tag":
+      case "unknown_effect":
+        activityLog.add({
+          type: "bits_failed_no_tag",
+          nickname: result.nickname,
+          bits: result.bits,
+        });
+        return;
+      case "donations_disabled":
+        activityLog.add({
+          type: "bits_failed_disabled",
+          effect_id: result.effect_id,
+          effect_name: getString("effects", result.effect_id),
+          nickname: result.nickname,
+          bits: result.bits,
+        });
+        return;
+      case "price_too_low":
+        activityLog.add({
+          type: "bits_failed_price",
+          effect_id: result.effect_id,
+          effect_name: getString("effects", result.effect_id),
+          nickname: result.nickname,
+          bits: result.bits,
+          required_bits: result.required_bits,
+        });
+        return;
+      case "activate":
+        if (bridge) {
+          bridge.emit("activate_effects", {
+            effects: [
+              {
+                id: result.effect_id,
+                type: "donate",
+                nickname: result.nickname,
+              },
+            ],
+          });
+        }
+        activityLog.add({
+          type: "bits",
+          effect_id: result.effect_id,
+          effect_name: getString("effects", result.effect_id),
+          nickname: result.nickname,
+          bits: result.bits,
+          required_bits: result.required_bits,
+          price_group: result.price_group,
+        });
+        return;
+    }
+  }
+
   function handleChatMessage(chat: ChatEvent): void {
     if (!config?.streamer_mode.streamer_mode_enabled) return;
 
-    console.log(chat);
+    const bits = chat.cheer?.bits ?? 0;
+    const isCheer = bits > 0;
 
     const text = chat.message.text.trim();
     let voteNum: number | null = null;
 
-    const direct = Number(text);
-    if (Number.isInteger(direct) && text !== "") {
-      voteNum = direct;
-    }
+    if (!isCheer) {
+      const direct = Number(text);
+      if (Number.isInteger(direct) && text !== "") {
+        voteNum = direct;
+      }
 
-    if (voteNum === null && config.streamer_mode.allow_vote_command) {
-      const parts = text.split(/\s+/);
-      if (parts[0]?.toLowerCase() === "!vote" && parts.length === 2) {
-        const n = Number(parts[1]);
-        if (Number.isInteger(n)) voteNum = n;
+      if (voteNum === null && config.streamer_mode.allow_vote_command) {
+        const parts = text.split(/\s+/);
+        if (parts[0]?.toLowerCase() === "!vote" && parts.length === 2) {
+          const n = Number(parts[1]);
+          if (Number.isInteger(n)) voteNum = n;
+        }
       }
     }
 
@@ -658,7 +733,7 @@ async function main(): Promise<void> {
       );
     }
 
-    if (config.streamer_mode.voting_enabled) {
+    if (!isCheer && config.streamer_mode.voting_enabled) {
       if (voteNum !== null) {
         const n = config.streamer_mode.voting_options_number;
         if (voteNum >= n + 1 && voteNum <= 2 * n) voteNum -= n;
@@ -666,6 +741,10 @@ async function main(): Promise<void> {
           votingManager.addVote(chat.chatter_user_id, voteNum);
         }
       }
+    }
+
+    if (isCheer) {
+      handleBitsForChat(chat);
     }
   }
 
@@ -1037,10 +1116,16 @@ async function main(): Promise<void> {
           input.currency,
         );
         if (config && luaFolder) {
-          if (
-            !config.streamer_mode.donate_providers.includes("donationalerts")
-          ) {
-            config.streamer_mode.donate_providers.push("donationalerts");
+          let changed = false;
+          if (!config.streamer_mode.donation_systems.donationalerts.enabled) {
+            config.streamer_mode.donation_systems.donationalerts.enabled = true;
+            changed = true;
+          }
+          if (!config.streamer_mode.enable_donate) {
+            config.streamer_mode.enable_donate = true;
+            changed = true;
+          }
+          if (changed) {
             saveConfig(luaFolder, config);
             bridge?.emit("reload_config");
           }
@@ -1070,19 +1155,46 @@ async function main(): Promise<void> {
                 luaFolder,
                 effects,
                 config?.streamer_mode.donate_price_groups ?? [],
-                Boolean(
-                  config?.streamer_mode.enable_donate && daProvider.isConnected,
-                ),
+                getXlsxExportOptions(),
               )
             : writeEffectsCsv(luaFolder);
         revealInExplorer(outputPath);
         logger.info(`Exported to ${colors.cyan(outputPath)}`);
         return { success: true, path: outputPath };
       },
+      downloadEffects: async (kind: string) => {
+        if (kind !== "csv" && kind !== "xlsx") {
+          return {
+            success: false as const,
+            error: `Unsupported export type: ${kind}`,
+          };
+        }
+        if (kind === "xlsx") {
+          const buffer = await buildEffectsXlsxBuffer(
+            effects,
+            config?.streamer_mode.donate_price_groups ?? [],
+            getXlsxExportOptions(),
+          );
+          return {
+            success: true as const,
+            bytes: buffer,
+            filename: "chaos_mod_effects.xlsx",
+            contentType:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          };
+        }
+        const csv = buildEffectsCsvString();
+        return {
+          success: true as const,
+          bytes: new TextEncoder().encode(csv).buffer as ArrayBuffer,
+          filename: "chaos_mod_effects.csv",
+          contentType: "text/csv; charset=utf-8",
+        };
+      },
     };
   }
 
-  function writeEffectsCsv(luaDir: string): string {
+  function buildEffectsCsvString(): string {
     const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
     const rows: string[] = [
       "id,name,effect_id,enabled,chance,duration,price_group,price",
@@ -1105,9 +1217,25 @@ async function main(): Promise<void> {
         ].join(","),
       );
     }
+    return rows.join("\n");
+  }
+
+  function writeEffectsCsv(luaDir: string): string {
     const outputPath = join(luaDir, "export.csv");
-    writeFileSync(outputPath, rows.join("\n"), "utf-8");
+    writeFileSync(outputPath, buildEffectsCsvString(), "utf-8");
     return outputPath;
+  }
+
+  function getXlsxExportOptions() {
+    return {
+      donationalertsEnabled:
+        config?.streamer_mode.donation_systems.donationalerts.enabled ?? false,
+      twitchBitsEnabled:
+        config?.streamer_mode.donation_systems.twitch_bits.enabled ?? false,
+      bitsMultiplier:
+        config?.streamer_mode.donation_systems.twitch_bits.price_multiplier ??
+        100,
+    };
   }
 
   let activeServer = startServer(buildServerCtx(host));
@@ -1293,9 +1421,7 @@ async function main(): Promise<void> {
               luaFolder,
               effects,
               config?.streamer_mode.donate_price_groups ?? [],
-              Boolean(
-                config?.streamer_mode.enable_donate && daProvider.isConnected,
-              ),
+              getXlsxExportOptions(),
             )
           : writeEffectsCsv(luaFolder);
       logger.info(`Exported to ${colors.cyan(outputPath)}`);

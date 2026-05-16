@@ -35,7 +35,15 @@
         "say_killed_zombie_name": true,
         "zombie_nicknames_buffer": 150,
         "enable_donate": false,
-        "donate_providers": [],
+        "donation_systems": {
+            "donationalerts": {
+                "enabled": false
+            },
+            "twitch_bits": {
+                "enabled": false,
+                "price_multiplier": 100.0
+            }
+        },
         "donate_price_groups": [
             {
                 "group": "positive_1",

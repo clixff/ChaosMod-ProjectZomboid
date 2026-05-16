@@ -13,7 +13,7 @@
 ---@field zombie_nicknames_buffer number
 ---@field use_zombie_nicknames boolean
 ---@field enable_donate boolean
----@field donate_providers table<integer, string>
+---@field donation_systems table -- opaque, owned by StreamerMode app; Lua only round-trips it through save
 ---@field donate_price_groups DonatePriceGroup[]
 ---@field allow_vote_command boolean
 ---@field hide_votes boolean
@@ -95,7 +95,10 @@ ChaosConfig = ChaosConfig or {
         zombie_nicknames_buffer = 150,
         use_zombie_nicknames = true,
         enable_donate = false,
-        donate_providers = {},
+        donation_systems = {
+            donationalerts = { enabled = false },
+            twitch_bits = { enabled = false, price_multiplier = 100.0 },
+        },
         donate_price_groups = {
             { group = "positive_1", price = 1 },
             { group = "positive_2", price = 2.5 },
@@ -362,9 +365,9 @@ function ChaosConfig.LoadConfigFromDisk()
         if type(configData.streamer_mode.enable_donate) == "boolean" then
             ChaosConfig.streamer_mode.enable_donate = configData.streamer_mode.enable_donate
         end
-        -- Donate providers list
-        if type(configData.streamer_mode.donate_providers) == "table" then
-            ChaosConfig.streamer_mode.donate_providers = configData.streamer_mode.donate_providers
+        -- Donation systems (opaque blob owned by StreamerMode app)
+        if type(configData.streamer_mode.donation_systems) == "table" then
+            ChaosConfig.streamer_mode.donation_systems = configData.streamer_mode.donation_systems
         end
         -- If chat vote command (!vote) is allowed
         if type(configData.streamer_mode.allow_vote_command) == "boolean" then
@@ -487,12 +490,6 @@ function ChaosConfig.BuildJsonSnapshot()
             end
         end
     end
-    local providers = {}
-    if type(sm.donate_providers) == "table" then
-        for _, p in ipairs(sm.donate_providers) do
-            table.insert(providers, p)
-        end
-    end
     return {
         lang = ChaosConfig.lang,
         effects_interval_enabled = ChaosConfig.effects_interval_enabled,
@@ -530,7 +527,7 @@ function ChaosConfig.BuildJsonSnapshot()
             say_killed_zombie_name = sm.say_killed_zombie_name,
             zombie_nicknames_buffer = sm.zombie_nicknames_buffer,
             enable_donate = sm.enable_donate,
-            donate_providers = providers,
+            donation_systems = sm.donation_systems or {},
             donate_price_groups = groups,
             allow_vote_command = sm.allow_vote_command,
             hide_votes = sm.hide_votes,

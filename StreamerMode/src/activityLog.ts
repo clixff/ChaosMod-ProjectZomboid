@@ -25,6 +25,35 @@ export type ActivityEventInput =
       nickname: string;
       donation_amount: number;
     }
+  | {
+      type: "bits";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+      required_bits: number;
+      price_group: string;
+    }
+  | {
+      type: "bits_failed_price";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+      required_bits: number;
+    }
+  | {
+      type: "bits_failed_disabled";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+    }
+  | {
+      type: "bits_failed_no_tag";
+      nickname: string;
+      bits: number;
+    }
   | { type: "chat_connected" }
   | { type: "chat_disconnected" }
   | { type: "donationalerts_connected" }

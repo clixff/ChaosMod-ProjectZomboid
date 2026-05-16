@@ -28,7 +28,7 @@ export type DonationActivationFailure =
       donation_amount: number;
     };
 
-function parseEffectTag(message: string): string | null {
+export function parseEffectTag(message: string): string | null {
   const hashMatch = message.match(/#(\w+)/);
   if (hashMatch && hashMatch[1]) return hashMatch[1];
 

@@ -464,7 +464,9 @@
         "status_disabled": "無効",
         "status_voting_only": "投票のみ",
         "status_donations_only": "寄付のみ",
-        "donate_hint": "寄付で効果をアクティブにするには、メッセージテキストに効果ID(ID列)と「価格」列の金額を記述してください"
+        "donate_hint": "寄付で効果をアクティブにするには、メッセージテキストに効果ID(ID列)と「価格」列の金額を記述してください",
+        "col_twitch_bits": "Twitch Bits",
+        "donate_hint_bits": "Twitch Bitsで効果をアクティブにするには、効果ID(ID列)を含むチアメッセージを送り、「Twitch Bits」列の金額以上のビッツを送信してください"
     },
     "descriptions": {
         "spawn_friendly_npc": "プレイヤーを守るコンパニオンをスポーンします",

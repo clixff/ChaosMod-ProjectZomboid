@@ -17,6 +17,20 @@ export interface DonatePriceGroup {
   price: number;
 }
 
+export interface DonationSystemDonationAlerts {
+  enabled: boolean;
+}
+
+export interface DonationSystemTwitchBits {
+  enabled: boolean;
+  price_multiplier: number;
+}
+
+export interface DonationSystemsConfig {
+  donationalerts: DonationSystemDonationAlerts;
+  twitch_bits: DonationSystemTwitchBits;
+}
+
 export interface StreamerModeConfig {
   streamer_mode_enabled: boolean;
   voting_enabled: boolean;
@@ -30,7 +44,7 @@ export interface StreamerModeConfig {
   say_killed_zombie_name: boolean;
   zombie_nicknames_buffer: number;
   enable_donate: boolean;
-  donate_providers: string[];
+  donation_systems: DonationSystemsConfig;
   donate_price_groups: DonatePriceGroup[];
   allow_vote_command: boolean;
   hide_votes: boolean;
@@ -122,6 +136,43 @@ export type ActivityEvent =
       nickname: string;
       donation_amount: number;
     }
+  | {
+      id: number;
+      ts: number;
+      type: "bits";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+      required_bits: number;
+      price_group: string;
+    }
+  | {
+      id: number;
+      ts: number;
+      type: "bits_failed_price";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+      required_bits: number;
+    }
+  | {
+      id: number;
+      ts: number;
+      type: "bits_failed_disabled";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+    }
+  | {
+      id: number;
+      ts: number;
+      type: "bits_failed_no_tag";
+      nickname: string;
+      bits: number;
+    }
   | { id: number; ts: number; type: "chat_connected" }
   | { id: number; ts: number; type: "chat_disconnected" }
   | { id: number; ts: number; type: "donationalerts_connected" }
@@ -201,6 +252,10 @@ export async function exportEffects(kind: string): Promise<{ path: string | null
     throw new Error(text || `export: ${res.status}`);
   }
   return (await res.json()) as { path: string | null };
+}
+
+export function downloadEffectsUrl(kind: string): string {
+  return `/api/export/download?type=${encodeURIComponent(kind)}`;
 }
 
 export async function getLanguages(): Promise<string[]> {

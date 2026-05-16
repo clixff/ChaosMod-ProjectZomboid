@@ -86,8 +86,16 @@ export function registerDonateCommand(
 
         await daProvider.saveCredentials(appId, clientSecret, currency);
         if (config && luaFolder) {
-          if (!config.streamer_mode.donate_providers.includes("donationalerts")) {
-            config.streamer_mode.donate_providers.push("donationalerts");
+          let changed = false;
+          if (!config.streamer_mode.donation_systems.donationalerts.enabled) {
+            config.streamer_mode.donation_systems.donationalerts.enabled = true;
+            changed = true;
+          }
+          if (!config.streamer_mode.enable_donate) {
+            config.streamer_mode.enable_donate = true;
+            changed = true;
+          }
+          if (changed) {
             saveConfig(luaFolder, config);
             onConfigSaved?.();
           }
@@ -103,11 +111,11 @@ export function registerDonateCommand(
         await daProvider.deleteTokens();
         await daProvider.deleteCredentials();
         if (config && luaFolder) {
-          config.streamer_mode.donate_providers = config.streamer_mode.donate_providers.filter(
-            (p) => p !== "donationalerts",
-          );
-          saveConfig(luaFolder, config);
-          onConfigSaved?.();
+          if (config.streamer_mode.donation_systems.donationalerts.enabled) {
+            config.streamer_mode.donation_systems.donationalerts.enabled = false;
+            saveConfig(luaFolder, config);
+            onConfigSaved?.();
+          }
         }
         logger.info(`[DonationAlerts] Logged out and credentials removed.`);
         return;

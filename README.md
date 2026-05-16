@@ -96,8 +96,9 @@ This feature uses the same **StreamerApp** that is used for Twitch support.
 Currently supported donation services:
 
 - **DonationAlerts**
+- **Twitch Bits**
 
-Viewers can activate effects by donating a specific amount of money and including an effect ID in their donation message.
+Viewers can activate effects by donating a specific amount of money (or cheering with bits on Twitch) and including an effect ID in their donation message.
 
 Supported tag formats:
 
@@ -119,9 +120,17 @@ Hello! 22
 
 You can set up DonationAlerts in the StreamerApp dashboard.
 
+### Twitch Bits Setup
+
+You can enable Twitch Bits in the StreamerApp dashboard. You must be logged in to Twitch first.
+
+Viewers cheer with bits and include an effect ID in the cheer message — the same tag formats as above are supported.
+
+The amount of bits required to activate an effect is calculated from the effect's price group price multiplied by the Twitch Bits multiplier (configured in the dashboard, default is `100`). For example, an effect with price `2` and multiplier `100` requires at least `200` bits.
+
 ### Donation Prices Export
 
-You can export donation prices to a XLSX file on StreamerApp dashboard.
+You can export donation prices to a XLSX file on StreamerApp dashboard. The XLSX includes a `Price` column when DonationAlerts is enabled and a `Twitch Bits` column when Twitch Bits is enabled.
 
 The exported XLSX file can be imported into Google Sheets and shared with viewers as a donation price table.
 

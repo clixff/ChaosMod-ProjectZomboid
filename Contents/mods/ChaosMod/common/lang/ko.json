@@ -464,7 +464,9 @@
         "status_disabled": "비활성화됨",
         "status_voting_only": "투표만",
         "status_donations_only": "후원만",
-        "donate_hint": "후원을 통해 효과를 활성화하려면 메시지 내용에 효과 ID(ID 열)를 적고 \"가격\" 열에 있는 금액을 후원하세요."
+        "donate_hint": "후원을 통해 효과를 활성화하려면 메시지 내용에 효과 ID(ID 열)를 적고 \"가격\" 열에 있는 금액을 후원하세요.",
+        "col_twitch_bits": "Twitch Bits",
+        "donate_hint_bits": "Twitch Bits로 효과를 활성화하려면 효과 ID(ID 열)와 함께 채팅을 보내고 \"Twitch Bits\" 열에 표시된 비트 이상을 응원으로 보내세요."
     },
     "descriptions": {
         "spawn_friendly_npc": "플레이어를 보호해 줄 동료를 소환합니다",

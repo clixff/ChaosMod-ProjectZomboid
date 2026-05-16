@@ -84,6 +84,15 @@ export interface ServerContext {
   ) =>
     | { success: boolean; error?: string; path?: string }
     | Promise<{ success: boolean; error?: string; path?: string }>;
+  downloadEffects?: (kind: string) => Promise<
+    | { success: false; error: string }
+    | {
+        success: true;
+        bytes: ArrayBuffer;
+        filename: string;
+        contentType: string;
+      }
+  >;
 }
 
 export interface HomeStatus {
@@ -305,6 +314,28 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
             return new Response(r.error ?? "Export failed", { status: 400 });
           }
           return Response.json({ path: r.path ?? null });
+        },
+      },
+
+      "/api/export/download": {
+        GET: async (req: Request) => {
+          if (!ctx.downloadEffects) {
+            return new Response("Not available", { status: 503 });
+          }
+          const url = new URL(req.url);
+          const kind = url.searchParams.get("type") ?? "csv";
+          const r = await ctx.downloadEffects(kind);
+          if (!r.success) {
+            return new Response(r.error, { status: 400 });
+          }
+          return new Response(r.bytes, {
+            headers: {
+              "Content-Type": r.contentType,
+              "Content-Disposition": `attachment; filename="${r.filename}"`,
+              "Content-Length": String(r.bytes.byteLength),
+              "Cache-Control": "no-store",
+            },
+          });
         },
       },
 
