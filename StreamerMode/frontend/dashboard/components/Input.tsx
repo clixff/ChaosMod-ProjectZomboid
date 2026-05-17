@@ -1,4 +1,4 @@
-import type { ChangeEvent, CSSProperties } from "react";
+import type { ChangeEvent, CSSProperties, KeyboardEvent } from "react";
 
 interface TextInputProps {
   value: string;
@@ -7,6 +7,8 @@ interface TextInputProps {
   size?: "small" | "mid" | "full";
   type?: "text" | "color" | "password";
   style?: CSSProperties;
+  onBlur?: () => void;
+  onSubmit?: () => void;
 }
 
 export function TextInput({
@@ -16,11 +18,19 @@ export function TextInput({
   size = "full",
   type = "text",
   style,
+  onBlur,
+  onSubmit,
 }: TextInputProps) {
   const cls =
     size === "small" ? "input input--small" : size === "mid" ? "input input--mid" : "input";
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
+  };
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && onSubmit) {
+      e.preventDefault();
+      onSubmit();
+    }
   };
   return (
     <input
@@ -30,6 +40,8 @@ export function TextInput({
       onChange={handleChange}
       placeholder={placeholder}
       style={style}
+      onBlur={onBlur}
+      onKeyDown={handleKeyDown}
     />
   );
 }

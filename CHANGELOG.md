@@ -8,6 +8,7 @@
 - Explosions now damage vehicle parts and kick player out of cars
 - New vehicles now spawn with random part conditions
 - Added Twitch Bits donation system for effects activation
+- Added YouTube provider for live chat support for voting and zombie nicknames using your own YouTube Data API key
 
 ### Mod Fixes
 

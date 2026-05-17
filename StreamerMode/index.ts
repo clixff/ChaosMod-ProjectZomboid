@@ -1,3 +1,7 @@
+// MUST be first import — see file header. Sets globalThis.Long so that
+// protobufjs (loaded transitively by @grpc/proto-loader) can find the Long
+// class in `bun build --compile` output.
+import "./src/streamer/youtube/protobufBootstrap.ts";
 import colors from "colors";
 import open from "open";
 import { existsSync, statSync, writeFileSync } from "fs";
@@ -28,15 +32,18 @@ import {
 import { loadEffects, saveEffects } from "./src/effects.ts";
 import { syncEffectsForModVersion } from "./src/versionFile.ts";
 import { startServer } from "./src/server.ts";
-import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
+import {
+  createChatProviders,
+  type NormalizedChatMessage,
+} from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
 import {
   buildEffectsXlsxBuffer,
   writeEffectsXlsx,
 } from "./src/exportXlsx.ts";
-import { TwitchChat, type ChatEvent } from "./src/streamer/TwitchChat.ts";
 import { NicknamesManager } from "./src/streamer/NicknamesManager.ts";
 import { VotingManager } from "./src/streamer/VotingManager.ts";
+import { removeEmojis } from "./src/utils/text.ts";
 import {
   startDebugChatMessages,
   startDebugNicknames,
@@ -422,7 +429,9 @@ async function main(): Promise<void> {
   const useLocalhost = config?.streamer_mode.use_localhost_ip ?? true;
   const host = hostOverride ?? (useLocalhost ? "127.0.0.1" : "0.0.0.0");
 
-  const provider = createProvider(config);
+  const { twitch: twitchProvider, youtube: youtubeProvider } =
+    createChatProviders();
+  const chatProviders = [twitchProvider, youtubeProvider];
 
   const nicknamesManager = luaFolder
     ? new NicknamesManager(
@@ -626,13 +635,13 @@ async function main(): Promise<void> {
     startDebugVotes(votingManager);
   }
 
-  function handleBitsForChat(chat: ChatEvent): void {
+  function handleBitsForChat(msg: NormalizedChatMessage): void {
     if (!config) return;
-    const bits = chat.cheer?.bits ?? 0;
+    const bits = msg.cheer?.bits ?? 0;
     if (bits <= 0) return;
-    const nickname = chat.chatter_user_name || chat.chatter_user_login || "";
+    const nickname = msg.displayName || msg.loginName || "";
     const result = handleBitsCheer({
-      message: chat.message.text,
+      message: msg.text,
       bits,
       nickname,
       config,
@@ -694,13 +703,13 @@ async function main(): Promise<void> {
     }
   }
 
-  function handleChatMessage(chat: ChatEvent): void {
+  function handleChatMessage(msg: NormalizedChatMessage): void {
     if (!config?.streamer_mode.streamer_mode_enabled) return;
 
-    const bits = chat.cheer?.bits ?? 0;
+    const bits = msg.cheer?.bits ?? 0;
     const isCheer = bits > 0;
 
-    const text = chat.message.text.trim();
+    const text = msg.text;
     let voteNum: number | null = null;
 
     if (!isCheer) {
@@ -719,17 +728,22 @@ async function main(): Promise<void> {
     }
 
     if (config.streamer_mode.use_zombie_nicknames && nicknamesManager) {
-      const sanitizedMessage =
-        config.streamer_mode.render_chat_messages && voteNum === null
-          ? text.replace(/\\n/g, "").replace(/\r?\n/g, "")
-          : undefined;
+      const cleanedDisplayName =
+        removeEmojis(msg.displayName) || msg.displayName;
+      let sanitizedMessage: string | undefined;
+      if (config.streamer_mode.render_chat_messages && voteNum === null) {
+        const stripped = removeEmojis(
+          text.replace(/\\n/g, "").replace(/\r?\n/g, " "),
+        );
+        sanitizedMessage = stripped.length > 0 ? stripped : undefined;
+      }
 
       nicknamesManager.add(
-        chat.chatter_user_login,
-        chat.chatter_user_name,
-        chat.color,
+        msg.loginName,
+        cleanedDisplayName,
+        msg.colorHex,
         sanitizedMessage,
-        chat.timestamp_ms,
+        msg.timestampMs,
       );
     }
 
@@ -738,70 +752,35 @@ async function main(): Promise<void> {
         const n = config.streamer_mode.voting_options_number;
         if (voteNum >= n + 1 && voteNum <= 2 * n) voteNum -= n;
         if (voteNum >= 1 && voteNum <= n) {
-          votingManager.addVote(chat.chatter_user_id, voteNum);
+          votingManager.addVote(msg.userId, voteNum);
         }
       }
     }
 
     if (isCheer) {
-      handleBitsForChat(chat);
+      handleBitsForChat(msg);
     }
   }
 
-  let chat: TwitchChat | null = null;
-  let twitchUser: StreamerUser | null = null;
-  let chatConnected = false;
-
-  function connectChat(token: string, user: StreamerUser): void {
-    if (chat) chat.disconnect();
-    twitchUser = user;
-    chat = new TwitchChat({
-      accessToken: token,
-      broadcasterUserId: user.id,
-      readerUserId: user.id,
-    });
-    chat.onMessage = handleChatMessage;
-    chat.onConnect = () => {
-      chatConnected = true;
-      activityLog.add({ type: "chat_connected" });
-    };
-    chat.onDisconnect = () => {
-      chatConnected = false;
-      activityLog.add({ type: "chat_disconnected" });
-    };
-    chat.connect();
-  }
-
-  // Try loading existing token on startup
-  let isLoggedIn = false;
-  if (provider) {
-    const existingToken = await provider.loadToken();
-    if (existingToken) {
-      const user = await provider.validateToken(existingToken);
-      if (user) {
-        logger.info(
-          `${provider.coloredName} Logged in as ${colors.cyan(user.display_name)}`,
-        );
-        isLoggedIn = true;
-        connectChat(existingToken, user);
-      } else {
-        logger.debug(`Stored ${provider.name} token is invalid or expired`);
+  for (const provider of chatProviders) {
+    provider.onMessage = handleChatMessage;
+    provider.onChatConnect = () => {
+      if (provider.key === "twitch") {
+        activityLog.add({ type: "chat_connected" });
+      } else if (provider.key === "youtube") {
+        activityLog.add({ type: "youtube_chat_connected" });
       }
-    }
-    if (!isLoggedIn) {
-      logger.info(
-        `${provider.coloredName} Not logged in. Type ${colors.cyan("login")} to get the login URL.`,
-      );
-    }
+    };
+    provider.onChatDisconnect = () => {
+      if (provider.key === "twitch") {
+        activityLog.add({ type: "chat_disconnected" });
+      } else if (provider.key === "youtube") {
+        activityLog.add({ type: "youtube_chat_disconnected" });
+      }
+    };
   }
 
-  function onLogin(user: StreamerUser, token: string): void {
-    if (provider) {
-      logger.info(
-        `${provider.coloredName} Logged in as ${colors.cyan(user.display_name)}`,
-      );
-      connectChat(token, user);
-    }
+  twitchProvider.onLogin = () => {
     if (config && luaFolder) {
       config.streamer_mode.streamer_mode_enabled = true;
       config.streamer_mode.voting_enabled = true;
@@ -809,6 +788,23 @@ async function main(): Promise<void> {
       bridge?.emit("reload_config");
       logger.info("Streamer mode and voting enabled.");
     }
+  };
+
+  await twitchProvider.initFromStorage();
+  if (!twitchProvider.isAccountConnected()) {
+    logger.info(
+      `${twitchProvider.coloredName} Not logged in. Type ${colors.cyan("login")} to get the login URL.`,
+    );
+  }
+
+  youtubeProvider.setPollingOnlyReader(
+    () => config?.streamer_mode.youtube_chat_polling_only ?? false,
+  );
+  await youtubeProvider.initFromStorage();
+  if (!youtubeProvider.isAccountConnected()) {
+    logger.debug(
+      `${youtubeProvider.coloredName} Not logged in. Use the dashboard YouTube card to connect.`,
+    );
   }
 
   function reloadRuntimeConfig(): boolean {
@@ -837,6 +833,7 @@ async function main(): Promise<void> {
     effectCount: effects.length,
     onShutdown: () => {
       bridge?.stop();
+      for (const p of chatProviders) p.shutdown();
     },
   });
 
@@ -844,8 +841,7 @@ async function main(): Promise<void> {
     return {
       host: serverHost,
       port,
-      provider,
-      onLogin,
+      twitch: twitchProvider,
       getModStatus: () => {
         const optionsCount = config?.streamer_mode.voting_options_number ?? 4;
         const offset = iterationIndex % 2 !== 0 ? optionsCount : 0;
@@ -1021,18 +1017,20 @@ async function main(): Promise<void> {
           : null;
         const localUrl = `http://127.0.0.1:${port}/obs`;
         const lanUrl = lan ? `http://${lan}:${port}/obs` : null;
+        const youtubeStatus = youtubeProvider.getStatusSnapshot();
         return {
           port,
           twitch: {
-            configured: provider !== null,
-            connected: chat !== null && twitchUser !== null,
-            name: twitchUser?.display_name ?? null,
+            configured: true,
+            connected: twitchProvider.isAccountConnected(),
+            name: twitchProvider.getAccountName(),
           },
           donationalerts: {
             configured: true,
             connected: daProvider.isConnected,
             name: daProvider.currentUser?.name ?? null,
           },
+          youtube: youtubeStatus,
           obs: {
             use_localhost_ip: useLocalhost,
             local_url: localUrl,
@@ -1045,17 +1043,14 @@ async function main(): Promise<void> {
             active: votingManager.isActive,
           },
           twitch_chat: {
-            connected: chatConnected,
+            connected: twitchProvider.isChatConnected(),
           },
           recent_activity: activityLog.list(),
           version: versionStatus,
         };
       },
       twitchLogin: async () => {
-        if (!provider) {
-          return { success: false, error: "No streamer provider configured" };
-        }
-        const loginUrl = `http://localhost:${port}/login/${provider.key}`;
+        const loginUrl = `http://localhost:${port}/login/twitch`;
         try {
           await open(loginUrl);
         } catch (err) {
@@ -1065,20 +1060,28 @@ async function main(): Promise<void> {
         return { success: true, url: loginUrl };
       },
       twitchLogout: async () => {
-        if (!provider) {
-          return { success: false, error: "No streamer provider configured" };
-        }
-        if (chat) {
-          chat.disconnect();
-          chat = null;
-        }
-        twitchUser = null;
-        chatConnected = false;
-        const deleted = await provider.deleteToken();
+        const deleted = await twitchProvider.logout();
         if (!deleted) {
           return { success: false, error: "Not logged in" };
         }
-        logger.info(`${provider.coloredName} Logged out.`);
+        return { success: true };
+      },
+      youtubeLogout: async () => {
+        await youtubeProvider.logout();
+        return { success: true };
+      },
+      youtubeSetStreamUrl: async (rawUrl: string) => {
+        const r = await youtubeProvider.setStreamUrl(rawUrl);
+        if (!r.success) {
+          return { success: false, error: r.error };
+        }
+        return { success: true };
+      },
+      youtubeSetApiKey: async (rawKey: string) => {
+        const r = await youtubeProvider.setApiKey(rawKey);
+        if (!r.success) {
+          return { success: false, error: r.error };
+        }
         return { success: true };
       },
       donationAlertsLogin: async () => {
@@ -1278,15 +1281,11 @@ async function main(): Promise<void> {
     [],
     [],
     async () => {
-      if (!provider) {
-        logger.warn("No streamer provider configured.");
-        return;
-      }
-      const loginUrl = `http://localhost:${port}/login/${provider.key}`;
+      const loginUrl = `http://localhost:${port}/login/twitch`;
       logger.info(`Opening login URL: ${colors.cyan(loginUrl)}`);
       await open(loginUrl);
     },
-    "Open the login URL for the current streaming provider",
+    "Open the Twitch login URL",
   );
 
   app.registerCommand(
@@ -1294,23 +1293,12 @@ async function main(): Promise<void> {
     [],
     [],
     async () => {
-      if (!provider) {
-        logger.warn("No streamer provider configured.");
-        return;
-      }
-      if (chat) {
-        chat.disconnect();
-        chat = null;
-      }
-      twitchUser = null;
-      const deleted = await provider.deleteToken();
-      if (deleted) {
-        logger.info(`${provider.coloredName} Logged out.`);
-      } else {
+      const deleted = await twitchProvider.logout();
+      if (!deleted) {
         logger.warn("Not logged in.");
       }
     },
-    "Log out from the current streaming provider",
+    "Log out from Twitch",
   );
 
   app.registerCommand(

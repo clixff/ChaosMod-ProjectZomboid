@@ -95,6 +95,16 @@ function renderText(event: ActivityEvent): {
         className: "activity-row activity-row--warn",
         message: <>Disconnected from DonationAlerts Server</>,
       };
+    case "youtube_chat_connected":
+      return {
+        className: "activity-row activity-row--ok",
+        message: <>Connected to YouTube chat</>,
+      };
+    case "youtube_chat_disconnected":
+      return {
+        className: "activity-row activity-row--warn",
+        message: <>Disconnected from YouTube chat</>,
+      };
   }
 }
 

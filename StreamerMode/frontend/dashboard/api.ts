@@ -48,6 +48,7 @@ export interface StreamerModeConfig {
   donate_price_groups: DonatePriceGroup[];
   allow_vote_command: boolean;
   hide_votes: boolean;
+  youtube_chat_polling_only: boolean;
 }
 
 export interface ModConfig {
@@ -176,12 +177,23 @@ export type ActivityEvent =
   | { id: number; ts: number; type: "chat_connected" }
   | { id: number; ts: number; type: "chat_disconnected" }
   | { id: number; ts: number; type: "donationalerts_connected" }
-  | { id: number; ts: number; type: "donationalerts_disconnected" };
+  | { id: number; ts: number; type: "donationalerts_disconnected" }
+  | { id: number; ts: number; type: "youtube_chat_connected" }
+  | { id: number; ts: number; type: "youtube_chat_disconnected" };
 
 export interface HomeStatus {
   port: number;
   twitch: { configured: boolean; connected: boolean; name: string | null };
   donationalerts: { configured: boolean; connected: boolean; name: string | null };
+  youtube: {
+    account_connected: boolean;
+    channel_name: string | null;
+    chat_connected: boolean;
+    stream_url: string | null;
+    stream_title: string | null;
+    chat_message_count: number;
+    last_error: string | null;
+  };
   obs: {
     use_localhost_ip: boolean;
     local_url: string;
@@ -226,6 +238,31 @@ export async function donationAlertsLogin(): Promise<void> {
 }
 export async function donationAlertsLogout(): Promise<void> {
   await postSimple("/api/donationalerts/logout");
+}
+export async function youtubeLogout(): Promise<void> {
+  await postSimple("/api/youtube/logout");
+}
+export async function youtubeSetStreamUrl(url: string): Promise<void> {
+  const res = await fetch("/api/youtube/stream-url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `youtubeSetStreamUrl: ${res.status}`);
+  }
+}
+export async function youtubeSetApiKey(apiKey: string): Promise<void> {
+  const res = await fetch("/api/youtube/api-key", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ apiKey }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `youtubeSetApiKey: ${res.status}`);
+  }
 }
 export async function donationAlertsSetup(input: {
   appId: string;

@@ -1,5 +1,7 @@
 import { logger } from "./utils/logger.ts";
-import type { AnyProvider, StreamerUser } from "./streamer/index.ts";
+import type {
+  TwitchChatProvider,
+} from "./streamer/index.ts";
 import type { ModConfig } from "./config.ts";
 import type { EffectEntry } from "./effects.ts";
 import type { ActivityEvent } from "./activityLog.ts";
@@ -57,8 +59,7 @@ export interface ModStatus {
 export interface ServerContext {
   host: string;
   port: number;
-  provider: AnyProvider | null;
-  onLogin: (user: StreamerUser, token: string) => void | Promise<void>;
+  twitch: TwitchChatProvider | null;
   getModStatus: () => ModStatus;
   getEffectsResponse: () => unknown;
   activateEffect: (nickname: string | undefined, effectId: string) => { success: boolean; error?: string };
@@ -79,6 +80,9 @@ export interface ServerContext {
     clientSecret: string;
     currency: string;
   }) => Promise<{ success: boolean; error?: string; url?: string }>;
+  youtubeLogout?: () => Promise<{ success: boolean; error?: string }>;
+  youtubeSetStreamUrl?: (url: string) => Promise<{ success: boolean; error?: string }>;
+  youtubeSetApiKey?: (apiKey: string) => Promise<{ success: boolean; error?: string }>;
   exportEffects?: (
     kind: string,
   ) =>
@@ -107,6 +111,15 @@ export interface HomeStatus {
     connected: boolean;
     name: string | null;
   };
+  youtube: {
+    account_connected: boolean;
+    channel_name: string | null;
+    chat_connected: boolean;
+    stream_url: string | null;
+    stream_title: string | null;
+    chat_message_count: number;
+    last_error: string | null;
+  };
   obs: {
     use_localhost_ip: boolean;
     local_url: string;
@@ -131,16 +144,17 @@ export interface HomeStatus {
 }
 
 export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
-  const { host, port, provider } = ctx;
+  const { host, port } = ctx;
+  const twitch = ctx.twitch;
 
   const server = Bun.serve({
     hostname: host,
     port,
     routes: {
       "/login/twitch": () => {
-        if (!provider)
+        if (!twitch)
           return new Response("No provider configured", { status: 503 });
-        return Response.redirect(provider.getLoginUrl(port), 302);
+        return Response.redirect(twitch.getLoginUrl(port), 302);
       },
 
       "/auth/result/twitch": new Response(AUTH_CALLBACK_HTML, {
@@ -156,17 +170,14 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           if (!token || !providerParam) {
             return new Response("Missing parameters", { status: 400 });
           }
-          if (!provider || providerParam !== provider.key) {
+          if (!twitch || providerParam !== "twitch") {
             return new Response("Unknown provider", { status: 400 });
           }
 
-          const user = await provider.validateToken(token);
+          const user = await twitch.validateAndSaveToken(token);
           if (!user) {
             return new Response("Invalid or expired token", { status: 401 });
           }
-
-          await provider.saveToken(token);
-          await ctx.onLogin(user, token);
           return new Response(
             `Logged in as ${user.display_name}. You can close this tab.`,
           );
@@ -375,6 +386,72 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           const result = ctx.updateEffect(id, body);
           if (!result.success) {
             return new Response(result.error ?? "Update failed", { status: 400 });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/youtube/logout": {
+        POST: async () => {
+          if (!ctx.youtubeLogout)
+            return new Response("Not available", { status: 503 });
+          const r = await ctx.youtubeLogout();
+          if (!r.success) {
+            return new Response(r.error ?? "Logout failed", { status: 400 });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/youtube/api-key": {
+        POST: async (req: Request) => {
+          if (!ctx.youtubeSetApiKey)
+            return new Response("Not available", { status: 503 });
+          let body: unknown;
+          try {
+            body = await req.json();
+          } catch {
+            return new Response("Invalid JSON", { status: 400 });
+          }
+          if (body === null || typeof body !== "object" || Array.isArray(body)) {
+            return new Response("Body must be an object", { status: 400 });
+          }
+          const rawKey = (body as Record<string, unknown>)["apiKey"];
+          if (typeof rawKey !== "string") {
+            return new Response("Missing 'apiKey' field", { status: 400 });
+          }
+          const r = await ctx.youtubeSetApiKey(rawKey);
+          if (!r.success) {
+            return new Response(r.error ?? "Failed to save API key", {
+              status: 400,
+            });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/youtube/stream-url": {
+        POST: async (req: Request) => {
+          if (!ctx.youtubeSetStreamUrl)
+            return new Response("Not available", { status: 503 });
+          let body: unknown;
+          try {
+            body = await req.json();
+          } catch {
+            return new Response("Invalid JSON", { status: 400 });
+          }
+          if (body === null || typeof body !== "object" || Array.isArray(body)) {
+            return new Response("Body must be an object", { status: 400 });
+          }
+          const rawUrl = (body as Record<string, unknown>)["url"];
+          if (typeof rawUrl !== "string") {
+            return new Response("Missing 'url' field", { status: 400 });
+          }
+          const r = await ctx.youtubeSetStreamUrl(rawUrl);
+          if (!r.success) {
+            return new Response(r.error ?? "Failed to save stream URL", {
+              status: 400,
+            });
           }
           return new Response("OK");
         },

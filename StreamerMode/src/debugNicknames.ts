@@ -4,7 +4,7 @@ import { NicknamesManager } from "./streamer/NicknamesManager.ts";
 const DEBUG_CHAT_INTERVAL_MS = 15000;
 const DEBUG_CHAT_OFFSETS_MS = [0, 4000, 9000];
 
-const COLORS: string[] = [
+export const COLORS: string[] = [
   "#FF0000",
   "#0000FF",
   "#00FF00",

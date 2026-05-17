@@ -21,6 +21,7 @@ import donationAlertsLogo from "../assets/donationalerts_logo.webp";
 import obsLogo from "../assets/obs_logo.webp";
 import googleSheetsLogo from "../assets/google_sheets_logo.webp";
 import steamLogo from "../assets/steam_logo.webp";
+import youtubeLogo from "../assets/youtube_logo.webp";
 
 const STEAM_WORKSHOP_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142";
@@ -40,6 +41,9 @@ import {
   updateConfig,
   getConfig,
   getLanguages,
+  youtubeLogout,
+  youtubeSetStreamUrl,
+  youtubeSetApiKey,
   type HomeStatus,
   type ModConfig,
 } from "../api.ts";
@@ -101,6 +105,10 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [config, setConfig] = useState<ModConfig | null>(null);
   const [languages, setLanguages] = useState<string[]>([]);
   const [bitsOptionsModal, setBitsOptionsModal] = useState(false);
+  const [youtubeUrlDraft, setYoutubeUrlDraft] = useState<string | null>(null);
+  const [youtubeConnectModal, setYoutubeConnectModal] = useState(false);
+  const [youtubeApiKeyDraft, setYoutubeApiKeyDraft] = useState("");
+  const [youtubeInstructionsOpen, setYoutubeInstructionsOpen] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -183,6 +191,25 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
     } finally {
       setBusy(false);
     }
+  };
+
+  const commitYoutubeUrl = () => {
+    if (youtubeUrlDraft === null) return;
+    const next = youtubeUrlDraft;
+    const current = status?.youtube.stream_url ?? "";
+    if (next === current) {
+      setYoutubeUrlDraft(null);
+      return;
+    }
+    void wrap(async () => {
+      await youtubeSetStreamUrl(next);
+      setYoutubeUrlDraft(null);
+      onNotify(
+        next.trim()
+          ? "YouTube stream URL saved."
+          : "YouTube stream URL cleared.",
+      );
+    });
   };
 
   if (loading) return <div className="loading">Loading…</div>;
@@ -307,6 +334,18 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
               labelOn="Connected"
               labelOff="Not connected"
             />
+            <StatusRow
+              label="YouTube Account"
+              on={status.youtube.account_connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
+            <StatusRow
+              label="YouTube Chat"
+              on={status.youtube.chat_connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
           </div>
         </Section>
       </div>
@@ -345,6 +384,97 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                     "Login URL opened in your browser.",
                   )
                 }
+              >
+                <LogIn size={14} aria-hidden="true" />
+                Login
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-head">
+            <h3 className="card-title">
+              <img src={youtubeLogo} alt="" className="card-title-logo" />
+              YouTube
+            </h3>
+            <StatusBadge
+              on={status.youtube.account_connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
+          </div>
+          <div className="card-row">
+            <span className="card-row-label">Account</span>
+            <span className="card-row-value">
+              {status.youtube.channel_name ?? "—"}
+            </span>
+          </div>
+          <div className="card-row">
+            <span className="card-row-label">Chat</span>
+            <StatusBadge
+              on={status.youtube.chat_connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
+          </div>
+          {status.youtube.account_connected && status.youtube.stream_title && (
+            <>
+              <div className="card-row">
+                <span className="card-row-value">
+                  {status.youtube.stream_title}
+                </span>
+              </div>
+              <div className="card-row">
+                <span className="card-row-value" style={{ opacity: 0.65 }}>
+                  {status.youtube.chat_message_count} chat messages
+                </span>
+              </div>
+            </>
+          )}
+          {status.youtube.account_connected && (
+            <div className="card-row card-row-inline">
+              <span className="card-row-label">Stream URL</span>
+              <TextInput
+                value={youtubeUrlDraft ?? status.youtube.stream_url ?? ""}
+                placeholder="https://www.youtube.com/watch?v=..."
+                onChange={(v) => setYoutubeUrlDraft(v)}
+                onBlur={() => commitYoutubeUrl()}
+                onSubmit={() => commitYoutubeUrl()}
+              />
+            </div>
+          )}
+          {status.youtube.last_error && (
+            <div className="card-row">
+              <span className="card-row-value" style={{ color: "#f5b301" }}>
+                {status.youtube.last_error}
+              </span>
+            </div>
+          )}
+          <div className="card-actions">
+            {status.youtube.account_connected ? (
+              <button
+                className="btn"
+                disabled={busy}
+                onClick={() =>
+                  void wrap(
+                    () => youtubeLogout(),
+                    "Disconnected from YouTube.",
+                  )
+                }
+              >
+                <LogOut size={14} aria-hidden="true" />
+                Disconnect
+              </button>
+            ) : (
+              <button
+                className="btn btn--primary"
+                disabled={busy}
+                onClick={() => {
+                  setYoutubeApiKeyDraft("");
+                  setYoutubeInstructionsOpen(false);
+                  setYoutubeConnectModal(true);
+                }}
               >
                 <LogIn size={14} aria-hidden="true" />
                 Login
@@ -761,6 +891,29 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
         />
       )}
 
+      {youtubeConnectModal && (
+        <YouTubeConnectModal
+          busy={busy}
+          apiKey={youtubeApiKeyDraft}
+          onApiKey={setYoutubeApiKeyDraft}
+          instructionsOpen={youtubeInstructionsOpen}
+          onToggleInstructions={() =>
+            setYoutubeInstructionsOpen((v) => !v)
+          }
+          onClose={() => setYoutubeConnectModal(false)}
+          onSubmit={() => {
+            const key = youtubeApiKeyDraft.trim();
+            if (!key) return;
+            void wrap(async () => {
+              await youtubeSetApiKey(key);
+              setYoutubeConnectModal(false);
+              setYoutubeApiKeyDraft("");
+              onNotify("YouTube API key saved.");
+            });
+          }}
+        />
+      )}
+
       {bitsOptionsModal && config && (
         <TwitchBitsOptionsModal
           multiplier={
@@ -1100,6 +1253,95 @@ function DonationAlertsLoginModal({
         >
           <LogIn size={14} aria-hidden="true" />
           Login
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+interface YouTubeConnectModalProps {
+  busy: boolean;
+  apiKey: string;
+  onApiKey: (v: string) => void;
+  instructionsOpen: boolean;
+  onToggleInstructions: () => void;
+  onClose: () => void;
+  onSubmit: () => void;
+}
+
+function YouTubeConnectModal({
+  busy,
+  apiKey,
+  onApiKey,
+  instructionsOpen,
+  onToggleInstructions,
+  onClose,
+  onSubmit,
+}: YouTubeConnectModalProps) {
+  const canSubmit = !busy && apiKey.trim().length > 0;
+  return (
+    <Modal title="Connect YouTube" onClose={onClose}>
+      <p style={{ marginTop: 0, marginBottom: 12 }}>
+        Paste a YouTube Data API v3 key from your own Google Cloud project.
+        ChaosMod does not need access to your Google account.
+      </p>
+
+      <button
+        type="button"
+        className="btn"
+        onClick={onToggleInstructions}
+        style={{ marginBottom: 10 }}
+      >
+        {instructionsOpen ? "Hide" : "Show"} setup instructions
+      </button>
+      {instructionsOpen && (
+        <div
+          style={{
+            marginBottom: 12,
+            padding: 10,
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 6,
+            fontSize: 13,
+            opacity: 0.85,
+          }}
+        >
+          Detailed setup instructions will appear here.
+        </div>
+      )}
+
+      <div className="form-grid">
+        <label className="form-field">
+          <span className="form-label">YouTube Data API key</span>
+          <TextInput
+            value={apiKey}
+            onChange={onApiKey}
+            type="password"
+            placeholder="AIza..."
+            onSubmit={() => {
+              if (canSubmit) onSubmit();
+            }}
+          />
+        </label>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 18,
+        }}
+      >
+        <button className="btn" onClick={onClose} disabled={busy}>
+          Cancel
+        </button>
+        <button
+          className="btn btn--primary"
+          disabled={!canSubmit}
+          onClick={onSubmit}
+        >
+          <LogIn size={14} aria-hidden="true" />
+          Save
         </button>
       </div>
     </Modal>

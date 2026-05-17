@@ -57,7 +57,9 @@ export type ActivityEventInput =
   | { type: "chat_connected" }
   | { type: "chat_disconnected" }
   | { type: "donationalerts_connected" }
-  | { type: "donationalerts_disconnected" };
+  | { type: "donationalerts_disconnected" }
+  | { type: "youtube_chat_connected" }
+  | { type: "youtube_chat_disconnected" };
 
 export type ActivityEvent = ActivityEventInput & { id: number; ts: number };
 
@@ -72,7 +74,9 @@ export class ActivityLog {
       (event.type === "chat_connected" ||
         event.type === "chat_disconnected" ||
         event.type === "donationalerts_connected" ||
-        event.type === "donationalerts_disconnected") &&
+        event.type === "donationalerts_disconnected" ||
+        event.type === "youtube_chat_connected" ||
+        event.type === "youtube_chat_disconnected") &&
       last.type === event.type
     ) {
       return last;
