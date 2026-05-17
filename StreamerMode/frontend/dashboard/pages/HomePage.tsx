@@ -108,7 +108,6 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [youtubeUrlDraft, setYoutubeUrlDraft] = useState<string | null>(null);
   const [youtubeConnectModal, setYoutubeConnectModal] = useState(false);
   const [youtubeApiKeyDraft, setYoutubeApiKeyDraft] = useState("");
-  const [youtubeInstructionsOpen, setYoutubeInstructionsOpen] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -472,7 +471,6 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 disabled={busy}
                 onClick={() => {
                   setYoutubeApiKeyDraft("");
-                  setYoutubeInstructionsOpen(false);
                   setYoutubeConnectModal(true);
                 }}
               >
@@ -896,10 +894,6 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           busy={busy}
           apiKey={youtubeApiKeyDraft}
           onApiKey={setYoutubeApiKeyDraft}
-          instructionsOpen={youtubeInstructionsOpen}
-          onToggleInstructions={() =>
-            setYoutubeInstructionsOpen((v) => !v)
-          }
           onClose={() => setYoutubeConnectModal(false)}
           onSubmit={() => {
             const key = youtubeApiKeyDraft.trim();
@@ -1263,8 +1257,6 @@ interface YouTubeConnectModalProps {
   busy: boolean;
   apiKey: string;
   onApiKey: (v: string) => void;
-  instructionsOpen: boolean;
-  onToggleInstructions: () => void;
   onClose: () => void;
   onSubmit: () => void;
 }
@@ -1273,8 +1265,6 @@ function YouTubeConnectModal({
   busy,
   apiKey,
   onApiKey,
-  instructionsOpen,
-  onToggleInstructions,
   onClose,
   onSubmit,
 }: YouTubeConnectModalProps) {
@@ -1289,25 +1279,17 @@ function YouTubeConnectModal({
       <button
         type="button"
         className="btn"
-        onClick={onToggleInstructions}
+        onClick={() =>
+          window.open(
+            "https://github.com/clixff/ChaosMod-ProjectZomboid/wiki/YouTube:-How-to-create-API-Key",
+            "_blank",
+            "noopener,noreferrer",
+          )
+        }
         style={{ marginBottom: 10 }}
       >
-        {instructionsOpen ? "Hide" : "Show"} setup instructions
+        Show setup instructions
       </button>
-      {instructionsOpen && (
-        <div
-          style={{
-            marginBottom: 12,
-            padding: 10,
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 6,
-            fontSize: 13,
-            opacity: 0.85,
-          }}
-        >
-          Detailed setup instructions will appear here.
-        </div>
-      )}
 
       <div className="form-grid">
         <label className="form-field">

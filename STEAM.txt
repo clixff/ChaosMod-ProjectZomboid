@@ -4,7 +4,7 @@
 
 This mod triggers a random effect every 45 seconds. There are currently [b]310+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
 
-[b]Twitch integration[/b] is optional and allows your viewers to vote for the next effect. You can play without Twitch integration.
+[b]Twitch and YouTube integration[/b] is optional and allows your viewers to vote for the next effect. You can play without it.
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_02.png[/img]
 
@@ -42,10 +42,12 @@ Full list of effects: [url=https://docs.google.com/spreadsheets/d/11eyODgqo1gVId
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_twitch.png[/img]
 
-Viewers can vote for the next effect, and Twitch nicknames can appear above zombies.
-To enable Twitch support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
+Viewers can vote for the next effect, and Twitch or YouTube nicknames can appear above zombies.
+To enable Twitch or YouTube support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
 
-You can read more about Twitch integration on the mod's GitHub page.
+You can also activate effects with donations through [b]Twitch Bits[/b] or [b]DonationAlerts[/b]. Viewers cheer or donate with an effect ID in the message to trigger that specific effect.
+
+You can read more about Twitch, YouTube, and donation integration on the mod's GitHub page.
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_06.png[/img]
 
@@ -61,7 +63,7 @@ A: Make sure you are using the unstable branch of Project Zomboid on Steam.
 [b]Q: How can to disable some effect or change effect settings?[/b]
 A: You can edit settings of every effect in the mod settings windows (bottom-left corner)
 
-[b]Q: I only want to display Twitch nicknames above zombies, without random effects and without voting. How can I do this?[/b]
+[b]Q: I only want to display Twitch or YouTube nicknames above zombies, without random effects and without voting. How can I do this?[/b]
 A: In StreamerApp dashboard set these settings:
 [list]
 [*]Effects interval enabled: [b]false[/b]
@@ -131,6 +133,8 @@ It is designed for single-player only.
 [*]New effects
 [*]Meta effects system
 [*]Context aware effects system
+[*]Twitch Bits donation system
+[*]YouTube chat integration
 [/list]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_2_0_future.png[/img]

@@ -12,7 +12,7 @@ The mod currently includes **310+ effects**, such as:
 
 You can see the the full list of effects in [Google Sheets](https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I).
 
-Chaos Mod also supports Twitch integration. Viewers can vote for the next effect, and Twitch nicknames can be displayed above zombies.
+Chaos Mod also supports Twitch and YouTube integration. Viewers can vote for the next effect, and their nicknames can be displayed above zombies.
 
 ## Installation
 
@@ -86,6 +86,25 @@ The option numbers are displayed in OBS.
 
 To display voting options in OBS, add a browser source.
 You can see instructions on how to set up the browser source in the StreamerApp dashboard.
+
+## YouTube Support
+
+YouTube chat integration works the same way as Twitch — viewers can vote for the next effect by typing a number in chat, and their nicknames can appear above zombies. YouTube integration uses the same **StreamerApp** as Twitch.
+
+To vote, viewers send the option number in YouTube live chat — the same `<number>` and `!vote <number>` formats as Twitch.
+
+### YouTube Support Installation
+
+YouTube integration uses your own **YouTube Data API v3 key**. The mod never logs in to your Google account.
+
+1. Create a project and an API key at [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
+2. Enable the **YouTube Data API v3** for that project.
+3. In the StreamerApp dashboard, open the YouTube card, paste your API key, and paste your current YouTube live video URL.
+
+Notes:
+
+- YouTube does **not** support donation-triggered effects (there is no equivalent of Twitch Bits in YouTube live chat). For donations use DonationAlerts or Twitch Bits.
+- Reading YouTube live chat consumes your API key's daily quota.
 
 ## Donation Effect Support
 
@@ -231,7 +250,7 @@ In StreamerApp dashboard set these settings:
 - Voting enabled: false
 - Donations enabled: true
 
-### I only want to display Twitch nicknames above zombies, without random effects every 45 seconds and without voting. How can I do this?
+### I only want to display Twitch or YouTube nicknames above zombies, without random effects every 45 seconds and without voting. How can I do this?
 
 In StreamerApp dashboard set these settings:
 
