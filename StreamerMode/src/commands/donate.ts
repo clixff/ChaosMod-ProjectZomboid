@@ -29,14 +29,18 @@ export function registerDonateCommand(
 
       if (!subCmd) {
         console.log(colors.bold("\nDonation providers:"));
-        const hasCreds = !!(await daProvider.loadCredentials());
+        const appId = daProvider.getAppId();
+        const secrets = await daProvider.loadSecrets();
+        const hasConfig = !!appId && !!secrets;
         const user = daProvider.currentUser;
         const wsStatus = daProvider.isConnected
           ? colors.green("websocket connected")
           : colors.yellow("websocket disconnected");
         const status = user
-          ? colors.green(`logged in as ${colors.cyan(user.name)}`) + colors.gray(", ") + wsStatus
-          : hasCreds
+          ? colors.green(`logged in as ${colors.cyan(user.name)}`) +
+            colors.gray(", ") +
+            wsStatus
+          : hasConfig
             ? colors.yellow("credentials saved, not logged in")
             : colors.gray("not configured");
         console.log(`  ${colors.yellow("donationalerts")} — ${status}`);
@@ -80,15 +84,30 @@ export function registerDonateCommand(
         }
 
         if (!/^[A-Z]{3}$/.test(currency)) {
-          logger.warn(`[DonationAlerts] Currency must be exactly 3 letters, for example ${colors.cyan("RUB")}.`);
+          logger.warn(
+            `[DonationAlerts] Currency must be exactly 3 letters, for example ${colors.cyan("RUB")}.`,
+          );
           return;
         }
 
-        await daProvider.saveCredentials(appId, clientSecret, currency);
+        await daProvider.saveSecrets({
+          clientSecret,
+          accessToken: "",
+          refreshToken: "",
+        });
         if (config && luaFolder) {
           let changed = false;
-          if (!config.streamer_mode.donation_systems.donationalerts.enabled) {
-            config.streamer_mode.donation_systems.donationalerts.enabled = true;
+          const da = config.streamer_mode.donation_systems.donationalerts;
+          if (da.app_id !== appId) {
+            da.app_id = appId;
+            changed = true;
+          }
+          if (da.currency !== currency) {
+            da.currency = currency;
+            changed = true;
+          }
+          if (!da.enabled) {
+            da.enabled = true;
             changed = true;
           }
           if (!config.streamer_mode.enable_donate) {
@@ -100,7 +119,9 @@ export function registerDonateCommand(
             onConfigSaved?.();
           }
         }
-        logger.info(`[DonationAlerts] App credentials saved with currency ${currency}. Opening login...`);
+        logger.info(
+          `[DonationAlerts] App credentials saved with currency ${currency}. Opening login...`,
+        );
         const loginUrl = daProvider.getLoginUrl(port, appId);
         await open(loginUrl);
         return;
@@ -108,8 +129,7 @@ export function registerDonateCommand(
 
       if (subCmd === "off") {
         daProvider.disconnect();
-        await daProvider.deleteTokens();
-        await daProvider.deleteCredentials();
+        await daProvider.deleteSecrets();
         if (config && luaFolder) {
           if (config.streamer_mode.donation_systems.donationalerts.enabled) {
             config.streamer_mode.donation_systems.donationalerts.enabled = false;
@@ -117,19 +137,20 @@ export function registerDonateCommand(
             onConfigSaved?.();
           }
         }
-        logger.info(`[DonationAlerts] Logged out and credentials removed.`);
+        logger.info(`[DonationAlerts] Logged out and client secret removed.`);
         return;
       }
 
       if (subCmd === "login") {
-        const creds = await daProvider.loadCredentials();
-        if (!creds) {
+        const appId = daProvider.getAppId();
+        const secrets = await daProvider.loadSecrets();
+        if (!appId || !secrets) {
           logger.warn(
-            `[DonationAlerts] No credentials stored. Run: ${colors.cyan("donate on donationalerts <app_id> <client_secret> <currency>")}`,
+            `[DonationAlerts] Not configured. Run: ${colors.cyan("donate on donationalerts <app_id> <client_secret> <currency>")}`,
           );
           return;
         }
-        const loginUrl = daProvider.getLoginUrl(port, creds.appId);
+        const loginUrl = daProvider.getLoginUrl(port, appId);
         logger.info(`[DonationAlerts] Opening login URL...`);
         await open(loginUrl);
         return;

@@ -456,10 +456,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 className="btn"
                 disabled={busy}
                 onClick={() =>
-                  void wrap(
-                    () => youtubeLogout(),
-                    "Disconnected from YouTube.",
-                  )
+                  void wrap(() => youtubeLogout(), "Disconnected from YouTube.")
                 }
               >
                 <LogOut size={14} aria-hidden="true" />
@@ -496,11 +493,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           <div className="provider-row">
             <div className="provider-row-main">
               <span className="provider-row-name">
-                <img
-                  src={twitchLogo}
-                  alt=""
-                  className="provider-row-logo"
-                />
+                <img src={twitchLogo} alt="" className="provider-row-logo" />
                 Twitch Bits
               </span>
               {(() => {
@@ -517,7 +510,13 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                     </span>
                   );
                 }
-                return <StatusBadge on={bitsEnabled} labelOn="Enabled" labelOff="Disabled" />;
+                return (
+                  <StatusBadge
+                    on={bitsEnabled}
+                    labelOn="Enabled"
+                    labelOff="Disabled"
+                  />
+                );
               })()}
             </div>
             {config && (
@@ -671,9 +670,11 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                   className="btn btn--primary"
                   disabled={busy}
                   onClick={() => {
-                    setDaAppId("");
+                    const da =
+                      config?.streamer_mode.donation_systems.donationalerts;
+                    setDaAppId(da?.app_id ?? "");
                     setDaSecret("");
-                    setDaCurrency("RUB");
+                    setDaCurrency(da?.currency ? da.currency : "RUB");
                     setDaModal(true);
                   }}
                 >
@@ -837,7 +838,9 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           title="Google Sheets import"
           onClose={() => setExportModal(false)}
         >
-          <GoogleSheetsInstructions kind={exportType === "csv" ? "csv" : "xlsx"} />
+          <GoogleSheetsInstructions
+            kind={exportType === "csv" ? "csv" : "xlsx"}
+          />
           <div
             style={{
               display: "flex",

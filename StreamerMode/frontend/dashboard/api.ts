@@ -19,6 +19,8 @@ export interface DonatePriceGroup {
 
 export interface DonationSystemDonationAlerts {
   enabled: boolean;
+  app_id: string;
+  currency: string;
 }
 
 export interface DonationSystemTwitchBits {
@@ -88,7 +90,9 @@ export async function getConfig(): Promise<ModConfig> {
   return (await res.json()) as ModConfig;
 }
 
-export async function updateConfig(patch: Partial<ModConfig> | Record<string, unknown>): Promise<void> {
+export async function updateConfig(
+  patch: Partial<ModConfig> | Record<string, unknown>,
+): Promise<void> {
   const res = await fetch("/api/config", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -107,7 +111,13 @@ export async function getEffects(): Promise<EffectsResponse> {
 }
 
 export type ActivityEvent =
-  | { id: number; ts: number; type: "vote"; effect_id: string; effect_name: string }
+  | {
+      id: number;
+      ts: number;
+      type: "vote";
+      effect_id: string;
+      effect_name: string;
+    }
   | {
       id: number;
       ts: number;
@@ -184,7 +194,7 @@ export type ActivityEvent =
 export interface HomeStatus {
   port: number;
   twitch: { configured: boolean; connected: boolean; name: string | null };
-  donationalerts: { configured: boolean; connected: boolean; name: string | null };
+  donationalerts: { connected: boolean; name: string | null };
   youtube: {
     account_connected: boolean;
     channel_name: string | null;
@@ -280,7 +290,9 @@ export async function donationAlertsSetup(input: {
   }
   return (await res.json()) as { url: string | null };
 }
-export async function exportEffects(kind: string): Promise<{ path: string | null }> {
+export async function exportEffects(
+  kind: string,
+): Promise<{ path: string | null }> {
   const res = await fetch(`/api/export?type=${encodeURIComponent(kind)}`, {
     method: "POST",
   });
@@ -302,7 +314,10 @@ export async function getLanguages(): Promise<string[]> {
   return data.languages;
 }
 
-export async function updateEffect(id: string, patch: Partial<EffectEntry>): Promise<void> {
+export async function updateEffect(
+  id: string,
+  patch: Partial<EffectEntry>,
+): Promise<void> {
   const res = await fetch(`/api/effects/${encodeURIComponent(id)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },

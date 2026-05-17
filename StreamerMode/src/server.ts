@@ -1,7 +1,5 @@
 import { logger } from "./utils/logger.ts";
-import type {
-  TwitchChatProvider,
-} from "./streamer/index.ts";
+import type { TwitchChatProvider } from "./streamer/index.ts";
 import type { ModConfig } from "./config.ts";
 import type { EffectEntry } from "./effects.ts";
 import type { ActivityEvent } from "./activityLog.ts";
@@ -62,18 +60,32 @@ export interface ServerContext {
   twitch: TwitchChatProvider | null;
   getModStatus: () => ModStatus;
   getEffectsResponse: () => unknown;
-  activateEffect: (nickname: string | undefined, effectId: string) => { success: boolean; error?: string };
+  activateEffect: (
+    nickname: string | undefined,
+    effectId: string,
+  ) => { success: boolean; error?: string };
   onDonationAlertsCode?: (code: string) => Promise<{ name: string } | null>;
   getConfig?: () => ModConfig | null;
   updateConfig?: (patch: unknown) => { success: boolean; error?: string };
   getEffectsList?: () => Array<EffectEntry & { name: string }>;
-  updateEffect?: (id: string, patch: unknown) => { success: boolean; error?: string };
+  updateEffect?: (
+    id: string,
+    patch: unknown,
+  ) => { success: boolean; error?: string };
   getPriceGroups?: () => Array<{ group: string; price: number }>;
   getLanguages?: () => string[];
   getHomeStatus?: () => HomeStatus;
-  twitchLogin?: () => Promise<{ success: boolean; error?: string; url?: string }>;
+  twitchLogin?: () => Promise<{
+    success: boolean;
+    error?: string;
+    url?: string;
+  }>;
   twitchLogout?: () => Promise<{ success: boolean; error?: string }>;
-  donationAlertsLogin?: () => Promise<{ success: boolean; error?: string; url?: string }>;
+  donationAlertsLogin?: () => Promise<{
+    success: boolean;
+    error?: string;
+    url?: string;
+  }>;
   donationAlertsLogout?: () => Promise<{ success: boolean; error?: string }>;
   donationAlertsSetup?: (input: {
     appId: string;
@@ -81,8 +93,12 @@ export interface ServerContext {
     currency: string;
   }) => Promise<{ success: boolean; error?: string; url?: string }>;
   youtubeLogout?: () => Promise<{ success: boolean; error?: string }>;
-  youtubeSetStreamUrl?: (url: string) => Promise<{ success: boolean; error?: string }>;
-  youtubeSetApiKey?: (apiKey: string) => Promise<{ success: boolean; error?: string }>;
+  youtubeSetStreamUrl?: (
+    url: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  youtubeSetApiKey?: (
+    apiKey: string,
+  ) => Promise<{ success: boolean; error?: string }>;
   exportEffects?: (
     kind: string,
   ) =>
@@ -107,7 +123,6 @@ export interface HomeStatus {
     name: string | null;
   };
   donationalerts: {
-    configured: boolean;
     connected: boolean;
     name: string | null;
   };
@@ -192,7 +207,8 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
       "/api/config": {
         GET: () => {
           const cfg = ctx.getConfig?.();
-          if (!cfg) return new Response("Config not available", { status: 503 });
+          if (!cfg)
+            return new Response("Config not available", { status: 503 });
           return Response.json(cfg);
         },
         PUT: async (req: Request) => {
@@ -207,7 +223,9 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           }
           const result = ctx.updateConfig(body);
           if (!result.success) {
-            return new Response(result.error ?? "Update failed", { status: 400 });
+            return new Response(result.error ?? "Update failed", {
+              status: 400,
+            });
           }
           return new Response("OK");
         },
@@ -224,7 +242,8 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
 
       "/api/twitch/login": {
         POST: async () => {
-          if (!ctx.twitchLogin) return new Response("Not available", { status: 503 });
+          if (!ctx.twitchLogin)
+            return new Response("Not available", { status: 503 });
           const r = await ctx.twitchLogin();
           if (!r.success) {
             return new Response(r.error ?? "Login failed", { status: 400 });
@@ -235,7 +254,8 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
 
       "/api/twitch/logout": {
         POST: async () => {
-          if (!ctx.twitchLogout) return new Response("Not available", { status: 503 });
+          if (!ctx.twitchLogout)
+            return new Response("Not available", { status: 503 });
           const r = await ctx.twitchLogout();
           if (!r.success) {
             return new Response(r.error ?? "Logout failed", { status: 400 });
@@ -268,7 +288,11 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           } catch {
             return new Response("Invalid JSON", { status: 400 });
           }
-          if (body === null || typeof body !== "object" || Array.isArray(body)) {
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
             return new Response("Body must be an object", { status: 400 });
           }
           const b = body as Record<string, unknown>;
@@ -317,7 +341,8 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
 
       "/api/export": {
         POST: async (req: Request) => {
-          if (!ctx.exportEffects) return new Response("Not available", { status: 503 });
+          if (!ctx.exportEffects)
+            return new Response("Not available", { status: 503 });
           const url = new URL(req.url);
           const kind = url.searchParams.get("type") ?? "csv";
           const r = await ctx.exportEffects(kind);
@@ -385,7 +410,9 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           }
           const result = ctx.updateEffect(id, body);
           if (!result.success) {
-            return new Response(result.error ?? "Update failed", { status: 400 });
+            return new Response(result.error ?? "Update failed", {
+              status: 400,
+            });
           }
           return new Response("OK");
         },
@@ -413,7 +440,11 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           } catch {
             return new Response("Invalid JSON", { status: 400 });
           }
-          if (body === null || typeof body !== "object" || Array.isArray(body)) {
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
             return new Response("Body must be an object", { status: 400 });
           }
           const rawKey = (body as Record<string, unknown>)["apiKey"];
@@ -440,7 +471,11 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           } catch {
             return new Response("Invalid JSON", { status: 400 });
           }
-          if (body === null || typeof body !== "object" || Array.isArray(body)) {
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
             return new Response("Body must be an object", { status: 400 });
           }
           const rawUrl = (body as Record<string, unknown>)["url"];
@@ -461,7 +496,9 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
       "/mod/effects": () => Response.json(ctx.getEffectsResponse()),
       "/provider/donationalerts/success/": async (req: Request) => {
         if (!ctx.onDonationAlertsCode) {
-          return new Response("Donation provider not configured", { status: 503 });
+          return new Response("Donation provider not configured", {
+            status: 503,
+          });
         }
         const url = new URL(req.url);
         const code = url.searchParams.get("code");
@@ -475,7 +512,9 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
             headers: { "Content-Type": "text/html; charset=utf-8" },
           });
         }
-        return new Response(`Logged in as ${user.name}. You can close this tab.`);
+        return new Response(
+          `Logged in as ${user.name}. You can close this tab.`,
+        );
       },
 
       "/mod/activate-effect": {
@@ -483,12 +522,16 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           const url = new URL(req.url);
           const effectId = url.searchParams.get("effect");
           if (!effectId) {
-            return new Response("Missing 'effect' query parameter", { status: 400 });
+            return new Response("Missing 'effect' query parameter", {
+              status: 400,
+            });
           }
           const nickname = url.searchParams.get("nickname") ?? undefined;
           const result = ctx.activateEffect(nickname, effectId);
           if (!result.success) {
-            return new Response(result.error ?? "Not available", { status: 403 });
+            return new Response(result.error ?? "Not available", {
+              status: 403,
+            });
           }
           return new Response("OK");
         },

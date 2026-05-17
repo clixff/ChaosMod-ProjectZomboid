@@ -1,66 +1,134 @@
 import colors from "colors";
 import { logger } from "../utils/logger.ts";
-import { buildDonationAlertsLoginUrl, exchangeCodeForToken, refreshDonationAlertsToken } from "./oauth.ts";
+import {
+  buildDonationAlertsLoginUrl,
+  exchangeCodeForToken,
+  refreshDonationAlertsToken,
+} from "./oauth.ts";
 import { getCurrentDonationAlertsUser } from "./api.ts";
 import { listenDonationAlertsDonations } from "./realtime.ts";
 import type { DonationAlertsDonation, DonationAlertsUser } from "./types.ts";
 
 const SERVICE = "chaos-mod-streamer-mode";
+const SECRET_NAME = "donationalerts";
+
+const LEGACY_SECRET_NAMES = [
+  "donationalerts-app-id",
+  "donationalerts-client-secret",
+  "donationalerts-currency",
+  "donationalerts-access-token",
+  "donationalerts-refresh-token",
+] as const;
+
+export interface DonationAlertsConfigView {
+  app_id: string;
+  currency: string;
+}
+
+export interface DonationAlertsSecrets {
+  clientSecret: string;
+  accessToken: string;
+  refreshToken: string;
+}
 
 export class DonationAlertsProvider {
   readonly name = "DonationAlerts";
   readonly key = "donationalerts";
   readonly coloredName = colors.yellow("[DonationAlerts]");
 
+  private readonly getDonationAlertsConfig: () => DonationAlertsConfigView | null;
   private ws: WebSocket | null = null;
   onDonation: ((donation: DonationAlertsDonation) => void) | null = null;
   onConnect: (() => void) | null = null;
   onDisconnect: (() => void) | null = null;
   currentUser: DonationAlertsUser | null = null;
 
+  constructor(getDonationAlertsConfig: () => DonationAlertsConfigView | null) {
+    this.getDonationAlertsConfig = getDonationAlertsConfig;
+  }
+
   get isConnected(): boolean {
     return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
+  }
+
+  getAppId(): string {
+    return this.getDonationAlertsConfig()?.app_id ?? "";
+  }
+
+  getCurrency(): string {
+    return this.getDonationAlertsConfig()?.currency ?? "";
   }
 
   redirectUri(port: number): string {
     return `http://localhost:${port}/provider/donationalerts/success/`;
   }
 
-  async loadCredentials(): Promise<{ appId: string; clientSecret: string; currency: string | null } | null> {
-    const appId = await Bun.secrets.get({ service: SERVICE, name: "donationalerts-app-id" });
-    const clientSecret = await Bun.secrets.get({ service: SERVICE, name: "donationalerts-client-secret" });
-    const currency = await Bun.secrets.get({ service: SERVICE, name: "donationalerts-currency" });
-    if (!appId || !clientSecret) return null;
-    return { appId, clientSecret, currency };
+  /**
+   * Delete the 5 pre-v1.1.2 keychain entries unconditionally. Idempotent —
+   * deleting an already-deleted key is a no-op. Migration is intentionally
+   * not performed: existing users are silently logged out.
+   */
+  static async cleanupLegacySecrets(): Promise<void> {
+    for (const name of LEGACY_SECRET_NAMES) {
+      try {
+        await Bun.secrets.delete({ service: SERVICE, name });
+      } catch {
+        // Ignore — key may not exist.
+      }
+    }
   }
 
-  async saveCredentials(appId: string, clientSecret: string, currency: string): Promise<void> {
-    await Bun.secrets.set({ service: SERVICE, name: "donationalerts-app-id", value: appId });
-    await Bun.secrets.set({ service: SERVICE, name: "donationalerts-client-secret", value: clientSecret });
-    await Bun.secrets.set({ service: SERVICE, name: "donationalerts-currency", value: currency });
+  async loadSecrets(): Promise<DonationAlertsSecrets | null> {
+    let raw: string | null;
+    try {
+      raw = await Bun.secrets.get({ service: SERVICE, name: SECRET_NAME });
+    } catch {
+      return null;
+    }
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const clientSecret =
+        typeof parsed["clientSecret"] === "string"
+          ? parsed["clientSecret"]
+          : "";
+      const accessToken =
+        typeof parsed["accessToken"] === "string" ? parsed["accessToken"] : "";
+      const refreshToken =
+        typeof parsed["refreshToken"] === "string"
+          ? parsed["refreshToken"]
+          : "";
+      if (!clientSecret) return null;
+      return { clientSecret, accessToken, refreshToken };
+    } catch {
+      return null;
+    }
   }
 
-  async deleteCredentials(): Promise<void> {
-    await Bun.secrets.delete({ service: SERVICE, name: "donationalerts-app-id" });
-    await Bun.secrets.delete({ service: SERVICE, name: "donationalerts-client-secret" });
-    await Bun.secrets.delete({ service: SERVICE, name: "donationalerts-currency" });
+  async saveSecrets(secrets: DonationAlertsSecrets): Promise<void> {
+    await Bun.secrets.set({
+      service: SERVICE,
+      name: SECRET_NAME,
+      value: JSON.stringify(secrets),
+    });
   }
 
-  async loadTokens(): Promise<{ accessToken: string; refreshToken: string } | null> {
-    const accessToken = await Bun.secrets.get({ service: SERVICE, name: "donationalerts-access-token" });
-    const refreshToken = await Bun.secrets.get({ service: SERVICE, name: "donationalerts-refresh-token" });
-    if (!accessToken || !refreshToken) return null;
-    return { accessToken, refreshToken };
+  async updateTokens(accessToken: string, refreshToken: string): Promise<void> {
+    const existing = await this.loadSecrets();
+    if (!existing) return;
+    await this.saveSecrets({
+      clientSecret: existing.clientSecret,
+      accessToken,
+      refreshToken,
+    });
   }
 
-  async saveTokens(accessToken: string, refreshToken: string): Promise<void> {
-    await Bun.secrets.set({ service: SERVICE, name: "donationalerts-access-token", value: accessToken });
-    await Bun.secrets.set({ service: SERVICE, name: "donationalerts-refresh-token", value: refreshToken });
-  }
-
-  async deleteTokens(): Promise<void> {
-    await Bun.secrets.delete({ service: SERVICE, name: "donationalerts-access-token" });
-    await Bun.secrets.delete({ service: SERVICE, name: "donationalerts-refresh-token" });
+  async deleteSecrets(): Promise<void> {
+    try {
+      await Bun.secrets.delete({ service: SERVICE, name: SECRET_NAME });
+    } catch {
+      // Ignore.
+    }
   }
 
   getLoginUrl(port: number, appId: string): string {
@@ -71,20 +139,34 @@ export class DonationAlertsProvider {
     });
   }
 
-  async handleOAuthCode(code: string, port: number): Promise<DonationAlertsUser | null> {
-    const creds = await this.loadCredentials();
-    if (!creds) {
-      logger.error(`[DonationAlerts] No credentials stored — run: donate on donationalerts <app_id> <client_secret> <currency>`);
+  async handleOAuthCode(
+    code: string,
+    port: number,
+  ): Promise<DonationAlertsUser | null> {
+    const appId = this.getAppId();
+    const secrets = await this.loadSecrets();
+    if (!appId || !secrets) {
+      logger.error(
+        `[DonationAlerts] Not configured — open the dashboard DonationAlerts card to set up credentials.`,
+      );
       return null;
     }
 
     let user: DonationAlertsUser;
     try {
       const tokenResponse = await exchangeCodeForToken(
-        { clientId: creds.appId, clientSecret: creds.clientSecret, redirectUri: this.redirectUri(port) },
+        {
+          clientId: appId,
+          clientSecret: secrets.clientSecret,
+          redirectUri: this.redirectUri(port),
+        },
         code,
       );
-      await this.saveTokens(tokenResponse.access_token, tokenResponse.refresh_token);
+      await this.saveSecrets({
+        clientSecret: secrets.clientSecret,
+        accessToken: tokenResponse.access_token,
+        refreshToken: tokenResponse.refresh_token,
+      });
       user = await getCurrentDonationAlertsUser(tokenResponse.access_token);
       this.currentUser = user;
       await this.connectRealtime(tokenResponse.access_token, user);
@@ -98,26 +180,30 @@ export class DonationAlertsProvider {
   }
 
   async start(port: number): Promise<DonationAlertsUser | null> {
-    const creds = await this.loadCredentials();
-    if (!creds) return null;
+    const appId = this.getAppId();
+    if (!appId) return null;
 
-    const tokens = await this.loadTokens();
-    if (!tokens) return null;
+    const secrets = await this.loadSecrets();
+    if (!secrets || !secrets.accessToken || !secrets.refreshToken) return null;
 
-    let { accessToken } = tokens;
-    const { refreshToken } = tokens;
+    let accessToken = secrets.accessToken;
+    const refreshToken = secrets.refreshToken;
 
     const getUser = async (): Promise<DonationAlertsUser> => {
       try {
         return await getCurrentDonationAlertsUser(accessToken);
       } catch {
         const refreshed = await refreshDonationAlertsToken(
-          { clientId: creds.appId, clientSecret: creds.clientSecret, redirectUri: this.redirectUri(port) },
+          {
+            clientId: appId,
+            clientSecret: secrets.clientSecret,
+            redirectUri: this.redirectUri(port),
+          },
           refreshToken,
         );
         accessToken = refreshed.access_token;
         const newRefreshToken = refreshed.refresh_token ?? refreshToken;
-        await this.saveTokens(accessToken, newRefreshToken);
+        await this.updateTokens(accessToken, newRefreshToken);
         return getCurrentDonationAlertsUser(accessToken);
       }
     };
@@ -136,9 +222,16 @@ export class DonationAlertsProvider {
     return user;
   }
 
-  private async connectRealtime(accessToken: string, user: DonationAlertsUser): Promise<void> {
+  private async connectRealtime(
+    accessToken: string,
+    user: DonationAlertsUser,
+  ): Promise<void> {
     if (this.ws) {
-      try { this.ws.close(); } catch { /* ignore */ }
+      try {
+        this.ws.close();
+      } catch {
+        /* ignore */
+      }
       this.ws = null;
     }
     try {
@@ -174,7 +267,11 @@ export class DonationAlertsProvider {
 
   disconnect(): void {
     if (this.ws) {
-      try { this.ws.close(); } catch { /* ignore */ }
+      try {
+        this.ws.close();
+      } catch {
+        /* ignore */
+      }
       this.ws = null;
       this.onDisconnect?.();
     }

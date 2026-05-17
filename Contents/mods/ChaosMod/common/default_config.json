@@ -37,7 +37,9 @@
         "enable_donate": false,
         "donation_systems": {
             "donationalerts": {
-                "enabled": false
+                "enabled": false,
+                "app_id": "",
+                "currency": ""
             },
             "twitch_bits": {
                 "enabled": false,

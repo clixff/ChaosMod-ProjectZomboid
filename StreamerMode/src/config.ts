@@ -23,6 +23,8 @@ export interface DonatePriceGroup {
 
 export interface DonationSystemDonationAlerts {
   enabled: boolean;
+  app_id: string;
+  currency: string;
 }
 
 export interface DonationSystemTwitchBits {
@@ -138,7 +140,7 @@ const DEFAULT_DONATE_PRICE_GROUPS: DonatePriceGroup[] = [
 ];
 
 const DEFAULT_DONATION_SYSTEMS: DonationSystemsConfig = {
-  donationalerts: { enabled: false },
+  donationalerts: { enabled: false, app_id: "", currency: "" },
   twitch_bits: { enabled: false, price_multiplier: 100.0 },
 };
 
@@ -249,14 +251,20 @@ function parseDonationSystems(
   const d = DEFAULT_DONATION_SYSTEMS;
   const da = obj(raw["donationalerts"]);
   const bits = obj(raw["twitch_bits"]);
-  const multiplier = num(bits["price_multiplier"], d.twitch_bits.price_multiplier);
+  const multiplier = num(
+    bits["price_multiplier"],
+    d.twitch_bits.price_multiplier,
+  );
   return {
     donationalerts: {
       enabled: bool(da["enabled"], d.donationalerts.enabled),
+      app_id: str(da["app_id"], d.donationalerts.app_id),
+      currency: str(da["currency"], d.donationalerts.currency),
     },
     twitch_bits: {
       enabled: bool(bits["enabled"], d.twitch_bits.enabled),
-      price_multiplier: multiplier > 0 ? multiplier : d.twitch_bits.price_multiplier,
+      price_multiplier:
+        multiplier > 0 ? multiplier : d.twitch_bits.price_multiplier,
     },
   };
 }

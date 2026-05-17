@@ -37,10 +37,7 @@ import {
   type NormalizedChatMessage,
 } from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
-import {
-  buildEffectsXlsxBuffer,
-  writeEffectsXlsx,
-} from "./src/exportXlsx.ts";
+import { buildEffectsXlsxBuffer, writeEffectsXlsx } from "./src/exportXlsx.ts";
 import { NicknamesManager } from "./src/streamer/NicknamesManager.ts";
 import { VotingManager } from "./src/streamer/VotingManager.ts";
 import { removeEmojis } from "./src/utils/text.ts";
@@ -585,7 +582,11 @@ async function main(): Promise<void> {
     bridge.start();
   }
 
-  const daProvider = new DonationAlertsProvider();
+  await DonationAlertsProvider.cleanupLegacySecrets();
+
+  const daProvider = new DonationAlertsProvider(() =>
+    config ? config.streamer_mode.donation_systems.donationalerts : null,
+  );
   daProvider.onConnect = () => {
     activityLog.add({ type: "donationalerts_connected" });
   };
@@ -623,8 +624,9 @@ async function main(): Promise<void> {
       `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`,
     );
   } else {
-    const daCreds = await daProvider.loadCredentials();
-    if (daCreds) {
+    const daAppId = daProvider.getAppId();
+    const daSecrets = await daProvider.loadSecrets();
+    if (daAppId && daSecrets) {
       logger.info(
         `${daProvider.coloredName} Not logged in. Type ${colors.cyan("donate login donationalerts")} to authenticate.`,
       );
@@ -1026,7 +1028,6 @@ async function main(): Promise<void> {
             name: twitchProvider.getAccountName(),
           },
           donationalerts: {
-            configured: true,
             connected: daProvider.isConnected,
             name: daProvider.currentUser?.name ?? null,
           },
@@ -1085,15 +1086,16 @@ async function main(): Promise<void> {
         return { success: true };
       },
       donationAlertsLogin: async () => {
-        const creds = await daProvider.loadCredentials();
-        if (!creds) {
+        const appId = daProvider.getAppId();
+        const secrets = await daProvider.loadSecrets();
+        if (!appId || !secrets) {
           return {
             success: false,
             error:
-              "DonationAlerts credentials not configured. Use the CLI: donate on donationalerts <app_id> <client_secret> <currency>",
+              "DonationAlerts is not set up. Open the dashboard DonationAlerts card to enter credentials.",
           };
         }
-        const loginUrl = daProvider.getLoginUrl(port, creds.appId);
+        const loginUrl = daProvider.getLoginUrl(port, appId);
         try {
           await open(loginUrl);
         } catch (err) {
@@ -1104,7 +1106,14 @@ async function main(): Promise<void> {
       },
       donationAlertsLogout: async () => {
         daProvider.disconnect();
-        await daProvider.deleteTokens();
+        await daProvider.deleteSecrets();
+        if (config && luaFolder) {
+          if (config.streamer_mode.donation_systems.donationalerts.enabled) {
+            config.streamer_mode.donation_systems.donationalerts.enabled = false;
+            saveConfig(luaFolder, config);
+            bridge?.emit("reload_config");
+          }
+        }
         logger.info(`${daProvider.coloredName} Logged out.`);
         return { success: true };
       },
@@ -1113,15 +1122,24 @@ async function main(): Promise<void> {
         clientSecret: string;
         currency: string;
       }) => {
-        await daProvider.saveCredentials(
-          input.appId,
-          input.clientSecret,
-          input.currency,
-        );
+        await daProvider.saveSecrets({
+          clientSecret: input.clientSecret,
+          accessToken: "",
+          refreshToken: "",
+        });
         if (config && luaFolder) {
           let changed = false;
-          if (!config.streamer_mode.donation_systems.donationalerts.enabled) {
-            config.streamer_mode.donation_systems.donationalerts.enabled = true;
+          const da = config.streamer_mode.donation_systems.donationalerts;
+          if (da.app_id !== input.appId) {
+            da.app_id = input.appId;
+            changed = true;
+          }
+          if (da.currency !== input.currency) {
+            da.currency = input.currency;
+            changed = true;
+          }
+          if (!da.enabled) {
+            da.enabled = true;
             changed = true;
           }
           if (!config.streamer_mode.enable_donate) {

@@ -96,7 +96,7 @@ ChaosConfig = ChaosConfig or {
         use_zombie_nicknames = true,
         enable_donate = false,
         donation_systems = {
-            donationalerts = { enabled = false },
+            donationalerts = { enabled = false, app_id = "", currency = "" },
             twitch_bits = { enabled = false, price_multiplier = 100.0 },
         },
         donate_price_groups = {

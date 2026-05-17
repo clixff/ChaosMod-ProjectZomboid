@@ -33,7 +33,8 @@ export function parseEffectTag(message: string): string | null {
   if (hashMatch && hashMatch[1]) return hashMatch[1];
 
   const prefixedNumberMatch = message.match(/(?:№|!)\s*(\d+)/);
-  if (prefixedNumberMatch && prefixedNumberMatch[1]) return prefixedNumberMatch[1];
+  if (prefixedNumberMatch && prefixedNumberMatch[1])
+    return prefixedNumberMatch[1];
 
   const bareNumberMatch = message.match(/(?:^|\s)(\d+)(?=\s|$|\D)/);
   if (bareNumberMatch && bareNumberMatch[1]) return bareNumberMatch[1];
@@ -66,8 +67,10 @@ export class DonationManager {
       `[DonationAlerts] Donation from ${donation.username}: amount=${donation.amount} ${donation.currency} message="${donation.message}"`,
     );
 
-    const creds = await provider.loadCredentials();
-    const configuredCurrency = creds?.currency?.toUpperCase() ?? null;
+    const configuredCurrencyRaw = provider.getCurrency();
+    const configuredCurrency = configuredCurrencyRaw
+      ? configuredCurrencyRaw.toUpperCase()
+      : null;
     const donationCurrency = donation.currency.toUpperCase();
 
     if (!configuredCurrency) {
