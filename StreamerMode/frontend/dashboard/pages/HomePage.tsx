@@ -42,6 +42,7 @@ import {
   getConfig,
   getLanguages,
   youtubeLogout,
+  youtubeReconnect,
   youtubeSetStreamUrl,
   youtubeSetApiKey,
   type HomeStatus,
@@ -108,6 +109,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [youtubeUrlDraft, setYoutubeUrlDraft] = useState<string | null>(null);
   const [youtubeConnectModal, setYoutubeConnectModal] = useState(false);
   const [youtubeApiKeyDraft, setYoutubeApiKeyDraft] = useState("");
+  const [youtubeChatTypeModal, setYoutubeChatTypeModal] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -195,11 +197,6 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const commitYoutubeUrl = () => {
     if (youtubeUrlDraft === null) return;
     const next = youtubeUrlDraft;
-    const current = status?.youtube.stream_url ?? "";
-    if (next === current) {
-      setYoutubeUrlDraft(null);
-      return;
-    }
     void wrap(async () => {
       await youtubeSetStreamUrl(next);
       setYoutubeUrlDraft(null);
@@ -208,6 +205,15 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           ? "YouTube stream URL saved."
           : "YouTube stream URL cleared.",
       );
+    });
+  };
+
+  const clearYoutubeUrl = () => {
+    setYoutubeUrlDraft("");
+    void wrap(async () => {
+      await youtubeSetStreamUrl("");
+      setYoutubeUrlDraft(null);
+      onNotify("YouTube stream URL cleared.");
     });
   };
 
@@ -440,6 +446,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 onChange={(v) => setYoutubeUrlDraft(v)}
                 onBlur={() => commitYoutubeUrl()}
                 onSubmit={() => commitYoutubeUrl()}
+                onClear={clearYoutubeUrl}
               />
             </div>
           )}
@@ -475,6 +482,14 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 Login
               </button>
             )}
+            <button
+              className="btn"
+              disabled={busy}
+              onClick={() => setYoutubeChatTypeModal(true)}
+            >
+              <Settings size={14} aria-hidden="true" />
+              Chat Settings
+            </button>
           </div>
         </div>
 
@@ -911,6 +926,35 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
         />
       )}
 
+      {youtubeChatTypeModal && config && (
+        <YouTubeChatTypeModal
+          busy={busy}
+          currentType={config.streamer_mode.youtube_chat_connection_type}
+          onClose={() => setYoutubeChatTypeModal(false)}
+          onSave={(next) => {
+            setYoutubeChatTypeModal(false);
+            setConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    streamer_mode: {
+                      ...prev.streamer_mode,
+                      youtube_chat_connection_type: next,
+                    },
+                  }
+                : prev,
+            );
+            void wrap(async () => {
+              await updateConfig({
+                streamer_mode: { youtube_chat_connection_type: next },
+              });
+              await youtubeReconnect();
+              onNotify("YouTube chat connection type saved.");
+            });
+          }}
+        />
+      )}
+
       {bitsOptionsModal && config && (
         <TwitchBitsOptionsModal
           multiplier={
@@ -1326,6 +1370,79 @@ function YouTubeConnectModal({
           onClick={onSubmit}
         >
           <LogIn size={14} aria-hidden="true" />
+          Save
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+interface YouTubeChatTypeModalProps {
+  busy: boolean;
+  currentType: "long_polling" | "message_streaming";
+  onClose: () => void;
+  onSave: (next: "long_polling" | "message_streaming") => void;
+}
+
+function YouTubeChatTypeModal({
+  busy,
+  currentType,
+  onClose,
+  onSave,
+}: YouTubeChatTypeModalProps) {
+  const [draft, setDraft] = useState<"long_polling" | "message_streaming">(
+    currentType,
+  );
+  return (
+    <Modal title="YouTube Chat Settings" onClose={onClose}>
+      <div className="form-grid">
+        <label className="form-field">
+          <span className="form-label">Chat Connection Type</span>
+          <Select
+            value={draft}
+            options={[
+              { value: "long_polling", label: "Polling (5s, lower quota)" },
+              {
+                value: "message_streaming",
+                label: "Streaming (faster, higher quota)",
+              },
+            ]}
+            onChange={(v) =>
+              setDraft(
+                v === "message_streaming" ? "message_streaming" : "long_polling",
+              )
+            }
+          />
+        </label>
+      </div>
+      <div style={{ marginTop: 14, fontSize: 13, lineHeight: 1.5 }}>
+        <p style={{ margin: "0 0 8px 0" }}>
+          <b>Polling (default).</b> Fetches new chat messages every 5 seconds.
+          Comfortably fits a ~10-hour daily stream within the free YouTube Data
+          API quota.
+        </p>
+        <p style={{ margin: 0 }}>
+          <b>Streaming.</b> Delivers messages with much shorter latency, but
+          burns through the daily API quota quickly — you can hit the limit
+          well before a long stream finishes.
+        </p>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 18,
+        }}
+      >
+        <button className="btn" onClick={onClose} disabled={busy}>
+          Cancel
+        </button>
+        <button
+          className="btn btn--primary"
+          disabled={busy}
+          onClick={() => onSave(draft)}
+        >
           Save
         </button>
       </div>

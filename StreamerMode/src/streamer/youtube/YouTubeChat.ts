@@ -9,7 +9,7 @@ import { openStreamListConnection } from "./grpcStream.ts";
 
 const STREAM_BACKOFF_MS = [1000, 2000, 4000, 8000] as const;
 
-const MIN_DELAY_MS = 1500;
+const MIN_DELAY_MS = 5000;
 const MAX_DELAY_MS = 60_000;
 const SEEN_CACHE_SIZE = 1000;
 

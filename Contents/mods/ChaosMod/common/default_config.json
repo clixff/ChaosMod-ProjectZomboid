@@ -121,6 +121,7 @@
             }
         ],
         "allow_vote_command": true,
-        "hide_votes": false
+        "hide_votes": false,
+        "youtube_chat_connection_type": "long_polling"
     }
 }

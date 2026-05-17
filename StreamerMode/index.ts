@@ -799,8 +799,9 @@ async function main(): Promise<void> {
     );
   }
 
-  youtubeProvider.setPollingOnlyReader(
-    () => config?.streamer_mode.youtube_chat_polling_only ?? false,
+  youtubeProvider.setConnectionTypeReader(
+    () =>
+      config?.streamer_mode.youtube_chat_connection_type ?? "long_polling",
   );
   await youtubeProvider.initFromStorage();
   if (!youtubeProvider.isAccountConnected()) {
@@ -1083,6 +1084,10 @@ async function main(): Promise<void> {
         if (!r.success) {
           return { success: false, error: r.error };
         }
+        return { success: true };
+      },
+      youtubeReconnect: async () => {
+        await youtubeProvider.restartChat();
         return { success: true };
       },
       donationAlertsLogin: async () => {

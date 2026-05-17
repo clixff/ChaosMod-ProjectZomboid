@@ -12,7 +12,6 @@ import { COLORS as CHAT_NICKNAME_COLORS } from "../../debugNicknames.ts";
 
 const SERVICE = "chaos-mod-streamer-mode";
 const API_KEY_KEY = "youtube-api-key";
-const STREAM_URL_KEY = "youtube-stream-url";
 
 function pickNicknameColor(channelId: string): string {
   let hash = 0;
@@ -50,14 +49,17 @@ export class YouTubeChatProvider implements ChatProvider {
   private chat: YouTubeChat | null = null;
   private chatConnected = false;
   private lastError: string | null = null;
-  private pollingOnlyReader: () => boolean = () => false;
+  private connectionTypeReader: () => "long_polling" | "message_streaming" =
+    () => "long_polling";
 
   onMessage: ((msg: NormalizedChatMessage) => void) | null = null;
   onChatConnect: (() => void) | null = null;
   onChatDisconnect: (() => void) | null = null;
 
-  setPollingOnlyReader(reader: () => boolean): void {
-    this.pollingOnlyReader = reader;
+  setConnectionTypeReader(
+    reader: () => "long_polling" | "message_streaming",
+  ): void {
+    this.connectionTypeReader = reader;
   }
 
   isAccountConnected(): boolean {
@@ -89,19 +91,15 @@ export class YouTubeChatProvider implements ChatProvider {
   }
 
   async initFromStorage(): Promise<void> {
-    const [apiKey, url] = await Promise.all([
-      Bun.secrets.get({ service: SERVICE, name: API_KEY_KEY }),
-      Bun.secrets.get({ service: SERVICE, name: STREAM_URL_KEY }),
-    ]);
+    const apiKey = await Bun.secrets.get({
+      service: SERVICE,
+      name: API_KEY_KEY,
+    });
     if (apiKey) this.apiKey = apiKey;
-    if (url) this.streamUrl = url;
 
     if (!this.apiKey) return;
 
     logger.info(`${this.coloredName} API key loaded from storage.`);
-    if (this.streamUrl) {
-      await this.startChatForCurrentUrl();
-    }
   }
 
   async setApiKey(
@@ -119,9 +117,6 @@ export class YouTubeChatProvider implements ChatProvider {
       value: trimmed,
     });
     logger.info(`${this.coloredName} API key saved.`);
-    if (this.streamUrl) {
-      await this.startChatForCurrentUrl();
-    }
     return { success: true };
   }
 
@@ -133,10 +128,7 @@ export class YouTubeChatProvider implements ChatProvider {
     this.streamTitle = null;
     this.chatMessageCount = 0;
     this.lastError = null;
-    await Promise.all([
-      Bun.secrets.delete({ service: SERVICE, name: API_KEY_KEY }),
-      Bun.secrets.delete({ service: SERVICE, name: STREAM_URL_KEY }),
-    ]);
+    await Bun.secrets.delete({ service: SERVICE, name: API_KEY_KEY });
     logger.info(`${this.coloredName} Disconnected.`);
   }
 
@@ -149,7 +141,6 @@ export class YouTubeChatProvider implements ChatProvider {
       this.streamUrl = null;
       this.streamTitle = null;
       this.chatMessageCount = 0;
-      await Bun.secrets.delete({ service: SERVICE, name: STREAM_URL_KEY });
       this.lastError = null;
       return { success: true };
     }
@@ -161,17 +152,21 @@ export class YouTubeChatProvider implements ChatProvider {
       };
     }
     this.streamUrl = trimmed;
-    await Bun.secrets.set({
-      service: SERVICE,
-      name: STREAM_URL_KEY,
-      value: trimmed,
-    });
     if (!this.isAccountConnected()) {
-      this.lastError = "Stream URL saved. Connect YouTube to start chat.";
+      this.lastError = "Connect YouTube to start chat.";
       return { success: true };
     }
     await this.startChatForCurrentUrl();
     return { success: true };
+  }
+
+  /**
+   * Restart the chat reader against the current in-memory URL (e.g. after
+   * the user changes the connection type). No-op if no URL or no API key.
+   */
+  async restartChat(): Promise<void> {
+    if (!this.streamUrl || !this.isAccountConnected()) return;
+    await this.startChatForCurrentUrl();
   }
 
   shutdown(): void {
@@ -237,7 +232,7 @@ export class YouTubeChatProvider implements ChatProvider {
       coloredName: this.coloredName,
       liveChatId: videoInfo.liveChatId,
       getAuth: () => Promise.resolve(this.getAuth()),
-      getPollingOnly: () => this.pollingOnlyReader(),
+      getPollingOnly: () => this.connectionTypeReader() === "long_polling",
       onMessage: (m) => {
         const text = m.text.trim();
         if (!text) return;

@@ -54,7 +54,7 @@ export interface StreamerModeConfig {
   donate_price_groups: DonatePriceGroup[];
   allow_vote_command: boolean;
   hide_votes: boolean;
-  youtube_chat_polling_only: boolean;
+  youtube_chat_connection_type: "long_polling" | "message_streaming";
 }
 
 export interface ModConfig {
@@ -161,7 +161,7 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   donate_price_groups: DEFAULT_DONATE_PRICE_GROUPS,
   allow_vote_command: true,
   hide_votes: false,
-  youtube_chat_polling_only: false,
+  youtube_chat_connection_type: "long_polling",
 };
 
 const DEFAULT_CONFIG: ModConfig = {
@@ -315,10 +315,10 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
     ),
     allow_vote_command: bool(raw["allow_vote_command"], d.allow_vote_command),
     hide_votes: bool(raw["hide_votes"], d.hide_votes),
-    youtube_chat_polling_only: bool(
-      raw["youtube_chat_polling_only"],
-      d.youtube_chat_polling_only,
-    ),
+    youtube_chat_connection_type:
+      raw["youtube_chat_connection_type"] === "message_streaming"
+        ? "message_streaming"
+        : "long_polling",
   };
 }
 

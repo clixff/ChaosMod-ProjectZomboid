@@ -50,7 +50,7 @@ export interface StreamerModeConfig {
   donate_price_groups: DonatePriceGroup[];
   allow_vote_command: boolean;
   hide_votes: boolean;
-  youtube_chat_polling_only: boolean;
+  youtube_chat_connection_type: "long_polling" | "message_streaming";
 }
 
 export interface ModConfig {
@@ -273,6 +273,9 @@ export async function youtubeSetApiKey(apiKey: string): Promise<void> {
     const text = await res.text();
     throw new Error(text || `youtubeSetApiKey: ${res.status}`);
   }
+}
+export async function youtubeReconnect(): Promise<void> {
+  await postSimple("/api/youtube/reconnect");
 }
 export async function donationAlertsSetup(input: {
   appId: string;

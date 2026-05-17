@@ -1,4 +1,5 @@
 import type { ChangeEvent, CSSProperties, KeyboardEvent } from "react";
+import { X } from "lucide-react";
 
 interface TextInputProps {
   value: string;
@@ -9,6 +10,7 @@ interface TextInputProps {
   style?: CSSProperties;
   onBlur?: () => void;
   onSubmit?: () => void;
+  onClear?: () => void;
 }
 
 export function TextInput({
@@ -20,6 +22,7 @@ export function TextInput({
   style,
   onBlur,
   onSubmit,
+  onClear,
 }: TextInputProps) {
   const cls =
     size === "small" ? "input input--small" : size === "mid" ? "input input--mid" : "input";
@@ -32,7 +35,7 @@ export function TextInput({
       onSubmit();
     }
   };
-  return (
+  const input = (
     <input
       className={cls}
       type={type}
@@ -43,6 +46,24 @@ export function TextInput({
       onBlur={onBlur}
       onKeyDown={handleKeyDown}
     />
+  );
+  if (!onClear) return input;
+  return (
+    <span className="input-wrap">
+      {input}
+      {value.length > 0 && (
+        <button
+          type="button"
+          className="input-clear"
+          aria-label="Clear"
+          title="Clear"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={onClear}
+        >
+          <X size={14} aria-hidden="true" />
+        </button>
+      )}
+    </span>
   );
 }
 

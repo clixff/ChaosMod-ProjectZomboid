@@ -99,6 +99,7 @@ export interface ServerContext {
   youtubeSetApiKey?: (
     apiKey: string,
   ) => Promise<{ success: boolean; error?: string }>;
+  youtubeReconnect?: () => Promise<{ success: boolean; error?: string }>;
   exportEffects?: (
     kind: string,
   ) =>
@@ -454,6 +455,20 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           const r = await ctx.youtubeSetApiKey(rawKey);
           if (!r.success) {
             return new Response(r.error ?? "Failed to save API key", {
+              status: 400,
+            });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/youtube/reconnect": {
+        POST: async () => {
+          if (!ctx.youtubeReconnect)
+            return new Response("Not available", { status: 503 });
+          const r = await ctx.youtubeReconnect();
+          if (!r.success) {
+            return new Response(r.error ?? "Reconnect failed", {
               status: 400,
             });
           }

@@ -359,15 +359,6 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setStreamer("enable_donate", v)}
           />
         </FieldRow>
-        <FieldRow
-          label="YouTube: Fallback to chat polling"
-          hint="Skip the gRPC streaming path and read YouTube chat with REST polling only. Use this if gRPC streaming fails on your machine."
-        >
-          <Checkbox
-            checked={sm.youtube_chat_polling_only}
-            onChange={(v) => setStreamer("youtube_chat_polling_only", v)}
-          />
-        </FieldRow>
       </Section>
 
       <Section

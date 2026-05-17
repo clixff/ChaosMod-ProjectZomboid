@@ -292,6 +292,39 @@ a:focus-visible {
   width: 200px;
 }
 
+.input-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.input-wrap .input {
+  padding-right: 30px;
+}
+
+.input-clear {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.input-clear:hover {
+  color: var(--text);
+  background: var(--bg-2);
+}
+
 /* Checkbox */
 .checkbox {
   display: inline-flex;
