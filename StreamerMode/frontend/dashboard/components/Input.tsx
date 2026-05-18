@@ -11,6 +11,7 @@ interface TextInputProps {
   onBlur?: () => void;
   onSubmit?: () => void;
   onClear?: () => void;
+  noAutofill?: boolean;
 }
 
 export function TextInput({
@@ -23,6 +24,7 @@ export function TextInput({
   onBlur,
   onSubmit,
   onClear,
+  noAutofill,
 }: TextInputProps) {
   const cls =
     size === "small" ? "input input--small" : size === "mid" ? "input input--mid" : "input";
@@ -35,6 +37,18 @@ export function TextInput({
       onSubmit();
     }
   };
+  const noAutofillProps = noAutofill
+    ? {
+        autoComplete: "off",
+        spellCheck: false,
+        autoCorrect: "off",
+        autoCapitalize: "off",
+        "data-lpignore": "true",
+        "data-1p-ignore": "true",
+        "data-bwignore": "true",
+        "data-form-type": "other",
+      }
+    : {};
   const input = (
     <input
       className={cls}
@@ -45,6 +59,7 @@ export function TextInput({
       style={style}
       onBlur={onBlur}
       onKeyDown={handleKeyDown}
+      {...noAutofillProps}
     />
   );
   if (!onClear) return input;

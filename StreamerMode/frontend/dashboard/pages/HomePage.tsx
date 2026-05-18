@@ -26,6 +26,7 @@ import youtubeLogo from "../assets/youtube_logo.webp";
 const STEAM_WORKSHOP_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142";
 import { Modal } from "../components/Modal.tsx";
+import { YouTubeSetupGuide } from "../components/YouTubeSetupGuide.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
 import { Select } from "../components/Select.tsx";
 import { TextInput, NumberInput } from "../components/Input.tsx";
@@ -1316,27 +1317,15 @@ function YouTubeConnectModal({
   onSubmit,
 }: YouTubeConnectModalProps) {
   const canSubmit = !busy && apiKey.trim().length > 0;
+  const [guideOpen, setGuideOpen] = useState(false);
   return (
-    <Modal title="Connect YouTube" onClose={onClose}>
+    <Modal title="Connect YouTube" onClose={onClose} wide={guideOpen}>
       <p style={{ marginTop: 0, marginBottom: 12 }}>
         Paste a YouTube Data API v3 key from your own Google Cloud project.
         ChaosMod does not need access to your Google account.
       </p>
 
-      <button
-        type="button"
-        className="btn"
-        onClick={() =>
-          window.open(
-            "https://github.com/clixff/ChaosMod-ProjectZomboid/wiki/YouTube:-How-to-create-API-Key",
-            "_blank",
-            "noopener,noreferrer",
-          )
-        }
-        style={{ marginBottom: 10 }}
-      >
-        Show setup instructions
-      </button>
+      <YouTubeSetupGuide open={guideOpen} onOpenChange={setGuideOpen} />
 
       <div className="form-grid">
         <label className="form-field">
@@ -1346,6 +1335,7 @@ function YouTubeConnectModal({
             onChange={onApiKey}
             type="password"
             placeholder="AIza..."
+            noAutofill
             onSubmit={() => {
               if (canSubmit) onSubmit();
             }}
