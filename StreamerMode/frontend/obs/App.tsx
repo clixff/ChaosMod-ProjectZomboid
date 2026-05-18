@@ -6,6 +6,7 @@ interface VoteOption {
   effect_name: string;
   votes: number | undefined;
   hidden?: boolean;
+  duration?: number;
 }
 
 interface ModStatus {
@@ -213,6 +214,11 @@ export function App() {
                 ? 1
                 : 0.5
               : 1;
+          const showDuration =
+            !opt.hidden && typeof opt.duration === "number";
+          const displayedName = showDuration
+            ? `${opt.effect_name} (${opt.duration}s)`
+            : opt.effect_name;
 
           return (
             <div key={opt.effect_id} className="option" style={{ opacity }}>
@@ -226,9 +232,9 @@ export function App() {
                   <span className="option-index">{opt.index}</span>
                   <span
                     className="option-name"
-                    style={{ fontSize: getNameFontSize(opt.effect_name) }}
+                    style={{ fontSize: getNameFontSize(displayedName) }}
                   >
-                    {opt.effect_name}
+                    {displayedName}
                   </span>
                   {opt.votes !== undefined && (
                     <span className="option-votes">{formatOptionVotes(opt.votes)}</span>

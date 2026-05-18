@@ -9,8 +9,7 @@
 - New vehicles now spawn with random part conditions
 - Added Twitch Bits donation system for effects activation
 - Added YouTube provider for live chat support for voting and zombie nicknames using your own YouTube Data API key
-
-### Mod Fixes
+- OBS vote overlay now shows the effect duration next to its name when the effect has one
 
 ### New Effects
 
@@ -23,6 +22,10 @@
 
 - Fixed localization across all language files: corrected typos and missing diacritics translations
 - Twitch viewers without a chat color now get a stable color from the chat palette instead of plain white
+
+### Effect Fixes
+
+- Fixed "Player Can't Stop Coughing" effect not ending after duration
 
 [1.1.1]
 

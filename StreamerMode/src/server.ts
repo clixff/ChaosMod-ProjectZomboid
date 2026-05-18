@@ -40,6 +40,7 @@ export interface VoteOptionStatus {
   effect_name: string;
   votes: number | undefined;
   hidden?: boolean;
+  duration?: number;
 }
 
 export interface ModStatus {

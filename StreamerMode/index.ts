@@ -862,10 +862,19 @@ async function main(): Promise<void> {
             const isRandom = opt.id === "random_effect";
             const revealSecret = isRandom && !votingManager.isActive;
             const secretId = votingManager.secretRandomEffectId;
-            const effectName =
-              revealSecret && secretId
-                ? getString("effects", secretId)
-                : getString("effects", opt.id);
+            const hidden = isRandom && votingManager.isActive;
+            const resolvedId =
+              revealSecret && secretId ? secretId : opt.id;
+            const effectName = getString("effects", resolvedId);
+            const effectEntry = hidden
+              ? null
+              : effects.find((e) => e.id === resolvedId);
+            const duration =
+              effectEntry &&
+              effectEntry.withDuration &&
+              typeof effectEntry.duration === "number"
+                ? effectEntry.duration
+                : undefined;
             return {
               effect_id: opt.id,
               index: i + 1 + offset,
@@ -873,7 +882,8 @@ async function main(): Promise<void> {
               votes: config?.streamer_mode.hide_votes
                 ? undefined
                 : opt.voters.size,
-              hidden: isRandom && votingManager.isActive,
+              hidden,
+              duration,
             };
           }),
           donateEnabled: config?.streamer_mode.enable_donate ?? false,
