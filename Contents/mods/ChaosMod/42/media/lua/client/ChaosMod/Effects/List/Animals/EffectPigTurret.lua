@@ -117,6 +117,8 @@ function PigWeaponAttach.ensureItem(data, square)
     local item = instanceItem(WEAPON_ITEM_ID)
     if not item then return false end
 
+    item:setConditionNoSound(0)
+
     local placedItem = square:AddWorldInventoryItem(item, 0.5, 0.5, Z_OFFSET, false)
     if not placedItem then return false end
 
@@ -311,7 +313,7 @@ local function playShotEffects(pigSquare, target)
     if weapon.setJammed then weapon:setJammed(false) end
     if weapon.setContainsClip then weapon:setContainsClip(true) end
     if weapon.setRoundChambered then weapon:setRoundChambered(true) end
-    weapon:setCurrentAmmoCount(30)
+    weapon:setCurrentAmmoCount(0)
     if target and weapon.setAttackTargetSquare then
         weapon:setAttackTargetSquare(target:getSquare())
     end
@@ -397,7 +399,7 @@ local function firePigTurret(self)
     if weapon.setJammed then weapon:setJammed(false) end
     if weapon.setContainsClip then weapon:setContainsClip(true) end
     if weapon.setRoundChambered then weapon:setRoundChambered(true) end
-    weapon:setCurrentAmmoCount(30)
+    weapon:setCurrentAmmoCount(0)
     if weapon.setAttackTargetSquare then
         weapon:setAttackTargetSquare(target:getSquare())
     end
