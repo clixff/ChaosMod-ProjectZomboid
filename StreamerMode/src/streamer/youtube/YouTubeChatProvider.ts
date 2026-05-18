@@ -8,20 +8,10 @@ import {
 } from "./api.ts";
 import { extractYouTubeVideoId } from "./youtubeUrl.ts";
 import { YouTubeChat, type YouTubeChatStopInfo } from "./YouTubeChat.ts";
-import { COLORS as CHAT_NICKNAME_COLORS } from "../../debugNicknames.ts";
+import { pickColorForUser } from "../../debugNicknames.ts";
 
 const SERVICE = "chaos-mod-streamer-mode";
 const API_KEY_KEY = "youtube-api-key";
-
-function pickNicknameColor(channelId: string): string {
-  let hash = 0;
-  for (let i = 0; i < channelId.length; i++) {
-    hash = (hash * 31 + channelId.charCodeAt(i)) >>> 0;
-  }
-  const palette = CHAT_NICKNAME_COLORS;
-  const picked = palette[hash % palette.length] ?? "#ffffff";
-  return picked.startsWith("#") ? picked.slice(1) : picked;
-}
 
 export interface YouTubeProviderStatus {
   account_connected: boolean;
@@ -245,7 +235,7 @@ export class YouTubeChatProvider implements ChatProvider {
           // name reaches the file instead of the raw channel id.
           loginName: m.authorDisplayName.toLowerCase(),
           displayName: m.authorDisplayName,
-          colorHex: pickNicknameColor(m.authorChannelId),
+          colorHex: pickColorForUser(m.authorChannelId),
           text,
           timestampMs: Date.now(),
           publishedAtMs: m.publishedAtMs,

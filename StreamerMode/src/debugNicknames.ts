@@ -4,6 +4,15 @@ import { NicknamesManager } from "./streamer/NicknamesManager.ts";
 const DEBUG_CHAT_INTERVAL_MS = 15000;
 const DEBUG_CHAT_OFFSETS_MS = [0, 4000, 9000];
 
+export function pickColorForUser(seed: string): string {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  const picked = COLORS[hash % COLORS.length] ?? "#ffffff";
+  return picked.startsWith("#") ? picked.slice(1) : picked;
+}
+
 export const COLORS: string[] = [
   "#FF0000",
   "#0000FF",

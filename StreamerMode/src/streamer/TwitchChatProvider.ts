@@ -9,11 +9,15 @@ import type {
   ChatProvider,
   NormalizedChatMessage,
 } from "./ChatProvider.ts";
+import { pickColorForUser } from "../debugNicknames.ts";
 
-function normalizeColorHex(input: string | null | undefined): string {
-  if (!input) return "ffffff";
+function normalizeColorHex(
+  input: string | null | undefined,
+  fallbackSeed: string,
+): string {
+  if (!input) return pickColorForUser(fallbackSeed);
   const trimmed = input.startsWith("#") ? input.slice(1) : input;
-  if (!/^[0-9a-fA-F]{6}$/.test(trimmed)) return "ffffff";
+  if (!/^[0-9a-fA-F]{6}$/.test(trimmed)) return pickColorForUser(fallbackSeed);
   return trimmed.toLowerCase();
 }
 
@@ -126,7 +130,7 @@ export class TwitchChatProvider implements ChatProvider {
       userId: `twitch:${ev.chatter_user_id}`,
       loginName: ev.chatter_user_login,
       displayName: ev.chatter_user_name,
-      colorHex: normalizeColorHex(ev.color),
+      colorHex: normalizeColorHex(ev.color, ev.chatter_user_id),
       text: ev.message.text.trim(),
       timestampMs: ev.timestamp_ms,
       publishedAtMs: ev.timestamp_ms,

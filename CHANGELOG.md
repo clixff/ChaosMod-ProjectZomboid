@@ -22,6 +22,7 @@
 ### Mod Fixes
 
 - Fixed localization across all language files: corrected typos and missing diacritics translations
+- Twitch viewers without a chat color now get a stable color from the chat palette instead of plain white
 
 [1.1.1]
 
