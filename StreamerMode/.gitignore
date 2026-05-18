@@ -36,3 +36,5 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 mod-folder
 .twitch-auth
 oauth-token-twitch
+dist-hub
+frontend/hub/public/mod
