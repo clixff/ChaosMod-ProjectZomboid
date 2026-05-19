@@ -9,10 +9,15 @@
     "debug": "bun index.ts --debug",
     "watch": "bun --watch index.ts",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "prepare:hub-assets": "bun scripts/prepare-hub-assets.ts",
+    "dev:hub": "bun run prepare:hub-assets && bun scripts/dev-hub.ts",
+    "build:hub": "bun run prepare:hub-assets && bun scripts/clean-hub-dist.ts && bun build --target=browser --minify --define:process.env.NODE_ENV='\"production\"' frontend/hub/index.html --outdir=dist-hub && bun scripts/copy-hub-assets-to-dist.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@tanstack/react-query-devtools": "^5.100.10",
+    "@tanstack/react-router-devtools": "^1.167.0",
     "@types/bun": "latest",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -29,13 +34,10 @@
     "@grpc/proto-loader": "^0.8.1",
     "@tanstack/eslint-plugin-query": "^5.100.10",
     "@tanstack/react-query": "^5.100.10",
-    "@tanstack/react-query-devtools": "^5.100.10",
     "@tanstack/react-router": "^1.170.4",
-    "@tanstack/react-router-devtools": "^1.167.0",
     "colors": "^1.4.0",
     "exceljs": "^4.4.0",
     "lucide-react": "^1.14.0",
-    "motion": "^12.39.0",
     "open": "^11.0.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"

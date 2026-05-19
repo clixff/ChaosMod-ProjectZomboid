@@ -37,4 +37,4 @@ mod-folder
 .twitch-auth
 oauth-token-twitch
 dist-hub
-frontend/hub/public/mod
+frontend/hub/mod
