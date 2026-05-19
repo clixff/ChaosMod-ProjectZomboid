@@ -17,6 +17,7 @@
 - Supersonic
 - UFO Abducts Zombies
 - Roll Dice
+- Night Vision
 
 ### Mod Fixes
 

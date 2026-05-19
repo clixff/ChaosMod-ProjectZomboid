@@ -327,7 +327,8 @@
         "ufo_abduction": "Похищение НЛО",
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "НЛО похищает зомби",
-        "roll_dice": "Бросок Кубика"
+        "roll_dice": "Бросок Кубика",
+        "night_vision": "Ночное зрение"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

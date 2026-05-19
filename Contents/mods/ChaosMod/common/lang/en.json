@@ -327,7 +327,8 @@
         "ufo_abduction": "UFO Abduction",
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFO Abducts Zombies",
-        "roll_dice": "Roll Dice"
+        "roll_dice": "Roll Dice",
+        "night_vision": "Night Vision"
     },
     "core": {
         "start_mod": "Start ChaosMod",

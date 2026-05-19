@@ -327,7 +327,8 @@
         "ufo_abduction": "UFO 납치",
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFO가 좀비를 납치함",
-        "roll_dice": "주사위 굴리기"
+        "roll_dice": "주사위 굴리기",
+        "night_vision": "야간 투시"
     },
     "core": {
         "start_mod": "ChaosMod 시작",

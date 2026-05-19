@@ -327,7 +327,8 @@
         "ufo_abduction": "Abdução por OVNI",
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "OVNI Abduz Zumbis",
-        "roll_dice": "Lançar Dado"
+        "roll_dice": "Lançar Dado",
+        "night_vision": "Visão Noturna"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

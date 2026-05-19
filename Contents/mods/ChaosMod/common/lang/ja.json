@@ -327,7 +327,8 @@
         "ufo_abduction": "UFOの誘拐",
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFOがゾンビを誘拐",
-        "roll_dice": "サイコロを振る"
+        "roll_dice": "サイコロを振る",
+        "night_vision": "暗視"
     },
     "core": {
         "start_mod": "ChaosModを開始",

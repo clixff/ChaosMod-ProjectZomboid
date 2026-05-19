@@ -327,7 +327,8 @@
         "ufo_abduction": "Enlèvement par OVNI",
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "Un OVNI enlève les zombies",
-        "roll_dice": "Lancer de dé"
+        "roll_dice": "Lancer de dé",
+        "night_vision": "Vision nocturne"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

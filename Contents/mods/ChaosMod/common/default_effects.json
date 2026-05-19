@@ -2947,6 +2947,18 @@
             ],
             "enabled_donate": true,
             "price_group": "neutral_3"
+        },
+        {
+            "id": "night_vision",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": true,
+            "duration": 90,
+            "disable_effects": [
+                "night_vision"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_3"
         }
     ]
 }

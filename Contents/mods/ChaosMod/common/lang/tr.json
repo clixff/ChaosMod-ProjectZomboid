@@ -327,7 +327,8 @@
         "ufo_abduction": "UFO Kaçırması",
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFO Zombileri Kaçırıyor",
-        "roll_dice": "Zar At"
+        "roll_dice": "Zar At",
+        "night_vision": "Gece Görüşü"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
