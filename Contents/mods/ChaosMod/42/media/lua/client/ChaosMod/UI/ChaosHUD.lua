@@ -55,10 +55,15 @@ end
 function ChaosHUD:initialise()
     ISPanel.initialise(self)
     self.text = "Test String"
+
+    -- Do not consume mouse move / wheel because of the panel background.
+    if self.javaObject and self.javaObject.setConsumeMouseEvents then
+        self.javaObject:setConsumeMouseEvents(false)
+    end
 end
 
 function ChaosHUD:new()
-    local panelWidth = ChaosUIManager.GetScaledWidth(1920 * 0.2)
+    local panelWidth = ChaosUIManager.GetScaledWidth(1920 * 0.3)
     local panelHeight = ChaosUIManager.GetScaledWidth(PANEL_HEIGHT)
     local panelX = 0
     local panelY = ChaosUIManager.cachedHeight - panelHeight
@@ -343,4 +348,33 @@ end
 
 function ChaosHUD:OnSettingsButtonClick()
     ChaosUIManager:ToggleSettingsWindow()
+end
+
+-- Let background left-clicks pass through.
+-- Child buttons are handled before this by UIElement, so buttons still work.
+---@return boolean
+function ChaosHUD:onMouseDown(x, y)
+    return false
+end
+
+---@return boolean
+function ChaosHUD:onMouseUp(x, y)
+    return false
+end
+
+-- Optional, but useful if you don't want right-click blocked by the HUD.
+---@return boolean
+function ChaosHUD:onRightMouseDown(x, y)
+    return false
+end
+
+---@return boolean
+function ChaosHUD:onRightMouseUp(x, y)
+    return false
+end
+
+-- Optional: let mouse wheel pass to game too.
+---@return boolean
+function ChaosHUD:onMouseWheel(del)
+    return false
 end

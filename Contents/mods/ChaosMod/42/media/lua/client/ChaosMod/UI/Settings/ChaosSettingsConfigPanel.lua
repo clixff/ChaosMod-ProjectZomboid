@@ -22,7 +22,7 @@ local LANG_OPTIONS = {
     { key = "zh", label = "Simplified Chinese" },
     { key = "de", label = "German" },
     { key = "ko", label = "Korean" },
-    { key = "jp", label = "Japanese" },
+    { key = "ja", label = "Japanese" },
 }
 
 ---@param x number
