@@ -328,7 +328,8 @@
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFO가 좀비를 납치함",
         "roll_dice": "주사위 굴리기",
-        "night_vision": "야간 투시"
+        "night_vision": "야간 투시",
+        "zombies_can_smell_you": "좀비가 당신의 냄새를 맡습니다"
     },
     "core": {
         "start_mod": "ChaosMod 시작",
@@ -623,6 +624,7 @@
         "bounty_on_player_head": "효과 지속 시간 동안 적대적인 NPC들이 스폰됩니다",
         "supersonic": "플레이어의 이동 속도를 8배로 증가시킴",
         "ufo_abduction": "플레이어를 무작위 지점으로 순간이동시키고, 상처를 치유하며, 옷을 제거함",
-        "roll_dice": "플레이어가 주사위를 굴려 다양한 카테고리에서 선택된 무작위 효과 하나를 발동합니다"
+        "roll_dice": "플레이어가 주사위를 굴려 다양한 카테고리에서 선택된 무작위 효과 하나를 발동합니다",
+        "zombies_can_smell_you": "반경 30칸 이내의 좀비가 플레이어를 감지하고 그 위치로 향합니다"
     }
 }

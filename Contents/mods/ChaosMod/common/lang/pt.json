@@ -328,7 +328,8 @@
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "OVNI Abduz Zumbis",
         "roll_dice": "Lançar Dado",
-        "night_vision": "Visão Noturna"
+        "night_vision": "Visão Noturna",
+        "zombies_can_smell_you": "Zumbis podem sentir seu cheiro"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -606,6 +607,7 @@
         "bounty_on_player_head": "Spawna NPCs hostis durante a duração do efeito",
         "supersonic": "Acelera o movimento do jogador em 8 vezes",
         "ufo_abduction": "Teletransporta o jogador para um ponto aleatório, cura ferimentos, remove roupas",
-        "roll_dice": "O jogador rola um dado e ativa um efeito aleatório escolhido entre categorias diferentes"
+        "roll_dice": "O jogador rola um dado e ativa um efeito aleatório escolhido entre categorias diferentes",
+        "zombies_can_smell_you": "Zumbis em um raio de 30 células percebem o jogador e vão até sua posição"
     }
 }

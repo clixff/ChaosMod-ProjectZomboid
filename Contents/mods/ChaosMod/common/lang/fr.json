@@ -328,7 +328,8 @@
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "Un OVNI enlève les zombies",
         "roll_dice": "Lancer de dé",
-        "night_vision": "Vision nocturne"
+        "night_vision": "Vision nocturne",
+        "zombies_can_smell_you": "Les zombies peuvent te sentir"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
@@ -606,6 +607,7 @@
         "bounty_on_player_head": "Fait apparaître des PNJ hostiles pendant la durée de l'effet",
         "supersonic": "Accélère le déplacement du joueur de 8 fois",
         "ufo_abduction": "Téléporte le joueur à un point aléatoire, soigne les blessures, retire les vêtements",
-        "roll_dice": "Le joueur lance un dé et active un effet aléatoire choisi parmi différentes catégories"
+        "roll_dice": "Le joueur lance un dé et active un effet aléatoire choisi parmi différentes catégories",
+        "zombies_can_smell_you": "Les zombies dans un rayon de 30 cases repèrent le joueur et se dirigent vers sa position"
     }
 }

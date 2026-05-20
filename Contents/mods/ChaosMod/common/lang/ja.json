@@ -328,7 +328,8 @@
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFOがゾンビを誘拐",
         "roll_dice": "サイコロを振る",
-        "night_vision": "暗視"
+        "night_vision": "暗視",
+        "zombies_can_smell_you": "ゾンビがあなたの匂いを嗅ぎつける"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -623,6 +624,7 @@
         "bounty_on_player_head": "効果が持続している間、敵対的なNPCをスポーンします",
         "supersonic": "プレイヤーの移動速度を8倍にする",
         "ufo_abduction": "プレイヤーをランダムな地点にテレポートし、傷を癒し、衣服を取り除く",
-        "roll_dice": "プレイヤーがサイコロを振り、異なるカテゴリから選ばれたランダムな効果を1つ発動します"
+        "roll_dice": "プレイヤーがサイコロを振り、異なるカテゴリから選ばれたランダムな効果を1つ発動します",
+        "zombies_can_smell_you": "半径30マス以内のゾンビがプレイヤーに気づき、その位置に向かいます"
     }
 }

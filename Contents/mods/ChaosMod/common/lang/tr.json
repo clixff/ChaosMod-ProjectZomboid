@@ -328,7 +328,8 @@
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFO Zombileri Kaçırıyor",
         "roll_dice": "Zar At",
-        "night_vision": "Gece Görüşü"
+        "night_vision": "Gece Görüşü",
+        "zombies_can_smell_you": "Zombiler kokunu alabiliyor"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
@@ -606,6 +607,7 @@
         "bounty_on_player_head": "Etki süresi boyunca düşman NPC'ler spawnlar",
         "supersonic": "Oyuncunun hareketini 8 kat hızlandırır",
         "ufo_abduction": "Oyuncuyu rastgele bir noktaya ışınlar, yaraları iyileştirir, kıyafetleri çıkarır",
-        "roll_dice": "Oyuncu zar atar ve farklı kategorilerden seçilen rastgele bir efekti etkinleştirir"
+        "roll_dice": "Oyuncu zar atar ve farklı kategorilerden seçilen rastgele bir efekti etkinleştirir",
+        "zombies_can_smell_you": "30 karelik yarıçap içindeki zombiler oyuncuyu fark eder ve konumuna yönelir"
     }
 }

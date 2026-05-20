@@ -328,7 +328,8 @@
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFO entführt Zombies",
         "roll_dice": "Würfeln",
-        "night_vision": "Nachtsicht"
+        "night_vision": "Nachtsicht",
+        "zombies_can_smell_you": "Zombies können dich riechen"
     },
     "core": {
         "start_mod": "ChaosMod starten",
@@ -606,6 +607,7 @@
         "bounty_on_player_head": "Spawnt feindliche NPCs während der Effektdauer",
         "supersonic": "Beschleunigt die Bewegung des Spielers um das 8-fache",
         "ufo_abduction": "Teleportiert den Spieler an einen zufälligen Ort, heilt Wunden, entfernt Kleidung",
-        "roll_dice": "Der Spieler würfelt und aktiviert einen zufälligen Effekt, ausgewählt aus verschiedenen Kategorien"
+        "roll_dice": "Der Spieler würfelt und aktiviert einen zufälligen Effekt, ausgewählt aus verschiedenen Kategorien",
+        "zombies_can_smell_you": "Zombies in einem Umkreis von 30 Feldern bemerken den Spieler und bewegen sich zu seiner Position"
     }
 }

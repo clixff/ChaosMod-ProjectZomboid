@@ -15,6 +15,7 @@ function EffectZombiesWalkAway:OnStart()
     local counter = 0
 
     ChaosZombie.ForEachZombieInRange(px, py, 30, function(zombie)
+        if not zombie or not zombie:isAlive() then return end
         local zx = zombie:getX()
         local zy = zombie:getY()
         local zz = zombie:getZ()
@@ -30,6 +31,11 @@ function EffectZombiesWalkAway:OnStart()
 
         local tx = math.floor(zx + nx * 30)
         local ty = math.floor(zy + ny * 30)
+
+        zombie:clearAggroList()
+        ---@diagnostic disable-next-line: param-type-mismatch
+        zombie:setTarget(nil)
+        zombie:setTargetSeenTime(0)
 
         ChaosZombie.MoveToLocation(zombie, tx, ty, zz, true, true, true, true)
         counter = counter + 1

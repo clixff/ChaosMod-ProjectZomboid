@@ -328,7 +328,8 @@
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFO Abducts Zombies",
         "roll_dice": "Roll Dice",
-        "night_vision": "Night Vision"
+        "night_vision": "Night Vision",
+        "zombies_can_smell_you": "Zombies Can Smell You"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -623,6 +624,7 @@
         "bounty_on_player_head": "Spawns hostile NPCs for the duration of the effect",
         "supersonic": "Speeds up player movement by 8 times",
         "ufo_abduction": "Teleports the player to a random point, heals wounds, removes clothes",
-        "roll_dice": "The player rolls a die and activates one random effect selected from different categories"
+        "roll_dice": "The player rolls a die and activates one random effect selected from different categories",
+        "zombies_can_smell_you": "Zombies within a 30-tile radius notice the player and head to their position"
     }
 }

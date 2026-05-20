@@ -328,7 +328,8 @@
         "supersonic": "Supersonic",
         "ufo_abducts_zombies": "UFO porywa zombie",
         "roll_dice": "Rzut kostką",
-        "night_vision": "Widzenie nocne"
+        "night_vision": "Widzenie nocne",
+        "zombies_can_smell_you": "Zombie czują twój zapach"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",
@@ -606,6 +607,7 @@
         "bounty_on_player_head": "Spawnuje wrogich NPC podczas trwania efektu",
         "supersonic": "Przyspiesza ruch gracza 8-krotnie",
         "ufo_abduction": "Teleportuje gracza w losowe miejsce, leczy rany, usuwa ubrania",
-        "roll_dice": "Gracz rzuca kostką i aktywuje jeden losowy efekt wybrany z różnych kategorii"
+        "roll_dice": "Gracz rzuca kostką i aktywuje jeden losowy efekt wybrany z różnych kategorii",
+        "zombies_can_smell_you": "Zombie w promieniu 30 pól zauważają gracza i ruszają w stronę jego pozycji"
     }
 }

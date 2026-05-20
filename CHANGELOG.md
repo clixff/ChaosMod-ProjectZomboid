@@ -18,6 +18,7 @@
 - UFO Abducts Zombies
 - Roll Dice
 - Night Vision
+- Zombies Can Smell You
 
 ### Mod Fixes
 
@@ -30,6 +31,7 @@
 
 - Fixed "Player Can't Stop Coughing" effect not ending after duration
 - "Hide Random Items" and "Hide Player Clothes" effects now do not hide bandages equipped on body parts
+- Updated zombies AI for effect "Zombies Walk Away"
 
 [1.1.1]
 
