@@ -133,25 +133,45 @@ function ChaosUtils.RemovePropExplosion(obj)
     end
 
     local containerCount = obj:getContainerCount()
-    if not containerCount or containerCount == 0 then return end
     local sq = obj:getSquare()
     if not sq then return end
-    for i = 0, containerCount - 1 do
-        local container = obj:getContainerByIndex(i)
-        if container then
-            local items = container:getItems()
-            ---@type InventoryItem[]
-            local snapshot = {}
-            for j = 0, items:size() - 1 do
-                table.insert(snapshot, items:get(j))
-            end
-            for _, item in ipairs(snapshot) do
-                local ox = ChaosUtils.RandFloat(0.15, 0.85)
-                local oy = ChaosUtils.RandFloat(0.15, 0.85)
-                sq:AddWorldInventoryItem(item, ox, oy, 0.0)
+    if containerCount and containerCount > 0 then
+        for i = 0, containerCount - 1 do
+            local container = obj:getContainerByIndex(i)
+            if container then
+                local items = container:getItems()
+                ---@type InventoryItem[]
+                local snapshot = {}
+                for j = 0, items:size() - 1 do
+                    table.insert(snapshot, items:get(j))
+                end
+                for _, item in ipairs(snapshot) do
+                    local ox = ChaosUtils.RandFloat(0.15, 0.85)
+                    local oy = ChaosUtils.RandFloat(0.15, 0.85)
+                    sq:AddWorldInventoryItem(item, ox, oy, 0.0)
+                end
             end
         end
     end
+
+    local isContainer = containerCount > 0
+    local isFurniture = ChaosProps.GetFurnitureType(obj) ~= nil
+
+    if isContainer == false and isFurniture == false then
+        return
+    end
+
+    local x = math.floor(obj:getX())
+    local y = math.floor(obj:getY())
+    local z = math.floor(obj:getZ())
+
+    getPlayer():playSound("BreakObject")
+    addSound(getPlayer(), x, y, z, 10, 10)
+
+    print("removing prop with expl")
+
+    sq:AddWorldInventoryItem("Base.UnusableWood", ChaosUtils.RandFloat(0.1, 0.9), ChaosUtils.RandFloat(0.1, 0.9), 0)
+    sq:transmitRemoveItemFromSquare(obj)
 
     local square = obj:getSquare()
     if square then
@@ -183,6 +203,7 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
         ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
             if sq then
                 ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
+                    print("obj: " .. obj:getObjectName())
                     ChaosUtils.RemovePropExplosion(obj)
                 end)
             end
