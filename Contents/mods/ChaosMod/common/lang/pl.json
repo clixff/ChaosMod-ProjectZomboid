@@ -330,7 +330,12 @@
         "roll_dice": "Rzut kostką",
         "night_vision": "Widzenie nocne",
         "zombies_can_smell_you": "Zombie czują twój zapach",
-        "spawn_orc_friend": "Przywołaj przyjaznego orka"
+        "spawn_orc_friend": "Przywołaj przyjaznego orka",
+        "spawn_griefer_alien": "Zespawnuj kosmitę-griefera",
+        "spawn_homer_simpson": "Zespawnuj Homera Simpsona",
+        "spawn_doctor": "Zespawnuj lekarkę",
+        "spawn_carl_johnson": "Zespawnuj Carla Johnsona",
+        "npc_battle_royale": "Battle royale NPC"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",
@@ -609,6 +614,8 @@
         "supersonic": "Przyspiesza ruch gracza 8-krotnie",
         "ufo_abduction": "Teleportuje gracza w losowe miejsce, leczy rany, usuwa ubrania",
         "roll_dice": "Gracz rzuca kostką i aktywuje jeden losowy efekt wybrany z różnych kategorii",
-        "zombies_can_smell_you": "Zombie w promieniu 30 pól zauważają gracza i ruszają w stronę jego pozycji"
+        "zombies_can_smell_you": "Zombie w promieniu 30 pól zauważają gracza i ruszają w stronę jego pozycji",
+        "spawn_doctor": "NPC, który leczy rany gracza do 5 razy w krótkich odstępach czasu",
+        "npc_battle_royale": "Spawnuje 15 NPC, którzy walczą ze sobą"
     }
 }

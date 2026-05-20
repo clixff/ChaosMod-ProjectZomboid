@@ -330,7 +330,12 @@
         "roll_dice": "Würfeln",
         "night_vision": "Nachtsicht",
         "zombies_can_smell_you": "Zombies können dich riechen",
-        "spawn_orc_friend": "Befreundeten Ork beschwören"
+        "spawn_orc_friend": "Befreundeten Ork beschwören",
+        "spawn_griefer_alien": "Griefer-Alien spawnen",
+        "spawn_homer_simpson": "Homer Simpson spawnen",
+        "spawn_doctor": "Ärztin spawnen",
+        "spawn_carl_johnson": "Carl Johnson spawnen",
+        "npc_battle_royale": "NPC Battle Royale"
     },
     "core": {
         "start_mod": "ChaosMod starten",
@@ -609,6 +614,8 @@
         "supersonic": "Beschleunigt die Bewegung des Spielers um das 8-fache",
         "ufo_abduction": "Teleportiert den Spieler an einen zufälligen Ort, heilt Wunden, entfernt Kleidung",
         "roll_dice": "Der Spieler würfelt und aktiviert einen zufälligen Effekt, ausgewählt aus verschiedenen Kategorien",
-        "zombies_can_smell_you": "Zombies in einem Umkreis von 30 Feldern bemerken den Spieler und bewegen sich zu seiner Position"
+        "zombies_can_smell_you": "Zombies in einem Umkreis von 30 Feldern bemerken den Spieler und bewegen sich zu seiner Position",
+        "spawn_doctor": "Ein NPC, der die Wunden des Spielers in kurzen Abständen bis zu 5-mal heilt",
+        "npc_battle_royale": "Spawnt 15 NPCs, die sich gegenseitig bekämpfen"
     }
 }

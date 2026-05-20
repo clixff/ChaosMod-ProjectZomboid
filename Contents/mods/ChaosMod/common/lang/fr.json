@@ -330,7 +330,12 @@
         "roll_dice": "Lancer de dé",
         "night_vision": "Vision nocturne",
         "zombies_can_smell_you": "Les zombies peuvent te sentir",
-        "spawn_orc_friend": "Invoquer un orc ami"
+        "spawn_orc_friend": "Invoquer un orc ami",
+        "spawn_griefer_alien": "Faire apparaître un alien griefer",
+        "spawn_homer_simpson": "Faire apparaître Homer Simpson",
+        "spawn_doctor": "Faire apparaître une doctoresse",
+        "spawn_carl_johnson": "Faire apparaître Carl Johnson",
+        "npc_battle_royale": "Battle royale de PNJ"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
@@ -609,6 +614,8 @@
         "supersonic": "Accélère le déplacement du joueur de 8 fois",
         "ufo_abduction": "Téléporte le joueur à un point aléatoire, soigne les blessures, retire les vêtements",
         "roll_dice": "Le joueur lance un dé et active un effet aléatoire choisi parmi différentes catégories",
-        "zombies_can_smell_you": "Les zombies dans un rayon de 30 cases repèrent le joueur et se dirigent vers sa position"
+        "zombies_can_smell_you": "Les zombies dans un rayon de 30 cases repèrent le joueur et se dirigent vers sa position",
+        "spawn_doctor": "Un PNJ qui soigne les blessures du joueur jusqu'à 5 fois à court intervalle",
+        "npc_battle_royale": "Fait apparaître 15 PNJ qui se battent entre eux"
     }
 }

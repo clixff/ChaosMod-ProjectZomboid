@@ -330,7 +330,12 @@
         "roll_dice": "掷骰子",
         "night_vision": "夜视",
         "zombies_can_smell_you": "僵尸能闻到你",
-        "spawn_orc_friend": "召唤兽人朋友"
+        "spawn_orc_friend": "召唤兽人朋友",
+        "spawn_griefer_alien": "生成捣蛋鬼外星人",
+        "spawn_homer_simpson": "生成荷马·辛普森",
+        "spawn_doctor": "生成医生",
+        "spawn_carl_johnson": "生成卡尔·约翰逊",
+        "npc_battle_royale": "NPC大逃杀"
     },
     "core": {
         "start_mod": "启动混乱模式",
@@ -609,6 +614,8 @@
         "supersonic": "玩家移动速度提升8倍",
         "ufo_abduction": "将玩家传送到随机地点，治愈伤口，移除衣物",
         "roll_dice": "玩家掷骰子，激活从不同类别中选出的一个随机效果",
-        "zombies_can_smell_you": "30 格范围内的僵尸会察觉玩家并向其位置移动"
+        "zombies_can_smell_you": "30 格范围内的僵尸会察觉玩家并向其位置移动",
+        "spawn_doctor": "一个 NPC，会以较短间隔治疗玩家的伤口，最多 5 次",
+        "npc_battle_royale": "生成 15 个互相攻击的 NPC"
     }
 }

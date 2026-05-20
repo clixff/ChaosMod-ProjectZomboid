@@ -330,7 +330,12 @@
         "roll_dice": "주사위 굴리기",
         "night_vision": "야간 투시",
         "zombies_can_smell_you": "좀비가 당신의 냄새를 맡습니다",
-        "spawn_orc_friend": "오크 친구 소환"
+        "spawn_orc_friend": "오크 친구 소환",
+        "spawn_griefer_alien": "그리퍼 외계인 소환",
+        "spawn_homer_simpson": "호머 심슨 소환",
+        "spawn_doctor": "의사 소환",
+        "spawn_carl_johnson": "칼 존슨 소환",
+        "npc_battle_royale": "NPC 배틀로얄"
     },
     "core": {
         "start_mod": "ChaosMod 시작",
@@ -626,6 +631,8 @@
         "supersonic": "플레이어의 이동 속도를 8배로 증가시킴",
         "ufo_abduction": "플레이어를 무작위 지점으로 순간이동시키고, 상처를 치유하며, 옷을 제거함",
         "roll_dice": "플레이어가 주사위를 굴려 다양한 카테고리에서 선택된 무작위 효과 하나를 발동합니다",
-        "zombies_can_smell_you": "반경 30칸 이내의 좀비가 플레이어를 감지하고 그 위치로 향합니다"
+        "zombies_can_smell_you": "반경 30칸 이내의 좀비가 플레이어를 감지하고 그 위치로 향합니다",
+        "spawn_doctor": "짧은 간격으로 플레이어의 상처를 최대 5회까지 치료해주는 NPC",
+        "npc_battle_royale": "서로 싸우는 NPC 15명을 소환합니다"
     }
 }

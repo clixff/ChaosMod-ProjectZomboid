@@ -330,7 +330,12 @@
         "roll_dice": "Roll Dice",
         "night_vision": "Night Vision",
         "zombies_can_smell_you": "Zombies Can Smell You",
-        "spawn_orc_friend": "Spawn Orc Friend"
+        "spawn_orc_friend": "Spawn Orc Friend",
+        "spawn_griefer_alien": "Spawn Griefer Alien",
+        "spawn_homer_simpson": "Spawn Homer Simpson",
+        "spawn_doctor": "Spawn Doctor",
+        "spawn_carl_johnson": "Spawn Carl Johnson",
+        "npc_battle_royale": "NPC Battle Royale"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -626,6 +631,8 @@
         "supersonic": "Speeds up player movement by 8 times",
         "ufo_abduction": "Teleports the player to a random point, heals wounds, removes clothes",
         "roll_dice": "The player rolls a die and activates one random effect selected from different categories",
-        "zombies_can_smell_you": "Zombies within a 30-tile radius notice the player and head to their position"
+        "zombies_can_smell_you": "Zombies within a 30-tile radius notice the player and head to their position",
+        "spawn_doctor": "An NPC who heals the player's wounds up to 5 times at short intervals",
+        "npc_battle_royale": "Spawns 15 NPCs that fight each other"
     }
 }

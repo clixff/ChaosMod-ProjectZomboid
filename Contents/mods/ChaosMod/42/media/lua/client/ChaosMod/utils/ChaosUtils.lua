@@ -373,23 +373,28 @@ function ChaosUtils.PlayUISound(soundname, skipCheck, volume)
         return nil
     end
 
-    ---@type SoundManager
     local soundManager = getSoundManager()
     if not soundManager then
         print("[ChaosUtils] Sound manager not found")
         return nil
     end
 
-    local soundId = soundManager:playUISound(soundname)
-
     if volume ~= nil then
-        local emitter = soundManager:getUIEmitter()
-        if emitter then
-            emitter:setVolume(soundId, volume)
+        local sound = GameSounds.getSound(soundname)
+        if sound then
+            local oldVolume = sound:getUserVolume()
+            sound:setUserVolume(volume)
+
+            local soundId = soundManager:playUISound(soundname)
+
+            -- Restore so future uses of the same UI sound are not permanently changed.
+            sound:setUserVolume(oldVolume)
+
+            return soundId
         end
     end
 
-    return soundId
+    return soundManager:playUISound(soundname)
 end
 
 ---@param targetHours integer

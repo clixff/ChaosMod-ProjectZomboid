@@ -107,8 +107,9 @@ end
 ---@param tint table?
 ---@param textureChoice integer?
 ---@param updateVisuals boolean?
+---@param useAlternativeTintMethod boolean?
 ---@return ItemVisual?
-function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, updateVisuals)
+function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, updateVisuals, useAlternativeTintMethod)
     if not zombie or not fullType or fullType == "" then return nil end
 
     local item = instanceItem(fullType)
@@ -127,10 +128,14 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, upd
     end
 
     if tint then
-        item:setColorRed(tint.r)
-        item:setColorGreen(tint.g)
-        item:setColorBlue(tint.b)
-        item:setCustomColor(true)
+        if useAlternativeTintMethod then
+            visual:setTint(ImmutableColor.new(tint.r, tint.g, tint.b))
+        else
+            item:setColorRed(tint.r)
+            item:setColorGreen(tint.g)
+            item:setColorBlue(tint.b)
+            item:setCustomColor(true)
+        end
     end
 
     zombie:getWornItems():setFromItemVisuals(zombie:getItemVisuals())
@@ -188,8 +193,12 @@ function ChaosZombie.HumanizeZombie(zombie)
     local humanVisual = zombie:getHumanVisual()
     if not humanVisual then return end
 
+    local textureName = zombie:isFemale() and "FemaleBody01" or "MaleBody01"
+
+    print("[ChaosZombie.HumanizeZombie] Setting skin texture name: " .. tostring(textureName))
+
     -- Base skin
-    humanVisual:setSkinTextureName(zombie:isFemale() and "FemaleBody03" or "MaleBody03")
+    humanVisual:setSkinTextureName(textureName)
 
     -- Remove attached knives / weapons / props
     zombie:clearAttachedItems()

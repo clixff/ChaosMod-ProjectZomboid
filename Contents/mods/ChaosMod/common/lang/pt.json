@@ -330,7 +330,12 @@
         "roll_dice": "Lançar Dado",
         "night_vision": "Visão Noturna",
         "zombies_can_smell_you": "Zumbis podem sentir seu cheiro",
-        "spawn_orc_friend": "Invocar Orc Amigo"
+        "spawn_orc_friend": "Invocar Orc Amigo",
+        "spawn_griefer_alien": "Gerar Alienígena Griefer",
+        "spawn_homer_simpson": "Gerar Homer Simpson",
+        "spawn_doctor": "Gerar Doutora",
+        "spawn_carl_johnson": "Gerar Carl Johnson",
+        "npc_battle_royale": "Battle Royale de NPCs"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -609,6 +614,8 @@
         "supersonic": "Acelera o movimento do jogador em 8 vezes",
         "ufo_abduction": "Teletransporta o jogador para um ponto aleatório, cura ferimentos, remove roupas",
         "roll_dice": "O jogador rola um dado e ativa um efeito aleatório escolhido entre categorias diferentes",
-        "zombies_can_smell_you": "Zumbis em um raio de 30 células percebem o jogador e vão até sua posição"
+        "zombies_can_smell_you": "Zumbis em um raio de 30 células percebem o jogador e vão até sua posição",
+        "spawn_doctor": "Um NPC que cura as feridas do jogador até 5 vezes em intervalos curtos",
+        "npc_battle_royale": "Gera 15 NPCs que lutam entre si"
     }
 }

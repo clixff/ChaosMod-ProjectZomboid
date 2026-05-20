@@ -21,6 +21,11 @@
 - Night Vision
 - Zombies Can Smell You
 - Spawn Orc Friend
+- Spawn Griefer Alien
+- Spawn Homer Simpson
+- Spawn Doctor
+- Spawn Carl Johnson
+- NPC Battle Royale
 
 ### Mod Fixes
 

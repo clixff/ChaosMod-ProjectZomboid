@@ -330,7 +330,12 @@
         "roll_dice": "サイコロを振る",
         "night_vision": "暗視",
         "zombies_can_smell_you": "ゾンビがあなたの匂いを嗅ぎつける",
-        "spawn_orc_friend": "オークの友達を召喚"
+        "spawn_orc_friend": "オークの友達を召喚",
+        "spawn_griefer_alien": "グリーファーエイリアンをスポーン",
+        "spawn_homer_simpson": "ホーマー・シンプソンをスポーン",
+        "spawn_doctor": "医者をスポーン",
+        "spawn_carl_johnson": "カール・ジョンソンをスポーン",
+        "npc_battle_royale": "NPCバトルロイヤル"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -626,6 +631,8 @@
         "supersonic": "プレイヤーの移動速度を8倍にする",
         "ufo_abduction": "プレイヤーをランダムな地点にテレポートし、傷を癒し、衣服を取り除く",
         "roll_dice": "プレイヤーがサイコロを振り、異なるカテゴリから選ばれたランダムな効果を1つ発動します",
-        "zombies_can_smell_you": "半径30マス以内のゾンビがプレイヤーに気づき、その位置に向かいます"
+        "zombies_can_smell_you": "半径30マス以内のゾンビがプレイヤーに気づき、その位置に向かいます",
+        "spawn_doctor": "プレイヤーの傷を短い間隔で最大5回まで治療してくれるNPC",
+        "npc_battle_royale": "互いに戦う15体のNPCをスポーンさせる"
     }
 }
