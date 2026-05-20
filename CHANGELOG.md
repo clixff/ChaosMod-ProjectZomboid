@@ -29,6 +29,7 @@
 ### Effect Fixes
 
 - Fixed "Player Can't Stop Coughing" effect not ending after duration
+- "Hide Random Items" and "Hide Player Clothes" effects now do not hide bandages equipped on body parts
 
 [1.1.1]
 

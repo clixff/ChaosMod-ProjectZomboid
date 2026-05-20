@@ -12,7 +12,7 @@ local function collectItems(container, out)
     if not items then return end
     for i = 0, items:size() - 1 do
         local item = items:get(i)
-        if item then
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             if item:IsInventoryContainer() then
                 ---@type InventoryContainer
                 local inner = item
