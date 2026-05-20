@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "Un OVNI enlève les zombies",
         "roll_dice": "Lancer de dé",
         "night_vision": "Vision nocturne",
-        "zombies_can_smell_you": "Les zombies peuvent te sentir"
+        "zombies_can_smell_you": "Les zombies peuvent te sentir",
+        "spawn_orc_friend": "Invoquer un orc ami"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "UFO entführt Zombies",
         "roll_dice": "Würfeln",
         "night_vision": "Nachtsicht",
-        "zombies_can_smell_you": "Zombies können dich riechen"
+        "zombies_can_smell_you": "Zombies können dich riechen",
+        "spawn_orc_friend": "Befreundeten Ork beschwören"
     },
     "core": {
         "start_mod": "ChaosMod starten",

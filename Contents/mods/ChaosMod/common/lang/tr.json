@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "UFO Zombileri Kaçırıyor",
         "roll_dice": "Zar At",
         "night_vision": "Gece Görüşü",
-        "zombies_can_smell_you": "Zombiler kokunu alabiliyor"
+        "zombies_can_smell_you": "Zombiler kokunu alabiliyor",
+        "spawn_orc_friend": "Dost Ork Çağır"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

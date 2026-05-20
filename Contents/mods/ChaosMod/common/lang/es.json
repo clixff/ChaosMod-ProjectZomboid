@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "OVNI abduce zombis",
         "roll_dice": "Lanzar dados",
         "night_vision": "Visión nocturna",
-        "zombies_can_smell_you": "Los zombis pueden olerte"
+        "zombies_can_smell_you": "Los zombis pueden olerte",
+        "spawn_orc_friend": "Invocar a un orco amigo"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

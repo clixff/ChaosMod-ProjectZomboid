@@ -234,7 +234,19 @@ function ChaosNPC:OnAttackEnemyHit()
 
     print(string.format("[ChaosNPCCombatSystem] Damage min: %d, max: %d, result: %f", minDamage, maxDamage, damage))
 
-    damage = damage * self.DamageMultiplier
+    local damageMod = self.weaponItemCached:getDamageMod(zombie)
+    local hittingMod = zombie:getHittingMod()
+
+    print("[ChaosNPCCombatSystem] Damage mod: " .. tostring(damageMod) .. ", Hitting mod: " .. tostring(hittingMod))
+
+
+    damage = damage * self.DamageMultiplier * damageMod * hittingMod
+
+    print("[ChaosNPCCombatSystem] Total damage after mods: " .. tostring(damage))
+    damage = damage / 0.5
+
+    print("[ChaosNPCCombatSystem] Total damage after split: " .. tostring(damage))
+
     if damage <= 0.1 then
         damage = 0.1
     end
@@ -281,7 +293,7 @@ function ChaosNPC:OnAttackEnemyHit()
         ---@type table<integer, string>
         local hitReactions = { "HeadLeft", "HeadRight", "HeadTop" }
         fakeAttacker:setVariable("ZombieHitReaction", hitReactions[ChaosUtils.RandArrayIndex(hitReactions)])
-        enemy:Hit(self.weaponItemCached, fakeAttacker, damage, false, 1.0)
+        enemy:Hit(self.weaponItemCached, zombie, damage, false, 1.0)
         enemy:playSound(self.weaponItemCached:getZombieHitSound())
 
         if enemy:isAlive() and ChaosUtils.RandFloat(0, 100) < chanceToKnockDown and not enemy:isKnockedDown() then

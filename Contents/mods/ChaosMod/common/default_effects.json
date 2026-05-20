@@ -3,7 +3,7 @@
         {
             "id": "spawn_zombies_nearby",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 30,
             "enabled_donate": true,
@@ -20,7 +20,7 @@
         {
             "id": "spawn_friendly_npc",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_4"
@@ -44,7 +44,7 @@
         {
             "id": "spawn_vehicle_nearby",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_4"
@@ -143,7 +143,7 @@
         {
             "id": "cant_stop_shouting",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 25,
             "disable_effects": [
@@ -222,7 +222,7 @@
         {
             "id": "spawn_random_animal_follower",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_3"
@@ -230,7 +230,7 @@
         {
             "id": "give_baseball_bat",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_4"
@@ -254,7 +254,7 @@
         {
             "id": "invisible_characters",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 90,
             "disable_effects": [
@@ -342,7 +342,7 @@
         {
             "id": "spawn_player_clone_zombie",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -366,7 +366,7 @@
         {
             "id": "launch_zombies_up",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -374,7 +374,7 @@
         {
             "id": "reanimate_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_5"
@@ -382,7 +382,7 @@
         {
             "id": "smash_nearby_windows",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -406,7 +406,7 @@
         {
             "id": "kill_nearby_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_5"
@@ -414,7 +414,7 @@
         {
             "id": "set_zombies_on_fire",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_3"
@@ -422,7 +422,7 @@
         {
             "id": "effect_insanity",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -492,7 +492,7 @@
         {
             "id": "teleport_to_random_vehicle",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_3"
@@ -524,7 +524,7 @@
         {
             "id": "1hp_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 90,
             "disable_effects": [
@@ -556,7 +556,7 @@
         {
             "id": "effect_doppelganger",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -732,7 +732,7 @@
         {
             "id": "remove_player_gloves",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -774,7 +774,7 @@
         {
             "id": "damage_car_engine",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -798,7 +798,7 @@
         {
             "id": "player_want_to_sleep",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -806,7 +806,7 @@
         {
             "id": "make_player_drunk",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
@@ -818,7 +818,7 @@
         {
             "id": "player_is_hungry",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -962,7 +962,7 @@
         {
             "id": "spawn_few_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -978,7 +978,7 @@
         {
             "id": "remove_player_weapons",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_6"
@@ -1002,7 +1002,7 @@
         {
             "id": "give_random_item",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_1"
@@ -1010,7 +1010,7 @@
         {
             "id": "honk_vehicles_nearby",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 15,
             "disable_effects": [
@@ -1022,7 +1022,7 @@
         {
             "id": "disable_vehicle_engine",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
@@ -1042,7 +1042,7 @@
         {
             "id": "vehicle_magnet_field",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 30,
             "disable_effects": [
@@ -1070,7 +1070,7 @@
         {
             "id": "remove_bandages",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -1078,7 +1078,7 @@
         {
             "id": "give_bandages",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -1086,7 +1086,7 @@
         {
             "id": "give_random_medical_item",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_2"
@@ -1192,7 +1192,7 @@
         {
             "id": "spawn_random_tire",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_2"
@@ -1200,7 +1200,7 @@
         {
             "id": "mirror_damage",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "duration": 80,
             "withDuration": true,
             "disable_effects": [
@@ -1212,7 +1212,7 @@
         {
             "id": "zombie_drop_food",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
@@ -1224,7 +1224,7 @@
         {
             "id": "zombie_drop_random_items",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
@@ -1236,7 +1236,7 @@
         {
             "id": "effect_lags",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
@@ -1256,7 +1256,7 @@
         {
             "id": "give_random_food",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_2"
@@ -1300,7 +1300,7 @@
         {
             "id": "player_cant_sleep",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -1313,7 +1313,7 @@
         {
             "id": "teleport_to_last_used_bed",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_5"
@@ -1321,7 +1321,7 @@
         {
             "id": "explode_on_sleep",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -1350,7 +1350,7 @@
         {
             "id": "disable_sounds",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -1362,7 +1362,7 @@
         {
             "id": "clone_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -1370,7 +1370,7 @@
         {
             "id": "destroy_nearby_fridges",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -1378,7 +1378,7 @@
         {
             "id": "remove_player_drinks",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -1386,7 +1386,7 @@
         {
             "id": "drop_item_in_hand",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -1394,7 +1394,7 @@
         {
             "id": "spawn_cow_follower",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_3"
@@ -1402,7 +1402,7 @@
         {
             "id": "spawn_chicken_follower",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_2"
@@ -1410,7 +1410,7 @@
         {
             "id": "increase_hunger_level",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -1418,7 +1418,7 @@
         {
             "id": "decrease_hunger_level",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_2"
@@ -1426,7 +1426,7 @@
         {
             "id": "panic_mode",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 90,
             "disable_effects": [
@@ -1438,7 +1438,7 @@
         {
             "id": "food_is_poisoned",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -1458,7 +1458,7 @@
         {
             "id": "zombies_low_render_distance",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -1496,7 +1496,7 @@
         {
             "id": "temporary_night",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 90,
             "disable_effects": [
@@ -1524,7 +1524,7 @@
         {
             "id": "replace_food_with_maggots",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -1549,7 +1549,7 @@
         {
             "id": "player_cant_exit_car",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 100,
             "enabled_donate": true,
@@ -1566,7 +1566,7 @@
         {
             "id": "add_random_negative_effect",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -1574,7 +1574,7 @@
         {
             "id": "spawn_lootbox",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -1582,7 +1582,7 @@
         {
             "id": "math_captcha",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 20,
             "enabled_donate": true,
@@ -1591,21 +1591,21 @@
         {
             "id": "fan_club",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "enabled_donate": true,
             "price_group": "positive_3"
         },
         {
             "id": "spawn_adoring_fan",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "enabled_donate": true,
             "price_group": "positive_2"
         },
         {
             "id": "one_in_one_out",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "enabled_donate": true,
             "price_group": "neutral_3"
         },
@@ -1632,7 +1632,7 @@
         {
             "id": "spawn_robber",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 30,
             "enabled_donate": true,
@@ -1657,7 +1657,7 @@
         {
             "id": "add_random_wound",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -1665,7 +1665,7 @@
         {
             "id": "move_or_get_damage",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "enabled_donate": true,
@@ -1714,7 +1714,7 @@
         {
             "id": "spawn_item_on_walk",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 20,
             "enabled_donate": true,
@@ -1755,7 +1755,7 @@
         {
             "id": "disable_inventory",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 90,
             "enabled_donate": true,
@@ -1764,7 +1764,7 @@
         {
             "id": "restore_endurance",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_2"
@@ -1797,7 +1797,7 @@
         {
             "id": "spawn_stalker",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_3"
@@ -1849,7 +1849,7 @@
         {
             "id": "teleport_to_nearest_basement",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_5"
@@ -1857,7 +1857,7 @@
         {
             "id": "player_drops_random_items",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 30,
             "disable_effects": [
@@ -1869,7 +1869,7 @@
         {
             "id": "zombies_walk_away",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -1877,7 +1877,7 @@
         {
             "id": "freeze_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
@@ -1889,7 +1889,7 @@
         {
             "id": "reverse_movement",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -1901,7 +1901,7 @@
         {
             "id": "spoil_food_nearby",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -1909,7 +1909,7 @@
         {
             "id": "copy_nearest_zombie_clothes",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -1917,7 +1917,7 @@
         {
             "id": "spawn_friendly_priest",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -1934,7 +1934,7 @@
         {
             "id": "dry_mouth",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -1958,7 +1958,7 @@
         {
             "id": "hide_random_items",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -2006,7 +2006,7 @@
         {
             "id": "enable_alarm_nearby",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2014,7 +2014,7 @@
         {
             "id": "swap_mouse_buttons",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -2026,7 +2026,7 @@
         {
             "id": "remove_food_nearby",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2034,7 +2034,7 @@
         {
             "id": "spawn_vehicle_van",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -2042,7 +2042,7 @@
         {
             "id": "spawn_vehicle_trippy_van",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -2050,7 +2050,7 @@
         {
             "id": "explode_nearest_zombie",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_4"
@@ -2058,7 +2058,7 @@
         {
             "id": "random_controls",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -2071,7 +2071,7 @@
         {
             "id": "remove_items_from_dead_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -2103,7 +2103,7 @@
         {
             "id": "kamikaze_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 45,
             "disable_effects": [
@@ -2127,7 +2127,7 @@
         {
             "id": "give_spoon_weapon",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_1"
@@ -2135,7 +2135,7 @@
         {
             "id": "effect_spawn_friendly_clone",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -2143,7 +2143,7 @@
         {
             "id": "disable_attack",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 90,
             "enabled_donate": true,
@@ -2209,7 +2209,7 @@
         {
             "id": "npc_fight_each_other",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2217,7 +2217,7 @@
         {
             "id": "npc_duel",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -2249,7 +2249,7 @@
         {
             "id": "give_painkillers",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_2"
@@ -2257,7 +2257,7 @@
         {
             "id": "explode_nearby_cars",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2297,7 +2297,7 @@
         {
             "id": "spawn_pig_follower",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -2305,7 +2305,7 @@
         {
             "id": "remember_code",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 35,
             "enabled_donate": true,
@@ -2314,7 +2314,7 @@
         {
             "id": "select_random_card",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "enabled_donate": true,
@@ -2331,7 +2331,7 @@
         {
             "id": "hide_effect_names",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 250,
             "disable_effects": [
@@ -2343,7 +2343,7 @@
         {
             "id": "select_card_remove_items",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -2357,7 +2357,7 @@
         {
             "id": "select_card_add_items",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -2371,7 +2371,7 @@
         {
             "id": "equip_bunny_costume",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_1"
@@ -2379,7 +2379,7 @@
         {
             "id": "equip_spiffo_costume",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_1"
@@ -2406,7 +2406,7 @@
         {
             "id": "spawn_many_explosive_chickens",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 5,
             "enabled_donate": true,
@@ -2423,7 +2423,7 @@
         {
             "id": "food_thief",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 30,
             "enabled_donate": true,
@@ -2432,7 +2432,7 @@
         {
             "id": "shorter_effects_interval",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -2444,7 +2444,7 @@
         {
             "id": "less_inventory_capacity",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2452,7 +2452,7 @@
         {
             "id": "more_inventory_capacity",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_4"
@@ -2460,7 +2460,7 @@
         {
             "id": "random_items_weight_more",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -2468,7 +2468,7 @@
         {
             "id": "necromancy",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_4"
@@ -2492,7 +2492,7 @@
         {
             "id": "vampire_weakness",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -2504,7 +2504,7 @@
         {
             "id": "toxic_rain",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -2526,7 +2526,7 @@
         {
             "id": "player_cant_stop_coughing",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -2550,7 +2550,7 @@
         {
             "id": "quest_kill_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 150,
             "disable_effects": [
@@ -2562,7 +2562,7 @@
         {
             "id": "dark_souls_bonfire",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_5"
@@ -2570,7 +2570,7 @@
         {
             "id": "pick_up_nearby_items",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_4"
@@ -2578,7 +2578,7 @@
         {
             "id": "medieval_plague",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2586,7 +2586,7 @@
         {
             "id": "heal_random_wound",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -2594,7 +2594,7 @@
         {
             "id": "temporary_obesity",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -2614,7 +2614,7 @@
         {
             "id": "random_item_bomb",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "disable_effects": [
                 "random_item_bomb"
@@ -2625,7 +2625,7 @@
         {
             "id": "remove_random_item",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2633,7 +2633,7 @@
         {
             "id": "teleport_to_previous_location",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -2641,7 +2641,7 @@
         {
             "id": "add_bomb_to_player_inventory",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "disable_effects": [
                 "add_bomb_to_player_inventory"
@@ -2660,7 +2660,7 @@
         {
             "id": "player_cant_eat",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 90,
             "disable_effects": [
@@ -2672,7 +2672,7 @@
         {
             "id": "hide_player_clothes",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -2680,7 +2680,7 @@
         {
             "id": "hide_player_weapons",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2697,7 +2697,7 @@
         {
             "id": "immortal_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 120,
             "disable_effects": [
@@ -2709,7 +2709,7 @@
         {
             "id": "remove_medical_items",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2717,7 +2717,7 @@
         {
             "id": "replace_items_with_rocks",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -2725,7 +2725,7 @@
         {
             "id": "remove_items_in_cars",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -2733,7 +2733,7 @@
         {
             "id": "find_chest_with_loot",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -2745,7 +2745,7 @@
         {
             "id": "fill_area_with_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_5"
@@ -2753,7 +2753,7 @@
         {
             "id": "spawn_random_l4d2_companion",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -2781,7 +2781,7 @@
         {
             "id": "zombies_turret",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 30,
             "disable_effects": [
@@ -2794,7 +2794,7 @@
         {
             "id": "spawn_walter_white",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_3"
@@ -2815,7 +2815,7 @@
         {
             "id": "spawn_annoying_pig",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 40,
             "disable_effects": [
@@ -2839,7 +2839,7 @@
         {
             "id": "spawn_courier",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 35,
             "disable_effects": [
@@ -2851,7 +2851,7 @@
         {
             "id": "food_delivery",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 35,
             "disable_effects": [
@@ -2863,7 +2863,7 @@
         {
             "id": "spawn_npc_with_loot",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -2887,7 +2887,7 @@
         {
             "id": "all_zombies_are_skeletons",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_2"
@@ -2915,7 +2915,7 @@
         {
             "id": "supersonic",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
@@ -2927,7 +2927,7 @@
         {
             "id": "ufo_abducts_zombies",
             "enabled": true,
-            "chance": 1.0,
+            "chance": 1,
             "withDuration": true,
             "duration": 15,
             "disable_effects": [
@@ -2971,6 +2971,14 @@
             ],
             "enabled_donate": true,
             "price_group": "negative_4"
+        },
+        {
+            "id": "spawn_orc_friend",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
         }
     ]
 }

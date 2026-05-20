@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "НЛО похищает зомби",
         "roll_dice": "Бросок Кубика",
         "night_vision": "Ночное зрение",
-        "zombies_can_smell_you": "Зомби чуют вас"
+        "zombies_can_smell_you": "Зомби чуют вас",
+        "spawn_orc_friend": "Призвать друга-орка"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

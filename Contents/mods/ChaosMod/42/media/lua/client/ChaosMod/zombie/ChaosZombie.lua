@@ -106,8 +106,9 @@ end
 ---@param fullType string
 ---@param tint table?
 ---@param textureChoice integer?
+---@param updateVisuals boolean?
 ---@return ItemVisual?
-function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice)
+function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, updateVisuals)
     if not zombie or not fullType or fullType == "" then return nil end
 
     local item = instanceItem(fullType)
@@ -133,8 +134,10 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice)
     end
 
     zombie:getWornItems():setFromItemVisuals(zombie:getItemVisuals())
-    zombie:resetModelNextFrame()
-    zombie:onWornItemsChanged()
+    if updateVisuals then
+        zombie:onWornItemsChanged()
+        zombie:resetModelNextFrame()
+    end
 
     return visual
 end

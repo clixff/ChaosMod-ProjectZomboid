@@ -19,6 +19,7 @@
 - Roll Dice
 - Night Vision
 - Zombies Can Smell You
+- Spawn Orc Friend
 
 ### Mod Fixes
 

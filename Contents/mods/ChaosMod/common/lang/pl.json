@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "UFO porywa zombie",
         "roll_dice": "Rzut kostką",
         "night_vision": "Widzenie nocne",
-        "zombies_can_smell_you": "Zombie czują twój zapach"
+        "zombies_can_smell_you": "Zombie czują twój zapach",
+        "spawn_orc_friend": "Przywołaj przyjaznego orka"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

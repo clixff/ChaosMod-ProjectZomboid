@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "UFO Abducts Zombies",
         "roll_dice": "Roll Dice",
         "night_vision": "Night Vision",
-        "zombies_can_smell_you": "Zombies Can Smell You"
+        "zombies_can_smell_you": "Zombies Can Smell You",
+        "spawn_orc_friend": "Spawn Orc Friend"
     },
     "core": {
         "start_mod": "Start ChaosMod",

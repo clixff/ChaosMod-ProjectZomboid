@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "UFOがゾンビを誘拐",
         "roll_dice": "サイコロを振る",
         "night_vision": "暗視",
-        "zombies_can_smell_you": "ゾンビがあなたの匂いを嗅ぎつける"
+        "zombies_can_smell_you": "ゾンビがあなたの匂いを嗅ぎつける",
+        "spawn_orc_friend": "オークの友達を召喚"
     },
     "core": {
         "start_mod": "ChaosModを開始",

@@ -329,7 +329,8 @@
         "ufo_abducts_zombies": "UFO绑架僵尸",
         "roll_dice": "掷骰子",
         "night_vision": "夜视",
-        "zombies_can_smell_you": "僵尸能闻到你"
+        "zombies_can_smell_you": "僵尸能闻到你",
+        "spawn_orc_friend": "召唤兽人朋友"
     },
     "core": {
         "start_mod": "启动混乱模式",
