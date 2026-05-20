@@ -38,6 +38,10 @@ function isSupported(code: string): code is LanguageCode {
   return (SUPPORTED_LANGUAGES as readonly string[]).includes(code);
 }
 
+export function isLanguageSupported(code: string | null | undefined): code is LanguageCode {
+  return typeof code === "string" && isSupported(code);
+}
+
 export function resolveLanguageFromBrowser(): LanguageCode {
   if (typeof navigator === "undefined") return "en";
   const candidates = navigator.languages?.length

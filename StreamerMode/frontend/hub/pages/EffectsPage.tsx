@@ -21,6 +21,7 @@ import {
   useLangFile,
 } from "../api/loaders.ts";
 import { useLanguage } from "../i18n/LanguageProvider.tsx";
+import { isLanguageSupported, type LanguageCode } from "../i18n/languages.ts";
 import { getColumnLabels } from "../i18n/columnLabels.ts";
 import { buildEffectRows, priceGroupCompare } from "../api/effectRows.ts";
 import type { EffectRow } from "../api/types.ts";
@@ -55,8 +56,47 @@ interface GroupedSection {
   rows: EffectRow[];
 }
 
+function buildEffectsUrl(params: URLSearchParams): string {
+  const search = params.toString();
+  return (
+    window.location.pathname +
+    (search ? `?${search}` : "") +
+    window.location.hash
+  );
+}
+
+function useEffectsLangParamSync(
+  language: LanguageCode,
+  setLanguage: (code: LanguageCode, opts?: { persist?: boolean }) => void,
+) {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const rawParam = params.get("lang");
+
+    if (rawParam !== null) {
+      if (isLanguageSupported(rawParam)) {
+        if (rawParam !== language) setLanguage(rawParam, { persist: false });
+        return;
+      }
+      params.delete("lang");
+      window.history.replaceState(null, "", buildEffectsUrl(params));
+    }
+
+    if (language !== "en") {
+      const next = new URLSearchParams(window.location.search);
+      next.set("lang", language);
+      window.history.replaceState(null, "", buildEffectsUrl(next));
+    }
+    // Mount-only: subsequent changes flow through the switcher, which
+    // updates the URL itself. Re-running on `language` would race with that.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
 export function EffectsPage() {
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
+  useEffectsLangParamSync(language, setLanguage);
   const effectsQuery = useEffectsFile();
   const configQuery = useConfigFile();
   const langQuery = useLangFile(language);

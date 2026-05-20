@@ -13,9 +13,13 @@ import {
   type LanguageCode,
 } from "./languages.ts";
 
+interface SetLanguageOptions {
+  persist?: boolean;
+}
+
 interface LanguageContextValue {
   language: LanguageCode;
-  setLanguage: (code: LanguageCode) => void;
+  setLanguage: (code: LanguageCode, opts?: SetLanguageOptions) => void;
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
@@ -29,10 +33,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.setAttribute("lang", language);
   }, [language]);
 
-  const setLanguage = useCallback((code: LanguageCode) => {
-    setLanguageState(code);
-    persistLanguage(code);
-  }, []);
+  const setLanguage = useCallback(
+    (code: LanguageCode, opts?: SetLanguageOptions) => {
+      setLanguageState(code);
+      if (opts?.persist !== false) persistLanguage(code);
+    },
+    [],
+  );
 
   const value = useMemo(
     () => ({ language, setLanguage }),

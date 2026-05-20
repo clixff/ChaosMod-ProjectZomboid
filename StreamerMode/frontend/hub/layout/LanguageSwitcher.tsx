@@ -7,6 +7,16 @@ import {
   type LanguageCode,
 } from "../i18n/languages.ts";
 
+function syncEffectsLangParam(code: LanguageCode): void {
+  if (typeof window === "undefined") return;
+  if (window.location.pathname !== "/effects") return;
+  const params = new URLSearchParams(window.location.search);
+  params.set("lang", code);
+  const url =
+    window.location.pathname + `?${params.toString()}` + window.location.hash;
+  window.history.replaceState(null, "", url);
+}
+
 export function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
@@ -45,6 +55,7 @@ export function LanguageSwitcher() {
                 className={`lang-menu-item${code === language ? " is-active" : ""}`}
                 onClick={() => {
                   setLanguage(code as LanguageCode);
+                  syncEffectsLangParam(code as LanguageCode);
                   setOpen(false);
                 }}
               >
