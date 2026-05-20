@@ -4,10 +4,9 @@
   "installCommand": "bun install",
   "buildCommand": "bun run build:hub",
   "outputDirectory": "dist-hub",
-  "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
