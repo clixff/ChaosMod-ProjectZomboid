@@ -5,18 +5,31 @@ import type {
   LangFile,
 } from "./types.ts";
 
+export interface BuildEffectRowsOverrides {
+  groupPriceOverrides?: ReadonlyMap<string, number>;
+  bitsMultiplierOverride?: number | null;
+}
+
 export function buildEffectRows(
   effects: EffectDef[],
   config: ConfigFile,
   lang: LangFile,
   fallback: LangFile,
+  overrides?: BuildEffectRowsOverrides,
 ): EffectRow[] {
   const priceByGroup = new Map<string, number>();
   for (const entry of config.streamer_mode.donate_price_groups) {
     priceByGroup.set(entry.group, entry.price);
   }
+  if (overrides?.groupPriceOverrides) {
+    for (const [g, p] of overrides.groupPriceOverrides) {
+      priceByGroup.set(g, p);
+    }
+  }
   const bitsMultiplier =
-    config.streamer_mode.donation_systems.twitch_bits.price_multiplier;
+    overrides?.bitsMultiplierOverride != null
+      ? overrides.bitsMultiplierOverride
+      : config.streamer_mode.donation_systems.twitch_bits.price_multiplier;
 
   const langEffects = lang.effects ?? {};
   const langDescriptions = lang.descriptions ?? {};

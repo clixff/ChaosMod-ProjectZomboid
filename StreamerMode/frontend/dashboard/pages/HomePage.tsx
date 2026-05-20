@@ -4,7 +4,9 @@ import {
   CircleQuestionMark,
   Copy,
   DollarSign,
+  ExternalLink,
   FileDown,
+  Globe,
   Info,
   Link as LinkIcon,
   LogIn,
@@ -25,6 +27,45 @@ import youtubeLogo from "../assets/youtube_logo.webp";
 
 const STEAM_WORKSHOP_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142";
+
+const HUB_EFFECTS_URL = "https://chaos-zomboid.vercel.app/effects";
+const DEFAULT_BITS_MULTIPLIER = 100;
+const DEFAULT_PRICE_GROUPS: Record<string, number> = {
+  positive_1: 1,
+  positive_2: 2.5,
+  positive_3: 5,
+  positive_4: 7,
+  positive_5: 8,
+  positive_6: 10,
+  negative_1: 1,
+  negative_2: 2.5,
+  negative_3: 5,
+  negative_4: 7,
+  negative_5: 8,
+  negative_6: 10,
+  neutral_1: 1,
+  neutral_2: 2.5,
+  neutral_3: 5,
+  neutral_4: 7,
+  neutral_5: 8,
+  neutral_6: 10,
+};
+
+function buildHubEffectsUrl(config: ModConfig): string {
+  const params = new URLSearchParams();
+  params.set("lang", config.lang || "en");
+  for (const entry of config.streamer_mode.donate_price_groups) {
+    const defaultPrice = DEFAULT_PRICE_GROUPS[entry.group];
+    if (defaultPrice === undefined || entry.price !== defaultPrice) {
+      params.append("g", `${entry.group}:${entry.price}`);
+    }
+  }
+  const bits = config.streamer_mode.donation_systems.twitch_bits.price_multiplier;
+  if (Number.isFinite(bits) && bits !== DEFAULT_BITS_MULTIPLIER) {
+    params.set("bits", String(bits));
+  }
+  return `${HUB_EFFECTS_URL}?${params.toString()}`;
+}
 import { Modal } from "../components/Modal.tsx";
 import { YouTubeSetupGuide } from "../components/YouTubeSetupGuide.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
@@ -754,6 +795,45 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             </button>
           </div>
         </div>
+
+        {config && (
+          <div className="card">
+            <div className="card-head">
+              <h3 className="card-title">
+                <span className="card-title-icon">
+                  <Globe size={18} aria-hidden="true" />
+                </span>
+                Export To Hub{" "}
+                <span style={{ opacity: 0.6, fontWeight: 400, fontSize: 13 }}>
+                  (Test version)
+                </span>
+              </h3>
+            </div>
+            <div className="card-row card-row-inline">
+              <span className="card-link card-link--with-copy">
+                <span className="card-link-text">
+                  {buildHubEffectsUrl(config)}
+                </span>
+                <CopyButton
+                  value={buildHubEffectsUrl(config)}
+                  onCopied={() => onNotify("Hub URL copied to clipboard.")}
+                  onError={(msg) => onNotify(msg, true)}
+                />
+              </span>
+            </div>
+            <div className="card-actions">
+              <a
+                className="btn btn--primary"
+                href={buildHubEffectsUrl(config)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ExternalLink size={14} aria-hidden="true" />
+                Open
+              </a>
+            </div>
+          </div>
+        )}
 
         <div className="card">
           <div className="card-head">

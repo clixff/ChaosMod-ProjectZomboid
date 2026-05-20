@@ -94,6 +94,35 @@ function useEffectsLangParamSync(
   }, []);
 }
 
+function parseEffectsQueryOverrides(): {
+  groupPriceOverrides: Map<string, number>;
+  bitsMultiplierOverride: number | null;
+} {
+  const groupPriceOverrides = new Map<string, number>();
+  let bitsMultiplierOverride: number | null = null;
+  if (typeof window === "undefined") {
+    return { groupPriceOverrides, bitsMultiplierOverride };
+  }
+  const params = new URLSearchParams(window.location.search);
+  for (const raw of params.getAll("g")) {
+    // Accept either `group:price` or `group=price` so that
+    // ?g=neutral_3:19 and ?g=neutral_3=19 both work.
+    const m = /^([^:=]+)[:=](.+)$/.exec(raw);
+    if (!m) continue;
+    const group = m[1]!.trim();
+    const price = Number(m[2]!.trim());
+    if (group && Number.isFinite(price) && price >= 0) {
+      groupPriceOverrides.set(group, price);
+    }
+  }
+  const bitsRaw = params.get("bits");
+  if (bitsRaw != null) {
+    const v = Number(bitsRaw);
+    if (Number.isFinite(v) && v > 0) bitsMultiplierOverride = v;
+  }
+  return { groupPriceOverrides, bitsMultiplierOverride };
+}
+
 export function EffectsPage() {
   const { language, setLanguage } = useLanguage();
   useEffectsLangParamSync(language, setLanguage);
@@ -101,6 +130,8 @@ export function EffectsPage() {
   const configQuery = useConfigFile();
   const langQuery = useLangFile(language);
   const englishQuery = useEnglishLangFile();
+
+  const queryOverrides = useMemo(() => parseEffectsQueryOverrides(), []);
 
   const isLoading =
     effectsQuery.isPending ||
@@ -127,8 +158,18 @@ export function EffectsPage() {
       configQuery.data,
       langQuery.data,
       englishQuery.data,
+      {
+        groupPriceOverrides: queryOverrides.groupPriceOverrides,
+        bitsMultiplierOverride: queryOverrides.bitsMultiplierOverride,
+      },
     );
-  }, [effectsQuery.data, configQuery.data, langQuery.data, englishQuery.data]);
+  }, [
+    effectsQuery.data,
+    configQuery.data,
+    langQuery.data,
+    englishQuery.data,
+    queryOverrides,
+  ]);
 
   const labels = useMemo(
     () => getColumnLabels(langQuery.data, englishQuery.data),
