@@ -234,13 +234,12 @@ function ChaosNPC:OnAttackEnemyHit()
 
     print(string.format("[ChaosNPCCombatSystem] Damage min: %d, max: %d, result: %f", minDamage, maxDamage, damage))
 
-    local damageMod = self.weaponItemCached:getDamageMod(zombie)
-    local hittingMod = zombie:getHittingMod()
+    local damageMod = 2.0
 
-    print("[ChaosNPCCombatSystem] Damage mod: " .. tostring(damageMod) .. ", Hitting mod: " .. tostring(hittingMod))
+    print("[ChaosNPCCombatSystem] Damage mod: " .. tostring(damageMod))
 
 
-    damage = damage * self.DamageMultiplier * damageMod * hittingMod
+    damage = damage * self.DamageMultiplier * damageMod
 
     print("[ChaosNPCCombatSystem] Total damage after mods: " .. tostring(damage))
     damage = damage / 0.5
