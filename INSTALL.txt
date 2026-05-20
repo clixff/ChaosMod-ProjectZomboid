@@ -1,0 +1,74 @@
+Chaos Mod installation
+======================
+
+Requirements
+------------
+- Project Zomboid Build 42 / unstable branch.
+- Single-player only.
+
+Steam Workshop installation
+---------------------------
+1. Open Steam and go to Project Zomboid > Properties > Game Versions & Betas.
+2. Select the unstable / Build 42 branch.
+3. Subscribe to Chaos Mod on the Steam Workshop:
+   https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142
+4. Start Project Zomboid and enable Chaos Mod in the Mods menu.
+
+Replace an existing Steam Workshop install with local release files
+------------------------------------------------------------------
+Use this if you are subscribed on Steam but want to test/install the files from
+a downloaded release archive.
+
+1. Close Project Zomboid.
+2. Open the Steam Workshop item folder:
+   Steam\steamapps\workshop\content\108600\3717082142
+3. Remove the files and folders inside this folder.
+4. From the release archive, copy the mods folder into the Steam Workshop item
+   folder above. Copy the mods folder itself, not the ChaosModPZ folder.
+
+   Source in the archive:
+   ChaosModPZ\mods
+
+   Before copying:
+   Steam\steamapps\workshop\content\108600\3717082142\ (empty folder)
+
+   Destination should become after copying:
+   Steam\steamapps\workshop\content\108600\3717082142\mods
+
+5. Start Project Zomboid and enable Chaos Mod in the Mods menu.
+
+Manual installation in your user Zomboid folder
+-----------------------------------------------
+Use this if you downloaded a release ZIP instead of Steam Workshop.
+
+Option A - Workshop-style folder (recommended for this release package):
+1. Extract the release ZIP.
+2. Copy the whole ChaosModPZ folder to:
+   %UserProfile%\Zomboid\Workshop\ChaosModPZ
+3. The final folder should contain:
+   %UserProfile%\Zomboid\Workshop\ChaosModPZ\mods\ChaosMod\42\mod.info
+4. Start Project Zomboid and enable Chaos Mod in the Mods menu.
+
+Option B - Local mods folder:
+1. Extract the release ZIP.
+2. Copy this folder:
+   ChaosModPZ\mods\ChaosMod
+3. Paste it as:
+   %UserProfile%\Zomboid\mods\ChaosMod
+4. The final folder should contain:
+   %UserProfile%\Zomboid\mods\ChaosMod\42\mod.info
+5. Start Project Zomboid and enable Chaos Mod in the Mods menu.
+
+Streamer app launch
+-------------------
+The StreamerApp is optional. You only need it for Twitch / YouTube voting,
+zombie nicknames from chat, OBS vote overlay, and donation-triggered effects.
+
+1. Launch Project Zomboid with Chaos Mod enabled at least once.
+2. Run ZomboidStreamerApp.exe from the release folder.
+3. A dashboard will open in your browser.
+4. Connect Twitch and/or YouTube in the dashboard.
+5. Keep ZomboidStreamerApp.exe running while you stream.
+
+If the browser does not open automatically, check the StreamerApp console window
+for the local dashboard URL and open it manually.

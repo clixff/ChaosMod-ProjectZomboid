@@ -11,6 +11,7 @@ const rootDir = join(import.meta.dir, "..");
 const contentsDir = join(rootDir, "Contents");
 const streamerModeDir = join(rootDir, "StreamerMode");
 const streamerExePath = join(streamerModeDir, "dist", "ChaosModStreamerApp.exe");
+const installInstructionsPath = join(rootDir, "INSTALL.txt");
 
 function formatTimestamp(date) {
     const pad = (value) => String(value).padStart(2, "0");
@@ -50,12 +51,16 @@ async function main() {
     const releaseDir = join(rootDir, "releases", timestamp);
     const chaosModDir = join(releaseDir, "ChaosModPZ");
     const releaseExePath = join(releaseDir, "ZomboidStreamerApp.exe");
+    const releaseInstallInstructionsPath = join(releaseDir, "INSTALL.txt");
 
     console.log(`${CYAN}Creating release folder ${releaseDir}${RESET}`);
     await mkdir(chaosModDir, { recursive: true });
 
     console.log(`${CYAN}Copying Contents -> ${chaosModDir}${RESET}`);
     await cp(contentsDir, chaosModDir, { recursive: true });
+
+    console.log(`${CYAN}Copying INSTALL.txt -> ${releaseInstallInstructionsPath}${RESET}`);
+    await copyFile(installInstructionsPath, releaseInstallInstructionsPath);
 
     console.log(`${CYAN}Running StreamerMode compile${RESET}`);
     await runCompile();
