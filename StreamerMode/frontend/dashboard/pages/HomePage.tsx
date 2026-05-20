@@ -52,19 +52,24 @@ const DEFAULT_PRICE_GROUPS: Record<string, number> = {
 };
 
 function buildHubEffectsUrl(config: ModConfig): string {
-  const params = new URLSearchParams();
-  params.set("lang", config.lang || "en");
+  // Build the query string manually so the `:` separator inside `g=group:price`
+  // stays literal (URLSearchParams would percent-encode it to `%3A`).
+  const parts: string[] = [];
+  parts.push(`lang=${encodeURIComponent(config.lang || "en")}`);
   for (const entry of config.streamer_mode.donate_price_groups) {
     const defaultPrice = DEFAULT_PRICE_GROUPS[entry.group];
     if (defaultPrice === undefined || entry.price !== defaultPrice) {
-      params.append("g", `${entry.group}:${entry.price}`);
+      parts.push(
+        `g=${encodeURIComponent(entry.group)}:${encodeURIComponent(String(entry.price))}`,
+      );
     }
   }
-  const bits = config.streamer_mode.donation_systems.twitch_bits.price_multiplier;
+  const bits =
+    config.streamer_mode.donation_systems.twitch_bits.price_multiplier;
   if (Number.isFinite(bits) && bits !== DEFAULT_BITS_MULTIPLIER) {
-    params.set("bits", String(bits));
+    parts.push(`bits=${encodeURIComponent(String(bits))}`);
   }
-  return `${HUB_EFFECTS_URL}?${params.toString()}`;
+  return `${HUB_EFFECTS_URL}?${parts.join("&")}`;
 }
 import { Modal } from "../components/Modal.tsx";
 import { YouTubeSetupGuide } from "../components/YouTubeSetupGuide.tsx";
