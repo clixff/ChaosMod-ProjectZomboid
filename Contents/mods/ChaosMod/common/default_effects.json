@@ -2970,7 +2970,7 @@
                 "zombies_can_smell_you"
             ],
             "enabled_donate": true,
-            "price_group": "negative_4"
+            "price_group": "negative_3"
         },
         {
             "id": "spawn_orc_friend",
