@@ -32,4 +32,5 @@ function EffectSpawnGrieferWizard:OnStart()
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
     npc:SetWeapon("Base.Sledgehammer")
+    npc:EnterPlayerVehicle(player)
 end

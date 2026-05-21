@@ -35,4 +35,5 @@ function EffectSpawnNPC:OnStart()
 
     -- npc:SetWeapon("Base.PipeWrench")
     npc:SetWeapon("Base.BaseballBat")
+    npc:EnterPlayerVehicle(player)
 end

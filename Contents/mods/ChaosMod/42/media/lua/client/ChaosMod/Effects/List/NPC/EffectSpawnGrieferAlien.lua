@@ -51,6 +51,7 @@ function EffectSpawnGrieferAlien:OnStart()
     end
 
     zombie:resetModelNextFrame()
+    npc:EnterPlayerVehicle(player)
 end
 
 function EffectSpawnGrieferAlien:OnEnd()

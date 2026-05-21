@@ -23,6 +23,7 @@ function EffectWomanizer:OnStart()
                 zombie:dressInRandomOutfit()
                 npc:initializeHuman()
                 npc.npcGroup = ChaosNPCGroupID.RAIDERS
+                npc:EnterPlayerVehicle(player)
             end
         end
     end

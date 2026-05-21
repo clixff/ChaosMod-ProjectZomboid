@@ -281,7 +281,8 @@ end
 
 ---@param player IsoPlayer
 ---@param item InventoryItem
-function ChaosPlayer.EquipWeapon(player, item)
+---@param bothHands boolean?
+function ChaosPlayer.EquipWeapon(player, item, bothHands)
     if not player then return end
     if not item then return end
 
@@ -293,6 +294,9 @@ function ChaosPlayer.EquipWeapon(player, item)
     end
 
     player:setPrimaryHandItem(item)
+    if bothHands then
+        player:setSecondaryHandItem(item)
+    end
 end
 
 ---@param player IsoPlayer

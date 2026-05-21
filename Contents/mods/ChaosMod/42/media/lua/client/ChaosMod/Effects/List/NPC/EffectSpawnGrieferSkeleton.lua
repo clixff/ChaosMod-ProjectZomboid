@@ -30,4 +30,5 @@ function EffectSpawnGrieferSkeleton:OnStart()
     ChaosZombie.MakeZombieSkeleton(zombie)
 
     npc:SetWeapon("Base.Cudgel_Spike")
+    npc:EnterPlayerVehicle(player)
 end

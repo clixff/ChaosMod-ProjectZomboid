@@ -33,4 +33,5 @@ function EffectSpawnAngryPoliceman:OnStart()
 
     ChaosZombie.RemoveAllWeapons(zombie)
     npc:SetWeapon("Base.Nightstick")
+    npc:EnterPlayerVehicle(player)
 end

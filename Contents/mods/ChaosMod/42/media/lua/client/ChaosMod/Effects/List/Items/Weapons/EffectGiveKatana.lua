@@ -12,7 +12,7 @@ function EffectGiveKatana:OnStart()
     local newItem = inventory:AddItem("Base.Katana")
 
     if newItem then
-        ChaosPlayer.EquipWeapon(player, newItem)
+        ChaosPlayer.EquipWeapon(player, newItem, true)
         ChaosPlayer.SayLineNewItem(player, newItem)
     end
 end

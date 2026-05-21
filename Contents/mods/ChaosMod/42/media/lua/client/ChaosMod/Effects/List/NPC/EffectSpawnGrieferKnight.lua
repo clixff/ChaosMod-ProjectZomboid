@@ -33,4 +33,6 @@ function EffectSpawnGrieferKnight:OnStart()
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
     npc:SetWeapon("Base.Sword")
+
+    npc:EnterPlayerVehicle(player)
 end

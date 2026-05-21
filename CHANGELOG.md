@@ -13,6 +13,7 @@
 - Added INSTALL.txt to release packages with Steam, manual install, and StreamerApp launch instructions
 - The recent effects blocklist now persists between game sessions so you don't get the same effects right after restarting the game
 - Added a recommended-values hint under the "Recent effects block buffer" setting in the in-game settings window and StreamerApp dashboard
+- Enemy NPCs now can spawn in player car, and will exit when player exits the car
 
 ### New Effects
 
@@ -55,6 +56,7 @@
 - "Player Can't Exit Car": change duration from 100s to 70s
 - Toxic Rain no longer damages the player while inside a car, and now damages car parts
 - "Break Nearby Windows" effect now also smashes the windows of nearby cars
+- "Give Katana" effect now equips the katana to both hands of the player
 
 [1.1.1]
 

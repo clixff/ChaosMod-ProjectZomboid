@@ -38,4 +38,5 @@ function EffectDoppelganger:OnStart()
 
     -- npc:SetWeapon("Base.PipeWrench")
     npc:SetWeapon("Base.RollingPin")
+    npc:EnterPlayerVehicle(player)
 end

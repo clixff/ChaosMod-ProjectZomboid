@@ -174,41 +174,94 @@ function ChaosNPC:UpdateSneakAnim()
     self.zombie:setVariable("ChaosSneak", isSneak)
 end
 
+-- Per-tick vehicle bookkeeping for NPCs.
+--
+-- Two independent rules, applied in order:
+--
+--   1. Exit rule (NPC currently inside a vehicle):
+--      stay only while the NPC's enemy or move target is in the same vehicle,
+--      otherwise force-exit. This covers both followers (move target = player)
+--      and raiders placed via EnterPlayerVehicle (enemy = player) — when the
+--      player leaves the vehicle, the NPC drops out next tick.
+--
+--   2. Enter rule (NPC outside a vehicle):
+--      auto-board the move target's vehicle if standing nearby. Disabled when
+--      the NPC has an enemy or belongs to RAIDERS — raiders only ever board
+--      via the manual EnterPlayerVehicle entry point, never during combat AI.
 function ChaosNPC:VehiclesTick()
     if not self.zombie then return end
 
     local zombieVehicle = self.zombie:getVehicle()
-    ---@type BaseVehicle?
-    local moveTargetVehicle = nil
 
-    if self.moveTargetCharacter ~= nil and self.enemy == nil then
-        moveTargetVehicle = self.moveTargetCharacter:getVehicle()
-    end
+    if zombieVehicle ~= nil then
+        local enemyInVehicle = self.enemy ~= nil and self.enemy:getVehicle() == zombieVehicle
+        local moveTargetInVehicle = self.moveTargetCharacter ~= nil and
+            self.moveTargetCharacter:getVehicle() == zombieVehicle
 
-    if zombieVehicle and moveTargetVehicle ~= zombieVehicle then
-        zombieVehicle:exit(self.zombie)
-        return
-    end
-
-    if zombieVehicle == nil and moveTargetVehicle ~= nil and self.enemy == nil then
-        local seat = ChaosVehicle.FindFreeSeat(moveTargetVehicle, true)
-        if seat < 1 then
-            return
+        if not enemyInVehicle and not moveTargetInVehicle then
+            print("[ChaosNPC] VehiclesTick: exit - enemy/move_target not in same vehicle")
+            zombieVehicle:exit(self.zombie)
         end
-
-        local x1, y1 = moveTargetVehicle:getSquare():getX(), moveTargetVehicle:getSquare():getY()
-        local x2, y2 = self.zombie:getX(), self.zombie:getY()
-
-        if not ChaosUtils.isInRange(x1, y1, x2, y2, 4.0) then
-            return
-        end
-
-        moveTargetVehicle:enter(seat, self.zombie)
         return
     end
 
-    if zombieVehicle ~= nil and self.enemy ~= nil then
-        zombieVehicle:exit(self.zombie)
+    -- Combat-engaged NPCs never auto-board: fighting takes priority over riding along.
+    if self.enemy ~= nil then return end
+    -- Raiders are always treated as enemies even before an explicit enemy is picked,
+    -- so block them here too. They board exclusively via EnterPlayerVehicle.
+    if self.npcGroup == ChaosNPCGroupID.RAIDERS then return end
+    if self.moveTargetCharacter == nil then return end
+
+    local moveTargetVehicle = self.moveTargetCharacter:getVehicle()
+    if moveTargetVehicle == nil then return end
+
+    -- skipDriver=true: never displace the player from the driver seat.
+    local seat = ChaosVehicle.FindFreeSeat(moveTargetVehicle, true)
+    if seat < 1 then return end
+
+    local moveTargetSquare = moveTargetVehicle:getSquare()
+    if not moveTargetSquare then return end
+
+    -- Require the NPC to physically reach the vehicle before teleporting them in.
+    local x1, y1 = moveTargetSquare:getX(), moveTargetSquare:getY()
+    local x2, y2 = self.zombie:getX(), self.zombie:getY()
+
+    if not ChaosUtils.isInRange(x1, y1, x2, y2, 4.0) then return end
+
+    print("[ChaosNPC] VehiclesTick: enter - following move_target into vehicle")
+    moveTargetVehicle:enter(seat, self.zombie)
+end
+
+-- Manually seat this NPC inside the given player's vehicle.
+--
+-- The only sanctioned way for an enemy/raider NPC to board a vehicle. Called
+-- from effect code at spawn time — not from per-tick AI. Aborts if the player
+-- isn't currently driving or every passenger seat is taken.
+--
+-- Sets the player as the NPC's enemy after seating so VehiclesTick's exit rule
+-- has a target to compare against; without this, the NPC would be evicted on
+-- the very next tick because both enemy and move_target would still be nil.
+-- SetAsTargetEnemy → MoveToCharacter is a no-op while in a vehicle, so this
+-- assignment is purely informational until the NPC exits.
+---@param player IsoGameCharacter
+function ChaosNPC:EnterPlayerVehicle(player)
+    if not self.zombie then return end
+    if not player then return end
+
+    local vehicle = player:getVehicle()
+    if not vehicle then
+        print("[ChaosNPC] EnterPlayerVehicle: abort - player has no vehicle")
         return
     end
+
+    local seat = ChaosVehicle.FindFreeSeat(vehicle, true)
+    if seat < 1 then
+        print("[ChaosNPC] EnterPlayerVehicle: abort - no free seat")
+        return
+    end
+
+    vehicle:enter(seat, self.zombie)
+    self:SetAsTargetEnemy(player)
+
+    print("[ChaosNPC] EnterPlayerVehicle: NPC seated in player vehicle, targeting player")
 end

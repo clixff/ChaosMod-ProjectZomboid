@@ -80,4 +80,5 @@ function EffectSpawnGrieferMiner:OnStart()
     addDeathDrop("Base.Diamond", 5)
     addDeathDrop("Base.IronIngot", 3)
     addDeathDrop("Base.GoldBar", 2)
+    npc:EnterPlayerVehicle(player)
 end
