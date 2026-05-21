@@ -30,6 +30,7 @@ import {
   getAvailableLanguages,
 } from "./src/commands/lang.ts";
 import { loadEffects, saveEffects } from "./src/effects.ts";
+import { buildHubExportPayload } from "./src/hubExport.ts";
 import { syncEffectsForModVersion } from "./src/versionFile.ts";
 import { startServer } from "./src/server.ts";
 import {
@@ -1411,6 +1412,17 @@ async function main(): Promise<void> {
           filename: "chaos_mod_effects.csv",
           contentType: "text/csv; charset=utf-8",
         };
+      },
+      getHubExportPayload: () => {
+        if (!config) return null;
+        const rewards = rewardsManager?.list() ?? [];
+        return buildHubExportPayload({
+          version: VERSION,
+          modFolder,
+          config,
+          effects,
+          rewards: rewards.map((r) => ({ name: r.name, groups: r.groups })),
+        });
       },
     };
   }

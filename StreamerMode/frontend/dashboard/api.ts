@@ -388,3 +388,28 @@ export async function updateEffect(
     throw new Error(text || `updateEffect: ${res.status}`);
   }
 }
+
+export interface HubExportPayload {
+  mod_version: string;
+  rewards: boolean;
+  bits: boolean;
+  donationalerts: boolean;
+  last_effect: number;
+  data: {
+    effects: Record<string, Record<string, unknown>>;
+    prices: Record<string, number>;
+    rewards: Record<string, { groups: string[] }>;
+    currency: string;
+    bits_override: number;
+    donation_enabled: boolean;
+  };
+}
+
+export async function getHubExportPayload(): Promise<HubExportPayload> {
+  const res = await fetch("/api/hub-export");
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `getHubExportPayload: ${res.status}`);
+  }
+  return (await res.json()) as HubExportPayload;
+}

@@ -5,9 +5,18 @@ import type {
   LangFile,
 } from "./types.ts";
 
+export interface EffectOverrideEntry {
+  enabled?: boolean;
+  chance?: number;
+  duration?: number;
+  enabled_donate?: boolean;
+  price_group?: string;
+}
+
 export interface BuildEffectRowsOverrides {
   groupPriceOverrides?: ReadonlyMap<string, number>;
   bitsMultiplierOverride?: number | null;
+  effectOverrides?: ReadonlyMap<string, EffectOverrideEntry>;
 }
 
 export function buildEffectRows(
@@ -37,10 +46,24 @@ export function buildEffectRows(
   const fallbackDescriptions = fallback.descriptions ?? {};
 
   return effects.map((effect, index) => {
-    const price = priceByGroup.get(effect.price_group) ?? null;
-    // Price and bits are always shown — the hub is a public reference so they
-    // reflect the value that would apply, regardless of enabled_donate or the
-    // bits-system enabled flag.
+    const ovr = overrides?.effectOverrides?.get(effect.id);
+    const enabled = ovr?.enabled ?? effect.enabled;
+    const chance = ovr?.chance ?? effect.chance;
+    const enabledDonate = ovr?.enabled_donate ?? effect.enabled_donate;
+    const priceGroup = ovr?.price_group ?? effect.price_group;
+    // duration override of 0 means "no duration"; positive value means
+    // "use this many seconds"; absent means inherit from the base effect.
+    const durationOverridden = ovr?.duration !== undefined;
+    const duration = durationOverridden
+      ? ovr.duration === 0
+        ? undefined
+        : ovr.duration
+      : effect.duration;
+    const withDuration = durationOverridden
+      ? ovr.duration !== 0
+      : effect.withDuration;
+
+    const price = priceByGroup.get(priceGroup) ?? null;
     const twitchBits =
       price != null ? Math.ceil(price * bitsMultiplier) : null;
 
@@ -52,12 +75,12 @@ export function buildEffectRows(
     return {
       numericId: index + 1,
       effectId: effect.id,
-      enabled: effect.enabled,
-      chance: effect.chance,
-      withDuration: effect.withDuration,
-      duration: effect.duration,
-      enabledDonate: effect.enabled_donate,
-      priceGroup: effect.price_group,
+      enabled,
+      chance,
+      withDuration,
+      duration,
+      enabledDonate,
+      priceGroup,
       price,
       twitchBits,
       name,

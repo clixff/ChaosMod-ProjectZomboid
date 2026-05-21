@@ -28,49 +28,8 @@ import youtubeLogo from "../assets/youtube_logo.webp";
 const STEAM_WORKSHOP_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142";
 
-const HUB_EFFECTS_URL = "https://chaos-zomboid.vercel.app/effects";
-const DEFAULT_BITS_MULTIPLIER = 100;
-const DEFAULT_PRICE_GROUPS: Record<string, number> = {
-  positive_1: 1,
-  positive_2: 2.5,
-  positive_3: 5,
-  positive_4: 7,
-  positive_5: 8,
-  positive_6: 10,
-  negative_1: 1,
-  negative_2: 2.5,
-  negative_3: 5,
-  negative_4: 7,
-  negative_5: 8,
-  negative_6: 10,
-  neutral_1: 1,
-  neutral_2: 2.5,
-  neutral_3: 5,
-  neutral_4: 7,
-  neutral_5: 8,
-  neutral_6: 10,
-};
-
-function buildHubEffectsUrl(config: ModConfig): string {
-  // Build the query string manually so the `:` separator inside `g=group:price`
-  // stays literal (URLSearchParams would percent-encode it to `%3A`).
-  const parts: string[] = [];
-  parts.push(`lang=${encodeURIComponent(config.lang || "en")}`);
-  for (const entry of config.streamer_mode.donate_price_groups) {
-    const defaultPrice = DEFAULT_PRICE_GROUPS[entry.group];
-    if (defaultPrice === undefined || entry.price !== defaultPrice) {
-      parts.push(
-        `g=${encodeURIComponent(entry.group)}:${encodeURIComponent(String(entry.price))}`,
-      );
-    }
-  }
-  const bits =
-    config.streamer_mode.donation_systems.twitch_bits.price_multiplier;
-  if (Number.isFinite(bits) && bits !== DEFAULT_BITS_MULTIPLIER) {
-    parts.push(`bits=${encodeURIComponent(String(bits))}`);
-  }
-  return `${HUB_EFFECTS_URL}?${parts.join("&")}`;
-}
+const HUB_BASE_URL = "https://chaos-zomboid.com";
+const HUB_EXPORT_URL = `${HUB_BASE_URL}/effects?export=true`;
 import { Modal } from "../components/Modal.tsx";
 import { YouTubeSetupGuide } from "../components/YouTubeSetupGuide.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
@@ -88,6 +47,7 @@ import {
   updateConfig,
   getConfig,
   getLanguages,
+  getHubExportPayload,
   youtubeLogout,
   youtubeReconnect,
   youtubeSetStreamUrl,
@@ -144,6 +104,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [loading, setLoading] = useState(true);
   const [obsModal, setObsModal] = useState(false);
   const [exportModal, setExportModal] = useState(false);
+  const [hubExportModal, setHubExportModal] = useState(false);
   const [exportDoneKind, setExportDoneKind] = useState<"csv" | "xlsx" | null>(
     null,
   );
@@ -882,33 +843,20 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                   <Globe size={18} aria-hidden="true" />
                 </span>
                 Export To Hub{" "}
-                <span style={{ opacity: 0.6, fontWeight: 400, fontSize: 13 }}>
-                  (Test version)
-                </span>
               </h3>
             </div>
-            <div className="card-row card-row-inline">
-              <span className="card-link card-link--with-copy">
-                <span className="card-link-text">
-                  {buildHubEffectsUrl(config)}
-                </span>
-                <CopyButton
-                  value={buildHubEffectsUrl(config)}
-                  onCopied={() => onNotify("Hub URL copied to clipboard.")}
-                  onError={(msg) => onNotify(msg, true)}
-                />
-              </span>
-            </div>
+            <p className="card-row-label" style={{ fontSize: 13 }}>
+              Share your prices, rewards, and effect tweaks with viewers via a
+              public Hub URL.
+            </p>
             <div className="card-actions">
-              <a
+              <button
                 className="btn btn--primary"
-                href={buildHubEffectsUrl(config)}
-                target="_blank"
-                rel="noreferrer"
+                onClick={() => setHubExportModal(true)}
               >
                 <ExternalLink size={14} aria-hidden="true" />
-                Open
-              </a>
+                Export
+              </button>
             </div>
           </div>
         )}
@@ -1123,6 +1071,15 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
         />
       )}
 
+      {hubExportModal && (
+        <HubExportModal
+          url={HUB_EXPORT_URL}
+          onClose={() => setHubExportModal(false)}
+          onCopied={(what) => onNotify(`${what} copied to clipboard.`)}
+          onError={(msg) => onNotify(msg, true)}
+        />
+      )}
+
       {bitsOptionsModal && config && (
         <TwitchBitsOptionsModal
           multiplier={
@@ -1232,6 +1189,138 @@ function GoogleSheetsInstructions({ kind }: GoogleSheetsInstructionsProps) {
         <i>General access → Anyone with the link → Viewer</i>.
       </li>
     </ol>
+  );
+}
+
+interface HubExportModalProps {
+  url: string;
+  onClose: () => void;
+  onCopied: (what: string) => void;
+  onError: (message: string) => void;
+}
+
+function HubExportModal({
+  url,
+  onClose,
+  onCopied,
+  onError,
+}: HubExportModalProps) {
+  const [json, setJson] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const payload = await getHubExportPayload();
+        if (!cancelled) {
+          setJson(JSON.stringify(payload));
+          setLoading(false);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          const msg = e instanceof Error ? e.message : String(e);
+          setError(msg);
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <Modal title="Export to Hub" onClose={onClose} wide>
+      <ol style={{ marginTop: 0 }}>
+        <li>
+          Open the Hub link below and follow the &quot;Create config&quot; flow.
+        </li>
+        <li>
+          Paste the JSON below into the modal that opens on the Hub, pick a
+          public name, then click <b>Create</b>.
+        </li>
+        <li>Share the resulting Hub URL with your viewers.</li>
+      </ol>
+
+      <div className="form-grid">
+        <label className="form-field">
+          <span className="form-label">Hub URL</span>
+          <div className="card-link card-link--with-copy">
+            <span className="card-link-text">{url}</span>
+            <CopyButton
+              value={url}
+              onCopied={() => onCopied("Hub URL")}
+              onError={onError}
+            />
+          </div>
+        </label>
+
+        <label className="form-field">
+          <span className="form-label">Config JSON</span>
+          {loading ? (
+            <div style={{ opacity: 0.7, fontSize: 13 }}>
+              Building export payload…
+            </div>
+          ) : error ? (
+            <div style={{ color: "#f5b301", fontSize: 13 }}>
+              Failed to build payload: {error}
+            </div>
+          ) : (
+            <div style={{ position: "relative" }}>
+              <textarea
+                readOnly
+                value={json ?? ""}
+                rows={10}
+                style={{
+                  width: "100%",
+                  resize: "vertical",
+                  fontFamily: "Roboto Mono, monospace",
+                  fontSize: 12,
+                  padding: "10px 44px 10px 10px",
+                  background: "#0a0a0a",
+                  border: "1px solid #2a2a2a",
+                  borderRadius: 6,
+                  color: "#ededed",
+                  lineHeight: 1.4,
+                }}
+                onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+              />
+              <div style={{ position: "absolute", top: 6, right: 6 }}>
+                <CopyButton
+                  value={json ?? ""}
+                  onCopied={() => onCopied("Config JSON")}
+                  onError={onError}
+                />
+              </div>
+            </div>
+          )}
+        </label>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 18,
+        }}
+      >
+        <a
+          className="btn btn--primary"
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ExternalLink size={14} aria-hidden="true" />
+          Open Hub
+        </a>
+        <button className="btn" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </Modal>
   );
 }
 
@@ -1566,7 +1655,9 @@ function YouTubeChatTypeModal({
             ]}
             onChange={(v) =>
               setDraft(
-                v === "message_streaming" ? "message_streaming" : "long_polling",
+                v === "message_streaming"
+                  ? "message_streaming"
+                  : "long_polling",
               )
             }
           />
@@ -1580,8 +1671,8 @@ function YouTubeChatTypeModal({
         </p>
         <p style={{ margin: 0 }}>
           <b>Streaming.</b> Delivers messages with much shorter latency, but
-          burns through the daily API quota quickly — you can hit the limit
-          well before a long stream finishes.
+          burns through the daily API quota quickly — you can hit the limit well
+          before a long stream finishes.
         </p>
       </div>
       <div

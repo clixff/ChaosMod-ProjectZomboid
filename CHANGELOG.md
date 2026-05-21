@@ -18,6 +18,7 @@
 - NPCs now have a chance to drop their weapon on death (40%), and always drop it if they picked it up from the ground
 - Added a Streamer Mode setting to disable the hidden "Random" effect option in voting, so every vote choice is visible
 - Added Twitch Channel Points donation system
+- Export your prices, rewards, and effect tweaks as a shareable Hub config so viewers see exactly what's active on your stream
 
 ### New Effects
 

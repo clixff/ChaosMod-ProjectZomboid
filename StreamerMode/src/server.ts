@@ -131,6 +131,7 @@ export interface ServerContext {
         contentType: string;
       }
   >;
+  getHubExportPayload?: () => unknown | null;
 }
 
 export interface TwitchPointsStatus {
@@ -541,6 +542,19 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
         GET: () => {
           const langs = ctx.getLanguages?.() ?? [];
           return Response.json({ languages: langs });
+        },
+      },
+
+      "/api/hub-export": {
+        GET: () => {
+          if (!ctx.getHubExportPayload) {
+            return new Response("Not available", { status: 503 });
+          }
+          const payload = ctx.getHubExportPayload();
+          if (!payload) {
+            return new Response("Hub export unavailable", { status: 503 });
+          }
+          return Response.json(payload);
         },
       },
 
