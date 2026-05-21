@@ -1,5 +1,5 @@
-import { cp, mkdir, rm } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -18,19 +18,39 @@ const modCommonDir = resolve(repoRoot, "Contents/mods/ChaosMod/common");
 await rm(targetModDir, { recursive: true, force: true });
 await mkdir(targetModDir, { recursive: true });
 
-await cp(
+async function copyMinifiedJson(src: string, dst: string): Promise<number> {
+  const raw = await readFile(src, "utf-8");
+  const parsed: unknown = JSON.parse(raw);
+  const minified = JSON.stringify(parsed);
+  await writeFile(dst, minified, "utf-8");
+  // Byte savings = original size − minified size. Useful for logs.
+  return Buffer.byteLength(raw, "utf-8") - Buffer.byteLength(minified, "utf-8");
+}
+
+let totalSaved = 0;
+
+totalSaved += await copyMinifiedJson(
   resolve(modCommonDir, "default_config.json"),
   resolve(targetModDir, "default_config.json"),
 );
 
-await cp(
+totalSaved += await copyMinifiedJson(
   resolve(modCommonDir, "default_effects.json"),
   resolve(targetModDir, "default_effects.json"),
 );
 
-await cp(resolve(modCommonDir, "lang"), resolve(targetModDir, "lang"), {
-  recursive: true,
-  force: true,
-});
+const langSrcDir = resolve(modCommonDir, "lang");
+const langDstDir = resolve(targetModDir, "lang");
+await mkdir(langDstDir, { recursive: true });
+const langFiles = await readdir(langSrcDir);
+for (const file of langFiles) {
+  if (!file.endsWith(".json")) continue;
+  totalSaved += await copyMinifiedJson(
+    join(langSrcDir, file),
+    join(langDstDir, file),
+  );
+}
 
-console.log("Prepared Hub mod assets at", targetModDir);
+console.log(
+  `Prepared Hub mod assets at ${targetModDir} (saved ${(totalSaved / 1024).toFixed(1)} KB by minification)`,
+);
