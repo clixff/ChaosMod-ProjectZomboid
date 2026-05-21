@@ -27,7 +27,6 @@
         "voting_enabled": false,
         "voting_mode": 0,
         "voting_options_number": 4,
-        "type": "twitch",
         "use_localhost_ip": true,
         "use_zombie_nicknames": true,
         "use_animals_nicknames": true,

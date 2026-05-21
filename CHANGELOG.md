@@ -12,6 +12,7 @@
 - OBS vote overlay now shows the effect duration next to its name when the effect has one
 - Added INSTALL.txt to release packages with Steam, manual install, and StreamerApp launch instructions
 - The recent effects blocklist now persists between game sessions so you don't get the same effects right after restarting the game
+- Added a recommended-values hint under the "Recent effects block buffer" setting in the in-game settings window and StreamerApp dashboard
 
 ### New Effects
 
@@ -42,6 +43,7 @@
 - Spawned zombies now respect player's Sandbox setting and spawn with random health instead of 1.00
 - NPCs now have different health groups (weak, default, strong) that determine their max health level
 - Fixed NPCs AI against zombies
+- Removed the unused "Voting Type" setting from the in-game settings window and the StreamerApp dashboard
 
 ### Effect Fixes
 

@@ -42,7 +42,6 @@ export interface StreamerModeConfig {
   voting_enabled: boolean;
   voting_mode: number;
   voting_options_number: number;
-  type: string;
   use_localhost_ip: boolean;
   use_zombie_nicknames: boolean;
   use_animals_nicknames: boolean;
@@ -149,7 +148,6 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   voting_enabled: false,
   voting_mode: 0,
   voting_options_number: 4,
-  type: "twitch",
   use_localhost_ip: true,
   use_zombie_nicknames: true,
   use_animals_nicknames: true,
@@ -285,7 +283,6 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
         Math.floor(num(raw["voting_options_number"], d.voting_options_number)),
       ),
     ),
-    type: str(raw["type"], d.type),
     use_localhost_ip: bool(raw["use_localhost_ip"], d.use_localhost_ip),
     use_zombie_nicknames: bool(
       raw["use_zombie_nicknames"],

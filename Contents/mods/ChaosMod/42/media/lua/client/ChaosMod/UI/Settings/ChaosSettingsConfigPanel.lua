@@ -166,6 +166,13 @@ function ChaosSettingsConfigPanel:rebuild()
     table.insert(children, self.controls.recent_effects_block_buffer)
     y = y + rowH + rowGap
 
+    local hintLabels, hintH = W.MakeHint(self, controlX, y,
+        "Recommended:\nFor default Chaos - 30-100\nFor 4 options vote - 90-130\nFor 5+ options vote - 150+")
+    for _, lbl in ipairs(hintLabels) do
+        table.insert(children, lbl)
+    end
+    y = y + hintH + rowGap
+
     addLabelled("hide_progress_bar")
     self.controls.hide_progress_bar = W.MakeCheckbox(self, controlX, y, "", cfg.hide_progress_bar == true,
         function(checked)
@@ -236,15 +243,6 @@ function ChaosSettingsConfigPanel:rebuild()
         sm.voting_options_number = key
     end)
     table.insert(children, self.controls.voting_options_number)
-    y = y + rowH + rowGap
-
-    addLabelled("voting_type")
-    self.controls.voting_type = W.MakeDropdown(self, controlX, y, controlW, {
-        { key = "twitch", label = "Twitch" },
-    }, sm.type or "twitch", function(key)
-        sm.type = key
-    end)
-    table.insert(children, self.controls.voting_type)
     y = y + rowH + rowGap
 
     addLabelled("use_localhost_ip")

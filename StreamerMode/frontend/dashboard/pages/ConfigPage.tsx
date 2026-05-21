@@ -211,7 +211,7 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
         </FieldRow>
         <FieldRow
           label="Recent effects block buffer"
-          hint="How many of the most recently triggered effects are blocked from being picked again."
+          hint={"How many of the most recently triggered effects are blocked from being picked again.\n\nRecommended:\nFor default Chaos - 30-100\nFor 4 options vote - 90-130\nFor 5+ options vote - 150+"}
         >
           <NumberInput
             value={config.recent_effects_block_buffer}
@@ -295,13 +295,6 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
               { value: "8", label: "8" },
             ]}
             onChange={(v) => setStreamer("voting_options_number", Number(v))}
-          />
-        </FieldRow>
-        <FieldRow label="Provider type">
-          <Select
-            value={sm.type}
-            options={[{ value: "twitch", label: "Twitch" }]}
-            onChange={(v) => setStreamer("type", v)}
           />
         </FieldRow>
         <FieldRow label="Bind to localhost only">
