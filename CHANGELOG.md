@@ -11,6 +11,7 @@
 - Added YouTube provider for live chat support for voting and zombie nicknames using your own YouTube Data API key
 - OBS vote overlay now shows the effect duration next to its name when the effect has one
 - Added INSTALL.txt to release packages with Steam, manual install, and StreamerApp launch instructions
+- The recent effects blocklist now persists between game sessions so you don't get the same effects right after restarting the game
 
 ### New Effects
 

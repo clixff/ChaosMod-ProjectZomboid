@@ -275,6 +275,8 @@ function ChaosMod.OnTick()
     ChaosMod.lastTimeTickMs = msNow
     -- Tick all active effects
     ChaosEffectsManager.OnTick(deltaMs)
+    -- Flush pending recent-effects blocklist writes when the throttle window has elapsed
+    ChaosEffectsRegistry.TickRecentEffectsSave()
     -- Tick zombie nicknames if enabled
     if ChaosMod.enabled and ChaosConfig.IsZombieNicknamesEnabled() then
         ChaosNicknames.OnTick(deltaMs)

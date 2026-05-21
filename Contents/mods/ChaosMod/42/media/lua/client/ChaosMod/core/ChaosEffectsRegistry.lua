@@ -106,6 +106,8 @@ function ChaosEffectsRegistry.Initialize()
         enabledEffects)
     print(resultString)
     ChaosEffectsRegistry.effectsEnabledCount = enabledEffects
+
+    ChaosEffectsRegistry.EnsureRecentEffectsLoaded()
 end
 
 --- If VERSION.txt is missing, empty or different from the current mod version,
@@ -155,11 +157,76 @@ local recentEffectsSet = {}
 ---@type string[]
 local recentEffectsQueue = {}
 
+local RECENT_EFFECTS_FILE = "ChaosMod/recent_effects.txt"
+local RECENT_EFFECTS_SAVE_INTERVAL_MS = 5000
+local recentEffectsLoaded = false
+local recentEffectsDirty = false
+local recentEffectsLastWriteMs = 0
+
 ---@return integer
 local function getRecentEffectsMax()
     local v = ChaosConfig.recent_effects_block_buffer
     if type(v) ~= "number" or v < 0 then return 90 end
     return math.floor(v)
+end
+
+local function writeRecentEffectsToDisk()
+    local maxBuffer = getRecentEffectsMax()
+    if maxBuffer <= 0 then
+        -- Blocklist disabled: leave the file as-is so re-enabling restores history.
+        recentEffectsDirty = false
+        return
+    end
+    local content = table.concat(recentEffectsQueue, "\n")
+    ChaosFileReader.WriteTextToCache(RECENT_EFFECTS_FILE, content)
+    recentEffectsDirty = false
+    recentEffectsLastWriteMs = getTimestampMs()
+end
+
+local function loadRecentEffectsFromDisk()
+    local maxBuffer = getRecentEffectsMax()
+    if maxBuffer <= 0 then return end
+
+    local lines = ChaosFileReader.ReadFileArrayFromCacheAllLines(RECENT_EFFECTS_FILE)
+    if not lines then return end
+
+    for _, line in ipairs(lines) do
+        if type(line) == "string" then
+            local trimmed = line:gsub("^%s+", ""):gsub("%s+$", "")
+            if trimmed ~= "" and not recentEffectsSet[trimmed] then
+                table.insert(recentEffectsQueue, trimmed)
+                recentEffectsSet[trimmed] = true
+            end
+        end
+    end
+
+    -- Keep newest N if the saved file is larger than the current cap.
+    while #recentEffectsQueue > maxBuffer do
+        local evicted = table.remove(recentEffectsQueue, 1)
+        recentEffectsSet[evicted] = nil
+    end
+end
+
+--- Loads the persisted recent-effects blocklist from disk on first call. Subsequent
+--- calls are no-ops so re-running `Initialize` (settings save, save load) doesn't
+--- repopulate the in-RAM queue.
+function ChaosEffectsRegistry.EnsureRecentEffectsLoaded()
+    if recentEffectsLoaded then return end
+    recentEffectsLoaded = true
+    loadRecentEffectsFromDisk()
+end
+
+--- Driven from `ChaosMod.OnTick`. Flushes a pending blocklist write to disk when
+--- the throttle window has elapsed since the last write.
+function ChaosEffectsRegistry.TickRecentEffectsSave()
+    if not recentEffectsDirty then return end
+    if getRecentEffectsMax() <= 0 then
+        recentEffectsDirty = false
+        return
+    end
+    if (getTimestampMs() - recentEffectsLastWriteMs) >= RECENT_EFFECTS_SAVE_INTERVAL_MS then
+        writeRecentEffectsToDisk()
+    end
 end
 
 ---@param id string
@@ -177,6 +244,11 @@ local function addToBlocklist(id)
     end
     table.insert(recentEffectsQueue, id)
     recentEffectsSet[id] = true
+
+    recentEffectsDirty = true
+    if (getTimestampMs() - recentEffectsLastWriteMs) >= RECENT_EFFECTS_SAVE_INTERVAL_MS then
+        writeRecentEffectsToDisk()
+    end
 end
 
 --- Adds an effect id to the recent-effects blocklist if it isn't already in it.
