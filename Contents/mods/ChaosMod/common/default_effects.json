@@ -3019,6 +3019,42 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_4"
+        },
+        {
+            "id": "rubber_duck_steps",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "rubber_duck_steps"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "hurricane",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "hurricane"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "the_magic_broom",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "the_magic_broom"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_4"
         }
     ]
 }

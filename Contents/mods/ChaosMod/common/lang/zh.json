@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "生成荷马·辛普森",
         "spawn_doctor": "生成医生",
         "spawn_carl_johnson": "生成卡尔·约翰逊",
-        "npc_battle_royale": "NPC大逃杀"
+        "npc_battle_royale": "NPC大逃杀",
+        "rubber_duck_steps": "橡皮鸭脚步声",
+        "hurricane": "飓风",
+        "the_magic_broom": "魔法扫帚"
     },
     "core": {
         "start_mod": "启动混乱模式",

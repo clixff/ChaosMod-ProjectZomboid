@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "Gerar Homer Simpson",
         "spawn_doctor": "Gerar Doutora",
         "spawn_carl_johnson": "Gerar Carl Johnson",
-        "npc_battle_royale": "Battle Royale de NPCs"
+        "npc_battle_royale": "Battle Royale de NPCs",
+        "rubber_duck_steps": "Passos de Pato de Borracha",
+        "hurricane": "Furacão",
+        "the_magic_broom": "Vassoura Mágica"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

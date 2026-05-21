@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "Spawn Homer Simpson",
         "spawn_doctor": "Spawn Doctor",
         "spawn_carl_johnson": "Spawn Carl Johnson",
-        "npc_battle_royale": "NPC Battle Royale"
+        "npc_battle_royale": "NPC Battle Royale",
+        "rubber_duck_steps": "Rubber Duck Steps",
+        "hurricane": "Hurricane",
+        "the_magic_broom": "The Magic Broom"
     },
     "core": {
         "start_mod": "Start ChaosMod",

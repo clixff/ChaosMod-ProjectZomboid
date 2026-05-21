@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "호머 심슨 소환",
         "spawn_doctor": "의사 소환",
         "spawn_carl_johnson": "칼 존슨 소환",
-        "npc_battle_royale": "NPC 배틀로얄"
+        "npc_battle_royale": "NPC 배틀로얄",
+        "rubber_duck_steps": "고무 오리 발소리",
+        "hurricane": "허리케인",
+        "the_magic_broom": "마법 빗자루"
     },
     "core": {
         "start_mod": "ChaosMod 시작",

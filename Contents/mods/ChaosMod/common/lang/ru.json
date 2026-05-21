@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "Заспавнить Гомера Симпсона",
         "spawn_doctor": "Заспавнить доктора",
         "spawn_carl_johnson": "Заспавнить Карла Джонсона",
-        "npc_battle_royale": "Королевская битва NPC"
+        "npc_battle_royale": "Королевская битва NPC",
+        "rubber_duck_steps": "Шаги резиновой уточки",
+        "hurricane": "Ураган",
+        "the_magic_broom": "Волшебная метла"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

@@ -291,7 +291,7 @@ function ChaosNPC:OnZombieDead()
     local isFollowGroup = self.npcGroup == ChaosNPCGroupID.COMPANIONS or
         self.npcGroup == ChaosNPCGroupID.FOLLOWERS
     if isFollowGroup and self.zombie then
-        ChaosUtils.PlayUISound("deathcrash", false, 0.25)
+        ChaosUtils.PlayUISound("deathcrash", false, 1.0)
 
         local player = getPlayer()
         if player then

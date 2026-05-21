@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "Faire apparaître Homer Simpson",
         "spawn_doctor": "Faire apparaître une doctoresse",
         "spawn_carl_johnson": "Faire apparaître Carl Johnson",
-        "npc_battle_royale": "Battle royale de PNJ"
+        "npc_battle_royale": "Battle royale de PNJ",
+        "rubber_duck_steps": "Pas de canard en plastique",
+        "hurricane": "Ouragan",
+        "the_magic_broom": "Balai magique"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

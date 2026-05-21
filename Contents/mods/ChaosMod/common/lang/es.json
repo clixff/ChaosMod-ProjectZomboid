@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "Generar a Homer Simpson",
         "spawn_doctor": "Generar a una doctora",
         "spawn_carl_johnson": "Generar a Carl Johnson",
-        "npc_battle_royale": "Battle royale de NPC"
+        "npc_battle_royale": "Battle royale de NPC",
+        "rubber_duck_steps": "Pasos de pato de goma",
+        "hurricane": "Huracán",
+        "the_magic_broom": "Escoba mágica"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

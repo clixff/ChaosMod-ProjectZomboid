@@ -26,6 +26,9 @@
 - Spawn Doctor
 - Spawn Carl Johnson
 - NPC Battle Royale
+- Rubber Duck Steps
+- Hurricane
+- The Magic Broom
 
 ### Mod Fixes
 

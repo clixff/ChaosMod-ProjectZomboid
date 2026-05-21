@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "Homer Simpson spawnen",
         "spawn_doctor": "Ärztin spawnen",
         "spawn_carl_johnson": "Carl Johnson spawnen",
-        "npc_battle_royale": "NPC Battle Royale"
+        "npc_battle_royale": "NPC Battle Royale",
+        "rubber_duck_steps": "Quietscheenten-Schritte",
+        "hurricane": "Hurrikan",
+        "the_magic_broom": "Zauberbesen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "Zespawnuj Homera Simpsona",
         "spawn_doctor": "Zespawnuj lekarkę",
         "spawn_carl_johnson": "Zespawnuj Carla Johnsona",
-        "npc_battle_royale": "Battle royale NPC"
+        "npc_battle_royale": "Battle royale NPC",
+        "rubber_duck_steps": "Kroki gumowej kaczki",
+        "hurricane": "Huragan",
+        "the_magic_broom": "Magiczna miotła"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

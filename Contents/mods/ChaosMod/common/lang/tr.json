@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "Homer Simpson'ı oluştur",
         "spawn_doctor": "Doktor oluştur",
         "spawn_carl_johnson": "Carl Johnson'ı oluştur",
-        "npc_battle_royale": "NPC Battle Royale"
+        "npc_battle_royale": "NPC Battle Royale",
+        "rubber_duck_steps": "Lastik Ördek Adımları",
+        "hurricane": "Kasırga",
+        "the_magic_broom": "Sihirli Süpürge"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

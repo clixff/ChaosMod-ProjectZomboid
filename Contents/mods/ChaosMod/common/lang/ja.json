@@ -335,7 +335,10 @@
         "spawn_homer_simpson": "ホーマー・シンプソンをスポーン",
         "spawn_doctor": "医者をスポーン",
         "spawn_carl_johnson": "カール・ジョンソンをスポーン",
-        "npc_battle_royale": "NPCバトルロイヤル"
+        "npc_battle_royale": "NPCバトルロイヤル",
+        "rubber_duck_steps": "ラバーダックの足音",
+        "hurricane": "ハリケーン",
+        "the_magic_broom": "魔法のほうき"
     },
     "core": {
         "start_mod": "ChaosModを開始",
