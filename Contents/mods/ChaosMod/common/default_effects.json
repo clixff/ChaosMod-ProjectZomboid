@@ -994,7 +994,7 @@
         {
             "id": "give_random_tool",
             "enabled": true,
-            "chance": 0.8,
+            "chance": 0.85,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_2"

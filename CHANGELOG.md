@@ -38,6 +38,7 @@
 - Fixed a bug when players can't press options button using different localizations or screen sizes
 - NPCs now deal more damage to zombies
 - Fixed game crash that could happen when a vehicle carrying an NPC crashed
+- Spawned zombies and NPCs now respect player's Sandbox setting and spawn with random health instead of 1.00
 
 ### Effect Fixes
 

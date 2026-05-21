@@ -230,11 +230,19 @@ function ChaosNPC:OnAttackEnemyHit()
     if minDamage <= 0 then minDamage = 2 end
     if maxDamage <= 0 then maxDamage = 4 end
 
+    local weaponId = self.weaponItemCached:getFullType()
+    print("[ChaosNPCCombatSystem] Attacking enemy with weapon: " .. tostring(weaponId))
+
+    if weaponId == "Base.BareHands" then
+        minDamage = 0.5
+        maxDamage = 1.5
+    end
+
     local damage = ChaosUtils.RandFloat(minDamage, maxDamage)
 
     print(string.format("[ChaosNPCCombatSystem] Damage min: %d, max: %d, result: %f", minDamage, maxDamage, damage))
 
-    local damageMod = 2.0
+    local damageMod = 4.0
 
     print("[ChaosNPCCombatSystem] Damage mod: " .. tostring(damageMod))
 
@@ -242,9 +250,6 @@ function ChaosNPC:OnAttackEnemyHit()
     damage = damage * self.DamageMultiplier * damageMod
 
     print("[ChaosNPCCombatSystem] Total damage after mods: " .. tostring(damage))
-    damage = damage / 0.5
-
-    print("[ChaosNPCCombatSystem] Total damage after split: " .. tostring(damage))
 
     if damage <= 0.1 then
         damage = 0.1

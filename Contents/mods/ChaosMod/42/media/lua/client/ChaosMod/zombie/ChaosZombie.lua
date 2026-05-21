@@ -2,6 +2,27 @@ ChaosZombie = ChaosZombie or {}
 ChaosZombie.modDataChatLineKey = "ChaosModChatLine"
 ChaosZombie.modDataChatLineTimestampKey = "ChaosModChatLineTimestampMs"
 
+local function getNaturalZombieHealth()
+    local toughness = SandboxVars.ZombieLore.Toughness
+
+    if toughness == 1 then
+        -- Tough
+        return 3.5 + ChaosUtils.RandFloat(0.0, 0.3)
+    elseif toughness == 2 then
+        -- Normal
+        return 1.5 + ChaosUtils.RandFloat(0.0, 0.3)
+    elseif toughness == 3 then
+        -- Fragile
+        return 0.5 + ChaosUtils.RandFloat(0.0, 0.3)
+    elseif toughness == 4 then
+        -- Random
+        return ChaosUtils.RandFloat(0.5, 3.5) + ChaosUtils.RandFloat(0.0, 0.3)
+    end
+
+    -- Fallback, should not normally happen
+    return 1.0
+end
+
 ---@param player IsoGameCharacter
 ---@param zombie IsoZombie
 ---@param checkLightLevel boolean
@@ -78,8 +99,20 @@ function ChaosZombie.SpawnZombieAt(x, y, z, totalZombies, outfit, femaleChance)
     local x1 = math.floor(x)
     local y1 = math.floor(y)
     local z1 = math.floor(z)
-    femaleChance = femaleChance or 50
-    local zombies = addZombiesInOutfit(x1, y1, z1, totalZombies, outfit, femaleChance)
+    if femaleChance == nil then
+        femaleChance = 50
+    end
+
+    local health = getNaturalZombieHealth()
+
+    local zombies = addZombiesInOutfit(x1, y1, z1, totalZombies, outfit, femaleChance, false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        health
+    )
     return zombies
 end
 
