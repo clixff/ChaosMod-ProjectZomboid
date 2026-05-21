@@ -318,6 +318,62 @@ export async function getLanguages(): Promise<string[]> {
   return data.languages;
 }
 
+export interface TwitchPointsReward {
+  id: string;
+  name: string;
+  cost: number;
+  groups: string[];
+}
+
+export interface TwitchPointsStatus {
+  enabled: boolean;
+  twitch_connected: boolean;
+  has_scope: boolean;
+  has_rewards: boolean;
+  rewards: TwitchPointsReward[];
+  available_groups: string[];
+}
+
+export async function getTwitchPointsStatus(): Promise<TwitchPointsStatus> {
+  const res = await fetch("/api/twitch-points/status");
+  if (!res.ok) throw new Error(`getTwitchPointsStatus: ${res.status}`);
+  return (await res.json()) as TwitchPointsStatus;
+}
+
+export async function setTwitchPointsEnabled(enabled: boolean): Promise<void> {
+  const res = await fetch("/api/twitch-points/config", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ enabled }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `setTwitchPointsEnabled: ${res.status}`);
+  }
+}
+
+export async function createTwitchPointsRewards(
+  rows: Array<{ name: string; cost: number; groups: string[] }>,
+): Promise<void> {
+  const res = await fetch("/api/twitch-points/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rows }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `createTwitchPointsRewards: ${res.status}`);
+  }
+}
+
+export async function deleteTwitchPointsRewards(): Promise<void> {
+  const res = await fetch("/api/twitch-points/delete", { method: "POST" });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `deleteTwitchPointsRewards: ${res.status}`);
+  }
+}
+
 export async function updateEffect(
   id: string,
   patch: Partial<EffectEntry>,

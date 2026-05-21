@@ -1,5 +1,5 @@
 import colors from "colors";
-import { logger } from "../utils/logger.ts";
+import { isDebugMode, logger } from "../utils/logger.ts";
 
 const CLIENT_ID = "q72hcurbc7rcns1cefr9nqhmixe7b8";
 const EVENTSUB_URL =
@@ -28,7 +28,7 @@ interface EventSubMessage {
   payload: {
     session?: EventSubSession;
     subscription?: unknown;
-    event?: ChatEvent;
+    event?: ChatEvent | RedemptionEvent;
   };
 }
 
@@ -53,10 +53,28 @@ export interface ChatEvent {
   };
 }
 
+export interface RedemptionEvent {
+  id: string;
+  broadcaster_user_id: string;
+  user_id: string;
+  user_login: string;
+  user_name: string;
+  user_input: string;
+  status: "unfulfilled" | "fulfilled" | "canceled";
+  reward: {
+    id: string;
+    title: string;
+    cost: number;
+    prompt: string;
+  };
+  redeemed_at: string;
+}
+
 export interface TwitchChatParams {
   accessToken: string;
   broadcasterUserId: string;
   readerUserId: string;
+  subscribeRedemptions: () => boolean;
 }
 
 export class TwitchChat {
@@ -67,6 +85,7 @@ export class TwitchChat {
   private serverReconnect = false;
 
   onMessage: ((chat: ChatEvent) => void) | null = null;
+  onRedemption: ((event: RedemptionEvent) => void) | null = null;
   onConnect: (() => void) | null = null;
   onDisconnect: (() => void) | null = null;
 
@@ -141,6 +160,8 @@ export class TwitchChat {
 
     const type = msg.metadata?.message_type;
 
+    logger.debug(`${this.coloredName} New twitch event with type "${type}"`);
+
     if (type === "session_welcome") {
       if (!initial) return;
       const sessionId = msg.payload.session?.id;
@@ -154,6 +175,17 @@ export class TwitchChat {
           this.shouldReconnect = false;
         }
         ws.close();
+        return;
+      }
+      if (this.params.subscribeRedemptions()) {
+        try {
+          await this.createRedemptionSubscription(sessionId);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          logger.warn(
+            `${this.coloredName} Redemption subscription failed: ${message}`,
+          );
+        }
       }
       return;
     }
@@ -170,18 +202,29 @@ export class TwitchChat {
     }
 
     if (type === "notification") {
-      if (msg.metadata?.subscription_type !== "channel.chat.message") return;
-      const rawChat = msg.payload.event;
-      if (!rawChat) return;
-      const chat: ChatEvent = {
-        ...rawChat,
-        timestamp_ms: Date.now(),
-      };
-      logger.debug(
-        `${this.coloredName} New chat message: (${chat.color}) ${chat.chatter_user_name}: ${chat.message.text}`,
-      );
-      this.onMessage?.(chat);
-      return;
+      const subType = msg.metadata?.subscription_type;
+      if (subType === "channel.chat.message") {
+        const rawChat = msg.payload.event as ChatEvent | undefined;
+        if (!rawChat) return;
+        const chat: ChatEvent = {
+          ...rawChat,
+          timestamp_ms: Date.now(),
+        };
+        logger.debug(
+          `${this.coloredName} New chat message: (${chat.color}) ${chat.chatter_user_name}: ${chat.message.text}`,
+        );
+        this.onMessage?.(chat);
+        return;
+      }
+      if (subType === "channel.channel_points_custom_reward_redemption.add") {
+        const redemption = msg.payload.event as RedemptionEvent | undefined;
+        if (!redemption) return;
+        logger.debug(
+          `${this.coloredName} Reward redemption: ${redemption.user_name} -> "${redemption.reward.title}" (input="${redemption.user_input}")`,
+        );
+        this.onRedemption?.(redemption);
+        return;
+      }
     }
   }
 
@@ -209,6 +252,41 @@ export class TwitchChat {
         }),
       },
     );
+
+    if (!res.ok) {
+      const json: unknown = await res.json();
+      throw new Error(`${res.status} ${JSON.stringify(json)}`);
+    }
+  }
+
+  private async createRedemptionSubscription(sessionId: string): Promise<void> {
+    const res = await fetch(
+      "https://api.twitch.tv/helix/eventsub/subscriptions",
+      {
+        method: "POST",
+        headers: {
+          "Client-Id": CLIENT_ID,
+          Authorization: `Bearer ${this.params.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "channel.channel_points_custom_reward_redemption.add",
+          version: "1",
+          condition: {
+            broadcaster_user_id: this.params.broadcasterUserId,
+          },
+          transport: {
+            method: "websocket",
+            session_id: sessionId,
+          },
+        }),
+      },
+    );
+
+    logger.debug(`${this.coloredName} Subscribing to reward redemptions.`);
+    if (isDebugMode()) {
+      console.log(res);
+    }
 
     if (!res.ok) {
       const json: unknown = await res.json();

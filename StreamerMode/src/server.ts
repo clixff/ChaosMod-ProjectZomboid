@@ -88,6 +88,22 @@ export interface ServerContext {
     url?: string;
   }>;
   donationAlertsLogout?: () => Promise<{ success: boolean; error?: string }>;
+  getTwitchPointsStatus?: () => TwitchPointsStatus;
+  updateTwitchPointsConfig?: (
+    input: { enabled: boolean },
+  ) => Promise<{ success: boolean; error?: string }>;
+  createTwitchPoints?: (
+    rows: Array<{ name: string; cost: number; groups: string[] }>,
+  ) => Promise<{
+    success: boolean;
+    error?: string;
+    status?: number;
+  }>;
+  deleteTwitchPoints?: () => Promise<{
+    success: boolean;
+    error?: string;
+    status?: number;
+  }>;
   donationAlertsSetup?: (input: {
     appId: string;
     clientSecret: string;
@@ -115,6 +131,15 @@ export interface ServerContext {
         contentType: string;
       }
   >;
+}
+
+export interface TwitchPointsStatus {
+  enabled: boolean;
+  twitch_connected: boolean;
+  has_scope: boolean;
+  has_rewards: boolean;
+  rewards: Array<{ id: string; name: string; cost: number; groups: string[] }>;
+  available_groups: string[];
 }
 
 export interface HomeStatus {
@@ -336,6 +361,141 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           const r = await ctx.donationAlertsLogout();
           if (!r.success) {
             return new Response(r.error ?? "Logout failed", { status: 400 });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/twitch-points/status": {
+        GET: () => {
+          if (!ctx.getTwitchPointsStatus) {
+            return new Response("Not available", { status: 503 });
+          }
+          return Response.json(ctx.getTwitchPointsStatus());
+        },
+      },
+
+      "/api/twitch-points/config": {
+        POST: async (req: Request) => {
+          if (!ctx.updateTwitchPointsConfig) {
+            return new Response("Not available", { status: 503 });
+          }
+          let body: unknown;
+          try {
+            body = await req.json();
+          } catch {
+            return new Response("Invalid JSON", { status: 400 });
+          }
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
+            return new Response("Body must be an object", { status: 400 });
+          }
+          const enabledRaw = (body as Record<string, unknown>)["enabled"];
+          if (typeof enabledRaw !== "boolean") {
+            return new Response("'enabled' must be a boolean", { status: 400 });
+          }
+          const r = await ctx.updateTwitchPointsConfig({ enabled: enabledRaw });
+          if (!r.success) {
+            return new Response(r.error ?? "Update failed", { status: 400 });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/twitch-points/create": {
+        POST: async (req: Request) => {
+          if (!ctx.createTwitchPoints) {
+            return new Response("Not available", { status: 503 });
+          }
+          let body: unknown;
+          try {
+            body = await req.json();
+          } catch {
+            return new Response("Invalid JSON", { status: 400 });
+          }
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
+            return new Response("Body must be an object", { status: 400 });
+          }
+          const rowsRaw = (body as Record<string, unknown>)["rows"];
+          if (!Array.isArray(rowsRaw) || rowsRaw.length === 0) {
+            return new Response("Body must contain non-empty 'rows' array", {
+              status: 400,
+            });
+          }
+          const rows: Array<{ name: string; cost: number; groups: string[] }> = [];
+          const seenNames = new Set<string>();
+          for (let i = 0; i < rowsRaw.length; i++) {
+            const item = rowsRaw[i];
+            if (item === null || typeof item !== "object" || Array.isArray(item)) {
+              return new Response(`Row ${i + 1} is not an object`, {
+                status: 400,
+              });
+            }
+            const r = item as Record<string, unknown>;
+            const name = typeof r["name"] === "string" ? r["name"].trim() : "";
+            const cost =
+              typeof r["cost"] === "number" ? Math.floor(r["cost"]) : NaN;
+            const groupsRaw = r["groups"];
+            if (!name) {
+              return new Response(`Row ${i + 1} has empty name`, { status: 400 });
+            }
+            if (seenNames.has(name)) {
+              return new Response(`Duplicate row name: ${name}`, { status: 400 });
+            }
+            seenNames.add(name);
+            if (!Number.isInteger(cost) || cost < 1) {
+              return new Response(
+                `Row ${i + 1} has invalid cost (must be integer ≥ 1)`,
+                { status: 400 },
+              );
+            }
+            if (!Array.isArray(groupsRaw) || groupsRaw.length === 0) {
+              return new Response(
+                `Row ${i + 1} ("${name}") has no price groups`,
+                { status: 400 },
+              );
+            }
+            const groups: string[] = [];
+            const seenGroups = new Set<string>();
+            for (const g of groupsRaw) {
+              if (typeof g !== "string" || !g) continue;
+              if (seenGroups.has(g)) continue;
+              seenGroups.add(g);
+              groups.push(g);
+            }
+            if (groups.length === 0) {
+              return new Response(
+                `Row ${i + 1} ("${name}") has no valid price groups`,
+                { status: 400 },
+              );
+            }
+            rows.push({ name, cost, groups });
+          }
+          const result = await ctx.createTwitchPoints(rows);
+          if (!result.success) {
+            const status = result.status && result.status >= 400 ? 502 : 400;
+            return new Response(result.error ?? "Create failed", { status });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/twitch-points/delete": {
+        POST: async () => {
+          if (!ctx.deleteTwitchPoints) {
+            return new Response("Not available", { status: 503 });
+          }
+          const result = await ctx.deleteTwitchPoints();
+          if (!result.success) {
+            const status = result.status && result.status >= 400 ? 502 : 400;
+            return new Response(result.error ?? "Delete failed", { status });
           }
           return new Response("OK");
         },

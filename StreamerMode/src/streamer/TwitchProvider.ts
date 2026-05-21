@@ -6,22 +6,41 @@ export interface StreamerUser {
   display_name: string;
 }
 
-const CLIENT_ID = "q72hcurbc7rcns1cefr9nqhmixe7b8";
+export const TWITCH_CLIENT_ID = "q72hcurbc7rcns1cefr9nqhmixe7b8";
+export const TWITCH_REDEMPTIONS_SCOPE = "channel:manage:redemptions";
+const CLIENT_ID = TWITCH_CLIENT_ID;
 
 export class TwitchProvider {
   readonly name = "Twitch";
   readonly key = "twitch";
   readonly coloredName = colors.magenta("[Twitch]");
 
-  getLoginUrl(port: number): string {
+  getLoginUrl(port: number, includeRedemptions: boolean): string {
+    const scopes = ["user:read:chat"];
+    if (includeRedemptions) scopes.push(TWITCH_REDEMPTIONS_SCOPE);
     const params = new URLSearchParams({
       client_id: CLIENT_ID,
       redirect_uri: `http://localhost:${port}/auth/result/twitch`,
       response_type: "token",
-      scope: "user:read:chat",
+      scope: scopes.join(" "),
       force_verify: "true",
     });
     return `https://id.twitch.tv/oauth2/authorize?${params}`;
+  }
+
+  async getTokenScopes(accessToken: string): Promise<string[] | null> {
+    let res: Response;
+    try {
+      res = await fetch("https://id.twitch.tv/oauth2/validate", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+    } catch {
+      return null;
+    }
+    if (!res.ok) return null;
+    const json = (await res.json()) as { scopes?: unknown };
+    if (!Array.isArray(json.scopes)) return null;
+    return json.scopes.filter((s): s is string => typeof s === "string");
   }
 
   async validateToken(accessToken: string): Promise<StreamerUser | null> {

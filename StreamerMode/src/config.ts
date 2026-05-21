@@ -32,9 +32,14 @@ export interface DonationSystemTwitchBits {
   price_multiplier: number;
 }
 
+export interface DonationSystemTwitchPoints {
+  enabled: boolean;
+}
+
 export interface DonationSystemsConfig {
   donationalerts: DonationSystemDonationAlerts;
   twitch_bits: DonationSystemTwitchBits;
+  twitch_points: DonationSystemTwitchPoints;
 }
 
 export interface StreamerModeConfig {
@@ -142,6 +147,7 @@ const DEFAULT_DONATE_PRICE_GROUPS: DonatePriceGroup[] = [
 const DEFAULT_DONATION_SYSTEMS: DonationSystemsConfig = {
   donationalerts: { enabled: false, app_id: "", currency: "" },
   twitch_bits: { enabled: false, price_multiplier: 100.0 },
+  twitch_points: { enabled: false },
 };
 
 const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
@@ -251,6 +257,7 @@ function parseDonationSystems(
   const d = DEFAULT_DONATION_SYSTEMS;
   const da = obj(raw["donationalerts"]);
   const bits = obj(raw["twitch_bits"]);
+  const points = obj(raw["twitch_points"]);
   const multiplier = num(
     bits["price_multiplier"],
     d.twitch_bits.price_multiplier,
@@ -265,6 +272,9 @@ function parseDonationSystems(
       enabled: bool(bits["enabled"], d.twitch_bits.enabled),
       price_multiplier:
         multiplier > 0 ? multiplier : d.twitch_bits.price_multiplier,
+    },
+    twitch_points: {
+      enabled: bool(points["enabled"], d.twitch_points.enabled),
     },
   };
 }

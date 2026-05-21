@@ -43,6 +43,9 @@
             "twitch_bits": {
                 "enabled": false,
                 "price_multiplier": 100.0
+            },
+            "twitch_points": {
+                "enabled": false
             }
         },
         "donate_price_groups": [

@@ -17,6 +17,7 @@
 - Changing the effects interval or vote start time in the in-game settings now restarts the current iteration so the progress bar reflects the new timing
 - NPCs now have a chance to drop their weapon on death (40%), and always drop it if they picked it up from the ground
 - Added a Streamer Mode setting to disable the hidden "Random" effect option in voting, so every vote choice is visible
+- Added Twitch Channel Points donation system
 
 ### New Effects
 

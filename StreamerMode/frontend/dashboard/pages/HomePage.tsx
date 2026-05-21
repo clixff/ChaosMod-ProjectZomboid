@@ -92,9 +92,12 @@ import {
   youtubeReconnect,
   youtubeSetStreamUrl,
   youtubeSetApiKey,
+  getTwitchPointsStatus,
   type HomeStatus,
   type ModConfig,
+  type TwitchPointsStatus,
 } from "../api.ts";
+import { TwitchPointsSettingsModal } from "../components/TwitchPointsSettingsModal.tsx";
 
 interface HomePageProps {
   onNotify: (message: string, isError?: boolean) => void;
@@ -157,6 +160,19 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [youtubeConnectModal, setYoutubeConnectModal] = useState(false);
   const [youtubeApiKeyDraft, setYoutubeApiKeyDraft] = useState("");
   const [youtubeChatTypeModal, setYoutubeChatTypeModal] = useState(false);
+  const [twitchPointsModal, setTwitchPointsModal] = useState(false);
+  const [twitchPointsStatus, setTwitchPointsStatus] =
+    useState<TwitchPointsStatus | null>(null);
+
+  const refreshTwitchPoints = useCallback(async () => {
+    try {
+      const s = await getTwitchPointsStatus();
+      setTwitchPointsStatus(s);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      onNotify(`Failed to load Twitch Points: ${msg}`, true);
+    }
+  }, [onNotify]);
 
   const refresh = useCallback(async () => {
     try {
@@ -178,6 +194,16 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
     }, 3000);
     return () => clearInterval(t);
   }, [refresh]);
+
+  useEffect(() => {
+    void (async () => {
+      await refreshTwitchPoints();
+    })();
+    const t = setInterval(() => {
+      void refreshTwitchPoints();
+    }, 5000);
+    return () => clearInterval(t);
+  }, [refreshTwitchPoints]);
 
   useEffect(() => {
     let cancelled = false;
@@ -697,6 +723,53 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           <div className="provider-row">
             <div className="provider-row-main">
               <span className="provider-row-name">
+                <img src={twitchLogo} alt="" className="provider-row-logo" />
+                Twitch Points
+              </span>
+              {(() => {
+                const twitchAuthorized =
+                  status.twitch.configured && status.twitch.name !== null;
+                if (!twitchAuthorized) {
+                  return (
+                    <span className="badge badge--off">
+                      <span className="badge-dot" />
+                      Not Authorized
+                    </span>
+                  );
+                }
+                return (
+                  <StatusBadge
+                    on={twitchPointsStatus?.enabled ?? false}
+                    labelOn="Enabled"
+                    labelOff="Disabled"
+                  />
+                );
+              })()}
+            </div>
+            {twitchPointsStatus && (
+              <div className="provider-row-sub">
+                <span className="card-row-label">Rewards on Twitch</span>
+                <span className="card-row-value">
+                  {twitchPointsStatus.has_rewards
+                    ? `${twitchPointsStatus.rewards.length} active`
+                    : "None"}
+                </span>
+              </div>
+            )}
+            <div className="card-actions">
+              <button
+                className="btn"
+                disabled={busy || !twitchPointsStatus}
+                onClick={() => setTwitchPointsModal(true)}
+              >
+                <Settings size={14} aria-hidden="true" />
+                Settings
+              </button>
+            </div>
+          </div>
+          <div className="provider-row">
+            <div className="provider-row-main">
+              <span className="provider-row-name">
                 <img
                   src={donationAlertsLogo}
                   alt=""
@@ -1038,6 +1111,15 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
               onNotify("YouTube chat connection type saved.");
             });
           }}
+        />
+      )}
+
+      {twitchPointsModal && twitchPointsStatus && (
+        <TwitchPointsSettingsModal
+          status={twitchPointsStatus}
+          onClose={() => setTwitchPointsModal(false)}
+          onNotify={onNotify}
+          onRefresh={refreshTwitchPoints}
         />
       )}
 

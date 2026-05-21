@@ -50,6 +50,13 @@ import { Bridge } from "./src/bridge/Bridge.ts";
 import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
 import { DonationManager } from "./src/donations/DonationManager.ts";
 import { handleBitsCheer } from "./src/donations/BitsHandler.ts";
+import {
+  TwitchRewardsManager,
+  type EffectLookup,
+  type RewardRow,
+} from "./src/streamer/twitch/rewards/TwitchRewardsManager.ts";
+import { TwitchRewardsError } from "./src/streamer/twitch/rewards/TwitchRewardsClient.ts";
+import type { RedemptionEvent } from "./src/streamer/TwitchChat.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
 import type { EffectEntry } from "./src/effects.ts";
 import { ActivityLog } from "./src/activityLog.ts";
@@ -530,6 +537,12 @@ async function main(): Promise<void> {
         lastSentHandshake = null;
         bridge.rotateOutbound();
       }
+      if (
+        rewardsManager &&
+        (config?.streamer_mode.donation_systems.twitch_points.enabled ?? false)
+      ) {
+        void rewardsManager.setVisible(enabled);
+      }
     });
 
     bridge.on("open_github", () => {
@@ -632,6 +645,83 @@ async function main(): Promise<void> {
       );
     }
   }
+
+  // Twitch Channel Points rewards manager. Active only while a Lua folder is
+  // available; bootstraps from twitch_rewards.json and reconciles against the
+  // user's manageable rewards on Twitch.
+  const rewardsManager = luaFolder ? new TwitchRewardsManager(luaFolder) : null;
+
+  function parseRedemptionNumber(input: string): number | null {
+    const match = input.match(/\d+/);
+    if (!match) return null;
+    const value = Number.parseInt(match[0], 10);
+    return Number.isInteger(value) && value > 0 ? value : null;
+  }
+
+  function buildEffectLookup(effect: EffectEntry, index: number): EffectLookup {
+    return {
+      id: effect.id,
+      numericId: index + 1,
+      enabled: effect.enabled,
+      enabled_donate: effect.enabled_donate,
+      price_group: effect.price_group ?? "",
+    };
+  }
+
+  if (rewardsManager) {
+    rewardsManager.resolver = {
+      resolve: (event, reward) => {
+        const num = parseRedemptionNumber(event.userInput);
+        if (num === null) return null;
+        const effect = effects[num - 1];
+        if (!effect) return null;
+        if (!effect.enabled || !effect.enabled_donate) return null;
+        const group = effect.price_group ?? "";
+        if (!group || !reward.groups.includes(group)) return null;
+        return buildEffectLookup(effect, num - 1);
+      },
+    };
+    rewardsManager.onActivate = (effect, nickname) => {
+      if (!bridge) return;
+      bridge.emit("activate_effects", {
+        effects: [{ id: effect.id, type: "donate", nickname: nickname ?? "" }],
+      });
+      const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
+      const groupEntry = effect.price_group
+        ? priceGroups.find((entry) => entry.group === effect.price_group)
+        : undefined;
+      activityLog.add({
+        type: "donate",
+        effect_id: effect.id,
+        effect_name: getString("effects", effect.id),
+        nickname: nickname ?? "",
+        price: groupEntry ? groupEntry.price : null,
+        price_group: effect.price_group ?? "",
+      });
+    };
+  }
+
+  twitchProvider.onSessionChange = (token, user) => {
+    if (!rewardsManager) return;
+    rewardsManager.setAuth(user?.id ?? null, token);
+    if (token && user) {
+      void rewardsManager.bootstrap();
+    }
+  };
+
+  twitchProvider.setRedemptionScopeReader(
+    () => config?.streamer_mode.donation_systems.twitch_points.enabled ?? false,
+  );
+
+  twitchProvider.onRedemption = (ev: RedemptionEvent) => {
+    if (!rewardsManager) return;
+    void rewardsManager.handleRedemption({
+      redemptionId: ev.id,
+      rewardId: ev.reward.id,
+      userInput: ev.user_input,
+      userName: ev.user_name,
+    });
+  };
 
   if (args.includes("--debug-votes")) {
     startDebugVotes(votingManager);
@@ -800,8 +890,7 @@ async function main(): Promise<void> {
   }
 
   youtubeProvider.setConnectionTypeReader(
-    () =>
-      config?.streamer_mode.youtube_chat_connection_type ?? "long_polling",
+    () => config?.streamer_mode.youtube_chat_connection_type ?? "long_polling",
   );
   await youtubeProvider.initFromStorage();
   if (!youtubeProvider.isAccountConnected()) {
@@ -863,8 +952,7 @@ async function main(): Promise<void> {
             const revealSecret = isRandom && !votingManager.isActive;
             const secretId = votingManager.secretRandomEffectId;
             const hidden = isRandom && votingManager.isActive;
-            const resolvedId =
-              revealSecret && secretId ? secretId : opt.id;
+            const resolvedId = revealSecret && secretId ? secretId : opt.id;
             const effectName = getString("effects", resolvedId);
             const effectEntry = hidden
               ? null
@@ -1099,6 +1187,103 @@ async function main(): Promise<void> {
       youtubeReconnect: async () => {
         await youtubeProvider.restartChat();
         return { success: true };
+      },
+      getTwitchPointsStatus: () => {
+        const enabled =
+          config?.streamer_mode.donation_systems.twitch_points.enabled ?? false;
+        const hasScope = twitchProvider.hasRedemptionScope();
+        return {
+          enabled,
+          twitch_connected: twitchProvider.isAccountConnected(),
+          has_scope: hasScope,
+          has_rewards: rewardsManager?.hasRewards ?? false,
+          rewards: rewardsManager?.list() ?? [],
+          available_groups: (
+            config?.streamer_mode.donate_price_groups ?? []
+          ).map((g) => g.group),
+        };
+      },
+      updateTwitchPointsConfig: async (input: { enabled: boolean }) => {
+        if (!config || !luaFolder) {
+          return { success: false, error: "Config not available" };
+        }
+        const prev =
+          config.streamer_mode.donation_systems.twitch_points.enabled;
+        config.streamer_mode.donation_systems.twitch_points.enabled =
+          input.enabled;
+        saveConfig(luaFolder, config);
+        bridge?.emit("reload_config");
+        if (prev && !input.enabled && rewardsManager) {
+          try {
+            await rewardsManager.deleteAll();
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            logger.warn(`[TwitchPoints] deleteAll on disable failed: ${msg}`);
+          }
+        }
+        return { success: true };
+      },
+      createTwitchPoints: async (rows: RewardRow[]) => {
+        if (!rewardsManager) {
+          return { success: false, error: "Lua folder not available" };
+        }
+        if (!twitchProvider.isAccountConnected()) {
+          return { success: false, error: "Not logged in to Twitch" };
+        }
+        if (!twitchProvider.hasRedemptionScope()) {
+          return {
+            success: false,
+            error:
+              "Missing channel:manage:redemptions scope. Log in to Twitch.",
+          };
+        }
+        rewardsManager.setAuth(
+          twitchProvider.getBroadcasterId(),
+          twitchProvider.getCurrentToken(),
+        );
+        try {
+          await rewardsManager.createAll(rows);
+          if (!modEnabled) {
+            await rewardsManager.setVisible(false);
+          }
+          return { success: true };
+        } catch (err) {
+          if (err instanceof TwitchRewardsError) {
+            return {
+              success: false,
+              error: `${err.status} ${err.twitchMessage}`,
+              status: err.status,
+            };
+          }
+          const msg = err instanceof Error ? err.message : String(err);
+          return { success: false, error: msg };
+        }
+      },
+      deleteTwitchPoints: async () => {
+        if (!rewardsManager) {
+          return { success: false, error: "Lua folder not available" };
+        }
+        if (!twitchProvider.isAccountConnected()) {
+          return { success: false, error: "Not logged in to Twitch" };
+        }
+        rewardsManager.setAuth(
+          twitchProvider.getBroadcasterId(),
+          twitchProvider.getCurrentToken(),
+        );
+        try {
+          await rewardsManager.deleteAll();
+          return { success: true };
+        } catch (err) {
+          if (err instanceof TwitchRewardsError) {
+            return {
+              success: false,
+              error: `${err.status} ${err.twitchMessage}`,
+              status: err.status,
+            };
+          }
+          const msg = err instanceof Error ? err.message : String(err);
+          return { success: false, error: msg };
+        }
       },
       donationAlertsLogin: async () => {
         const appId = daProvider.getAppId();
