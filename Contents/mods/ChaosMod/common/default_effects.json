@@ -1551,7 +1551,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 100,
+            "duration": 70,
             "enabled_donate": true,
             "price_group": "negative_3"
         },

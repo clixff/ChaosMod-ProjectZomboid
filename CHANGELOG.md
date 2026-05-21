@@ -49,6 +49,10 @@
 - "Hide Random Items" and "Hide Player Clothes" effects now do not hide bandages equipped on body parts
 - Updated zombies AI for effect "Zombies Walk Away"
 - The game now stays paused during the reveal in card-select, random-card, and dice-roll effects, and only unpauses after the window closes
+- The Necromancy effect now spawns zombies if the game couldn't find any valid corpse to reanimate, instead of doing nothing
+- "Player Can't Exit Car": change duration from 100s to 70s
+- Toxic Rain no longer damages the player while inside a car, and now damages car parts
+- "Break Nearby Windows" effect now also smashes the windows of nearby cars
 
 [1.1.1]
 

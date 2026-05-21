@@ -5,8 +5,8 @@
 EffectInsanity = ChaosEffectBase:derive("EffectInsanity", "effect_insanity")
 
 local MAX_SPAWNED_ZOMBIES = 30
-local MIN_SPAWN_DISTANCE = 15
-local MAX_SPAWN_DISTANCE = 30
+local MIN_SPAWN_DISTANCE = 6
+local MAX_SPAWN_DISTANCE = 15
 local MIN_DIST_TELEPORT = 4
 local MAX_DIST_TELEPORT = 35
 
@@ -144,7 +144,7 @@ function EffectInsanity.GetRandomLocationForZombie(player)
     local playerSquare = player:getSquare()
     if not playerSquare then return end
 
-    local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, 0, MIN_SPAWN_DISTANCE, MAX_SPAWN_DISTANCE, 50,
+    local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, MIN_SPAWN_DISTANCE, MAX_SPAWN_DISTANCE, 50,
         true, true, false)
 
     if not randomSquare then return end

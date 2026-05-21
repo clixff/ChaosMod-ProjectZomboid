@@ -33,11 +33,11 @@ function EffectNecromancy:OnStart()
     local z = square:getZ()
     local minZ = z - 1
     local maxZ = z + 2
-    local reanimatedCount = 0
+    local companionsCount = 0
 
     ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
-        if not sq or reanimatedCount >= MAX_COMPANIONS then
-            return reanimatedCount >= MAX_COMPANIONS
+        if not sq or companionsCount >= MAX_COMPANIONS then
+            return companionsCount >= MAX_COMPANIONS
         end
 
         local objects = sq:getStaticMovingObjects()
@@ -46,7 +46,7 @@ function EffectNecromancy:OnStart()
         end
 
         for i = 0, objects:size() - 1 do
-            if reanimatedCount >= MAX_COMPANIONS then
+            if companionsCount >= MAX_COMPANIONS then
                 return true
             end
 
@@ -57,15 +57,29 @@ function EffectNecromancy:OnStart()
                 if deadBody.reanimate then
                     local zombie = deadBody:reanimate()
                     if MakeZombieCompanion(zombie) then
-                        reanimatedCount = reanimatedCount + 1
+                        companionsCount = companionsCount + 1
                     end
                 end
             end
         end
 
-        return reanimatedCount >= MAX_COMPANIONS
+        return companionsCount >= MAX_COMPANIONS
     end, 0, SEARCH_RADIUS, false, false, true, minZ, maxZ)
 
-    ChaosPlayer.SayLineByColor(player, string.format("Reanimated %d zombies as companions", reanimatedCount),
+    while companionsCount < MAX_COMPANIONS do
+        local spawnSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 2, 5, 50, true, true, false)
+        if not spawnSquare then break end
+
+        local spawnedZombies = ChaosZombie.SpawnZombieAt(spawnSquare:getX(), spawnSquare:getY(), spawnSquare:getZ(),
+            1, "Tourist", 50)
+        if not spawnedZombies or spawnedZombies:isEmpty() then break end
+
+        local zombie = spawnedZombies:getFirst()
+        zombie:dressInRandomOutfit()
+        if not MakeZombieCompanion(zombie) then break end
+        companionsCount = companionsCount + 1
+    end
+
+    ChaosPlayer.SayLineByColor(player, string.format("Raised %d zombies as companions", companionsCount),
         ChaosPlayerChatColors.green)
 end
