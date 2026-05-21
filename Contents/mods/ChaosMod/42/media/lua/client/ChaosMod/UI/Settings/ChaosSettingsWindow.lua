@@ -155,11 +155,24 @@ function ChaosSettingsWindow:OnSaveClicked()
         self.effectsPanel:CommitWorkingState()
     end
 
+    -- Capture timing values before reload so we can detect changes that require
+    -- restarting the global effects iteration.
+    local prevEffectsInterval = ChaosConfig.effects_interval
+    local prevVoteStartTime = ChaosConfig.vote_start_time
+
     -- Persist working config snapshot to disk, then reload to repopulate ChaosConfig.
     if not ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", self.workingConfig) then
         print("[ChaosSettingsWindow] Failed to write config.json")
     else
         ChaosConfig.LoadConfigFromDisk()
+    end
+
+    -- If the mod is currently running and the interval or vote-start timing changed,
+    -- restart the global iteration so the progress bar reflects the new timing.
+    if ChaosMod.enabled
+        and (ChaosConfig.effects_interval ~= prevEffectsInterval
+            or ChaosConfig.vote_start_time ~= prevVoteStartTime) then
+        ChaosEffectsManager.StartGlobalTimer()
     end
 
     -- Reload language files first so the registry rebuild below picks up the new translations.

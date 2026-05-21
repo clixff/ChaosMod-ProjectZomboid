@@ -14,6 +14,7 @@
 - The recent effects blocklist now persists between game sessions so you don't get the same effects right after restarting the game
 - Added a recommended-values hint under the "Recent effects block buffer" setting in the in-game settings window and StreamerApp dashboard
 - Enemy NPCs now can spawn in player car, and will exit when player exits the car
+- Changing the effects interval or vote start time in the in-game settings now restarts the current iteration so the progress bar reflects the new timing
 
 ### New Effects
 
