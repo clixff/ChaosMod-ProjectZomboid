@@ -57,6 +57,7 @@
 - Toxic Rain no longer damages the player while inside a car, and now damages car parts
 - "Break Nearby Windows" effect now also smashes the windows of nearby cars
 - "Give Katana" effect now equips the katana to both hands of the player
+- "Spawn Trees" effect now lasts 120 seconds and spawns more trees over a wider area; trees are removed when the effect ends, and the player is no longer damaged by car crashes into them while driving
 
 [1.1.1]
 

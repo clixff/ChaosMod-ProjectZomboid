@@ -2096,7 +2096,9 @@
             "id": "spawn_trees",
             "enabled": true,
             "chance": 0.75,
-            "withDuration": false,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": ["spawn_trees"],
             "enabled_donate": true,
             "price_group": "neutral_3"
         },
