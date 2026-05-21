@@ -36,7 +36,8 @@
 - Twitch viewers without a chat color now get a stable color from the chat palette instead of plain white
 - Fixed Japanese translation bug
 - Fixed a bug when players can't press options button using different localizations or screen sizes
-- NPCs now have more damage against zombies
+- NPCs now deal more damage to zombies
+- Fixed game crash that could happen when a vehicle carrying an NPC crashed
 
 ### Effect Fixes
 

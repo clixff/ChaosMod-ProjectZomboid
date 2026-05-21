@@ -183,6 +183,8 @@ function ChaosMod.OnInitWorld()
     ChaosUtils.playerPreviousPositionsSampleMs = 0
     ChaosUtils.playerPreviousPositions = {}
 
+    ChaosUtils.ResetCrashDamageOverride()
+
     LoadSpawnPointFromModData()
 end
 
@@ -286,7 +288,13 @@ function ChaosMod.OnTick()
         ChaosUtils.sleepHandleTick()
         ChaosNPCUtils.OnTick(deltaMs)
         ChaosBridge.Tick(deltaMs)
+        ChaosUtils.UpdateCrashDamageOverride()
     end
+end
+
+---@param player IsoPlayer
+function ChaosMod.OnPlayerDeath(player)
+    ChaosUtils.SetCrashDamageDisabled(false)
 end
 
 function ChaosMod.RegisterBridgeHandlers()
@@ -370,5 +378,6 @@ Events.OnTick.Add(ChaosMod.OnTick)
 Events.OnTick.Add(ChaosMod.OnSpecialAnimalsTick)
 Events.OnZombieDead.Add(ChaosMod.OnZombieDead)
 Events.OnEnterVehicle.Add(ChaosMod.OnEnterVehicle)
+Events.OnPlayerDeath.Add(ChaosMod.OnPlayerDeath)
 
 return ChaosMod

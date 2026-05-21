@@ -9,6 +9,8 @@
 ---@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 2 recorded player world positions, oldest first
 ---@field playerPreviousPositionsSampleMs integer
 ---@field DEBUG_SQUARE_RING_SEARCH boolean -- When true, SquareRingSearchTile_2D prints a per-ring non-null tile count at Z=0
+---@field crashDamage { originalValue: boolean|nil, disabled: boolean } -- Tracks the sandbox PlayerDamageFromCrash override state
+---@field EFFECT_FLYING_CARS_ENABLED boolean -- When true, forces crash damage off regardless of NPC count
 ChaosUtils = ChaosUtils or {
     DEBUG_SQUARE_RING_SEARCH = false,
     lastUsedVehicle = nil,
@@ -19,7 +21,9 @@ ChaosUtils = ChaosUtils or {
     sleepWorldLocation = nil,
     playerSpawnPoint = nil,
     playerPreviousPositions = {},
-    playerPreviousPositionsSampleMs = 0
+    playerPreviousPositionsSampleMs = 0,
+    crashDamage = { originalValue = nil, disabled = false },
+    EFFECT_FLYING_CARS_ENABLED = false
 }
 
 local SLEEP_MOD_DATA_KEY = "ChaosMod_SleepData"
@@ -1153,4 +1157,70 @@ function ChaosUtils.CompareVersions(a, b)
         if pa[i] > pb[i] then return 1 end
     end
     return 0
+end
+
+local function getCrashDamageOption()
+    local opts = SandboxOptions.instance or SandboxOptions.getInstance()
+    if not opts then return nil end
+
+    ---@diagnostic disable-next-line: undefined-field
+    if opts.playerDamageFromCrash then
+        ---@diagnostic disable-next-line: undefined-field
+        return opts.playerDamageFromCrash
+    end
+
+    return opts:getOptionByName("PlayerDamageFromCrash")
+end
+
+--- Disables or restores the PlayerDamageFromCrash sandbox option.
+--- Captures the original value lazily on the first disable call.
+--- No-op when the requested state already matches the cached state.
+---@param disabled boolean
+function ChaosUtils.SetCrashDamageDisabled(disabled)
+    if ChaosUtils.crashDamage.disabled == disabled then return end
+
+    local opt = getCrashDamageOption()
+    if not opt then return end
+
+    if disabled then
+        ChaosUtils.crashDamage.originalValue = opt:getValue()
+        opt:setValue(false)
+        ChaosUtils.crashDamage.disabled = true
+    else
+        local restore = ChaosUtils.crashDamage.originalValue
+        if restore == nil then restore = true end
+        opt:setValue(restore)
+        ChaosUtils.crashDamage.originalValue = nil
+        ChaosUtils.crashDamage.disabled = false
+    end
+end
+
+--- Counts ChaosNPCs currently sitting in any vehicle.
+---@return integer
+function ChaosUtils.CountNPCsInVehicles()
+    local list = ChaosNPCUtils and ChaosNPCUtils.npcList
+    if not list then return 0 end
+    local n = 0
+    for i = 0, list:size() - 1 do
+        local npc = list:get(i)
+        if npc and npc.zombie and npc.zombie:getVehicle() then
+            n = n + 1
+        end
+    end
+    return n
+end
+
+--- Re-evaluates whether the PlayerDamageFromCrash override should be active.
+--- Disables crash damage if any NPC is in a vehicle, or if EFFECT_FLYING_CARS_ENABLED is set.
+function ChaosUtils.UpdateCrashDamageOverride()
+    local shouldDisable = ChaosUtils.EFFECT_FLYING_CARS_ENABLED
+        or ChaosUtils.CountNPCsInVehicles() > 0
+    ChaosUtils.SetCrashDamageDisabled(shouldDisable)
+end
+
+--- Resets crash-damage override state at the start of a new world session.
+function ChaosUtils.ResetCrashDamageOverride()
+    ChaosUtils.EFFECT_FLYING_CARS_ENABLED = false
+    ChaosUtils.crashDamage.originalValue = nil
+    ChaosUtils.crashDamage.disabled = false
 end

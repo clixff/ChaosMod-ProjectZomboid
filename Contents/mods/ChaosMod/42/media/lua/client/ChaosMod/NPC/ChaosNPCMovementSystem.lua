@@ -187,7 +187,6 @@ function ChaosNPC:VehiclesTick()
 
     if zombieVehicle and moveTargetVehicle ~= zombieVehicle then
         zombieVehicle:exit(self.zombie)
-        self.zombie:setGodMod(false, true)
         return
     end
 
@@ -205,13 +204,11 @@ function ChaosNPC:VehiclesTick()
         end
 
         moveTargetVehicle:enter(seat, self.zombie)
-        self.zombie:setGodMod(true, true)
         return
     end
 
     if zombieVehicle ~= nil and self.enemy ~= nil then
         zombieVehicle:exit(self.zombie)
-        self.zombie:setGodMod(false, true)
         return
     end
 end
