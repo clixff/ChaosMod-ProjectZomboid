@@ -459,7 +459,8 @@
         "save": "Kaydet",
         "close": "Kapat",
         "confirm_reset_title": "Varsayılana sıfırlansın mı?",
-        "confirm_reset_text": "Tüm değişiklikler kaybolacak. Devam edilsin mi?"
+        "confirm_reset_text": "Tüm değişiklikler kaybolacak. Devam edilsin mi?",
+        "random_effect_in_vote": "Oylamadaki Bir Efekt Gizli (Rastgele)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Oyuncuyu korumak için bir yoldaş",

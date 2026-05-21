@@ -315,6 +315,15 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setStreamer("hide_votes", v)}
           />
         </FieldRow>
+        <FieldRow
+          label="One effect in vote is hidden (Random)"
+          hint="When on, the last vote option is a hidden Random effect. When off, all options are visible and there is no Random slot."
+        >
+          <Checkbox
+            checked={sm.random_effect_in_vote}
+            onChange={(v) => setStreamer("random_effect_in_vote", v)}
+          />
+        </FieldRow>
         <FieldRow label="Use zombie nicknames">
           <Checkbox
             checked={sm.use_zombie_nicknames}

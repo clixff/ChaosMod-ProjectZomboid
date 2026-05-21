@@ -130,13 +130,18 @@ function ChaosEffectsManager.OnTick(deltaMs)
             local voteStartMs = (ChaosConfig.vote_start_time or 0) * 1000
             if ChaosEffectsManager.globalTimerMs >= voteStartMs then
                 ChaosEffectsManager.voteStartedThisInterval = true
-                local optionsCount = sm.voting_options_number or 4
-                local visibleCount = math.max(0, math.floor(optionsCount) - 1)
+                local optionsCount = math.floor(sm.voting_options_number or 4)
+                local includeRandom = sm.random_effect_in_vote ~= false
+                local visibleCount = includeRandom
+                    and math.max(0, optionsCount - 1)
+                    or math.max(0, optionsCount)
                 local visibleEffects = ChaosEffectsRegistry.GetRandomEffects(visibleCount, "default", true)
-                local secretEffects = ChaosEffectsRegistry.GetRandomEffects(1, "default", false)
                 local payload = { effects = visibleEffects }
-                if secretEffects[1] then
-                    payload.secret_effect = secretEffects[1]
+                if includeRandom then
+                    local secretEffects = ChaosEffectsRegistry.GetRandomEffects(1, "default", false)
+                    if secretEffects[1] then
+                        payload.secret_effect = secretEffects[1]
+                    end
                 end
                 ChaosBridge.Emit("vote_start", payload)
             end

@@ -54,10 +54,12 @@ export class VotingManager {
     this.secretRandomEffect = secretEffectId;
     const knownIds = new Set(this.effects.map((e) => e.id));
     const filteredIds = visibleEffectIds.filter((id) => knownIds.has(id));
-    this.options = [
-      ...filteredIds.map((id) => ({ id, voters: new Set<string>() })),
-      { id: RANDOM_EFFECT_ID, voters: new Set<string>() },
-    ];
+    const includeRandom =
+      this.config.streamer_mode.random_effect_in_vote !== false;
+    this.options = filteredIds.map((id) => ({ id, voters: new Set<string>() }));
+    if (includeRandom) {
+      this.options.push({ id: RANDOM_EFFECT_ID, voters: new Set<string>() });
+    }
     this.active = true;
     logger.debug(
       `Voting started (options: ${this.options.map((o) => o.id).join(", ")}, secret: ${secretEffectId ?? "none"})`,

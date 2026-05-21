@@ -311,6 +311,14 @@ function ChaosSettingsConfigPanel:rebuild()
     table.insert(children, self.controls.hide_votes)
     y = y + rowH + rowGap
 
+    addLabelled("random_effect_in_vote")
+    self.controls.random_effect_in_vote = W.MakeCheckbox(self, controlX, y, "", sm.random_effect_in_vote ~= false,
+        function(c)
+            sm.random_effect_in_vote = c
+        end)
+    table.insert(children, self.controls.random_effect_in_vote)
+    y = y + rowH + rowGap
+
     -- ---------- Donate Groups ----------
     addHeader("section_donate_groups")
     if type(sm.donate_price_groups) ~= "table" then

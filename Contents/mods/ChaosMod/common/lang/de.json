@@ -459,7 +459,8 @@
         "save": "Speichern",
         "close": "Schließen",
         "confirm_reset_title": "Auf Standard zurücksetzen?",
-        "confirm_reset_text": "Alle Änderungen gehen verloren. Fortfahren?"
+        "confirm_reset_text": "Alle Änderungen gehen verloren. Fortfahren?",
+        "random_effect_in_vote": "Ein Effekt in der Abstimmung ist versteckt (Zufällig)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Ein Begleiter zum Schutz des Spielers",

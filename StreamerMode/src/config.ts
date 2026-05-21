@@ -54,6 +54,7 @@ export interface StreamerModeConfig {
   allow_vote_command: boolean;
   hide_votes: boolean;
   youtube_chat_connection_type: "long_polling" | "message_streaming";
+  random_effect_in_vote: boolean;
 }
 
 export interface ModConfig {
@@ -160,6 +161,7 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   allow_vote_command: true,
   hide_votes: false,
   youtube_chat_connection_type: "long_polling",
+  random_effect_in_vote: true,
 };
 
 const DEFAULT_CONFIG: ModConfig = {
@@ -316,6 +318,10 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
       raw["youtube_chat_connection_type"] === "message_streaming"
         ? "message_streaming"
         : "long_polling",
+    random_effect_in_vote: bool(
+      raw["random_effect_in_vote"],
+      d.random_effect_in_vote,
+    ),
   };
 }
 

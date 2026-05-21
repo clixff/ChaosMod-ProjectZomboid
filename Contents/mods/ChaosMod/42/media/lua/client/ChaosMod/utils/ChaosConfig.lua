@@ -18,6 +18,7 @@
 ---@field hide_votes boolean
 ---@field render_chat_messages boolean
 ---@field use_animals_nicknames boolean
+---@field random_effect_in_vote boolean -- if true, one of the vote options is a hidden "Random" effect
 
 ---@class ChaosConfigUI
 ---@field progress_bar_color string
@@ -122,6 +123,7 @@ ChaosConfig = ChaosConfig or {
         hide_votes = false,
         render_chat_messages = true,
         use_animals_nicknames = true,
+        random_effect_in_vote = true,
     }
 }
 
@@ -378,6 +380,10 @@ function ChaosConfig.LoadConfigFromDisk()
         if type(configData.streamer_mode.use_animals_nicknames) == "boolean" then
             ChaosConfig.streamer_mode.use_animals_nicknames = configData.streamer_mode.use_animals_nicknames
         end
+        -- If one of the vote options is a hidden "Random" effect
+        if type(configData.streamer_mode.random_effect_in_vote) == "boolean" then
+            ChaosConfig.streamer_mode.random_effect_in_vote = configData.streamer_mode.random_effect_in_vote
+        end
         -- Donate price groups
         if type(configData.streamer_mode.donate_price_groups) == "table" then
             local groups = {}
@@ -523,6 +529,7 @@ function ChaosConfig.BuildJsonSnapshot()
             donate_price_groups = groups,
             allow_vote_command = sm.allow_vote_command,
             hide_votes = sm.hide_votes,
+            random_effect_in_vote = sm.random_effect_in_vote,
         },
     }
 end

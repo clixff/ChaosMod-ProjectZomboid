@@ -459,7 +459,8 @@
         "save": "Сохранить",
         "close": "Закрыть",
         "confirm_reset_title": "Сбросить к настройкам по умолчанию?",
-        "confirm_reset_text": "Все изменения будут потеряны. Продолжить?"
+        "confirm_reset_text": "Все изменения будут потеряны. Продолжить?",
+        "random_effect_in_vote": "Один эффект в голосовании скрыт (Случайный)"
     },
     "export": {
         "title": "Chaos Mod Project Zomboid",

@@ -459,7 +459,8 @@
         "save": "Save",
         "close": "Close",
         "confirm_reset_title": "Reset to Defaults?",
-        "confirm_reset_text": "All custom changes will be lost. Continue?"
+        "confirm_reset_text": "All custom changes will be lost. Continue?",
+        "random_effect_in_vote": "One Effect In Vote Is Hidden (Random)"
     },
     "export": {
         "title": "Chaos Mod Project Zomboid",

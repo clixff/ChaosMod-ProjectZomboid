@@ -51,6 +51,7 @@ export interface StreamerModeConfig {
   allow_vote_command: boolean;
   hide_votes: boolean;
   youtube_chat_connection_type: "long_polling" | "message_streaming";
+  random_effect_in_vote: boolean;
 }
 
 export interface ModConfig {

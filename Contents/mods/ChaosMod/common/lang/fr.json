@@ -459,7 +459,8 @@
         "save": "Enregistrer",
         "close": "Fermer",
         "confirm_reset_title": "Réinitialiser aux valeurs par défaut ?",
-        "confirm_reset_text": "Toutes les modifications seront perdues. Continuer ?"
+        "confirm_reset_text": "Toutes les modifications seront perdues. Continuer ?",
+        "random_effect_in_vote": "Un effet du vote est caché (Aléatoire)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Un compagnon pour protéger le joueur",

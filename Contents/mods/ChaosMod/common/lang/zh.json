@@ -459,7 +459,8 @@
         "save": "保存",
         "close": "关闭",
         "confirm_reset_title": "重置为默认?",
-        "confirm_reset_text": "所有更改将丢失。是否继续?"
+        "confirm_reset_text": "所有更改将丢失。是否继续?",
+        "random_effect_in_vote": "投票中有一个效果被隐藏（随机）"
     },
     "descriptions": {
         "spawn_friendly_npc": "保护玩家的同伴",
