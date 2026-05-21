@@ -4,7 +4,7 @@ import {
   parseCreateBody,
   publicConfigSelect,
   supabase,
-} from "../_lib/sharedConfigs.ts";
+} from "../_lib/sharedConfigs.js";
 
 export default async function handler(
   req: VercelRequest,

@@ -6,7 +6,7 @@ import {
   publicConfigSelect,
   supabase,
   type UpdateSharedConfigBody,
-} from "../_lib/sharedConfigs.ts";
+} from "../_lib/sharedConfigs.js";
 
 function buildUpdatePatch(
   body: UpdateSharedConfigBody,
