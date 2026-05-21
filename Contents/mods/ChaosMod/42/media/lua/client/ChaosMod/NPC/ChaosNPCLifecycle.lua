@@ -35,6 +35,8 @@ function ChaosNPC:initializeHuman(shouldHumanize)
 
     self:DisableZombieVoice()
 
+    self:SetHealthGroup(self.healthGroup or CHAOS_NPC_HEALTH_GROUP.DEFAULT)
+
     ChaosNPCUtils.npcList:add(self)
 end
 
@@ -361,5 +363,19 @@ function ChaosNPC:SetWeapon(weaponFullType)
             ---@diagnostic disable-next-line: param-type-mismatch
             self.zombie:setSecondaryHandItem(nil)
         end
+    end
+end
+
+---@param group integer
+function ChaosNPC:SetHealthGroup(group)
+    if not self.zombie then return end
+
+    if self.healthGroup == CHAOS_NPC_HEALTH_GROUP.STRONG then
+        local health = ChaosUtils.RandFloat(3.5, 5.0)
+        self.zombie:setHealth(health)
+    elseif self.healthGroup == CHAOS_NPC_HEALTH_GROUP.WEAK then
+        self.zombie:setHealth(ChaosUtils.RandFloat(0.5, 1.2))
+    else
+        self.zombie:setHealth(ChaosUtils.RandFloat(1.5, 3.0))
     end
 end

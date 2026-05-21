@@ -29,6 +29,7 @@ function EffectDoppelganger:OnStart()
 
 
     local npc = ChaosNPC:new(zombie)
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc:initializeHuman()
 
     ChaosZombie.CopyCharacterVisualsAndClothes(player, zombie)

@@ -14,6 +14,7 @@ local function MakeZombieCompanion(zombie)
     ---@cast zombie IsoZombie
     local npc = ChaosNPC:new(zombie)
     npc:initializeHuman(false)
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
     return true
 end

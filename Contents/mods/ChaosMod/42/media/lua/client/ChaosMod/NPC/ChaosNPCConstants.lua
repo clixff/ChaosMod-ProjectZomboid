@@ -47,6 +47,12 @@ CHAOS_NPC_ATTACK_GROUND = {
     TWO_HAND = "ZombieAttack_Ground_Melee2",
 }
 
+CHAOS_NPC_HEALTH_GROUP = {
+    DEFAULT = 0,
+    STRONG = 1,
+    WEAK = 2
+}
+
 ---@type table<integer, string>
 CHAOS_NPC_WINDOW_VEHICLE_PART_BY_SEAT = {
     "WindowFrontLeft",

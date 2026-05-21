@@ -106,6 +106,7 @@ function EffectSpawnDoctor:OnStart()
 
     local npc = ChaosNPC:new(zombie)
     npc:initializeHuman()
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.WEAK)
     npc.npcGroup = ChaosNPCGroupID.FOLLOWERS
 
     ChaosZombie.HumanizeZombie(zombie)

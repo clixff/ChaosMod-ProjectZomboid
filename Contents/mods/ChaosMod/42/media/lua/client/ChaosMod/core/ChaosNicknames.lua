@@ -532,7 +532,7 @@ function ChaosNicknames.RenderNickname(zombie)
     end
 
     local health = zombie:getHealth()
-    local nicknameString = string.format("%s %f", name, health)
+    local nicknameString = string.format("%s", name)
     trackZombieLabel(zombie)
 
     -- Show nickname for visible zombies

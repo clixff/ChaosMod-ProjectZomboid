@@ -1,6 +1,6 @@
 EffectCureZombiesNearby = ChaosEffectBase:derive("EffectCureZombiesNearby", "cure_zombies_nearby")
 
-local RADIUS = 12
+local RADIUS = 30
 
 function EffectCureZombiesNearby:OnStart()
     ChaosEffectBase:OnStart()
