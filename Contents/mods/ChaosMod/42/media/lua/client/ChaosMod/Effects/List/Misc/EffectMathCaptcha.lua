@@ -58,12 +58,12 @@ function EffectMathCaptcha.applyCorrectAnswer()
 end
 
 function EffectMathCaptcha:OnEnd()
-    setGameSpeed(1)
-
     if self.captchaWindow and not self.captchaWindow.resolved then
         self.captchaWindow.resolved = true
         self.captchaWindow:setVisible(false)
         self.captchaWindow:removeFromUIManager()
     end
     self.captchaWindow = nil
+
+    setGameSpeed(1)
 end

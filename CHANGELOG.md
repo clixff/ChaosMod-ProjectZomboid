@@ -48,6 +48,7 @@
 - Fixed "Player Can't Stop Coughing" effect not ending after duration
 - "Hide Random Items" and "Hide Player Clothes" effects now do not hide bandages equipped on body parts
 - Updated zombies AI for effect "Zombies Walk Away"
+- The game now stays paused during the reveal in card-select, random-card, and dice-roll effects, and only unpauses after the window closes
 
 [1.1.1]
 

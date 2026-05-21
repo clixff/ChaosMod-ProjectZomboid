@@ -51,12 +51,12 @@ function EffectRememberCode.applyCorrectAnswer()
 end
 
 function EffectRememberCode:OnEnd()
-    setGameSpeed(1)
-
     if self.rememberCodeWindow and not self.rememberCodeWindow.resolved then
         self.rememberCodeWindow.resolved = true
         self.rememberCodeWindow:setVisible(false)
         self.rememberCodeWindow:removeFromUIManager()
     end
     self.rememberCodeWindow = nil
+
+    setGameSpeed(1)
 end

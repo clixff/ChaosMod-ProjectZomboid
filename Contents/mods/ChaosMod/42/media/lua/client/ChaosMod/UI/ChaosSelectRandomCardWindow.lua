@@ -4,6 +4,7 @@ require "ISUI/ISButton"
 ---@class ChaosCardSelectEffect : ChaosEffectBase
 ---@field selectedCardIndex integer | nil
 ---@field onCardSelected fun(self: ChaosCardSelectEffect, cardIndex: integer)
+---@field tickRevealPhase fun(self: ChaosCardSelectEffect) | nil
 
 ---@class ChaosSelectRandomCardWindow : ISPanel
 ---@field effect ChaosCardSelectEffect
@@ -89,6 +90,10 @@ end
 
 function ChaosSelectRandomCardWindow:prerender()
     ISPanel.prerender(self)
+
+    if not self.resolved and self.effect and self.effect.tickRevealPhase then
+        self.effect:tickRevealPhase()
+    end
 
     local title = self.title or "Select a card"
     local titleX = math.floor((WINDOW_W - getTextManager():MeasureStringX(UIFont.Large, title)) / 2)

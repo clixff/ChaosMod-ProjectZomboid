@@ -147,6 +147,8 @@ end
 
 function EffectRollDice:OnEnd()
     ChaosEffectBase:OnEnd()
+
+    self:closeWindow()
     setGameSpeed(1)
 
     if self.rollDicePhase ~= "completed" then
@@ -156,6 +158,4 @@ function EffectRollDice:OnEnd()
             ChaosEffectsManager.StartEffect(fallback, self.effectNickname, self.activationType)
         end
     end
-
-    self:closeWindow()
 end

@@ -33,7 +33,7 @@ function EffectSelectRandomCard:activateRandomCardEffect()
 
     self.selectedCardIndex = randomIndex
     self.selectedEffectId = effectId
-    ChaosEffectsManager.StartEffect(effectId, self.effectNickname, self.activationType)
+    ChaosEffectsManager.DisableSpecificEffects({ "select_random_card" })
 end
 
 function EffectSelectRandomCard:OnStart()
@@ -62,10 +62,6 @@ function EffectSelectRandomCard:onCardSelected(cardIndex)
     self.selectedCardIndex = cardIndex
     self.selectedEffectId = self.cardEffectIds[cardIndex]
     self.revealEndTimeMs = getTimestampMs() + 3000
-
-    setGameSpeed(1)
-
-    ChaosEffectsManager.StartEffect(self.selectedEffectId, self.effectNickname, self.activationType)
 end
 
 ---@param deltaMs integer
@@ -75,22 +71,31 @@ function EffectSelectRandomCard:OnTick(deltaMs)
         return
     end
 
-    if not self.revealEndTimeMs then
-        return
-    end
+    self:tickRevealPhase()
+end
+
+--- Drives the reveal-end check from the window's prerender so it advances
+--- while the game is paused via setGameSpeed(0).
+function EffectSelectRandomCard:tickRevealPhase()
+    if not self.revealEndTimeMs then return end
 
     if getTimestampMs() >= self.revealEndTimeMs then
+        self.revealEndTimeMs = nil
         ChaosEffectsManager.DisableSpecificEffects({ "select_random_card" })
     end
 end
 
 function EffectSelectRandomCard:OnEnd()
-    setGameSpeed(1)
-
     if self.selectRandomCardWindow and not self.selectRandomCardWindow.resolved then
         self.selectRandomCardWindow.resolved = true
         self.selectRandomCardWindow:setVisible(false)
         self.selectRandomCardWindow:removeFromUIManager()
     end
     self.selectRandomCardWindow = nil
+
+    setGameSpeed(1)
+
+    if self.selectedEffectId then
+        ChaosEffectsManager.StartEffect(self.selectedEffectId, self.effectNickname, self.activationType)
+    end
 end

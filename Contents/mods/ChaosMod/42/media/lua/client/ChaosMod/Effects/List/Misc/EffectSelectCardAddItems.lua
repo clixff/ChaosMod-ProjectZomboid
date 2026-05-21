@@ -81,8 +81,6 @@ function EffectSelectCardAddItems:onCardSelected(cardIndex)
     self.selectedCardIndex = cardIndex
     self.revealEndTimeMs = getTimestampMs() + 3000
 
-    setGameSpeed(1)
-
     local player = getPlayer()
     if not player then return end
 
@@ -103,16 +101,22 @@ function EffectSelectCardAddItems:OnTick(deltaMs)
         return
     end
 
+    self:tickRevealPhase()
+end
+
+--- Drives the reveal-end check from the window's prerender so it advances
+--- while the game is paused via setGameSpeed(0).
+function EffectSelectCardAddItems:tickRevealPhase()
     if not self.revealEndTimeMs then return end
 
     if getTimestampMs() >= self.revealEndTimeMs then
+        self.revealEndTimeMs = nil
         ChaosEffectsManager.DisableSpecificEffects({ "select_card_add_items" })
     end
 end
 
 function EffectSelectCardAddItems:OnEnd()
     ChaosEffectBase:OnEnd()
-    setGameSpeed(1)
 
     if self.selectRandomCardWindow and not self.selectRandomCardWindow.resolved then
         self.selectRandomCardWindow.resolved = true
@@ -120,4 +124,6 @@ function EffectSelectCardAddItems:OnEnd()
         self.selectRandomCardWindow:removeFromUIManager()
     end
     self.selectRandomCardWindow = nil
+
+    setGameSpeed(1)
 end
