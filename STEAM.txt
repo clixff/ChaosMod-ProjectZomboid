@@ -1,6 +1,6 @@
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_01.png[/img]
 
-[b]A single-player Chaos Mod v1.1.1 for Project Zomboid B42 with Twitch integration.[/b]
+[b]A single-player Chaos Mod v1.1.1 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
 
 This mod triggers a random effect every 45 seconds. There are currently [b]310+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
 
@@ -8,13 +8,17 @@ This mod triggers a random effect every 45 seconds. There are currently [b]310+ 
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_02.png[/img]
 
-[h3]v1.1.1[/h3]
+[h3]v1.1.2[/h3]
 
 [list]
-[*]Update to game version 42.18.0
-[*]Bug Fixes
-[*]Korean and Japanese translation
-[*]Updated effect chances
+[*] Bug fixes for many effects and crashes
+[*] YouTube Live Integration (Experimental)
+[*] Twitch Bits Donation System (Experimental)
+[*] Twitch Channel Point Rewards (Experimental)
+[*] New Chaos Project Hud WebApp with shared configs 
+[*] Recent Effects Blocklist preserves between sessions
+[*] N+ new effects
+
 [/list]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_03.png[/img]
@@ -36,16 +40,15 @@ This mod [b]will not[/b] work in multiplayer[/quote]
 [*]Turn Power Off
 [/list]
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_google_sheets.png[/img]
-
-Full list of effects: [url=https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I]Google Sheets[/url]
+Full list of effects: [url=https://chaos-zomboid.com/effects]Chaos Mod Hub[/url]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_twitch.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_youtube.png[/img]
 
 Viewers can vote for the next effect, and Twitch or YouTube nicknames can appear above zombies.
 To enable Twitch or YouTube support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
 
-You can also activate effects with donations through [b]Twitch Bits[/b] or [b]DonationAlerts[/b]. Viewers cheer or donate with an effect ID in the message to trigger that specific effect.
+You can also activate effects with donations through [b]Twitch Bits[/b], [b]Twitch Channel Point Rewards[/b] or [b]DonationAlerts[/b]. Viewers cheer or donate with an effect ID in the message to trigger that specific effect.
 
 You can read more about Twitch, YouTube, and donation integration on the mod's GitHub page.
 
@@ -59,8 +62,7 @@ You can edit the mod settings (effect interval time, vote start time, effect set
 A: Make sure you are using the unstable branch of Project Zomboid on Steam.
 
 
-
-[b]Q: How can to disable some effect or change effect settings?[/b]
+[b]Q: How to disable some effect or change effect settings?[/b]
 A: You can edit settings of every effect in the mod settings windows (bottom-left corner)
 
 [b]Q: I only want to display Twitch or YouTube nicknames above zombies, without random effects and without voting. How can I do this?[/b]
@@ -150,3 +152,4 @@ This mod will likely not work with mods that change zombie AI or add NPCs to the
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_11.png[/img]
 
 [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Repository[/url]
+[url=https://chaos-zomboid.com/effects]Effects List[/url]

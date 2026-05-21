@@ -1054,22 +1054,26 @@ function EffectRowView({
                 {row.duration}s
               </span>
             ) : null}
-            {!row.enabled ? (
-              <span className="effect-badge effect-badge--disabled">
-                Effect disabled
-              </span>
-            ) : null}
-            {donationDisabled && row.enabled ? (
-              <span className="effect-badge effect-badge--disabled">
-                Donations disabled
-              </span>
-            ) : null}
-            {beyondLast ? (
-              <span className="effect-badge effect-badge--disabled">
-                Not in v{sharedConfig?.mod_version}
-              </span>
-            ) : null}
           </div>
+          {!row.enabled || donationDisabled || beyondLast ? (
+            <div className="effect-badges-row">
+              {!row.enabled ? (
+                <span className="effect-badge effect-badge--disabled">
+                  Effect disabled
+                </span>
+              ) : null}
+              {donationDisabled && row.enabled ? (
+                <span className="effect-badge effect-badge--disabled">
+                  Donations disabled
+                </span>
+              ) : null}
+              {beyondLast ? (
+                <span className="effect-badge effect-badge--disabled">
+                  Not in v{sharedConfig?.mod_version}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
         </td>
         <td className="col-desc col-desktop-only">
           <div className="effect-desc-clamp">{row.description || ""}</div>
@@ -1083,11 +1087,15 @@ function EffectRowView({
         </td>
         {showPriceCol ? (
           <td className="col-price">
-            {formatPriceWithCurrency(row.price, currencyCode)}
+            {row.enabledDonate
+              ? formatPriceWithCurrency(row.price, currencyCode)
+              : ""}
           </td>
         ) : null}
         {showBitsCol ? (
-          <td className="col-bits">{formatBits(row.twitchBits)}</td>
+          <td className="col-bits">
+            {row.enabledDonate ? formatBits(row.twitchBits) : ""}
+          </td>
         ) : null}
         <td className="col-actions">
           <button
@@ -1143,7 +1151,7 @@ function EffectRowView({
                     </span>
                   </div>
                 ) : null}
-                {showPriceCol ? (
+                {showPriceCol && row.enabledDonate ? (
                   <div className="effect-expand-meta-item">
                     <span className="effect-expand-label">{labels.price}</span>
                     <span className="effect-expand-value">
@@ -1151,7 +1159,7 @@ function EffectRowView({
                     </span>
                   </div>
                 ) : null}
-                {showBitsCol ? (
+                {showBitsCol && row.enabledDonate ? (
                   <div className="effect-expand-meta-item">
                     <span className="effect-expand-label">
                       {labels.twitchBits}
@@ -1193,10 +1201,13 @@ function ActivationBlocks({
   const bits = row.twitchBits;
   const price = row.price;
   const effectNumber = row.numericId;
-  const showBits = visibility.showBitsActivation && bits != null;
+  const showBits =
+    visibility.showBitsActivation && bits != null && row.enabledDonate;
   const showPoints = visibility.showPointsActivation && rewardName != null;
   const showDonationAlerts =
-    visibility.showDonationAlertsActivation && price != null;
+    visibility.showDonationAlertsActivation &&
+    price != null &&
+    row.enabledDonate;
   if (!showBits && !showPoints && !showDonationAlerts) return null;
   return (
     <div className="effect-activation-list">

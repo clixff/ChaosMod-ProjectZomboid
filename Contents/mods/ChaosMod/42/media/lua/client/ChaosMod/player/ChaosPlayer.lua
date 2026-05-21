@@ -259,7 +259,7 @@ function ChaosPlayer.RecursiveInventoryLookup(inventory, useDeepLookup, skipCont
     --- backward loop
     for i = items:size() - 1, 0, -1 do
         local item = items:get(i)
-        if item then
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             local isContainer = item:IsInventoryContainer()
             local shouldCallFunc = true
             if skipContainers and isContainer then

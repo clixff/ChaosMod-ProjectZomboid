@@ -1243,6 +1243,17 @@ input:focus-visible {
   margin-top: 8px;
 }
 
+.effect-badges-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.effect-badges-row:empty {
+  display: none;
+}
+
 .effect-meta-chip {
   display: inline-flex;
   align-items: center;

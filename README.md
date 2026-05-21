@@ -14,7 +14,7 @@ The mod currently includes **310+ effects**, such as:
 - Give Random Tool
 - Enable Rain
 
-You can see the the full list of effects in [Google Sheets](https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I).
+You can see the the full list of effects in [Chaos Mod Hub](https://chaos-zomboid.com/effects) or [Google Sheets](https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I).
 
 Chaos Mod also supports Twitch and YouTube integration. Viewers can vote for the next effect, and their nicknames can be displayed above zombies.
 
@@ -115,6 +115,7 @@ This feature uses the same **StreamerApp** that is used for streaming services s
 Currently supported donation services:
 
 - **Twitch Bits**
+- **Twitch Channel Points Rewards**
 - **DonationAlerts**
 
 Viewers can activate effects by donating a specific amount of money (or cheering with bits on Twitch) and including an effect ID in their donation message.
@@ -135,10 +136,6 @@ Hello! №41
 Hello! 22
 ```
 
-### DonationAlerts Setup
-
-You can set up DonationAlerts in the StreamerApp dashboard.
-
 ### Twitch Bits Setup
 
 You can enable Twitch Bits in the StreamerApp dashboard. You must be logged in to Twitch first.
@@ -147,7 +144,20 @@ Viewers cheer with bits and include an effect ID in the cheer message — the sa
 
 The amount of bits required to activate an effect is calculated from the effect's price group price multiplied by the Twitch Bits multiplier (configured in the dashboard, default is `100`). For example, an effect with price `2` and multiplier `100` requires at least `200` bits.
 
+### Twitch Channel Points Rewards Setup
+
+You can enable Twitch Bits in the StreamerApp dashboard.
+You can create rewards for each Tier of Price group of effects.
+
+### DonationAlerts Setup
+
+You can set up DonationAlerts in the StreamerApp dashboard.
+
 ### Donation Prices Export
+
+Use "Export To Hub" in component to get unique URL for all your settings. You can share that link.
+
+#### Excel export
 
 You can export donation prices to a XLSX file on StreamerApp dashboard. The XLSX includes a `Price` column when DonationAlerts is enabled and a `Twitch Bits` column when Twitch Bits is enabled.
 
