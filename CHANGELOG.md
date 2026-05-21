@@ -15,6 +15,7 @@
 - Added a recommended-values hint under the "Recent effects block buffer" setting in the in-game settings window and StreamerApp dashboard
 - Enemy NPCs now can spawn in player car, and will exit when player exits the car
 - Changing the effects interval or vote start time in the in-game settings now restarts the current iteration so the progress bar reflects the new timing
+- NPCs now have a chance to drop their weapon on death (40%), and always drop it if they picked it up from the ground
 
 ### New Effects
 

@@ -192,6 +192,8 @@ function ChaosNPC:pickGroundItemToPrimary(worldObj)
         md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] = nil
     end
 
+    self.chanceToDropWeaponOnDeath = 1.0
+
     return item
 end
 
@@ -281,8 +283,38 @@ function ChaosNPC:Destroy()
     end
 end
 
+function ChaosNPC:TryDropWeaponOnDeath()
+    if not self.zombie then return end
+
+    local weapon = self.weaponItemCached
+    if not weapon then return end
+    if weapon:getFullType() == "Base.BareHands" then return end
+
+    local chance = self.chanceToDropWeaponOnDeath or 0.0
+    if chance <= 0.0 or ChaosUtils.RandFloat(0.0, 1.0) > chance then
+        return
+    end
+
+    local square = self.zombie:getSquare()
+    if not square then return end
+
+    local inventory = self.zombie:getInventory()
+    if inventory and inventory:contains(weapon) then
+        inventory:Remove(weapon)
+    end
+
+    ---@diagnostic disable-next-line: param-type-mismatch
+    self.zombie:setPrimaryHandItem(nil)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    self.zombie:setSecondaryHandItem(nil)
+
+    square:AddWorldInventoryItem(weapon, 0.5, 0.5, 0)
+end
+
 function ChaosNPC:OnZombieDead()
     if self.zombie then
+        self:TryDropWeaponOnDeath()
+
         local md = self.zombie:getModData()
         if md then
             md[CHAOS_NPC_MOD_DATA_KEY] = nil

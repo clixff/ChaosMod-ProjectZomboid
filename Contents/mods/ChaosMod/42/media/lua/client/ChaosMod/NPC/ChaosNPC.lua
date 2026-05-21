@@ -53,6 +53,7 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field stalkerInteractionCount integer
 ---@field effectMoveTargetLocation? IsoGridSquare
 ---@field healthGroup? integer
+---@field chanceToDropWeaponOnDeath number
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -107,6 +108,7 @@ function ChaosNPC:new(zombie)
     o.stalkerInteractionCount = 0
     o.effectMoveTargetLocation = nil
     o.healthGroup = CHAOS_NPC_HEALTH_GROUP.DEFAULT
+    o.chanceToDropWeaponOnDeath = 0.4
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o
