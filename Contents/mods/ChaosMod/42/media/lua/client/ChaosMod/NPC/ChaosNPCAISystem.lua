@@ -62,6 +62,33 @@ function ChaosNPC:update(deltaMs)
     end
 
     local actionState = zombie:getActionStateName()
+
+    if self.lastZombieBiteTimeMs then
+        local timeSinceBiteMs = timestampMs - self.lastZombieBiteTimeMs
+        if timeSinceBiteMs > 800 and actionState == "idle" then
+            zombie:setStaggerBack(false)
+            zombie:setHitReaction("")
+            zombie:setBumpType("")
+            self.isAttacking = false
+            self.attackAnimTimeMs = 0
+            self.attackAnimWindowMs = 0
+            self.attackAnimName = nil
+            self.attackHitPassed = false
+            self:StopMoving(true, "recover_from_zombie_bite_idle")
+
+            if self.enemy and self.enemy:isAlive() then
+                self.moveTargetCharacter = nil
+                self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
+                self:SetAsTargetEnemy(self.enemy)
+            end
+
+            self.lastZombieBiteTimeMs = nil
+            actionState = zombie:getActionStateName()
+        elseif timeSinceBiteMs > 5000 then
+            self.lastZombieBiteTimeMs = nil
+        end
+    end
+
     if actionState == "lunge" then
         zombie:setUseless(true)
         zombie:clearAggroList()

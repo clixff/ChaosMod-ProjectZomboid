@@ -40,6 +40,7 @@
 - Fixed game crash that could happen when a vehicle carrying an NPC crashed
 - Spawned zombies now respect player's Sandbox setting and spawn with random health instead of 1.00
 - NPCs now have different health groups (weak, default, strong) that determine their max health level
+- Fixed NPCs AI against zombies
 
 ### Effect Fixes
 

@@ -208,21 +208,18 @@ function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
                 targetZombie:addBlood(BloodBodyPartType.Torso_Upper,
                     true, true, false)
 
-                -- targetZombie:changeState(ZombieHitReactionState.instance())
-                local isBehind = zombie:isBehind(targetZombie)
-                targetZombie:setHitFromBehind(isBehind)
-                targetZombie:setHitReaction("Bite")
-                targetZombie:setVariable("hitreaction", "Bite")
-                -- targetZombie:setVariable("hashitreaction", true)
-                targetZombie:reportEvent("wasHit")
-                targetZombie:setHitForce(1.0)
+                if targetZombie:isAlive() then
+                    local isBehind = zombie:isBehind(targetZombie)
+                    targetZombie:setHitFromBehind(isBehind)
+                    targetZombie:setHitForce(0.5)
+                    -- Do not force a manual StaggerBackState here. Hit() already reports "wasHit"
+                    -- and sets the zombie hit/stagger variables; forcing the state can leave NPC AI idle-locked.
 
-                ---@diagnostic disable-next-line: param-type-mismatch
-                targetZombie:setPlayerAttackPosition(isBehind and "BEHIND" or nil)
-                -- local state = targetZombie:tryGetAIState("hitreaction-hit")
-                -- if state then
-                -- end
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    targetZombie:setPlayerAttackPosition(isBehind and "BEHIND" or nil)
+                end
 
+                target.lastZombieBiteTimeMs = ChaosMod.lastTimeTickMs
                 target:OnZombieDamagedNPC(zombie)
             end
 

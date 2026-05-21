@@ -222,8 +222,6 @@ function ChaosNPC:OnAttackEnemyHit()
         return
     end
 
-    local fakeAttacker = getFakeAttacker()
-
     enemy:setAttackedBy(zombie)
     local minDamage = self.weaponItemCached:getMinDamage()
     local maxDamage = self.weaponItemCached:getMaxDamage()
@@ -296,9 +294,31 @@ function ChaosNPC:OnAttackEnemyHit()
     if enemy:isZombie() then
         ---@type table<integer, string>
         local hitReactions = { "HeadLeft", "HeadRight", "HeadTop" }
-        fakeAttacker:setVariable("ZombieHitReaction", hitReactions[ChaosUtils.RandArrayIndex(hitReactions)])
+        zombie:setVariable("ZombieHitReaction", hitReactions[ChaosUtils.RandArrayIndex(hitReactions)])
         enemy:Hit(self.weaponItemCached, zombie, damage, false, 1.0)
+        zombie:clearVariable("ZombieHitReaction")
         enemy:playSound(self.weaponItemCached:getZombieHitSound())
+
+        ---@type IsoZombie
+        local enemyZombie = enemy
+        local enemyModData = enemyZombie:getModData()
+        if enemyModData then
+            local biteData = enemyModData["ZombieAttackBiteData"]
+            if biteData and biteData.target == self then
+                enemyModData["ZombieAttackBiteData"] = nil
+            end
+        end
+
+        enemyZombie:clearVariable("AttackDidDamage")
+        enemyZombie:clearVariable("ZombieBiteDone")
+        enemyZombie:setAttackOutcome("interrupted")
+        enemyZombie:setBumpType("")
+
+        if enemyZombie:isAlive() and not enemyZombie:isKnockedDown() then
+            enemyZombie:setHitForce(0.5)
+            enemyZombie:setStaggerBack(true)
+            enemyZombie:changeState(StaggerBackState.instance())
+        end
 
         if enemy:isAlive() and ChaosUtils.RandFloat(0, 100) < chanceToKnockDown and not enemy:isKnockedDown() then
             ---@type IsoZombie
@@ -514,7 +534,19 @@ function ChaosNPC:OnZombieDamagedNPC(otherZombie)
 
     local zombie = self.zombie
     if zombie:isDead() or otherZombie:isDead() then return end
-    if otherZombie == zombie or otherZombie == self.enemy or self.isAttacking then return end
+    if otherZombie == zombie then return end
+
+    if self.isAttacking then
+        self.isAttacking = false
+        self.attackAnimTimeMs = 0
+        self.attackAnimWindowMs = 0
+        self.attackAnimName = nil
+        self.attackHitPassed = false
+        self.attackObjectTarget = nil
+        self.attackObjectType = nil
+    end
+
+    if otherZombie == self.enemy then return end
 
     local rel = ChaosNPCRelations.GetRelationForNPC(self, otherZombie)
     if rel == ChaosNPCRelationType.ATTACK then
