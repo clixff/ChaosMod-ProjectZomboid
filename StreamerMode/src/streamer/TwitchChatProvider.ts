@@ -7,6 +7,7 @@ import {
 import {
   TwitchChat,
   type ChatEvent,
+  type ChatNotificationEvent,
   type RedemptionEvent,
 } from "./TwitchChat.ts";
 import type {
@@ -39,6 +40,7 @@ export class TwitchChatProvider implements ChatProvider {
 
   onMessage: ((msg: NormalizedChatMessage) => void) | null = null;
   onRedemption: ((event: RedemptionEvent) => void) | null = null;
+  onNotification: ((event: ChatNotificationEvent) => void) | null = null;
   onChatConnect: (() => void) | null = null;
   onChatDisconnect: (() => void) | null = null;
   /** Optional hook fired after a successful manual login (token saved + chat connected). */
@@ -164,6 +166,7 @@ export class TwitchChatProvider implements ChatProvider {
     });
     chat.onMessage = (ev) => this.handleRaw(ev);
     chat.onRedemption = (ev) => this.onRedemption?.(ev);
+    chat.onNotification = (ev) => this.onNotification?.(ev);
     chat.onConnect = () => {
       this.chatConnected = true;
       this.onChatConnect?.();

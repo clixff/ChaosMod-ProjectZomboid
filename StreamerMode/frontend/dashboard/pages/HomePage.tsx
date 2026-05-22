@@ -58,6 +58,8 @@ import {
   type TwitchPointsStatus,
 } from "../api.ts";
 import { TwitchPointsSettingsModal } from "../components/TwitchPointsSettingsModal.tsx";
+import { TwitchSubsSettingsModal } from "../components/TwitchSubsSettingsModal.tsx";
+import type { DonationSystemTwitchSubs } from "../api.ts";
 
 interface HomePageProps {
   onNotify: (message: string, isError?: boolean) => void;
@@ -124,6 +126,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [twitchPointsModal, setTwitchPointsModal] = useState(false);
   const [twitchPointsStatus, setTwitchPointsStatus] =
     useState<TwitchPointsStatus | null>(null);
+  const [twitchSubsModal, setTwitchSubsModal] = useState(false);
 
   const refreshTwitchPoints = useCallback(async () => {
     try {
@@ -731,6 +734,145 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           <div className="provider-row">
             <div className="provider-row-main">
               <span className="provider-row-name">
+                <img src={twitchLogo} alt="" className="provider-row-logo" />
+                Twitch Subs
+              </span>
+              {(() => {
+                const twitchAuthorized =
+                  status.twitch.configured && status.twitch.name !== null;
+                const subsEnabled =
+                  config?.streamer_mode.donation_systems.twitch_subs
+                    .enabled ?? false;
+                if (!twitchAuthorized) {
+                  return (
+                    <span className="badge badge--off">
+                      <span className="badge-dot" />
+                      Not Authorized
+                    </span>
+                  );
+                }
+                return (
+                  <StatusBadge
+                    on={subsEnabled}
+                    labelOn="Enabled"
+                    labelOff="Disabled"
+                  />
+                );
+              })()}
+            </div>
+            {config && (
+              <div className="provider-row-sub">
+                <span className="card-row-label">Subs</span>
+                <span className="card-row-value">
+                  {`${status.twitch_subs?.current ?? 0}/${
+                    config.streamer_mode.donation_systems.twitch_subs.threshold
+                  }`}
+                </span>
+              </div>
+            )}
+            {(() => {
+              const twitchAuthorized =
+                status.twitch.configured && status.twitch.name !== null;
+              if (!twitchAuthorized) return null;
+              const subsEnabled =
+                config?.streamer_mode.donation_systems.twitch_subs.enabled ??
+                false;
+              return (
+                <div className="card-actions">
+                  {subsEnabled ? (
+                    <button
+                      className="btn"
+                      disabled={busy}
+                      onClick={() =>
+                        void wrap(async () => {
+                          await updateConfig({
+                            streamer_mode: {
+                              donation_systems: {
+                                twitch_subs: { enabled: false },
+                              },
+                            },
+                          });
+                          setConfig((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  streamer_mode: {
+                                    ...prev.streamer_mode,
+                                    donation_systems: {
+                                      ...prev.streamer_mode.donation_systems,
+                                      twitch_subs: {
+                                        ...prev.streamer_mode.donation_systems
+                                          .twitch_subs,
+                                        enabled: false,
+                                      },
+                                    },
+                                  },
+                                }
+                              : prev,
+                          );
+                          onNotify("Twitch Subs disabled.");
+                        })
+                      }
+                    >
+                      <PowerOff size={14} aria-hidden="true" />
+                      Disable
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn--primary"
+                      disabled={busy}
+                      onClick={() =>
+                        void wrap(async () => {
+                          await updateConfig({
+                            streamer_mode: {
+                              enable_donate: true,
+                              donation_systems: {
+                                twitch_subs: { enabled: true },
+                              },
+                            },
+                          });
+                          setConfig((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  streamer_mode: {
+                                    ...prev.streamer_mode,
+                                    enable_donate: true,
+                                    donation_systems: {
+                                      ...prev.streamer_mode.donation_systems,
+                                      twitch_subs: {
+                                        ...prev.streamer_mode.donation_systems
+                                          .twitch_subs,
+                                        enabled: true,
+                                      },
+                                    },
+                                  },
+                                }
+                              : prev,
+                          );
+                          onNotify("Twitch Subs enabled.");
+                        })
+                      }
+                    >
+                      <Power size={14} aria-hidden="true" />
+                      Enable
+                    </button>
+                  )}
+                  <button
+                    className="btn"
+                    disabled={busy}
+                    onClick={() => setTwitchSubsModal(true)}
+                  >
+                    <Settings size={14} aria-hidden="true" />
+                    Settings
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+          <div className="provider-row">
+            <div className="provider-row-main">
+              <span className="provider-row-name">
                 <img
                   src={donationAlertsLogo}
                   alt=""
@@ -1068,6 +1210,34 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           onClose={() => setTwitchPointsModal(false)}
           onNotify={onNotify}
           onRefresh={refreshTwitchPoints}
+        />
+      )}
+
+      {twitchSubsModal && config && (
+        <TwitchSubsSettingsModal
+          value={config.streamer_mode.donation_systems.twitch_subs}
+          onChange={(next: DonationSystemTwitchSubs) => {
+            setConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    streamer_mode: {
+                      ...prev.streamer_mode,
+                      donation_systems: {
+                        ...prev.streamer_mode.donation_systems,
+                        twitch_subs: next,
+                      },
+                    },
+                  }
+                : prev,
+            );
+            void saveConfigPatch({
+              streamer_mode: {
+                donation_systems: { twitch_subs: next },
+              },
+            });
+          }}
+          onClose={() => setTwitchSubsModal(false)}
         />
       )}
 

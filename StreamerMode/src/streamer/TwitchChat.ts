@@ -28,7 +28,7 @@ interface EventSubMessage {
   payload: {
     session?: EventSubSession;
     subscription?: unknown;
-    event?: ChatEvent | RedemptionEvent;
+    event?: ChatEvent | RedemptionEvent | ChatNotificationEvent;
   };
 }
 
@@ -50,6 +50,44 @@ export interface ChatEvent {
   timestamp_ms: number;
   cheer?: {
     bits: number;
+  };
+}
+
+export type SubTier = "1000" | "2000" | "3000";
+
+export type ChatNotificationNoticeType =
+  | "sub"
+  | "resub"
+  | "sub_gift"
+  | "community_sub_gift"
+  | "gift_paid_upgrade"
+  | "prime_paid_upgrade"
+  | "raid"
+  | "announcement"
+  | "charity_donation"
+  | string;
+
+export interface ChatNotificationEvent {
+  broadcaster_user_id: string;
+  chatter_user_id: string;
+  chatter_user_login: string;
+  chatter_user_name: string;
+  chatter_is_anonymous?: boolean;
+  notice_type: ChatNotificationNoticeType;
+  sub?: { sub_tier: SubTier; is_prime?: boolean; duration_months?: number };
+  resub?: {
+    sub_tier: SubTier;
+    is_prime?: boolean;
+    is_gift?: boolean;
+    cumulative_months?: number;
+    duration_months?: number;
+  };
+  sub_gift?: {
+    sub_tier: SubTier;
+    duration_months?: number;
+    cumulative_total?: number | null;
+    recipient_user_name?: string;
+    community_gift_id?: string | null;
   };
 }
 
@@ -86,6 +124,7 @@ export class TwitchChat {
 
   onMessage: ((chat: ChatEvent) => void) | null = null;
   onRedemption: ((event: RedemptionEvent) => void) | null = null;
+  onNotification: ((event: ChatNotificationEvent) => void) | null = null;
   onConnect: (() => void) | null = null;
   onDisconnect: (() => void) | null = null;
 
@@ -187,6 +226,14 @@ export class TwitchChat {
           );
         }
       }
+      try {
+        await this.createNotificationSubscription(sessionId);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        logger.warn(
+          `${this.coloredName} Notification subscription failed: ${message}`,
+        );
+      }
       return;
     }
 
@@ -225,6 +272,17 @@ export class TwitchChat {
         this.onRedemption?.(redemption);
         return;
       }
+      if (subType === "channel.chat.notification") {
+        const notification = msg.payload.event as
+          | ChatNotificationEvent
+          | undefined;
+        if (!notification) return;
+        logger.debug(
+          `${this.coloredName} Chat notification (${notification.notice_type}) from ${notification.chatter_user_name}`,
+        );
+        this.onNotification?.(notification);
+        return;
+      }
     }
   }
 
@@ -240,6 +298,39 @@ export class TwitchChat {
         },
         body: JSON.stringify({
           type: "channel.chat.message",
+          version: "1",
+          condition: {
+            broadcaster_user_id: this.params.broadcasterUserId,
+            user_id: this.params.readerUserId,
+          },
+          transport: {
+            method: "websocket",
+            session_id: sessionId,
+          },
+        }),
+      },
+    );
+
+    if (!res.ok) {
+      const json: unknown = await res.json();
+      throw new Error(`${res.status} ${JSON.stringify(json)}`);
+    }
+  }
+
+  private async createNotificationSubscription(
+    sessionId: string,
+  ): Promise<void> {
+    const res = await fetch(
+      "https://api.twitch.tv/helix/eventsub/subscriptions",
+      {
+        method: "POST",
+        headers: {
+          "Client-Id": CLIENT_ID,
+          Authorization: `Bearer ${this.params.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "channel.chat.notification",
           version: "1",
           condition: {
             broadcaster_user_id: this.params.broadcasterUserId,

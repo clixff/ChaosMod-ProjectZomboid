@@ -54,6 +54,13 @@ export type ActivityEventInput =
       nickname: string;
       bits: number;
     }
+  | {
+      type: "sub";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      threshold: number;
+    }
   | { type: "chat_connected" }
   | { type: "chat_disconnected" }
   | { type: "donationalerts_connected" }

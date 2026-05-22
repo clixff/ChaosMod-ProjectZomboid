@@ -28,9 +28,24 @@ export interface DonationSystemTwitchBits {
   price_multiplier: number;
 }
 
+export interface DonationSystemTwitchPoints {
+  enabled: boolean;
+}
+
+export interface DonationSystemTwitchSubs {
+  enabled: boolean;
+  threshold: number;
+  allow_gift_subs: boolean;
+  allow_resubscriptions: boolean;
+  sub_tier_multipliers: boolean;
+  show_in_obs: boolean;
+}
+
 export interface DonationSystemsConfig {
   donationalerts: DonationSystemDonationAlerts;
   twitch_bits: DonationSystemTwitchBits;
+  twitch_points: DonationSystemTwitchPoints;
+  twitch_subs: DonationSystemTwitchSubs;
 }
 
 export interface StreamerModeConfig {
@@ -185,6 +200,15 @@ export type ActivityEvent =
       nickname: string;
       bits: number;
     }
+  | {
+      id: number;
+      ts: number;
+      type: "sub";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      threshold: number;
+    }
   | { id: number; ts: number; type: "chat_connected" }
   | { id: number; ts: number; type: "chat_disconnected" }
   | { id: number; ts: number; type: "donationalerts_connected" }
@@ -213,6 +237,7 @@ export interface HomeStatus {
   mod: { enabled: boolean };
   voting: { active: boolean };
   twitch_chat: { connected: boolean };
+  twitch_subs: { current: number };
   recent_activity: ActivityEvent[];
   version: {
     current: string;

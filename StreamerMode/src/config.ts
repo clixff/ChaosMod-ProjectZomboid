@@ -36,10 +36,20 @@ export interface DonationSystemTwitchPoints {
   enabled: boolean;
 }
 
+export interface DonationSystemTwitchSubs {
+  enabled: boolean;
+  threshold: number;
+  allow_gift_subs: boolean;
+  allow_resubscriptions: boolean;
+  sub_tier_multipliers: boolean;
+  show_in_obs: boolean;
+}
+
 export interface DonationSystemsConfig {
   donationalerts: DonationSystemDonationAlerts;
   twitch_bits: DonationSystemTwitchBits;
   twitch_points: DonationSystemTwitchPoints;
+  twitch_subs: DonationSystemTwitchSubs;
 }
 
 export interface StreamerModeConfig {
@@ -148,6 +158,14 @@ const DEFAULT_DONATION_SYSTEMS: DonationSystemsConfig = {
   donationalerts: { enabled: false, app_id: "", currency: "" },
   twitch_bits: { enabled: false, price_multiplier: 100.0 },
   twitch_points: { enabled: false },
+  twitch_subs: {
+    enabled: false,
+    threshold: 1,
+    allow_gift_subs: true,
+    allow_resubscriptions: true,
+    sub_tier_multipliers: true,
+    show_in_obs: true,
+  },
 };
 
 const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
@@ -258,10 +276,13 @@ function parseDonationSystems(
   const da = obj(raw["donationalerts"]);
   const bits = obj(raw["twitch_bits"]);
   const points = obj(raw["twitch_points"]);
+  const subs = obj(raw["twitch_subs"]);
   const multiplier = num(
     bits["price_multiplier"],
     d.twitch_bits.price_multiplier,
   );
+  const subsThresholdRaw = num(subs["threshold"], d.twitch_subs.threshold);
+  const subsThreshold = Math.max(1, Math.floor(subsThresholdRaw));
   return {
     donationalerts: {
       enabled: bool(da["enabled"], d.donationalerts.enabled),
@@ -275,6 +296,20 @@ function parseDonationSystems(
     },
     twitch_points: {
       enabled: bool(points["enabled"], d.twitch_points.enabled),
+    },
+    twitch_subs: {
+      enabled: bool(subs["enabled"], d.twitch_subs.enabled),
+      threshold: subsThreshold,
+      allow_gift_subs: bool(subs["allow_gift_subs"], d.twitch_subs.allow_gift_subs),
+      allow_resubscriptions: bool(
+        subs["allow_resubscriptions"],
+        d.twitch_subs.allow_resubscriptions,
+      ),
+      sub_tier_multipliers: bool(
+        subs["sub_tier_multipliers"],
+        d.twitch_subs.sub_tier_multipliers,
+      ),
+      show_in_obs: bool(subs["show_in_obs"], d.twitch_subs.show_in_obs),
     },
   };
 }

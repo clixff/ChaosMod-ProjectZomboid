@@ -9,13 +9,22 @@ interface VoteOption {
   duration?: number;
 }
 
+interface TwitchSubsStatus {
+  enabled: boolean;
+  show_in_obs: boolean;
+  current: number;
+  threshold: number;
+}
+
 interface ModStatus {
   voting_enabled: boolean;
+  donateEnabled?: boolean;
   total_votes: number;
   total_votes_label: string;
   vote_background_color: string;
   last_winner: string | null;
   vote_options: VoteOption[];
+  twitch_subs?: TwitchSubsStatus;
 }
 
 type DisplayMode = "hidden" | "entering" | "voting" | "results" | "hiding";
@@ -27,6 +36,9 @@ interface DisplayState {
   totalVotesLabel: string;
   bgColor: string;
   lastWinner: string | null;
+  subs: TwitchSubsStatus | null;
+  donateEnabled: boolean;
+  votingEnabled: boolean;
 }
 
 const BAR_WIDTH = 400;
@@ -89,6 +101,9 @@ export function App() {
     totalVotesLabel: "Total votes: %d",
     bgColor: "#9f211f",
     lastWinner: null,
+    subs: null,
+    donateEnabled: false,
+    votingEnabled: false,
   });
   const [hasSeenVoteOptions, setHasSeenVoteOptions] = useState(false);
 
@@ -110,6 +125,10 @@ export function App() {
           setHasSeenVoteOptions(true);
         }
 
+        const subs = data.twitch_subs ?? null;
+        const donateEnabled = data.donateEnabled === true;
+        const votingEnabled = data.voting_enabled === true;
+
         if (data.voting_enabled && data.vote_options.length > 0) {
           if (hideTimerRef.current !== null) {
             clearTimeout(hideTimerRef.current);
@@ -127,6 +146,9 @@ export function App() {
             totalVotesLabel: data.total_votes_label ?? "Total votes: %d",
             bgColor: data.vote_background_color,
             lastWinner: data.last_winner,
+            subs,
+            donateEnabled,
+            votingEnabled,
           });
         } else if (!data.voting_enabled && data.vote_options.length > 0) {
           const current = displayStateRef.current;
@@ -142,6 +164,9 @@ export function App() {
               totalVotesLabel: data.total_votes_label ?? "Total votes: %d",
               bgColor: data.vote_background_color,
               lastWinner: data.last_winner,
+              subs,
+              donateEnabled,
+              votingEnabled,
             }));
             hideTimerRef.current = setTimeout(() => {
               setDisplayState((prev) => ({ ...prev, mode: "hiding" }));
@@ -155,8 +180,25 @@ export function App() {
               totalVotesLabel: data.total_votes_label ?? "Total votes: %d",
               bgColor: data.vote_background_color,
               lastWinner: data.last_winner,
+              subs,
+              donateEnabled,
+              votingEnabled,
+            }));
+          } else {
+            setDisplayState((prev) => ({
+              ...prev,
+              subs,
+              donateEnabled,
+              votingEnabled,
             }));
           }
+        } else {
+          setDisplayState((prev) => ({
+            ...prev,
+            subs,
+            donateEnabled,
+            votingEnabled,
+          }));
         }
       } catch {
         // ignore network errors
@@ -172,18 +214,52 @@ export function App() {
     };
   }, []);
 
-  const { mode, options, totalVotes, totalVotesLabel, bgColor, lastWinner } = displayState;
+  const {
+    mode,
+    options,
+    totalVotes,
+    totalVotesLabel,
+    bgColor,
+    lastWinner,
+    subs,
+    votingEnabled,
+  } = displayState;
+
+  const subsEnabled = subs?.enabled === true;
+  const subsVisible = subsEnabled && subs?.show_in_obs === true;
+  const subsLine = subsVisible && subs
+    ? `Twitch Subs: ${subs.current}/${subs.threshold}`
+    : null;
+  const idleSecondLine = subsEnabled && !votingEnabled
+    ? "Waiting for mod start"
+    : "Waiting for vote";
 
   if (!hasSeenVoteOptions && mode === "hidden" && options.length === 0) {
+    if (subsVisible && subsLine) {
+      return (
+        <main className="overlay overlay--idle">
+          <div className="idle-line">{subsLine}</div>
+        </main>
+      );
+    }
     return (
       <main className="overlay overlay--idle">
         <div className="idle-line">Chaos Mod OBS is working</div>
-        <div className="idle-line">Waiting for vote</div>
+        <div className="idle-line">{idleSecondLine}</div>
       </main>
     );
   }
 
-  if (mode === "hidden" || options.length === 0) return null;
+  if (mode === "hidden" || options.length === 0) {
+    if (subsVisible && subsLine) {
+      return (
+        <main className="overlay overlay--idle">
+          <div className="idle-line">{subsLine}</div>
+        </main>
+      );
+    }
+    return null;
+  }
 
   const isResults = mode === "results" || mode === "hiding";
 
@@ -204,7 +280,12 @@ export function App() {
 
   return (
     <main className={overlayClass} onAnimationEnd={handleAnimationEnd}>
-      <div className="total-votes">{totalVotesLabel.replace("%d", formatTotalVotes(totalVotes))}</div>
+      <div className="total-votes-row">
+        <div className="total-votes">{totalVotesLabel.replace("%d", formatTotalVotes(totalVotes))}</div>
+        {subsVisible && subsLine && (
+          <div className="twitch-subs-inline">{subsLine}</div>
+        )}
+      </div>
       <div className="options">
         {options.map((opt) => {
           const barWidth = getBarWidth(opt.votes, options);

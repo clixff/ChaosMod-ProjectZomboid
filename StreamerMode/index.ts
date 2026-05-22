@@ -47,17 +47,22 @@ import {
   startDebugNicknames,
 } from "./src/debugNicknames.ts";
 import { startDebugVotes } from "./src/debugVotes.ts";
+import { startDebugSubs } from "./src/debugSubs.ts";
 import { Bridge } from "./src/bridge/Bridge.ts";
 import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
 import { DonationManager } from "./src/donations/DonationManager.ts";
 import { handleBitsCheer } from "./src/donations/BitsHandler.ts";
+import { SubsHandler } from "./src/donations/SubsHandler.ts";
 import {
   TwitchRewardsManager,
   type EffectLookup,
   type RewardRow,
 } from "./src/streamer/twitch/rewards/TwitchRewardsManager.ts";
 import { TwitchRewardsError } from "./src/streamer/twitch/rewards/TwitchRewardsClient.ts";
-import type { RedemptionEvent } from "./src/streamer/TwitchChat.ts";
+import type {
+  ChatNotificationEvent,
+  RedemptionEvent,
+} from "./src/streamer/TwitchChat.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
 import type { EffectEntry } from "./src/effects.ts";
 import { ActivityLog } from "./src/activityLog.ts";
@@ -182,6 +187,7 @@ const KNOWN_ARGS_EXACT = new Set([
   "--debug-chat-messages",
   "--debug-nicknames",
   "--debug-votes",
+  "--debug-subs",
 ]);
 const KNOWN_ARGS_PREFIXES = ["--port=", "--host="];
 let fatalExitInProgress = false;
@@ -525,6 +531,9 @@ async function main(): Promise<void> {
     emitHandshakeIfChanged();
   });
 
+  const subsHandler = new SubsHandler();
+  const pendingSubActivations: Array<{ nickname: string; threshold: number }> = [];
+
   if (bridge) {
     bridge.on("mod_change_status", (payload) => {
       const enabled = payload.enabled === true;
@@ -591,6 +600,20 @@ async function main(): Promise<void> {
     bridge.on("reload_config", () => {
       logger.debug("[Bridge] reload_config");
       reloadRuntimeConfig();
+    });
+
+    bridge.on("random_effect_activated", (payload) => {
+      const effectId =
+        typeof payload["effect_id"] === "string" ? payload["effect_id"] : "";
+      if (!effectId) return;
+      const pending = pendingSubActivations.shift();
+      activityLog.add({
+        type: "sub",
+        effect_id: effectId,
+        effect_name: getString("effects", effectId),
+        nickname: pending?.nickname ?? "",
+        threshold: pending?.threshold ?? 0,
+      });
     });
 
     bridge.start();
@@ -724,8 +747,40 @@ async function main(): Promise<void> {
     });
   };
 
+  function syncSubsHandlerFromConfig(): void {
+    if (!config) return;
+    const subs = config.streamer_mode.donation_systems.twitch_subs;
+    subsHandler.syncConfig(subs.enabled, subs.threshold);
+  }
+
+  function handleSubNotification(ev: ChatNotificationEvent): void {
+    if (!config) return;
+    syncSubsHandlerFromConfig();
+    const result = subsHandler.handle(ev, config);
+    if (result.type !== "activate") return;
+    if (!bridge) return;
+    pendingSubActivations.push({
+      nickname: result.nickname,
+      threshold: result.threshold,
+    });
+    bridge.emit("activate_random_effect", { nickname: result.nickname });
+  }
+
+  twitchProvider.onNotification = (ev) => {
+    try {
+      handleSubNotification(ev);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`[Subs] Failed to handle notification: ${msg}`);
+    }
+  };
+
   if (args.includes("--debug-votes")) {
     startDebugVotes(votingManager);
+  }
+
+  if (args.includes("--debug-subs")) {
+    startDebugSubs((ev) => handleSubNotification(ev));
   }
 
   function handleBitsForChat(msg: NormalizedChatMessage): void {
@@ -976,6 +1031,15 @@ async function main(): Promise<void> {
             };
           }),
           donateEnabled: config?.streamer_mode.enable_donate ?? false,
+          twitch_subs: (() => {
+            const subs = config?.streamer_mode.donation_systems.twitch_subs;
+            return {
+              enabled: subs?.enabled === true,
+              show_in_obs: subs?.show_in_obs !== false,
+              current: subsHandler.getCurrent(),
+              threshold: Math.max(1, Math.floor(subs?.threshold ?? 1)),
+            };
+          })(),
         };
       },
       onDonationAlertsCode: async (code: string) => {
@@ -1145,6 +1209,9 @@ async function main(): Promise<void> {
           },
           twitch_chat: {
             connected: twitchProvider.isChatConnected(),
+          },
+          twitch_subs: {
+            current: subsHandler.getCurrent(),
           },
           recent_activity: activityLog.list(),
           version: versionStatus,

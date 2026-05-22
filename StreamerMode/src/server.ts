@@ -53,6 +53,12 @@ export interface ModStatus {
   last_winner: string | null;
   vote_options: VoteOptionStatus[];
   donateEnabled: boolean;
+  twitch_subs: {
+    enabled: boolean;
+    show_in_obs: boolean;
+    current: number;
+    threshold: number;
+  };
 }
 
 export interface ServerContext {
@@ -176,6 +182,9 @@ export interface HomeStatus {
   };
   twitch_chat: {
     connected: boolean;
+  };
+  twitch_subs: {
+    current: number;
   };
   recent_activity: ActivityEvent[];
   version: {

@@ -321,6 +321,22 @@ function ChaosMod.RegisterBridgeHandlers()
             end
         end
     end)
+
+    ChaosBridge.On("activate_random_effect", function(payload)
+        if type(payload) ~= "table" then return end
+        local nickname = type(payload.nickname) == "string" and payload.nickname ~= "" and payload.nickname or nil
+        local effectIds = ChaosEffectsRegistry.GetRandomEffects(1, "default", true)
+        local effectId = effectIds and effectIds[1]
+        if not effectId then
+            print("[ChaosMod] activate_random_effect: no eligible effect to pick")
+            return
+        end
+        ChaosEffectsManager.StartEffect(effectId, nickname, ChaosEffectActivationType.DONATE)
+        if ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
+            ChaosUIManager.onDonateEffectActivated(nickname or "Anonymous", effectId)
+        end
+        ChaosBridge.Emit("random_effect_activated", { effect_id = effectId, nickname = nickname or "" })
+    end)
 end
 
 function ChaosMod.OnSpecialAnimalsTick()

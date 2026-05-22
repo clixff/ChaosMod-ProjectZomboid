@@ -20,6 +20,7 @@
 - Added Twitch Channel Points donation system
 - Export your prices, rewards, and effect tweaks as a shareable Chaos Mod Hub Web App config so viewers see exactly what's active on your stream
 - Spawn NPC effects activated by donations now use the donator’s nickname as the NPC nickname.
+- Added Twitch Subs donation system: every N subs triggers a random effect.
 
 ### New Effects
 

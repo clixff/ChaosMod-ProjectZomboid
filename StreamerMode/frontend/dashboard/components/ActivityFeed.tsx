@@ -75,6 +75,19 @@ function renderText(event: ActivityEvent): {
           </>
         ),
       };
+    case "sub":
+      return {
+        className: "activity-row activity-row--donate",
+        message: (
+          <>
+            <span className="activity-nickname">
+              {event.nickname || "Anonymous"}
+            </span>{" "}
+            triggered random effect via subs ({event.threshold}/{event.threshold}):{" "}
+            <span className="activity-effect">{event.effect_name}</span>
+          </>
+        ),
+      };
     case "chat_connected":
       return {
         className: "activity-row activity-row--ok",
