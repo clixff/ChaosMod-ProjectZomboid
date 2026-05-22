@@ -22,7 +22,8 @@ function EffectNPCDuel:OnStart()
             local newZombies = ChaosZombie.SpawnZombieAt(x, y, z, 1, "Tourist", 50)
             local zombie = newZombies:getFirst()
             if zombie then
-                local npc = ChaosNPC:new(zombie)
+                local nickname = (#spawnedNpcs == 0) and self.effectNickname or nil
+                local npc = ChaosNPC:new(zombie, nickname)
                 zombie:dressInRandomOutfit()
                 npc:initializeHuman()
                 npc.npcGroup = ChaosNPCGroupID.COMPANIONS

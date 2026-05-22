@@ -25,7 +25,7 @@ function EffectSpawnCarlJohnson:OnStart()
     local zombie = newZombies and newZombies:getFirst() or nil
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
 

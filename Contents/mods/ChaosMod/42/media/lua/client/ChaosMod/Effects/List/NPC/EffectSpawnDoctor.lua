@@ -104,7 +104,7 @@ function EffectSpawnDoctor:OnStart()
     local zombie = newZombies and newZombies:getFirst() or nil
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:initializeHuman()
     npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.WEAK)
     npc.npcGroup = ChaosNPCGroupID.FOLLOWERS

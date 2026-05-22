@@ -6,6 +6,7 @@ function EffectFanClub:OnStart()
     local player = getPlayer()
     if not player then return end
 
+    local nicknameAssigned = false
     for i = 1, 3 do
         local randomSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 2, 4, 50, true, true, false)
         if randomSquare then
@@ -16,7 +17,9 @@ function EffectFanClub:OnStart()
             local newZombies = ChaosZombie.SpawnZombieAt(x, y, z, 1, "Tourist", 50)
             local zombie = newZombies:getFirst()
             if zombie then
-                local npc = ChaosNPC:new(zombie)
+                local nickname = (not nicknameAssigned) and self.effectNickname or nil
+                local npc = ChaosNPC:new(zombie, nickname)
+                nicknameAssigned = true
                 zombie:dressInRandomOutfit()
                 npc:initializeHuman()
                 npc.npcGroup = ChaosNPCGroupID.FOLLOWERS

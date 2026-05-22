@@ -27,7 +27,7 @@ function EffectSpawnGrieferSanta:OnStart()
     if not zombie then return end
 
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:initializeHuman()
 
     npc.npcGroup = ChaosNPCGroupID.RAIDERS

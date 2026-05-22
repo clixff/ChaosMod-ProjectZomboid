@@ -65,11 +65,16 @@ require "ChaosMod/NPC/ChaosNPCCollisionSystem"
 require "ChaosMod/NPC/ChaosNPCBehaviorSystem"
 require "ChaosMod/NPC/ChaosNPCAISystem"
 
-function ChaosNPC:new(zombie)
+---@param zombie IsoZombie
+---@param nickname string|nil
+function ChaosNPC:new(zombie, nickname)
     ---@type ChaosNPC
     local o = setmetatable({}, self)
     o.pathfindUpdateMs = 0
     o.zombie = zombie
+    if nickname and type(nickname) == "string" and nickname ~= "" then
+        ChaosZombie.SetSpecificNickname(zombie, nickname)
+    end
     o.moveTargetCharacter = nil
     o.moveTargetLocation = nil
     o.lastCachedTargetMoveLocation = nil

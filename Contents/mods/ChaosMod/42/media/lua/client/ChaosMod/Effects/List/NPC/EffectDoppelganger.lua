@@ -28,7 +28,7 @@ function EffectDoppelganger:OnStart()
     if not zombie then return end
 
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc:initializeHuman()
 

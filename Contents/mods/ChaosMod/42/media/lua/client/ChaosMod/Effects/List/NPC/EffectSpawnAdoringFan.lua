@@ -14,7 +14,7 @@ function EffectSpawnAdoringFan:OnStart()
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     zombie:dressInRandomOutfit()
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.FOLLOWERS

@@ -930,7 +930,7 @@
         {
             "id": "spawn_petrol_can",
             "enabled": true,
-            "chance": 0.8,
+            "chance": 0.95,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_4"
@@ -2098,7 +2098,9 @@
             "chance": 0.75,
             "withDuration": true,
             "duration": 120,
-            "disable_effects": ["spawn_trees"],
+            "disable_effects": [
+                "spawn_trees"
+            ],
             "enabled_donate": true,
             "price_group": "neutral_3"
         },
@@ -3039,7 +3041,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 45,
+            "duration": 35,
             "disable_effects": [
                 "hurricane"
             ],

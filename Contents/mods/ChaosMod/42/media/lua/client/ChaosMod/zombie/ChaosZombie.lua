@@ -87,6 +87,25 @@ function ChaosZombie.AddNewChatLine(zombie, text)
     return true
 end
 
+--- Assigns a specific nickname to the zombie with a dark-gold color. The name is
+--- NOT added to the nickname buffer. Rendering still respects the user's
+--- nickname visibility config.
+---@param zombie IsoZombie
+---@param name string|nil
+function ChaosZombie.SetSpecificNickname(zombie, name)
+    if not zombie or type(name) ~= "string" or name == "" then
+        return
+    end
+
+    local md = zombie:getModData()
+    if not md then
+        return
+    end
+
+    md[ChaosNicknames.modDataNameKey] = name
+    md[ChaosNicknames.modDataColorKey] = { r = 255 / 255, g = 173 / 255, b = 31 / 255 }
+end
+
 --- Spawns zombies at the given position
 ---@param x number
 ---@param y number

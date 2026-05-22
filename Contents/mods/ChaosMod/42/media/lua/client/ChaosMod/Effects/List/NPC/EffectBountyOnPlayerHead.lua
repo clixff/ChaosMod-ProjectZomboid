@@ -24,7 +24,8 @@ local function spawnAttacker(effect)
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local nickname = (#effect.npcs == 0) and effect.effectNickname or nil
+    local npc = ChaosNPC:new(zombie, nickname)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
 

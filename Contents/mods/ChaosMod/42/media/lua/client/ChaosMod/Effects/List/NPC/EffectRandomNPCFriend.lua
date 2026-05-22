@@ -10,7 +10,7 @@ function EffectRandomZombieFriend:OnStart()
     if not nearestZombie then return end
 
 
-    local npc = ChaosNPC:new(nearestZombie)
+    local npc = ChaosNPC:new(nearestZombie, self.effectNickname)
     npc:initializeHuman()
 
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS

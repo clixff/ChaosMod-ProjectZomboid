@@ -5,14 +5,15 @@ local MAX_COMPANIONS = 2
 local SEARCH_RADIUS = 40
 
 ---@param zombie IsoGameCharacter?
+---@param nickname string|nil
 ---@return boolean
-local function MakeZombieCompanion(zombie)
+local function MakeZombieCompanion(zombie, nickname)
     if not zombie or not instanceof(zombie, "IsoZombie") then
         return false
     end
 
     ---@cast zombie IsoZombie
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, nickname)
     npc:initializeHuman(false)
     npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
@@ -56,7 +57,8 @@ function EffectNecromancy:OnStart()
                 local deadBody = obj
                 if deadBody.reanimate then
                     local zombie = deadBody:reanimate()
-                    if MakeZombieCompanion(zombie) then
+                    local nickname = (companionsCount == 0) and self.effectNickname or nil
+                    if MakeZombieCompanion(zombie, nickname) then
                         companionsCount = companionsCount + 1
                     end
                 end
@@ -76,7 +78,8 @@ function EffectNecromancy:OnStart()
 
         local zombie = spawnedZombies:getFirst()
         zombie:dressInRandomOutfit()
-        if not MakeZombieCompanion(zombie) then break end
+        local nickname = (companionsCount == 0) and self.effectNickname or nil
+        if not MakeZombieCompanion(zombie, nickname) then break end
         companionsCount = companionsCount + 1
     end
 
