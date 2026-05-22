@@ -2,6 +2,16 @@ CHAOS_NPC_MAX_PATHFIND_UPDATE_MS = 1000
 CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS = 2500
 CHAOS_NPC_FIND_GROUND_WEAPON_TIMEOUT_MS = 3000
 CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY = "ChaosNPCGroundWeaponClaim"
+CHAOS_NPC_NEED_HEAL_LINE_COOLDOWN_MS = 30000
+CHAOS_NPC_BANDAGE_HEAL_AMOUNTS = {
+    ["Base.Bandage"] = 0.5,
+    ["Base.AlcoholBandage"] = 0.5,
+    ["Base.RippedSheets"] = 0.5,
+    ["Base.AlcoholRippedSheets"] = 0.5,
+    ["Base.BandageDirty"] = 0.3,
+    ["Base.RippedSheetsDirty"] = 0.3,
+}
+CHAOS_NPC_BANDAGE_CHAT_COLOR = { r = 1.0, g = 0.5, b = 0.5 }
 CHAOS_NPC_MOD_DATA_KEY = "is_npc"
 CHAOS_NPC_MOD_DATA_KEY_2 = "ChaosNPC"
 

@@ -57,6 +57,7 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field healthGroup? integer
 ---@field maxHealth number
 ---@field chanceToDropWeaponOnDeath number
+---@field lastNeedHealLineMs integer
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -120,6 +121,7 @@ function ChaosNPC:new(zombie, nickname)
     o.healthGroup = CHAOS_NPC_HEALTH_GROUP.DEFAULT
     o.maxHealth = 1.0
     o.chanceToDropWeaponOnDeath = 0.4
+    o.lastNeedHealLineMs = 0
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o

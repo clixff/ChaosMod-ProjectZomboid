@@ -155,12 +155,16 @@ function ChaosNPC:update(deltaMs)
 
     if self.enemy then
         local wasPickingGroundWeapon = self.actionType == "pickup_ground_weapon"
+        local wasPickingBandage = self.actionType == "pickup_bandage"
         local shouldSwitchToEnemyPath = self.moveTargetCharacter ~= self.enemy or
             wasPickingGroundWeapon or
+            wasPickingBandage or
             not self.moving
 
         if wasPickingGroundWeapon then
             self:StopMoving(true, "pickup_ground_weapon_enemy_override")
+        elseif wasPickingBandage then
+            self:StopMoving(true, "pickup_bandage_enemy_override")
         end
         self:ClearAction()
         self.moveTargetCharacter = self.enemy
@@ -189,6 +193,35 @@ function ChaosNPC:update(deltaMs)
                 if isOnActionSquare then
                     self:pickGroundItemToPrimary(actionWorldObj)
                     self:StopMoving(true, "pickup_ground_weapon")
+                    self:ClearAction()
+                    shouldUpdatePathfind = false
+                elseif shouldUpdatePathfind then
+                    self:MoveToLocation(actionSquare)
+                end
+            end
+        end
+    end
+
+    if self.actionType == "pickup_bandage" then
+        local actionWorldObj = self.actionWorldObjectTarget
+        if not actionWorldObj or not self:IsGroundBandageWorldObject(actionWorldObj) or not self:NeedsHealing() then
+            self:StopMoving(true, "pickup_bandage_invalid")
+            self:ClearAction()
+        else
+            local actionSquare = actionWorldObj:getSquare()
+            if not actionSquare or actionSquare:getZ() ~= zombie:getZ() then
+                self:StopMoving(true, "pickup_bandage_square_invalid")
+                self:ClearAction()
+            else
+                local zombieSquare = zombie:getSquare()
+                local isOnActionSquare = zombieSquare and
+                    zombieSquare:getX() == actionSquare:getX() and
+                    zombieSquare:getY() == actionSquare:getY() and
+                    zombieSquare:getZ() == actionSquare:getZ()
+
+                if isOnActionSquare then
+                    self:pickGroundBandage(actionWorldObj)
+                    self:StopMoving(true, "pickup_bandage")
                     self:ClearAction()
                     shouldUpdatePathfind = false
                 elseif shouldUpdatePathfind then
@@ -228,6 +261,44 @@ function ChaosNPC:update(deltaMs)
     if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil and self:HasTag("item_robber") then
         if not self.moving then
             self:UpdateWanderTarget()
+        end
+    end
+
+    local isFriendly = self:IsFriendlyToPlayer()
+    local needsHealing = isFriendly and self:NeedsHealing()
+    local shouldFindBandage = needsHealing and self.enemy == nil and self.actionType == nil and
+        not self:HasTag("effect_move_to_square") and zombie:getVehicle() == nil
+    if shouldFindBandage and canFindGroundWeaponThisFrame then
+        self.findGroundWeaponTimeoutMs = 0
+
+        local px = math.floor(zombie:getX())
+        local py = math.floor(zombie:getY())
+        local pz = math.floor(zombie:getZ())
+
+        ChaosUtils.SquareRingSearchTile_2D(px, py, function(square)
+            local foundWorldObj = nil
+            local hasBandage = ChaosUtils.ForAllWorldObjectsOnSquare(square, function(worldObj)
+                if self:CanUseGroundBandageWorldObject(worldObj) then
+                    foundWorldObj = worldObj
+                    return true
+                end
+                return false
+            end)
+
+            if hasBandage and foundWorldObj then
+                self:StartPickupBandageAction(foundWorldObj)
+                return self.actionType == "pickup_bandage" and self.actionWorldObjectTarget == foundWorldObj
+            end
+
+            return false
+        end, 0, 3, false, false, true, pz, pz)
+    end
+
+    if isFriendly and needsHealing and self.enemy == nil and not self.isAttacking then
+        local timeSinceLineMs = timestampMs - (self.lastNeedHealLineMs or 0)
+        if timeSinceLineMs >= CHAOS_NPC_NEED_HEAL_LINE_COOLDOWN_MS then
+            ChaosZombie.AddNewChatLine(zombie, "npc_need_heal", CHAOS_NPC_BANDAGE_CHAT_COLOR)
+            self.lastNeedHealLineMs = timestampMs
         end
     end
 
@@ -316,6 +387,8 @@ function ChaosNPC:update(deltaMs)
                 self:StopMoving(true, "nearby_finished")
             elseif self.actionType == "pickup_ground_weapon" then
                 self:StopMoving(true, "pickup_ground_weapon_reached")
+            elseif self.actionType == "pickup_bandage" then
+                self:StopMoving(true, "pickup_bandage_reached")
             elseif not self.moveTargetCharacter and self:HasTag("effect_move_to_square") then
                 self:StopMoving(true, "effect_move_to_square_finished")
             elseif not self.moveTargetCharacter and self:HasTag("item_robber") then

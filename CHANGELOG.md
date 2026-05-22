@@ -21,6 +21,8 @@
 - Export your prices, rewards, and effect tweaks as a shareable Chaos Mod Hub Web App config so viewers see exactly what's active on your stream
 - Spawn NPC effects activated by donations now use the donator’s nickname as the NPC nickname.
 - Added Twitch Subs donation system: every N subs triggers a random effect.
+- Friendly NPCs now pick up bandages from the ground to heal themselves when out of combat.
+- Animals now can open doors
 
 ### New Effects
 
@@ -69,6 +71,8 @@
 - "Give Katana" effect now equips the katana to both hands of the player
 - "Spawn Trees" effect now lasts 120 seconds and spawns more trees over a wider area; trees are removed when the effect ends, and the player is no longer damaged by car crashes into them while driving
 - "Spawn Random L4D2 Companion" now gives random melee weapon to NPC
+- "Griefer Pig Turret" effect no longer follows zombies or the player and instead wanders to random squares around the player
+- "Griefer Pig Turret" deals double damage to zombies
 
 [1.1.1]
 

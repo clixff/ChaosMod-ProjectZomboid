@@ -5,12 +5,9 @@
 ---@field worldGunItem InventoryItem?
 ---@field worldGunObj IsoWorldInventoryObject?
 ---@field lastShotMs integer
----@field lastRetargetMs integer
 ---@field lastWanderMs integer
 EffectPigTurret = ChaosEffectBase:derive("EffectPigTurret", "pig_turret")
 
----@type integer
-local RETARGET_INTERVAL_MS = 4000
 ---@type integer
 local WANDER_INTERVAL_MS = 1000
 ---@type integer
@@ -363,6 +360,8 @@ local function applyShotDamage(target, weapon, attacker)
 
     if instanceof(target, "IsoPlayer") then
         damage = damage * 0.5
+    else
+        damage = damage * 2.0
     end
 
     target:Hit(weapon, attacker, damage, false, 1.0, false)
@@ -445,55 +444,9 @@ function EffectPigTurret:OnStart()
     self.pig:changeStress(80)
     self.pig:updateStress()
     self.lastShotMs = 0
-    self.lastRetargetMs = 0
     self.lastWanderMs = 0
 
     PigWeaponAttach.update(self.pig, self)
-end
-
----@param pigSquare IsoGridSquare
----@return IsoZombie?
-local function findRetargetZombie(pigSquare)
-    local zombies = ChaosZombie.GetNearestZombies(
-        pigSquare:getX(),
-        pigSquare:getY(),
-        MAX_ATTACK_DIST,
-        true,
-        pigSquare:getZ()
-    )
-
-    local nearestZombie = nil
-    local nearestDist = math.huge
-
-    for i = 0, zombies:size() - 1 do
-        local zombie = zombies:get(i)
-        if zombie and zombie:isAlive() then
-            local zSquare = zombie:getSquare()
-            if zSquare and zSquare:getZ() == pigSquare:getZ() then
-                local dist = ChaosUtils.distTo(pigSquare:getX(), pigSquare:getY(), zombie:getX(), zombie:getY())
-                if dist < nearestDist then
-                    nearestDist = dist
-                    nearestZombie = zombie
-                end
-            end
-        end
-    end
-
-    return nearestZombie
-end
-
----@param self EffectPigTurret
-local function updateRetarget(self)
-    if not self.specialAnimal or not self.pig then return end
-
-    local now = getTimestampMs()
-    if now - (self.lastRetargetMs or 0) < RETARGET_INTERVAL_MS then return end
-    self.lastRetargetMs = now
-
-    local pigSquare = self.pig:getCurrentSquare()
-    if not pigSquare then return end
-
-    self.specialAnimal.followCharacter = findRetargetZombie(pigSquare)
 end
 
 ---@param pig IsoAnimal
@@ -502,9 +455,12 @@ local function pathPigToRandomNearbyLocation(pig, pigSquare)
     local cell = getCell()
     if not cell then return end
 
-    local pigZ = pigSquare:getZ()
-    local baseX = pigSquare:getX()
-    local baseY = pigSquare:getY()
+    local player = getPlayer()
+    if not player then return end
+
+    local pigZ = player:getZ()
+    local baseX = player:getX()
+    local baseY = player:getY()
 
     for _ = 1, WANDER_MAX_TRIES do
         local dx = ChaosUtils.RandIntegerRange(-WANDER_RADIUS, WANDER_RADIUS + 1)
@@ -514,6 +470,7 @@ local function pathPigToRandomNearbyLocation(pig, pigSquare)
             local ty = baseY + dy
             local sq = cell:getGridSquare(tx, ty, pigZ)
             if sq and sq:getFloor() and not sq:isSolid() and not sq:isSolidTrans() then
+                ---@diagnostic disable-next-line: param-type-mismatch
                 pig:pathToLocation(tx, ty, pigZ)
                 return
             end
@@ -524,10 +481,7 @@ end
 ---@param self EffectPigTurret
 local function updateWander(self)
     local pig = self.pig
-    if not pig or not self.specialAnimal then return end
-
-    local follow = self.specialAnimal.followCharacter
-    if follow and follow:isAlive() then return end
+    if not pig then return end
 
     local now = getTimestampMs()
     if now - (self.lastWanderMs or 0) < WANDER_INTERVAL_MS then return end
@@ -543,7 +497,6 @@ end
 function EffectPigTurret:OnTick(deltaMs)
     if not self.pig or self.pig:isDead() then return end
 
-    updateRetarget(self)
     updateWander(self)
 
     -- local debugPlayer = getPlayer()

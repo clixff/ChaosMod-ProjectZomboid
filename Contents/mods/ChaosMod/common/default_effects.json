@@ -2561,7 +2561,7 @@
                 "quest_kill_zombies"
             ],
             "enabled_donate": true,
-            "price_group": "positive_3"
+            "price_group": "positive_2"
         },
         {
             "id": "dark_souls_bonfire",

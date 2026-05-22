@@ -134,12 +134,106 @@ function ChaosNPC:ReleaseGroundWeaponClaim(worldObj)
 end
 
 function ChaosNPC:ClearAction()
-    if self.actionType == "pickup_ground_weapon" and self.actionWorldObjectTarget then
+    if self.actionWorldObjectTarget and
+        (self.actionType == "pickup_ground_weapon" or self.actionType == "pickup_bandage") then
         self:ReleaseGroundWeaponClaim(self.actionWorldObjectTarget)
     end
 
     self.actionType = nil
     self.actionWorldObjectTarget = nil
+end
+
+---@return boolean
+function ChaosNPC:IsFriendlyToPlayer()
+    return self.npcGroup == ChaosNPCGroupID.COMPANIONS or
+        self.npcGroup == ChaosNPCGroupID.FOLLOWERS
+end
+
+---@return boolean
+function ChaosNPC:NeedsHealing()
+    if not self.zombie then return false end
+    return self.zombie:getHealth() < self.maxHealth
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:IsGroundBandageWorldObject(worldObj)
+    if not worldObj then return false end
+
+    local item = worldObj:getItem()
+    if not item then return false end
+
+    return CHAOS_NPC_BANDAGE_HEAL_AMOUNTS[item:getFullType()] ~= nil
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:CanUseGroundBandageWorldObject(worldObj)
+    if not self:IsGroundBandageWorldObject(worldObj) then
+        return false
+    end
+
+    local owner = self:GetGroundWeaponClaimOwner(worldObj)
+    local token = self:GetGroundWeaponClaimToken()
+    return owner == nil or owner == token
+end
+
+---@param worldObj IsoWorldInventoryObject
+function ChaosNPC:StartPickupBandageAction(worldObj)
+    if not self.zombie or not worldObj then return end
+    if self.enemy then return end
+    if self.actionType ~= nil then return end
+    if not self:TryClaimGroundWeapon(worldObj) then return end
+
+    local square = worldObj:getSquare()
+    if not square then
+        self:ReleaseGroundWeaponClaim(worldObj)
+        return
+    end
+
+    self.actionType = "pickup_bandage"
+    self.actionWorldObjectTarget = worldObj
+    self:MoveToLocation(square)
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:pickGroundBandage(worldObj)
+    if not self.zombie or not worldObj then return false end
+
+    local claimOwner = self:GetGroundWeaponClaimOwner(worldObj)
+    if claimOwner ~= self:GetGroundWeaponClaimToken() then
+        return false
+    end
+
+    local item = worldObj:getItem()
+    if not item then return false end
+
+    local healAmount = CHAOS_NPC_BANDAGE_HEAL_AMOUNTS[item:getFullType()]
+    if not healAmount then return false end
+
+    local md = item:getModData()
+    if md then
+        md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] = nil
+    end
+
+    InventoryItem.RemoveFromContainer(item)
+
+    local zombie = self.zombie
+    local newHealth = zombie:getHealth() + healAmount
+    if newHealth > self.maxHealth then
+        newHealth = self.maxHealth
+    end
+    zombie:setHealth(newHealth)
+
+    local percent = 0
+    if self.maxHealth > 0 then
+        percent = math.floor(newHealth / self.maxHealth * 100)
+    end
+    local line = string.format("npc_heal_success %d%%", percent)
+    ChaosZombie.AddNewChatLine(zombie, line, CHAOS_NPC_BANDAGE_CHAT_COLOR)
+
+    return true
 end
 
 ---@param worldObj IsoWorldInventoryObject

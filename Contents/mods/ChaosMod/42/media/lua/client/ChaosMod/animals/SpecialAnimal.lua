@@ -5,11 +5,15 @@
 ---@field alwaysRunning boolean
 ---@field repathTicks integer
 ---@field maxRepathTicks integer
+---@field lastDoorCheckMs integer
 SpecialAnimal = SpecialAnimal or {}
 SpecialAnimal.__index = SpecialAnimal
 
 SpecialAnimal.modDataNameKey = "ChaosModAnimalNickname"
 SpecialAnimal.modDataColorKey = "ChaosModAnimalNicknameColor"
+
+local DOOR_CHECK_INTERVAL_MS = 1000
+local DOOR_CHECK_RADIUS = 1
 
 ---@param animal IsoAnimal
 ---@return SpecialAnimal
@@ -20,12 +24,47 @@ function SpecialAnimal:new(animal)
         renderNickname = true,
         alwaysRunning = true,
         repathTicks = 0,
-        maxRepathTicks = 20
+        maxRepathTicks = 20,
+        lastDoorCheckMs = 0
     }
     setmetatable(o, self)
     table.insert(ChaosMod.specialAnimalsFollowers, o)
     ---@diagnostic disable-next-line: return-type-mismatch
     return o
+end
+
+---@param door IsoDoor
+---@return boolean
+local function forceOpenDoor(door)
+    if not door or not instanceof(door, "IsoDoor") then
+        return false
+    end
+    if door:isBarricaded() then
+        return false
+    end
+    door:setLocked(false)
+    door:setLockedByKey(false)
+    if not door:IsOpen() then
+        door:ToggleDoorSilent()
+        door:sync()
+    end
+    return door:IsOpen()
+end
+
+---@param animal IsoAnimal
+function SpecialAnimal:openNearbyDoors(animal)
+    local sq = animal:getSquare()
+    if not sq then return end
+    local x, y, z = sq:getX(), sq:getY(), sq:getZ()
+    ChaosUtils.SquareRingSearchTile_2D(x, y, function(s)
+        if s then
+            ChaosUtils.ForAllObjectsInSquare(s, function(obj)
+                if instanceof(obj, "IsoDoor") then
+                    forceOpenDoor(obj)
+                end
+            end)
+        end
+    end, 0, DOOR_CHECK_RADIUS, false, false, true, z, z)
 end
 
 ---@return boolean
@@ -93,6 +132,12 @@ function SpecialAnimal:tick()
                 animal:pathToCharacter(follow)
             end
         end
+    end
+
+    local now = getTimestampMs()
+    if (now - (self.lastDoorCheckMs or 0)) >= DOOR_CHECK_INTERVAL_MS then
+        self.lastDoorCheckMs = now
+        self:openNearbyDoors(animal)
     end
 end
 
