@@ -873,7 +873,7 @@
             "chance": 0.3,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "negative_6"
+            "price_group": "negative_4"
         },
         {
             "id": "heal_player",
@@ -1475,7 +1475,7 @@
             "chance": 0.8,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "negative_5"
+            "price_group": "negative_6"
         },
         {
             "id": "pop_tires_vehicles_nearby",

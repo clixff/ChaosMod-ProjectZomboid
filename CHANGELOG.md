@@ -23,6 +23,7 @@
 - Added Twitch Subs donation system: every N subs triggers a random effect.
 - Friendly NPCs now pick up bandages from the ground to heal themselves when out of combat.
 - Animals now can open doors
+- NPCs now panic and flee to a nearby spot when surrounded by zombies
 
 ### New Effects
 
