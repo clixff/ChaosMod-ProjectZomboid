@@ -50,6 +50,7 @@
 - NPCs now have different health groups (weak, default, strong) that determine their max health level
 - Fixed NPCs AI against zombies
 - Removed the unused "Voting Type" setting from the in-game settings window and the StreamerApp dashboard
+- Removed debug keybinds that dropped weapons and changed clothes for player
 
 ### Effect Fixes
 

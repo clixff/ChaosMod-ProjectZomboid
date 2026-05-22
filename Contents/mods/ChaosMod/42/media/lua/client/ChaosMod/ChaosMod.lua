@@ -115,25 +115,6 @@ function ChaosMod.StopMod()
     end
 end
 
----@param key integer
-function ChaosMod.OnKeyPressed(key)
-    if key == 53 then
-        local player = getPlayer()
-        if player then
-            print("Drop item in hand")
-            player:dropHandItems()
-        end
-    elseif key == 51 then
-        local player = getPlayer()
-        if player then
-            player:getInventory()
-            print("Dress in random outfit")
-            ChaosPlayer.DropAllItemsOnGround(player, false)
-            player:dressInRandomOutfit()
-        end
-    end
-end
-
 local SPAWN_POINT_MOD_DATA_KEY = "ChaosMod_SpawnPoint"
 
 LoadSpawnPointFromModData = function()
@@ -371,7 +352,6 @@ function ChaosMod.OnEnterVehicle(character)
     ChaosUtils.lastUsedVehicle = vehicle
 end
 
-Events.OnKeyPressed.Add(ChaosMod.OnKeyPressed)
 Events.OnInitWorld.Add(ChaosMod.OnInitWorld)
 Events.OnWeaponHitCharacter.Add(ChaosMod.OnWeaponHitCharacter)
 Events.OnGameStart.Add(ChaosMod.OnGameStart)
