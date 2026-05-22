@@ -391,7 +391,10 @@
         "water_globally_enabled": "Water has been enabled globally",
         "total_votes": "Total votes: %d",
         "unlimited_ammo": "Unlimited Ammo",
-        "modified_zombies": "Modified %d zombies"
+        "modified_zombies": "Modified %d zombies",
+        "npc_need_heal": "I need bandages to heal",
+        "npc_bandaged_wounds": "I bandaged my wounds. (%d/100)",
+        "adoring_fan_greeting": "Golly, you're the best! I'm going to follow you and watch you and worship the ground you walk on! Let's go!"
     },
     "meta": {
         "username_activated_effect": "%s activated %s"

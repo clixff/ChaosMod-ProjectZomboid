@@ -391,7 +391,10 @@
         "water_globally_enabled": "Su küresel olarak etkinleştirildi",
         "total_votes": "Toplam oy: %d",
         "unlimited_ammo": "Sınırsız Cephane",
-        "modified_zombies": "%d zombi değiştirildi"
+        "modified_zombies": "%d zombi değiştirildi",
+        "npc_need_heal": "İyileşmek için bandaja ihtiyacım var",
+        "npc_bandaged_wounds": "Yaralarımı sardım. (%d/100)",
+        "adoring_fan_greeting": "Vay canına, sen en iyisisin! Seni takip edeceğim, seni izleyeceğim ve bastığın toprağa tapacağım! Hadi gidelim!"
     },
     "meta": {
         "username_activated_effect": "%s şunu etkinleştirdi: %s"

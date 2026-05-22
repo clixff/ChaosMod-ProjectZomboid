@@ -391,7 +391,10 @@
         "water_globally_enabled": "A água foi ativada globalmente",
         "total_votes": "Total de votos: %d",
         "unlimited_ammo": "Munição Ilimitada",
-        "modified_zombies": "%d zumbis modificados"
+        "modified_zombies": "%d zumbis modificados",
+        "npc_need_heal": "Preciso de curativos para me curar",
+        "npc_bandaged_wounds": "Enfaixei meus ferimentos. (%d/100)",
+        "adoring_fan_greeting": "Nossa, você é o melhor! Vou te seguir, te observar e venerar o chão por onde você passa! Vamos!"
     },
     "meta": {
         "username_activated_effect": "%s ativou %s"

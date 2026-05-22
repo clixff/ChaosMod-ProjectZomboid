@@ -391,7 +391,10 @@
         "water_globally_enabled": "전 세계적으로 수도가 공급됩니다",
         "total_votes": "총 투표수: %d",
         "unlimited_ammo": "무한 탄약",
-        "modified_zombies": "좀비 %d마리 수정됨"
+        "modified_zombies": "좀비 %d마리 수정됨",
+        "npc_need_heal": "치료하려면 붕대가 필요합니다",
+        "npc_bandaged_wounds": "상처에 붕대를 감았습니다. (%d/100)",
+        "adoring_fan_greeting": "세상에, 당신이 최고예요! 당신을 따라다니고, 지켜보고, 당신이 걷는 땅까지 숭배할 거예요! 가요!"
     },
     "meta": {
         "username_activated_effect": "%s 님이 %s 효과를 활성화했습니다"

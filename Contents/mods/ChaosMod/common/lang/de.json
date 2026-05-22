@@ -391,7 +391,10 @@
         "water_globally_enabled": "Wasser wurde weltweit aktiviert",
         "total_votes": "Stimmen insgesamt: %d",
         "unlimited_ammo": "Unbegrenzte Munition",
-        "modified_zombies": "%d Zombies modifiziert"
+        "modified_zombies": "%d Zombies modifiziert",
+        "npc_need_heal": "Ich brauche Verbände, um mich zu heilen",
+        "npc_bandaged_wounds": "Ich habe meine Wunden verbunden. (%d/100)",
+        "adoring_fan_greeting": "Meine Güte, du bist der Beste! Ich werde dir folgen, dich beobachten und den Boden verehren, auf dem du gehst! Los geht's!"
     },
     "meta": {
         "username_activated_effect": "%s hat %s aktiviert"

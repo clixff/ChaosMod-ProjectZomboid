@@ -391,7 +391,10 @@
         "water_globally_enabled": "El agua ha sido activada globalmente",
         "total_votes": "Votos totales: %d",
         "unlimited_ammo": "Munición Ilimitada",
-        "modified_zombies": "%d zombis modificados"
+        "modified_zombies": "%d zombis modificados",
+        "npc_need_heal": "Necesito vendas para curarme",
+        "npc_bandaged_wounds": "Me vendé las heridas. (%d/100)",
+        "adoring_fan_greeting": "¡Caray, eres el mejor! ¡Voy a seguirte, observarte y adorar el suelo que pisas! ¡Vamos!"
     },
     "meta": {
         "username_activated_effect": "%s activó %s"

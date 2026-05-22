@@ -391,7 +391,10 @@
         "removed_barricades": "Убрано баррикад: %d",
         "removed_curtains": "Убрано штор: %d",
         "unlimited_ammo": "Бесконечные патроны",
-        "modified_zombies": "Изменено зомби: %d"
+        "modified_zombies": "Изменено зомби: %d",
+        "npc_need_heal": "Мне нужны бинты для лечения",
+        "npc_bandaged_wounds": "Я перевязал свои раны. (%d/100)",
+        "adoring_fan_greeting": "Ого, ты лучший! Я буду следовать за тобой, смотреть за тобой и боготворить землю, по которой ты ходишь! Погнали!"
     },
     "meta": {
         "username_activated_effect": "%s активировал %s"

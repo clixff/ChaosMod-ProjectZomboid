@@ -391,7 +391,10 @@
         "water_globally_enabled": "L'eau a été activée mondialement",
         "total_votes": "Total des votes : %d",
         "unlimited_ammo": "Munitions Illimitées",
-        "modified_zombies": "%d zombies modifiés"
+        "modified_zombies": "%d zombies modifiés",
+        "npc_need_heal": "J'ai besoin de bandages pour me soigner",
+        "npc_bandaged_wounds": "J'ai bandé mes blessures. (%d/100)",
+        "adoring_fan_greeting": "Mazette, tu es le meilleur ! Je vais te suivre, te regarder et vénérer le sol sur lequel tu marches ! Allons-y !"
     },
     "meta": {
         "username_activated_effect": "%s a activé %s"

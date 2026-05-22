@@ -391,7 +391,10 @@
         "water_globally_enabled": "Woda została włączona globalnie",
         "total_votes": "Łączna liczba głosów: %d",
         "unlimited_ammo": "Nieskończona Amunicja",
-        "modified_zombies": "Zmodyfikowano %d zombie"
+        "modified_zombies": "Zmodyfikowano %d zombie",
+        "npc_need_heal": "Potrzebuję bandaży, żeby się wyleczyć",
+        "npc_bandaged_wounds": "Opatrzyłem swoje rany. (%d/100)",
+        "adoring_fan_greeting": "Rany, jesteś najlepszy! Będę za tobą chodzić, obserwować cię i czcić ziemię, po której stąpasz! Ruszajmy!"
     },
     "meta": {
         "username_activated_effect": "%s aktywował %s"

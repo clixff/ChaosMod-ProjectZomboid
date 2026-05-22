@@ -230,8 +230,12 @@ function ChaosNPC:pickGroundBandage(worldObj)
     if self.maxHealth > 0 then
         percent = math.floor(newHealth / self.maxHealth * 100)
     end
-    local line = string.format("npc_heal_success %d%%", percent)
+    local line = string.format(ChaosLocalization.GetString("misc", "npc_bandaged_wounds"), percent)
     ChaosZombie.AddNewChatLine(zombie, line, CHAOS_NPC_BANDAGE_CHAT_COLOR)
+
+
+    local soundName = zombie:isFemale() and "chaos_npc_wounds_bandaged_female" or "chaos_npc_wounds_bandaged_male"
+    ChaosZombie.PlaySoundLine(zombie, soundName, "bandage_wounds", 10000)
 
     return true
 end

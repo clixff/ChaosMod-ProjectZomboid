@@ -2,6 +2,7 @@ ChaosZombie = ChaosZombie or {}
 ChaosZombie.modDataChatLineKey = "ChaosModChatLine"
 ChaosZombie.modDataChatLineColorKey = "ChaosModChatLineColor"
 ChaosZombie.modDataChatLineTimestampKey = "ChaosModChatLineTimestampMs"
+ChaosZombie.lastSoundLineTimestampsByKey = {}
 
 local function getNaturalZombieHealth()
     local toughness = SandboxVars.ZombieLore.Toughness
@@ -664,4 +665,23 @@ function ChaosZombie.MoveToPlayerSpotted(zombie, player)
     zombie:setTurnAlertedValues(px, py)
     zombie:pathToCharacter(player)
     zombie:spotted(player, true)
+end
+
+---@param zombie IsoZombie
+---@param soundname string
+---@param key string
+---@param timeout integer Milliseconds to suppress repeats sharing the same key.
+---@return boolean played True when the sound actually played.
+function ChaosZombie.PlaySoundLine(zombie, soundname, key, timeout)
+    if not zombie or not soundname or not key then
+        return false
+    end
+    local now = getTimestampMs()
+    local lastTime = ChaosZombie.lastSoundLineTimestampsByKey[key]
+    if lastTime and (now - lastTime) < timeout then
+        return false
+    end
+    ChaosZombie.lastSoundLineTimestampsByKey[key] = now
+    zombie:playSound(soundname)
+    return true
 end

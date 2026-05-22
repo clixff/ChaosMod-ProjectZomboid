@@ -901,7 +901,7 @@
                 "player_falls"
             ],
             "enabled_donate": true,
-            "price_group": "negative_4"
+            "price_group": "negative_6"
         },
         {
             "id": "random_zombie_friend",

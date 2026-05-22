@@ -391,7 +391,10 @@
         "water_globally_enabled": "全球供水已启用",
         "total_votes": "总票数: %d",
         "unlimited_ammo": "无限弹药",
-        "modified_zombies": "已修改 %d 只僵尸"
+        "modified_zombies": "已修改 %d 只僵尸",
+        "npc_need_heal": "我需要绷带来疗伤",
+        "npc_bandaged_wounds": "我包扎了伤口。(%d/100)",
+        "adoring_fan_greeting": "天哪，你是最棒的！我要跟着你、看着你，还要崇拜你走过的每一寸土地！走吧！"
     },
     "meta": {
         "username_activated_effect": "%s 激活了 %s"

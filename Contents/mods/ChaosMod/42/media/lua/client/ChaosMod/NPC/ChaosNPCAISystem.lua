@@ -71,7 +71,9 @@ function ChaosNPC:update(deltaMs)
                 tostring(actionState):find("^hitreaction") ~= nil or tostring(actionState):find("^staggerback") ~= nil)
 
         if shouldRecoverFromBite or forceRecoverFromBite then
-            self:DebugLog("recover_from_zombie_bite elapsed=" .. tostring(timeSinceBiteMs) .. " force=" .. tostring(forceRecoverFromBite), true)
+            self:DebugLog(
+                "recover_from_zombie_bite elapsed=" ..
+                tostring(timeSinceBiteMs) .. " force=" .. tostring(forceRecoverFromBite), true)
 
             zombie:setStaggerBack(false)
             zombie:setHitReaction("")
@@ -297,8 +299,13 @@ function ChaosNPC:update(deltaMs)
     if isFriendly and needsHealing and self.enemy == nil and not self.isAttacking then
         local timeSinceLineMs = timestampMs - (self.lastNeedHealLineMs or 0)
         if timeSinceLineMs >= CHAOS_NPC_NEED_HEAL_LINE_COOLDOWN_MS then
-            ChaosZombie.AddNewChatLine(zombie, "npc_need_heal", CHAOS_NPC_BANDAGE_CHAT_COLOR)
+            ChaosZombie.AddNewChatLine(zombie, ChaosLocalization.GetString("misc", "npc_need_heal"),
+                CHAOS_NPC_BANDAGE_CHAT_COLOR)
             self.lastNeedHealLineMs = timestampMs
+
+            local soundName = zombie:isFemale() and "chaos_npc_need_bandages_female" or "chaos_npc_need_bandages_male"
+
+            ChaosZombie.PlaySoundLine(zombie, soundName, "need_heal", 80000)
         end
     end
 

@@ -391,7 +391,10 @@
         "water_globally_enabled": "世界中で水道が復旧しました",
         "total_votes": "総投票数: %d",
         "unlimited_ammo": "無限弾薬",
-        "modified_zombies": "%d 体のゾンビを変更"
+        "modified_zombies": "%d 体のゾンビを変更",
+        "npc_need_heal": "回復するために包帯が必要だ",
+        "npc_bandaged_wounds": "傷に包帯を巻いた。(%d/100)",
+        "adoring_fan_greeting": "わあ、君って最高だ！君についていって、君を見守って、君が歩く地面まで崇めるよ！行こう！"
     },
     "meta": {
         "username_activated_effect": "%sが%sをアクティブにしました"
