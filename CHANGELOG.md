@@ -53,6 +53,8 @@
 - Fixed NPCs AI against zombies
 - Removed the unused "Voting Type" setting from the in-game settings window and the StreamerApp dashboard
 - Removed debug keybinds that dropped weapons and changed clothes for player
+- Friendly NPCs now consume less stamina when attacking. (25%)
+- Overall NPC and Zombie vs NPC AI improvements
 
 ### Effect Fixes
 
@@ -66,6 +68,7 @@
 - "Break Nearby Windows" effect now also smashes the windows of nearby cars
 - "Give Katana" effect now equips the katana to both hands of the player
 - "Spawn Trees" effect now lasts 120 seconds and spawns more trees over a wider area; trees are removed when the effect ends, and the player is no longer damaged by car crashes into them while driving
+- "Spawn Random L4D2 Companion" now gives random melee weapon to NPC
 
 [1.1.1]
 

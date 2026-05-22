@@ -30,6 +30,8 @@ ChaosNicknames = ChaosNicknames or {
     modDataColorKey = "ChaosModNicknameColor"
 }
 
+local DEBUG_NICKNAMES_TEXT = false
+
 local NICKNAME_CHAT_MESSAGE_MAX_AGE_MS = 30000
 local NICKNAME_CHAT_MESSAGE_RENDER_MS = 7000
 local NICKNAME_CHAT_MESSAGE_FADE_MS = 1000
@@ -384,17 +386,35 @@ end
 local function drawAnimalLabel(animal, text, playerNum, alpha, colorR, colorG, colorB)
     if not animal or animal:isDead() then return end
 
+    alpha = alpha or 0.8
+
     local z = animal:getZ() + 0.8
     local sx = isoToScreenX(playerNum, animal:getX(), animal:getY(), z)
     local sy = isoToScreenY(playerNum, animal:getX(), animal:getY(), z)
 
     local font = UIFont.Dialogue
+    local tm = getTextManager()
+
     local w, lineCount = measureMultilineText(text, font)
+    local lineH = tm:getFontHeight(font)
 
     sx = sx - w / 2
     sy = sy - (20 * lineCount)
 
-    getTextManager():DrawString(font, sx, sy, text, colorR or 1, colorG or 1, colorB or 1, alpha or 0.8)
+    -- background
+    local padX = 4
+    local padY = 2
+    local bgX = sx - padX
+    local bgY = sy - padY
+    local bgW = w + padX * 2
+    local bgH = lineH * lineCount + padY * 2
+
+    local grayBg = { r = 0.08, g = 0.08, b = 0.08, a = 0.2 * alpha }
+
+    ---@diagnostic disable-next-line: param-type-mismatch, missing-parameter
+    getRenderer():render(nil, bgX, bgY, bgW, bgH, grayBg.r, grayBg.g, grayBg.b, grayBg.a, nil)
+
+    tm:DrawString(font, sx, sy, text, colorR or 1, colorG or 1, colorB or 1, alpha)
 end
 
 ---@param zombie IsoZombie
@@ -408,17 +428,36 @@ local function drawZombieLabel(zombie, text, playerNum, alpha, colorR, colorG, c
     if not zombie or zombie:isDead() then return end
     if zombie:getTargetAlpha(0) < 0.5 then return end
 
+    alpha = alpha or 0.8
+
     local z = zombie:getZ() + 0.8
     local sx = isoToScreenX(playerNum, zombie:getX(), zombie:getY(), z)
     local sy = isoToScreenY(playerNum, zombie:getX(), zombie:getY(), z)
 
     local font = UIFont.Dialogue
+    local tm = getTextManager()
+
     local w, lineCount = measureMultilineText(text, font)
+    local lineH = tm:getFontHeight(font)
 
     sx = sx - w / 2
     sy = sy - (20 * lineCount)
 
-    getTextManager():DrawString(font, sx, sy, text, colorR or 1, colorG or 1, colorB or 1, alpha or 0.8)
+    -- background
+    local padX = 4
+    local padY = 2
+    local bgX = sx - padX
+    local bgY = sy - padY
+    local bgW = w + padX * 2
+    local bgH = lineH * lineCount + padY * 2
+
+    local grayBg = { r = 0.08, g = 0.08, b = 0.08, a = 0.2 * alpha }
+
+    ---@diagnostic disable-next-line: param-type-mismatch, missing-parameter
+    getRenderer():render(nil, bgX, bgY, bgW, bgH, grayBg.r, grayBg.g, grayBg.b, grayBg.a, nil)
+
+
+    tm:DrawString(font, sx, sy, text, colorR or 1, colorG or 1, colorB or 1, alpha)
 end
 
 ---@param zombie IsoZombie
@@ -516,6 +555,103 @@ function getNicknameEntryByName(nickname)
 end
 
 ---@param zombie IsoZombie
+---@return string
+function ChaosNicknames.GetDebugNicknamesText(zombie)
+    if not zombie or zombie:isDead() then
+        return ""
+    end
+
+    local id = tostring(zombie:getID())
+    local health = zombie:getHealth()
+    local actionState = tostring(zombie:getActionStateName())
+    local bumpType = tostring(zombie:getBumpType() or "")
+    local hitReaction = tostring(zombie:getHitReaction() or "")
+    local isNPC = ChaosNPCUtils.IsNPC(zombie)
+
+    if isNPC then
+        local npc = ChaosNPCUtils.GetNPCFromZombie(zombie)
+        if not npc then
+            return string.format("NPC id=%s hp=%.2f state=%s bump=%s hit=%s", id, health, actionState, bumpType,
+                hitReaction)
+        end
+
+        local enemyId = "nil"
+        local enemyDist = -1.0
+        if npc.enemy then
+            enemyId = tostring(npc.enemy:getID())
+            enemyDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), npc.enemy:getX(), npc.enemy:getY())
+        end
+
+        local attackProgress = 0.0
+        if npc.attackAnimWindowMs and npc.attackAnimWindowMs > 0 then
+            attackProgress = (npc.attackAnimTimeMs or 0) / npc.attackAnimWindowMs
+        end
+
+        return string.format(
+            "NPC id=%s hp=%.2f state=%s bump=%s hit=%s\nAtk=%s %d/%d %.0f%% hitDone=%s last=%d\nmove=%s enemy=%s dist=%.2f pf=%d end=%.0f",
+            id,
+            health,
+            actionState,
+            bumpType,
+            hitReaction,
+            tostring(npc.attackAnimName or "nil"),
+            npc.attackAnimTimeMs or 0,
+            npc.attackAnimWindowMs or 0,
+            attackProgress * 100.0,
+            tostring(npc.attackHitPassed),
+            npc.attackLastTimeMs or 0,
+            tostring(npc.moving),
+            enemyId,
+            enemyDist,
+            npc.pathfindUpdateMs or 0,
+            npc.endurance or 0
+        )
+    end
+
+    local modData = zombie:getModData()
+    local biteData = modData and modData["ZombieAttackBiteData"]
+    if biteData then
+        local elapsedMs = ChaosMod.lastTimeTickMs - (biteData.startTime or ChaosMod.lastTimeTickMs)
+        local delayMs = biteData.damageDelayMs or 0
+        local cancelWindowMs = biteData.cancelWindowMs or 0
+        local targetId = "nil"
+        local targetDist = -1.0
+        if biteData.target and biteData.target.zombie then
+            targetId = tostring(biteData.target.zombie:getID())
+            targetDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), biteData.target.zombie:getX(),
+                biteData.target.zombie:getY())
+        end
+
+        return string.format(
+            "Z id=%s hp=%.2f state=%s bump=%s hit=%s\nBite %d/%d cancel<=%d cancelled=%s\ntarget=%s dist=%.2f",
+            id,
+            health,
+            actionState,
+            bumpType,
+            hitReaction,
+            elapsedMs,
+            delayMs,
+            cancelWindowMs,
+            tostring(biteData.cancelled),
+            targetId,
+            targetDist
+        )
+    end
+
+    local target = zombie:getTarget()
+    local targetId = "nil"
+    local targetDist = -1.0
+    if target then
+        targetId = tostring(target:getID())
+        targetDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), target:getX(), target:getY())
+    end
+
+    return string.format("Z id=%s hp=%.2f state=%s bump=%s hit=%s\ntarget=%s dist=%.2f", id, health, actionState,
+        bumpType,
+        hitReaction, targetId, targetDist)
+end
+
+---@param zombie IsoZombie
 function ChaosNicknames.RenderNickname(zombie)
     local shouldRender = shouldRenderZombieNickname(zombie)
     if not shouldRender then
@@ -555,6 +691,19 @@ function ChaosNicknames.OnPreUIDraw()
 
     local nowMs = getTimestampMs()
     ChaosZombie.ForEachZombieInRange(player:getX(), player:getY(), 15, function(zombie)
+        if DEBUG_NICKNAMES_TEXT then
+            local debugText = ChaosNicknames.GetDebugNicknamesText(zombie)
+            if debugText and debugText ~= "" then
+                local colorNPC = { r = 0, g = 0.8, b = 0 }
+                local colorZombie = { r = 1, g = 0.5, b = 0.5 }
+
+                local color = ChaosNPCUtils.IsNPC(zombie) and colorNPC or colorZombie
+
+                drawZombieLabel(zombie, debugText, 0, NICKNAME_CHAT_MESSAGE_MAX_ALPHA, color.r, color.g, color.b)
+            end
+            return
+        end
+
         local shouldRender = shouldRenderZombieLabel(zombie)
         if shouldRender then
             local chatMessage, _, alpha, colorR, colorG, colorB = resolveZombieRenderedMessage(zombie, nowMs)

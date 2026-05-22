@@ -95,6 +95,8 @@ function EffectSpawnHomerSimpson:OnStart()
 
     zombie:resetModelNextFrame()
 
+    npc:SetWeapon("Base.BaseballBat")
+
     local donutsToSpawn = 5
 
     for i = 1, donutsToSpawn do

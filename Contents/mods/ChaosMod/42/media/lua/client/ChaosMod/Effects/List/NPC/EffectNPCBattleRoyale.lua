@@ -1,7 +1,7 @@
 ---@class EffectNPCBattleRoyale : ChaosEffectBase
 EffectNPCBattleRoyale = ChaosEffectBase:derive("EffectNPCBattleRoyale", "npc_battle_royale")
 
-local NPC_COUNT = 15
+local NPC_COUNT = 50
 
 ---@type string[]
 local WEAPONS = {
@@ -32,7 +32,7 @@ function EffectNPCBattleRoyale:OnStart()
     local spawnedNpcs = {}
 
     for i = 1, NPC_COUNT do
-        local square = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 3, 8, 50, true, true, false)
+        local square = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 3, 15, 50, true, true, false)
         if square then
             local newZombies = ChaosZombie.SpawnZombieAt(
                 square:getX(), square:getY(), square:getZ(), 1, "Tourist", 50)
@@ -45,6 +45,7 @@ function EffectNPCBattleRoyale:OnStart()
                 local weapon = WEAPONS[ChaosUtils.RandArrayIndex(WEAPONS)]
                 if weapon then
                     npc:SetWeapon(weapon)
+                    npc.chanceToDropWeaponOnDeath = 0.1
                 end
                 table.insert(spawnedNpcs, npc)
             end

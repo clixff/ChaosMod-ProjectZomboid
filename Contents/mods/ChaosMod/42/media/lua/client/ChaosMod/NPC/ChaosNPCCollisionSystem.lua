@@ -122,7 +122,7 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
             canOpenDoor = false
         end
 
-        print("[ChaosNPCCollisionSystem] canOpenDoor: " .. tostring(canOpenDoor))
+        print(string.format("[ChaosNPCCollisionSystem][npc=%s] canOpenDoor=%s", tostring(zombie:getID()), tostring(canOpenDoor)))
 
         if canOpenDoor then
             door:ToggleDoor(getPlayer())

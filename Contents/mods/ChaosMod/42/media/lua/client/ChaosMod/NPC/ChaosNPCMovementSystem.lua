@@ -13,6 +13,7 @@ function ChaosNPC:MoveToCharacter(character)
         actionState == "pathfinding" or actionState == "run"
 
     if not allowActionState then
+        self:DebugLogThrottled("move_to_character_blocked_state " .. tostring(actionState))
         self:StopMoving(true, "not_allowed_action_state")
         return
     end
@@ -104,6 +105,7 @@ function ChaosNPC:MoveToLocation(square)
     local allowActionState = actionState == "walktoward" or actionState == "idle" or
         actionState == "pathfinding" or actionState == "run"
     if not allowActionState then
+        self:DebugLogThrottled("move_to_location_blocked_state " .. tostring(actionState))
         self:StopMoving(true, "not_allowed_action_state")
         return
     end
@@ -199,7 +201,8 @@ function ChaosNPC:VehiclesTick()
             self.moveTargetCharacter:getVehicle() == zombieVehicle
 
         if not enemyInVehicle and not moveTargetInVehicle then
-            print("[ChaosNPC] VehiclesTick: exit - enemy/move_target not in same vehicle")
+            print(string.format("[ChaosNPC][%s] VehiclesTick: exit - enemy/move_target not in same vehicle",
+                tostring(self.zombie:getID())))
             zombieVehicle:exit(self.zombie)
         end
         return
@@ -228,7 +231,8 @@ function ChaosNPC:VehiclesTick()
 
     if not ChaosUtils.isInRange(x1, y1, x2, y2, 4.0) then return end
 
-    print("[ChaosNPC] VehiclesTick: enter - following move_target into vehicle")
+    print(string.format("[ChaosNPC][%s] VehiclesTick: enter - following move_target into vehicle",
+        tostring(self.zombie:getID())))
     moveTargetVehicle:enter(seat, self.zombie)
 end
 
@@ -250,18 +254,21 @@ function ChaosNPC:EnterPlayerVehicle(player)
 
     local vehicle = player:getVehicle()
     if not vehicle then
-        print("[ChaosNPC] EnterPlayerVehicle: abort - player has no vehicle")
+        print(string.format("[ChaosNPC][%s] EnterPlayerVehicle: abort - player has no vehicle",
+            tostring(self.zombie:getID())))
         return
     end
 
     local seat = ChaosVehicle.FindFreeSeat(vehicle, true)
     if seat < 1 then
-        print("[ChaosNPC] EnterPlayerVehicle: abort - no free seat")
+        print(string.format("[ChaosNPC][%s] EnterPlayerVehicle: abort - no free seat",
+            tostring(self.zombie:getID())))
         return
     end
 
     vehicle:enter(seat, self.zombie)
     self:SetAsTargetEnemy(player)
 
-    print("[ChaosNPC] EnterPlayerVehicle: NPC seated in player vehicle, targeting player")
+    print(string.format("[ChaosNPC][%s] EnterPlayerVehicle: NPC seated in player vehicle, targeting player=%s",
+        tostring(self.zombie:getID()), tostring(player:getID())))
 end

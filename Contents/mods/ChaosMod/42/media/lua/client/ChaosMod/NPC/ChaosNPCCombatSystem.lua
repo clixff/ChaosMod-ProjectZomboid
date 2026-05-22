@@ -65,6 +65,7 @@ function ChaosNPC:SetAsTargetEnemy(newEnemy)
     if not self.zombie then return end
 
     self.enemy = newEnemy
+    self:DebugLog("set_enemy " .. tostring(newEnemy:getID()), false)
     self:MoveToCharacter(newEnemy)
 end
 
@@ -78,22 +79,26 @@ function ChaosNPC:StartAttackEnemy()
     end
 
     if zombie:getActionStateName() ~= "idle" then
+        self:DebugLogThrottled("attack_wait_not_idle")
         return
     end
 
     ---@diagnostic disable-next-line: need-check-nil, param-type-mismatch
     if not zombie:isFacingObject(self.enemy, 0.8) then
+        self:DebugLogThrottled("attack_wait_not_facing")
         return
     end
 
     if self:LineTraceToEnemy() ~= "Clear" then
         self.hasBlockingCollisionToTargetThisFrame = true
         self.isAttacking = false
+        self:DebugLogThrottled("attack_blocked_los")
         return
     end
 
     if not zombie:CanSee(self.enemy) then
         self.isAttacking = false
+        self:DebugLogThrottled("attack_blocked_cannot_see")
         return
     end
 
@@ -105,9 +110,11 @@ function ChaosNPC:StartAttackEnemy()
     self.attackObjectType = nil
 
     if not self:CanAttackTimeout() then
+        self:DebugLogThrottled("attack_wait_timeout")
         return
     end
 
+    self:DebugLog("start_attack_enemy", false)
     self:StartAttackAnimation()
 end
 
@@ -117,19 +124,24 @@ function ChaosNPC:OnAttackTick(deltaMs)
     local zombie = self.zombie
 
     local bumpType = zombie:getVariableString("BumpType")
-    if bumpType ~= self.attackAnimName then
-        self.isAttacking = false
-        self.attackAnimTimeMs = 0
-        self.attackAnimWindowMs = 0
-        self.attackAnimName = nil
-        self.attackHitPassed = false
-        self.attackObjectTarget = nil
-        self.attackObjectType = nil
+    -- The game often clears BumpType before our damage window even though the swing animation
+    -- is still visible. Treat empty BumpType as "animation no longer owns the variable" and
+    -- keep the timed attack alive. Only cancel if another non-empty bump/attack took over.
+    if bumpType ~= nil and bumpType ~= "" and bumpType ~= self.attackAnimName then
+        self:DebugLog("attack_anim_cancel bump=" .. tostring(bumpType) .. " expected=" .. tostring(self.attackAnimName),
+            false)
+        self:CancelAttackState("bump_changed")
         self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
         return
     end
 
     self.attackAnimTimeMs = self.attackAnimTimeMs + deltaMs
+
+    if self.attackHitPassed and self.attackAnimTimeMs > self.attackAnimWindowMs + 250 then
+        self:CancelAttackState("attack_finished")
+        self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
+        return
+    end
 
     if self.attackAnimTimeMs >= self.attackAnimWindowMs and not self.attackHitPassed then
         self.attackHitPassed = true
@@ -192,23 +204,40 @@ function ChaosNPC:OnTryAttackEnemyHit()
     if not self.enemy then return end
 
     local zombie = self.zombie
-    if self.enemy:isDead() then return end
-    if not zombie:isFacingObject(self.enemy, 0.5) then return end
-    if zombie:getZ() ~= self.enemy:getZ() then return end
+    if self.enemy:isDead() then
+        self:DebugLog("attack_hit_fail_enemy_dead", false)
+        return
+    end
+    if not zombie:isFacingObject(self.enemy, 0.5) then
+        self:DebugLog("attack_hit_fail_not_facing enemy=" .. tostring(self.enemy:getID()), false)
+        return
+    end
+    if zombie:getZ() ~= self.enemy:getZ() then
+        self:DebugLog("attack_hit_fail_z z1=" .. tostring(zombie:getZ()) .. " z2=" .. tostring(self.enemy:getZ()), false)
+        return
+    end
 
     local dist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), self.enemy:getX(), self.enemy:getY())
-    if dist > self:GetMaxDistanceAttack() + 0.2 then
+    local maxDist = self:GetMaxDistanceAttack() + 0.2
+    if dist > maxDist then
+        self:DebugLog(
+            string.format("attack_hit_fail_dist dist=%.2f max=%.2f enemy=%s", dist, maxDist, tostring(self.enemy:getID())),
+            false)
         return
     end
 
     if not self.enemy:isZombie() and ChaosPlayer.IsPlayerKnockedDown(self.enemy) then
+        self:DebugLog("attack_hit_fail_player_knocked", false)
         return
     end
 
     if not zombie:CanSee(self.enemy) then
+        self:DebugLog("attack_hit_fail_cannot_see enemy=" .. tostring(self.enemy:getID()), false)
         return
     end
 
+    self:DebugLog(
+        string.format("attack_hit_apply dist=%.2f max=%.2f enemy=%s", dist, maxDist, tostring(self.enemy:getID())), false)
     self:OnAttackEnemyHit()
 end
 
@@ -223,13 +252,20 @@ function ChaosNPC:OnAttackEnemyHit()
     end
 
     enemy:setAttackedBy(zombie)
+
+    if enemy:isZombie() and ChaosUtils.RandFloat(0, 100) < 10 then
+        self:DebugLog("melee_attack_missed_zombie " .. tostring(enemy:getID()), false)
+        return
+    end
+
     local minDamage = self.weaponItemCached:getMinDamage()
     local maxDamage = self.weaponItemCached:getMaxDamage()
     if minDamage <= 0 then minDamage = 2 end
     if maxDamage <= 0 then maxDamage = 4 end
 
     local weaponId = self.weaponItemCached:getFullType()
-    print("[ChaosNPCCombatSystem] Attacking enemy with weapon: " .. tostring(weaponId))
+    print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Attacking enemy with weapon: %s",
+        tostring(zombie:getID()), tostring(enemy:getID()), tostring(weaponId)))
 
     if weaponId == "Base.BareHands" then
         minDamage = 0.5
@@ -238,16 +274,19 @@ function ChaosNPC:OnAttackEnemyHit()
 
     local damage = ChaosUtils.RandFloat(minDamage, maxDamage)
 
-    print(string.format("[ChaosNPCCombatSystem] Damage min: %d, max: %d, result: %f", minDamage, maxDamage, damage))
+    print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Damage min: %.2f, max: %.2f, result: %.2f",
+        tostring(zombie:getID()), tostring(enemy:getID()), minDamage, maxDamage, damage))
 
     local damageMod = 4.0
 
-    print("[ChaosNPCCombatSystem] Damage mod: " .. tostring(damageMod))
+    print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Damage mod: %s",
+        tostring(zombie:getID()), tostring(enemy:getID()), tostring(damageMod)))
 
 
     damage = damage * self.DamageMultiplier * damageMod
 
-    print("[ChaosNPCCombatSystem] Total damage after mods: " .. tostring(damage))
+    print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Total damage after mods: %s",
+        tostring(zombie:getID()), tostring(enemy:getID()), tostring(damage)))
 
     if damage <= 0.1 then
         damage = 0.1
@@ -292,20 +331,78 @@ function ChaosNPC:OnAttackEnemyHit()
 
 
     if enemy:isZombie() then
+        ---@type IsoZombie
+        local enemyZombie = enemy
+        local enemyOldHealth = enemyZombie:getHealth()
+        local enemyModData = enemyZombie:getModData()
+        if enemyModData then
+            enemyModData["ChaosLastNPCDamageTimeMs"] = ChaosMod.lastTimeTickMs
+            enemyModData["ChaosLastNPCDamageById"] = zombie:getID()
+        end
+
         ---@type table<integer, string>
         local hitReactions = { "HeadLeft", "HeadRight", "HeadTop" }
         zombie:setVariable("ZombieHitReaction", hitReactions[ChaosUtils.RandArrayIndex(hitReactions)])
-        enemy:Hit(self.weaponItemCached, zombie, damage, false, 1.0)
+        local appliedDamage = enemy:Hit(self.weaponItemCached, zombie, damage, false, 1.0)
         zombie:clearVariable("ZombieHitReaction")
-        enemy:playSound(self.weaponItemCached:getZombieHitSound())
 
-        ---@type IsoZombie
-        local enemyZombie = enemy
-        local enemyModData = enemyZombie:getModData()
+        -- Safety fallback only if native Hit() did not change health for some reason.
+        if enemyZombie:isAlive() and enemyZombie:getHealth() >= enemyOldHealth then
+            enemyZombie:applyDamage(damage)
+            if enemyZombie:getHealth() >= enemyOldHealth then
+                damage = damage / (damageMod * 0.5)
+                enemyZombie:setHealth(math.max(0.0, enemyOldHealth - damage))
+            end
+        end
+
+        print(string.format(
+            "[ChaosNPCCombatSystem] Zombie native hit result npc=%s enemy=%s requestedDamage=%.2f appliedDamage=%.2f oldHealth=%.2f newHealth=%.2f alive=%s state=%s bump=%s hit=%s stagger=%s",
+            tostring(zombie:getID()),
+            tostring(enemyZombie:getID()),
+            damage,
+            appliedDamage or -1,
+            enemyOldHealth,
+            enemyZombie:getHealth(),
+            tostring(enemyZombie:isAlive()),
+            tostring(enemyZombie:getActionStateName()),
+            tostring(enemyZombie:getBumpType()),
+            tostring(enemyZombie:getHitReaction()),
+            tostring(enemyZombie:isStaggerBack())
+        ))
+
+        if enemyZombie:isDead() then
+            pcall(function()
+                enemyZombie:Kill(self.weaponItemCached, zombie)
+            end)
+        end
+
+        enemy:playSound(self.weaponItemCached:getZombieHitSound())
+        local enemyIsNPC = ChaosNPCUtils.IsNPC(enemyZombie)
+        enemyModData = enemyModData or enemyZombie:getModData()
         if enemyModData then
             local biteData = enemyModData["ZombieAttackBiteData"]
             if biteData and biteData.target == self then
-                enemyModData["ZombieAttackBiteData"] = nil
+                local elapsedMs = ChaosMod.lastTimeTickMs - (biteData.startTime or ChaosMod.lastTimeTickMs)
+                local cancelWindowMs = biteData.cancelWindowMs or ((biteData.damageDelayMs or 600) * 0.5)
+                if elapsedMs <= cancelWindowMs then
+                    biteData.cancelled = true
+                    enemyModData["ZombieAttackBiteData"] = nil
+                    print(string.format(
+                        "[ChaosNPCCombatSystem] NPC attack cancelled zombie bite npc=%s zombie=%s elapsed=%d cancelWindow=%d",
+                        tostring(zombie:getID()),
+                        tostring(enemyZombie:getID()),
+                        elapsedMs,
+                        cancelWindowMs
+                    ))
+                else
+                    print(string.format(
+                        "[ChaosNPCCombatSystem] NPC attack too late to cancel zombie bite npc=%s zombie=%s elapsed=%d cancelWindow=%d",
+                        tostring(zombie:getID()),
+                        tostring(enemyZombie:getID()),
+                        elapsedMs,
+                        cancelWindowMs
+                    ))
+                end
             end
         end
 
@@ -314,11 +411,8 @@ function ChaosNPC:OnAttackEnemyHit()
         enemyZombie:setAttackOutcome("interrupted")
         enemyZombie:setBumpType("")
 
-        if enemyZombie:isAlive() and not enemyZombie:isKnockedDown() then
-            enemyZombie:setHitForce(0.5)
-            enemyZombie:setStaggerBack(true)
-            enemyZombie:changeState(StaggerBackState.instance())
-        end
+        -- Avoid forcing StaggerBackState here too. It can also desync with vanilla zombie AI
+        -- when the attacker is an NPC IsoZombie. Knockdown below is still allowed.
 
         if enemy:isAlive() and ChaosUtils.RandFloat(0, 100) < chanceToKnockDown and not enemy:isKnockedDown() then
             ---@type IsoZombie
@@ -326,7 +420,7 @@ function ChaosNPC:OnAttackEnemyHit()
             enemyZombie:knockDown(false)
         end
 
-        if ChaosNPCUtils.IsNPC(enemy) then
+        if enemyIsNPC then
             local otherNPC = ChaosNPCUtils.GetNPCFromZombie(enemy)
             if otherNPC then
                 otherNPC:OnZombieDamagedNPC(zombie)
@@ -362,8 +456,8 @@ function ChaosNPC:OnAttackEnemyHit()
 
         minDamage, maxDamage = self:GetMinMaxDamageToPlayer()
         damage = ChaosUtils.RandFloat(minDamage, maxDamage)
-        print(string.format("[ChaosNPCCombatSystem] Damage to player min: %d, max: %d, result: %f", minDamage, maxDamage,
-            damage))
+        print(string.format("[ChaosNPCCombatSystem][npc=%s player=%s] Damage to player min=%.2f max=%.2f result=%.2f",
+            tostring(zombie:getID()), tostring(enemy:getID()), minDamage, maxDamage, damage))
 
         bodyDamage:ReduceGeneralHealth(damage)
         if self.CanAddWounds then
@@ -415,37 +509,40 @@ end
 
 ---@return number
 function ChaosNPC:GetAttackEnduranceCost()
-    if not self.weaponItemCached then
-        return CHAOS_NPC_ENDURANCE_ATTACK_DRAIN_HANDS
-    end
-    if self.weaponItemCached:getFullType() == "Base.BareHands" then
-        return CHAOS_NPC_ENDURANCE_ATTACK_DRAIN_HANDS
+    local cost = CHAOS_NPC_ENDURANCE_ATTACK_DRAIN_HANDS
+    if self.weaponItemCached and self.weaponItemCached:getFullType() ~= "Base.BareHands" then
+        local weaponType = WeaponType.getWeaponType(self.weaponItemCached)
+        if weaponType == WeaponType.TWO_HANDED or weaponType == WeaponType.HEAVY then
+            cost = CHAOS_NPC_ENDURANCE_ATTACK_DRAIN_TWO_HAND
+        elseif weaponType == WeaponType.ONE_HANDED then
+            cost = CHAOS_NPC_ENDURANCE_ATTACK_DRAIN_ONE_HAND
+        end
     end
 
-    local weaponType = WeaponType.getWeaponType(self.weaponItemCached)
-    if weaponType == WeaponType.TWO_HANDED or weaponType == WeaponType.HEAVY then
-        return CHAOS_NPC_ENDURANCE_ATTACK_DRAIN_TWO_HAND
-    elseif weaponType == WeaponType.ONE_HANDED then
-        return CHAOS_NPC_ENDURANCE_ATTACK_DRAIN_ONE_HAND
+    if self.npcGroup == ChaosNPCGroupID.COMPANIONS or self.npcGroup == ChaosNPCGroupID.FOLLOWERS then
+        cost = cost * 0.25
     end
-    return CHAOS_NPC_ENDURANCE_ATTACK_DRAIN_HANDS
+
+    return cost
 end
 
 function ChaosNPC:StartAttackAnimation()
     if not self.zombie then return end
     if self.endurance < self:GetAttackEnduranceCost() then
+        self:DebugLogThrottled("attack_wait_endurance")
         return
     end
 
     local zombie = self.zombie
 
+    if not self.weaponItemCached then
+        self:DebugLogThrottled("attack_no_weapon")
+        return
+    end
+
     self.isAttacking = true
     self.attackAnimTimeMs = 0
     self.attackAnimWindowMs = self:GetNextAttackWindowMs()
-
-    if not self.weaponItemCached then
-        return
-    end
 
     ---@type table<integer, string>
     local animsTable = {}
@@ -536,21 +633,15 @@ function ChaosNPC:OnZombieDamagedNPC(otherZombie)
     if zombie:isDead() or otherZombie:isDead() then return end
     if otherZombie == zombie then return end
 
-    if self.isAttacking then
-        self.isAttacking = false
-        self.attackAnimTimeMs = 0
-        self.attackAnimWindowMs = 0
-        self.attackAnimName = nil
-        self.attackHitPassed = false
-        self.attackObjectTarget = nil
-        self.attackObjectType = nil
-    end
-
-    if otherZombie == self.enemy then return end
+    self:CancelAttackState("damaged_by_zombie")
 
     local rel = ChaosNPCRelations.GetRelationForNPC(self, otherZombie)
     if rel == ChaosNPCRelationType.ATTACK then
-        self:SetAsTargetEnemy(otherZombie)
+        self.enemy = otherZombie
+        self.moveTargetCharacter = otherZombie
+        self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
+        self.findEnemyTimeoutMs = CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS
+        self:DebugLog("damaged_by_enemy_zombie " .. tostring(otherZombie:getID()), true)
     end
 end
 

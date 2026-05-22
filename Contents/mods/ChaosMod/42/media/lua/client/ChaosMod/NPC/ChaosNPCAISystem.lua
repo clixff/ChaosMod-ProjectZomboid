@@ -65,18 +65,37 @@ function ChaosNPC:update(deltaMs)
 
     if self.lastZombieBiteTimeMs then
         local timeSinceBiteMs = timestampMs - self.lastZombieBiteTimeMs
-        if timeSinceBiteMs > 800 and actionState == "idle" then
+        local shouldRecoverFromBite = timeSinceBiteMs > 250 and actionState == "idle"
+        local forceRecoverFromBite = timeSinceBiteMs > 1200 and
+            (actionState == "staggerback" or actionState == "hitreaction" or
+                tostring(actionState):find("^hitreaction") ~= nil or tostring(actionState):find("^staggerback") ~= nil)
+
+        if shouldRecoverFromBite or forceRecoverFromBite then
+            self:DebugLog("recover_from_zombie_bite elapsed=" .. tostring(timeSinceBiteMs) .. " force=" .. tostring(forceRecoverFromBite), true)
+
             zombie:setStaggerBack(false)
             zombie:setHitReaction("")
             zombie:setBumpType("")
-            self.isAttacking = false
-            self.attackAnimTimeMs = 0
-            self.attackAnimWindowMs = 0
-            self.attackAnimName = nil
-            self.attackHitPassed = false
-            self:StopMoving(true, "recover_from_zombie_bite_idle")
+            zombie:clearVariable("hitreaction")
+            zombie:clearVariable("BumpType")
+            zombie:clearVariable("bStaggerBack")
+            self:CancelAttackState("recover_from_zombie_bite")
+            self:StopMoving(true, "recover_from_zombie_bite")
 
-            if self.enemy and self.enemy:isAlive() then
+            if forceRecoverFromBite then
+                pcall(function()
+                    zombie:changeState(ZombieIdleState.instance())
+                end)
+            end
+
+            local biteEnemy = self.lastZombieThatAttackedNPC
+            if biteEnemy and biteEnemy:isAlive() then
+                self.enemy = biteEnemy
+                self.moveTargetCharacter = nil
+                self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
+                self.findEnemyTimeoutMs = CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS
+                self:SetAsTargetEnemy(biteEnemy)
+            elseif self.enemy and self.enemy:isAlive() then
                 self.moveTargetCharacter = nil
                 self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
                 self:SetAsTargetEnemy(self.enemy)
@@ -85,6 +104,7 @@ function ChaosNPC:update(deltaMs)
             self.lastZombieBiteTimeMs = nil
             actionState = zombie:getActionStateName()
         elseif timeSinceBiteMs > 5000 then
+            self:DebugLog("clear_expired_bite_recovery", false)
             self.lastZombieBiteTimeMs = nil
         end
     end

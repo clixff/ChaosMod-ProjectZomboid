@@ -2974,7 +2974,7 @@
                 "zombies_can_smell_you"
             ],
             "enabled_donate": true,
-            "price_group": "negative_3"
+            "price_group": "negative_5"
         },
         {
             "id": "spawn_orc_friend",

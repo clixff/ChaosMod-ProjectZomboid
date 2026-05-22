@@ -13,6 +13,8 @@ local function MakeTint(r, g, b)
     }
 end
 
+local weapons = { "Base.Axe", "Base.BaseballBat", "Base.BaseballBat_Nails", "Base.Plank_Nails" }
+
 ---@param zombie IsoZombie
 ---@param effectName string
 ---@param fullType string
@@ -158,6 +160,13 @@ function EffectSpawnRandomL4D2Companion:OnStart()
     npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
+
+    local weaponIndex = ChaosUtils.RandArrayIndex(weapons)
+    local weapon = weapons[weaponIndex]
+
+    if weapon then
+        npc:SetWeapon(weapon)
+    end
 
     ChaosZombie.HumanizeZombie(zombie)
     ApplyVariantVisuals(zombie, variant)

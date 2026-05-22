@@ -35,6 +35,8 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field lastTimeUpdateMs integer
 ---@field findEnemyTimeoutMs integer
 ---@field lastZombieThatAttackedNPC? IsoZombie
+---@field lastZombieBiteTimeMs? integer
+---@field lastNpcDebugLogMs integer
 ---@field spawnTimeMs integer
 ---@field debugLastTimePathfindMs integer
 ---@field attackLastTimeMs integer
@@ -95,6 +97,8 @@ function ChaosNPC:new(zombie, nickname)
     o.lastTimeUpdateMs = 0
     o.findEnemyTimeoutMs = 0
     o.lastZombieThatAttackedNPC = nil
+    o.lastZombieBiteTimeMs = nil
+    o.lastNpcDebugLogMs = 0
     o.spawnTimeMs = getTimestampMs()
     o.debugLastTimePathfindMs = 0
     o.attackLastTimeMs = 0
@@ -123,8 +127,8 @@ end
 ---@param target? IsoGameCharacter
 function ChaosNPC.SetTargetInner(npc, target)
     if not npc then return end
-    if not target then return end
 
+    ---@diagnostic disable-next-line: param-type-mismatch
     npc:setTarget(target)
 end
 
@@ -163,6 +167,61 @@ function ChaosNPC:SayDebug(message)
     if not zombie:isAlive() then return end
 
     zombie:SayDebug(2, message)
+end
+
+---@param message string
+---@param say? boolean
+function ChaosNPC:DebugLog(message, say)
+    if not self.zombie then return end
+
+    local zombie = self.zombie
+    local enemyId = "nil"
+    if self.enemy then
+        enemyId = tostring(self.enemy:getID())
+    end
+
+    print(string.format("[ChaosNPC][%s] %s | state=%s current=%s bump=%s hit=%s stagger=%s moving=%s attacking=%s enemy=%s health=%.2f",
+        tostring(zombie:getID()),
+        tostring(message),
+        tostring(zombie:getActionStateName()),
+        tostring(zombie:getCurrentStateName()),
+        tostring(zombie:getBumpType()),
+        tostring(zombie:getHitReaction()),
+        tostring(zombie:isStaggerBack()),
+        tostring(self.moving),
+        tostring(self.isAttacking),
+        enemyId,
+        zombie:getHealth()
+    ))
+
+    if say then
+        self:SayDebug(tostring(message))
+    end
+end
+
+---@param message string
+---@param intervalMs? integer
+function ChaosNPC:DebugLogThrottled(message, intervalMs)
+    intervalMs = intervalMs or 1000
+    local now = ChaosMod and ChaosMod.lastTimeTickMs or getTimestampMs()
+    if now - (self.lastNpcDebugLogMs or 0) < intervalMs then return end
+    self.lastNpcDebugLogMs = now
+    self:DebugLog(message, false)
+end
+
+---@param reason string
+function ChaosNPC:CancelAttackState(reason)
+    if self.isAttacking then
+        self:DebugLog("cancel_attack: " .. tostring(reason), false)
+    end
+
+    self.isAttacking = false
+    self.attackAnimTimeMs = 0
+    self.attackAnimWindowMs = 0
+    self.attackAnimName = nil
+    self.attackHitPassed = false
+    self.attackObjectTarget = nil
+    self.attackObjectType = nil
 end
 
 return ChaosNPC

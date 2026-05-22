@@ -525,7 +525,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
               onClick={() => setYoutubeChatTypeModal(true)}
             >
               <Settings size={14} aria-hidden="true" />
-              Chat Settings
+              Chat Options
             </button>
           </div>
         </div>
@@ -727,7 +727,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 onClick={() => setTwitchPointsModal(true)}
               >
                 <Settings size={14} aria-hidden="true" />
-                Settings
+                Options
               </button>
             </div>
           </div>
@@ -741,8 +741,8 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 const twitchAuthorized =
                   status.twitch.configured && status.twitch.name !== null;
                 const subsEnabled =
-                  config?.streamer_mode.donation_systems.twitch_subs
-                    .enabled ?? false;
+                  config?.streamer_mode.donation_systems.twitch_subs.enabled ??
+                  false;
                 if (!twitchAuthorized) {
                   return (
                     <span className="badge badge--off">
@@ -864,7 +864,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                     onClick={() => setTwitchSubsModal(true)}
                   >
                     <Settings size={14} aria-hidden="true" />
-                    Settings
+                    Options
                   </button>
                 </div>
               );
