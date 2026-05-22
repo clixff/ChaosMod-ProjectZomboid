@@ -896,12 +896,12 @@
             "enabled": true,
             "chance": 0.8,
             "withDuration": true,
-            "duration": 45,
+            "duration": 40,
             "disable_effects": [
                 "player_falls"
             ],
             "enabled_donate": true,
-            "price_group": "negative_6"
+            "price_group": "negative_5"
         },
         {
             "id": "random_zombie_friend",
@@ -2914,7 +2914,7 @@
                 "ufo_abduction"
             ],
             "enabled_donate": true,
-            "price_group": "negative_4"
+            "price_group": "negative_6"
         },
         {
             "id": "supersonic",

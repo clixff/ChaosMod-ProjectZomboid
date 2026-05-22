@@ -3,7 +3,7 @@
 ---@field forceSnowBeforeStart boolean
 EffectEnableSnow = ChaosEffectBase:derive("EffectEnableSnow", "enable_snow")
 
-local TEMP_WINTER_VALUE = -5.0
+local TEMP_WINTER_VALUE = -30
 
 function EffectEnableSnow:OnStart()
     ChaosEffectBase:OnStart()
@@ -40,7 +40,12 @@ function EffectEnableSnow:OnTick(deltaMs)
     local cm = ClimateManager.getInstance()
     if not cm then return end
 
-    ChaosUtils.SetClimateFloatOverride(cm, ClimateManager.FLOAT_TEMPERATURE, false, 0.0)
+    ChaosUtils.SetClimateFloatOverride(
+        cm,
+        ClimateManager.FLOAT_TEMPERATURE,
+        true,
+        TEMP_WINTER_VALUE
+    )
 end
 
 function EffectEnableSnow:OnEnd()

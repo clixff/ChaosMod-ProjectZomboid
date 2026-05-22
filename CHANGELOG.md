@@ -73,6 +73,8 @@
 - "Spawn Random L4D2 Companion" now gives random melee weapon to NPC
 - "Griefer Pig Turret" effect no longer follows zombies or the player and instead wanders to random squares around the player
 - "Griefer Pig Turret" deals double damage to zombies
+- "Player Falls" effect no longer makes the player fall while standing still or in a car, new duration is 40s
+- "Enable Snow" sets temperature to -30°C / -22 °F
 
 [1.1.1]
 
