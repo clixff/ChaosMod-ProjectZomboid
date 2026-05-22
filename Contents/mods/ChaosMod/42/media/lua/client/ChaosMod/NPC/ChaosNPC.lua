@@ -55,6 +55,7 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field stalkerInteractionCount integer
 ---@field effectMoveTargetLocation? IsoGridSquare
 ---@field healthGroup? integer
+---@field maxHealth number
 ---@field chanceToDropWeaponOnDeath number
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
@@ -117,6 +118,7 @@ function ChaosNPC:new(zombie, nickname)
     o.stalkerInteractionCount = 0
     o.effectMoveTargetLocation = nil
     o.healthGroup = CHAOS_NPC_HEALTH_GROUP.DEFAULT
+    o.maxHealth = 1.0
     o.chanceToDropWeaponOnDeath = 0.4
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
@@ -180,7 +182,8 @@ function ChaosNPC:DebugLog(message, say)
         enemyId = tostring(self.enemy:getID())
     end
 
-    print(string.format("[ChaosNPC][%s] %s | state=%s current=%s bump=%s hit=%s stagger=%s moving=%s attacking=%s enemy=%s health=%.2f",
+    print(string.format(
+        "[ChaosNPC][%s] %s | state=%s current=%s bump=%s hit=%s stagger=%s moving=%s attacking=%s enemy=%s health=%.2f",
         tostring(zombie:getID()),
         tostring(message),
         tostring(zombie:getActionStateName()),

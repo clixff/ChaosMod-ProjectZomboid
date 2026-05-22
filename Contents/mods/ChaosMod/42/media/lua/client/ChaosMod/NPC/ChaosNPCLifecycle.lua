@@ -410,4 +410,6 @@ function ChaosNPC:SetHealthGroup(group)
     else
         self.zombie:setHealth(ChaosUtils.RandFloat(1.5, 3.0))
     end
+
+    self.maxHealth = self.zombie:getHealth()
 end

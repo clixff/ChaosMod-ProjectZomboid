@@ -462,7 +462,7 @@ end
 
 ---@param zombie IsoZombie
 ---@param nowMs integer
----@return string|nil, integer, number
+---@return string|nil, integer, number, table|nil
 local function resolveInternalChatLineState(zombie, nowMs)
     if ChaosMod.enabled == false or not zombie then
         return nil, 0, 0
@@ -499,7 +499,9 @@ local function resolveInternalChatLineState(zombie, nowMs)
         end
     end
 
-    return chatLine, elapsedMs, alpha
+    local color = md[ChaosZombie.modDataChatLineColorKey]
+
+    return chatLine, elapsedMs, alpha, color
 end
 
 ---@param zombie IsoZombie
@@ -531,14 +533,19 @@ local function resolveZombieRenderedMessage(zombie, nowMs)
         return externalMessage, externalElapsedMs, externalAlpha, 1, 1, 1
     end
 
-    local internalMessage, internalElapsedMs, internalAlpha = resolveInternalChatLineState(zombie, nowMs)
+    local internalMessage, internalElapsedMs, internalAlpha, internalColor = resolveInternalChatLineState(zombie, nowMs)
+
+    if internalColor == nil then
+        internalColor = { r = 0, g = 1, b = 0 }
+    end
+
     if internalMessage and internalAlpha > 0 then
         return internalMessage,
             internalElapsedMs,
             internalAlpha,
-            INTERNAL_CHAT_LINE_GREEN.r,
-            INTERNAL_CHAT_LINE_GREEN.g,
-            INTERNAL_CHAT_LINE_GREEN.b
+            internalColor.r,
+            internalColor.g,
+            internalColor.b
     end
 
     return nil, 0, 0, 0, 0, 0

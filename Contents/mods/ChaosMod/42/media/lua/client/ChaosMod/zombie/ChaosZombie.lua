@@ -1,5 +1,6 @@
 ChaosZombie = ChaosZombie or {}
 ChaosZombie.modDataChatLineKey = "ChaosModChatLine"
+ChaosZombie.modDataChatLineColorKey = "ChaosModChatLineColor"
 ChaosZombie.modDataChatLineTimestampKey = "ChaosModChatLineTimestampMs"
 
 local function getNaturalZombieHealth()
@@ -65,8 +66,9 @@ end
 
 ---@param zombie IsoZombie
 ---@param text string|nil
+---@param color table|nil
 ---@return boolean
-function ChaosZombie.AddNewChatLine(zombie, text)
+function ChaosZombie.AddNewChatLine(zombie, text, color)
     if not zombie then
         return false
     end
@@ -83,6 +85,7 @@ function ChaosZombie.AddNewChatLine(zombie, text)
     end
 
     md[ChaosZombie.modDataChatLineKey] = text
+    md[ChaosZombie.modDataChatLineColorKey] = color or { r = 0, g = 1, b = 0 }
     md[ChaosZombie.modDataChatLineTimestampKey] = getTimestampMs()
     return true
 end
