@@ -657,7 +657,7 @@ export function EffectsPage() {
                 <li>Find the effect you want to activate.</li>
                 <li>Check its price and effect ID.</li>
                 <li>Open the streamer&apos;s DonationAlerts page.</li>
-                <li>Send a donation with the exact required price.</li>
+                <li>Send a donation of at least the required price.</li>
                 <li>
                   Put the effect ID in the donation message. For example, to
                   activate effect{" "}
@@ -1264,7 +1264,7 @@ function ActivationBlocks({
           </div>
           <div className="effect-activation-body">
             <p>
-              1. Set price to{" "}
+              1. Set price to at least{" "}
               <code className="effect-activation-inline-code">
                 {formatConverted(convertPrice(price))}
               </code>{" "}
