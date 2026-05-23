@@ -68,38 +68,33 @@ function defaultForConfig(config: ConfigCurrencies | null): string {
 }
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [configCurrencies, setConfigCurrenciesState] =
+  const [configCurrencies, setConfigCurrencies] =
     useState<ConfigCurrencies | null>(null);
-  const [selectedCurrency, setSelectedCurrencyState] = useState<string>(() => {
-    const stored = readStored();
-    return stored ?? DEFAULT_CURRENCY;
-  });
-
-  const setConfigCurrencies = useCallback(
-    (currencies: ConfigCurrencies | null) => {
-      setConfigCurrenciesState(currencies);
-      // Re-validate the persisted selection against the new config's currency
-      // list. If it isn't a known currency for this config, fall back to the
-      // config's main currency (or USD when no config).
-      setSelectedCurrencyState((prev) => {
-        const available = effectiveCurrencyList(currencies);
-        if (available.includes(prev)) return prev;
-        return defaultForConfig(currencies);
-      });
-    },
-    [],
-  );
-
-  const setSelectedCurrency = useCallback((code: string) => {
-    const upper = code.trim().toUpperCase();
-    setSelectedCurrencyState(upper);
-    persist(upper);
-  }, []);
+  // `userChoice` is the explicit pick the user made (persisted to
+  // localStorage). It overrides the config's main currency. `null` means the
+  // user hasn't picked anything yet, so we fall back to the config's main
+  // currency once it loads.
+  const [userChoice, setUserChoice] = useState<string | null>(() => readStored());
 
   const availableCurrencies = useMemo(
     () => effectiveCurrencyList(configCurrencies),
     [configCurrencies],
   );
+
+  // Effective currency = user choice when valid for the current config,
+  // otherwise the config's main currency (or USD when no config).
+  const selectedCurrency = useMemo(() => {
+    if (userChoice && availableCurrencies.includes(userChoice)) {
+      return userChoice;
+    }
+    return defaultForConfig(configCurrencies);
+  }, [userChoice, availableCurrencies, configCurrencies]);
+
+  const setSelectedCurrency = useCallback((code: string) => {
+    const upper = code.trim().toUpperCase();
+    setUserChoice(upper);
+    persist(upper);
+  }, []);
 
   const getRateToSelected = useCallback(
     (priceInMain: number): { converted: number; currency: string } => {
@@ -139,7 +134,6 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       setSelectedCurrency,
       availableCurrencies,
       configCurrencies,
-      setConfigCurrencies,
       getRateToSelected,
     ],
   );
