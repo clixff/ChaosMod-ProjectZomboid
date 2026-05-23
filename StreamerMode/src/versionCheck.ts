@@ -31,7 +31,10 @@ function compareVersions(a: string, b: string): number {
 
 export async function fetchLatestVersion(): Promise<string | null> {
   try {
-    const res = await fetch(VERSION_URL, { redirect: "follow" });
+    const res = await fetch(VERSION_URL, {
+      redirect: "follow",
+      signal: AbortSignal.timeout(15_000),
+    });
     if (!res.ok) {
       logger.debug(`[VersionCheck] HTTP ${res.status} fetching VERSION`);
       return null;

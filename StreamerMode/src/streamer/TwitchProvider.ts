@@ -33,6 +33,7 @@ export class TwitchProvider {
     try {
       res = await fetch("https://id.twitch.tv/oauth2/validate", {
         headers: { Authorization: `Bearer ${accessToken}` },
+        signal: AbortSignal.timeout(15_000),
       });
     } catch {
       return null;
@@ -51,6 +52,7 @@ export class TwitchProvider {
           "Client-Id": CLIENT_ID,
           Authorization: `Bearer ${accessToken}`,
         },
+        signal: AbortSignal.timeout(15_000),
       });
     } catch {
       return null;

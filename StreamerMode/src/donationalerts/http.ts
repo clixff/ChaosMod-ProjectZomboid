@@ -8,6 +8,8 @@ export class HttpError extends Error {
   }
 }
 
+const REQUEST_TIMEOUT_MS = 15_000;
+
 export async function readJson<T>(response: Response): Promise<T> {
   const text = await response.text();
 
@@ -42,6 +44,7 @@ export async function postForm<T>(
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body,
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 
   return readJson<T>(response);
@@ -56,6 +59,7 @@ export async function getBearer<T>(
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 
   return readJson<T>(response);
@@ -73,6 +77,7 @@ export async function postBearerJson<T>(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 
   return readJson<T>(response);

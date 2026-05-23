@@ -60,6 +60,7 @@ async function twitchHelix<T>(
   const res = await fetch(`https://api.twitch.tv/helix${path}`, {
     ...init,
     headers,
+    signal: init.signal ?? AbortSignal.timeout(15_000),
   });
 
   const text = await res.text();
@@ -97,6 +98,7 @@ export async function validateTwitchToken(
   try {
     res = await fetch("https://id.twitch.tv/oauth2/validate", {
       headers: { Authorization: `Bearer ${accessToken}` },
+      signal: AbortSignal.timeout(15_000),
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -185,6 +187,7 @@ export async function deleteCustomReward(params: {
         "Client-Id": params.clientId,
         Authorization: `Bearer ${params.token}`,
       },
+      signal: AbortSignal.timeout(15_000),
     },
   );
   if (res.status === 204) return;

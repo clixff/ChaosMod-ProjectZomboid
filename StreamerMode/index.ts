@@ -688,22 +688,30 @@ async function main(): Promise<void> {
   };
   donationManager.addProvider(daProvider);
 
-  // Auto-login donation providers on startup
-  const daUser = await daProvider.start(port);
-  if (daUser) {
-    logger.info(
-      `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`,
-    );
-    await autoSetupCurrenciesOnDALogin();
-  } else {
-    const daAppId = daProvider.getAppId();
-    const daSecrets = await daProvider.loadSecrets();
-    if (daAppId && daSecrets) {
-      logger.info(
-        `${daProvider.coloredName} Not logged in. Type ${colors.cyan("donate login donationalerts")} to authenticate.`,
-      );
+  // Auto-login donation providers on startup. Runs in the background so a
+  // slow or unreachable DonationAlerts API can't block the rest of startup.
+  void (async () => {
+    try {
+      const daUser = await daProvider.start(port);
+      if (daUser) {
+        logger.info(
+          `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`,
+        );
+        await autoSetupCurrenciesOnDALogin();
+      } else {
+        const daAppId = daProvider.getAppId();
+        const daSecrets = await daProvider.loadSecrets();
+        if (daAppId && daSecrets) {
+          logger.info(
+            `${daProvider.coloredName} Not logged in. Type ${colors.cyan("donate login donationalerts")} to authenticate.`,
+          );
+        }
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`[DonationAlerts] Background startup failed: ${msg}`);
     }
-  }
+  })();
 
   // Twitch Channel Points rewards manager. Active only while a Lua folder is
   // available; bootstraps from twitch_rewards.json and reconciles against the
@@ -973,22 +981,38 @@ async function main(): Promise<void> {
     }
   };
 
-  await twitchProvider.initFromStorage();
-  if (!twitchProvider.isAccountConnected()) {
-    logger.info(
-      `${twitchProvider.coloredName} Not logged in. Type ${colors.cyan("login")} to get the login URL.`,
-    );
-  }
+  // Auto-login Twitch on startup. Background so token validation hitting the
+  // Twitch API can't block the rest of startup if the network is slow.
+  void (async () => {
+    try {
+      await twitchProvider.initFromStorage();
+      if (!twitchProvider.isAccountConnected()) {
+        logger.info(
+          `${twitchProvider.coloredName} Not logged in. Type ${colors.cyan("login")} to get the login URL.`,
+        );
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`[Twitch] Background startup failed: ${msg}`);
+    }
+  })();
 
   youtubeProvider.setConnectionTypeReader(
     () => config?.streamer_mode.youtube_chat_connection_type ?? "long_polling",
   );
-  await youtubeProvider.initFromStorage();
-  if (!youtubeProvider.isAccountConnected()) {
-    logger.debug(
-      `${youtubeProvider.coloredName} Not logged in. Use the dashboard YouTube card to connect.`,
-    );
-  }
+  void (async () => {
+    try {
+      await youtubeProvider.initFromStorage();
+      if (!youtubeProvider.isAccountConnected()) {
+        logger.debug(
+          `${youtubeProvider.coloredName} Not logged in. Use the dashboard YouTube card to connect.`,
+        );
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`[YouTube] Background startup failed: ${msg}`);
+    }
+  })();
 
   function reloadRuntimeConfig(): boolean {
     if (!config || !modFolder || !luaFolder) {

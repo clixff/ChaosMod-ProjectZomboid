@@ -154,7 +154,7 @@ export async function fetchVideoLiveChat(params: {
   logger.debug(
     `${TAG} GET videos.list (videoId=${params.videoId}) ${redactUrl(url)}`,
   );
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
   if (!res.ok) {
     const body = await readErrorBody(res);
     const { reason, userMessage } = pickReason(res.status, body);
@@ -235,7 +235,7 @@ export async function fetchLiveChatPage(params: {
   logger.debug(
     `${TAG} GET liveChatMessages.list (pageToken=${params.pageToken ? params.pageToken.slice(0, 8) + "..." : "none"}) ${redactUrl(url)}`,
   );
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
   if (!res.ok) {
     const body = await readErrorBody(res);
     const { reason, userMessage } = pickReason(res.status, body);
