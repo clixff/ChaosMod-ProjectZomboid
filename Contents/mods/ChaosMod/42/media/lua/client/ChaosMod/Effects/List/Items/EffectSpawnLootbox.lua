@@ -45,6 +45,10 @@ LOOTBOX_ITEMS = {
         "Base.PetrolCan",
         "Base.Generator",
         "Base.CarBattery1",
+        "Base.AssaultRifle",
+        "Base.Pistol3",
+        "Base.Revolver_Long",
+        "Base.Pistol2"
     },
 }
 
@@ -97,14 +101,10 @@ function EffectSpawnLootbox:OnStart()
         return
     end
 
-    ---@type string
-    local rarity = rollRarity()
-    local pool = LOOTBOX_ITEMS[rarity]
-    if not pool then return end
-    ---@type string
-    local itemId = pool[ChaosUtils.RandArrayIndex(pool)]
-    if not itemId then return end
 
-    container:AddItem(itemId)
-    print("[EffectSpawnLootbox] Spawned lootbox with " .. rarity .. " item: " .. itemId)
+    local itemsToAdd = 5
+
+    for i = 1, itemsToAdd do
+        container:AddItem(GetRandomLootboxItem())
+    end
 end

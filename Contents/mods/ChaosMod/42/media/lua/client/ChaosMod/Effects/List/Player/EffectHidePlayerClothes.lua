@@ -61,4 +61,6 @@ function EffectHidePlayerClothes:OnStart()
 
     local str = string.format(ChaosLocalization.GetString("misc", "clothes_hidden"), #clothes)
     ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
+
+    ChaosPlayer.ScheduleItemsHiddenHint(player)
 end

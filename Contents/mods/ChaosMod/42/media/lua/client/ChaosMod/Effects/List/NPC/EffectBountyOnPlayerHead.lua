@@ -31,6 +31,11 @@ local function spawnAttacker(effect)
 
     npc:SetWeapon("Base.BaseballBat")
 
+    ChaosZombie.AddZombieClothes(zombie, "Base.Hat_Spiffo", nil, nil, false)
+    ChaosZombie.AddZombieClothes(zombie, "Base.SpiffoTail", nil, nil, true)
+
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.WEAK)
+
     table.insert(effect.npcs, npc)
 end
 

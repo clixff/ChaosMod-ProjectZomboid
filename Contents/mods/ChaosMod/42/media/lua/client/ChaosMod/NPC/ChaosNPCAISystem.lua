@@ -321,6 +321,24 @@ function ChaosNPC:update(deltaMs)
         end, 0, 3, false, false, true, pz, pz)
     end
 
+    if isFriendly and self.canGiftItems and self.enemy == nil and not self.isAttacking and not isPanicking then
+        local timeSinceGiftMs = timestampMs - (self.lastGiftItemTimeMs or 0)
+        if timeSinceGiftMs >= CHAOS_NPC_GIFT_ITEM_COOLDOWN_MS then
+            local followTarget = self:GetFollowTarget()
+            if followTarget and instanceof(followTarget, "IsoPlayer") and
+                zombie:getZ() == followTarget:getZ() then
+                local distToFollow = ChaosUtils.distTo(
+                    zombie:getX(), zombie:getY(),
+                    followTarget:getX(), followTarget:getY()
+                )
+                if distToFollow < CHAOS_NPC_GIFT_ITEM_MAX_DIST then
+                    ---@cast followTarget IsoPlayer
+                    self:TryGiftRandomItem(followTarget)
+                end
+            end
+        end
+    end
+
     if isFriendly and needsHealing and self.enemy == nil and not self.isAttacking and not isPanicking then
         local timeSinceLineMs = timestampMs - (self.lastNeedHealLineMs or 0)
         if timeSinceLineMs >= CHAOS_NPC_NEED_HEAL_LINE_COOLDOWN_MS then

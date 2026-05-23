@@ -30,7 +30,7 @@ ChaosNicknames = ChaosNicknames or {
     modDataColorKey = "ChaosModNicknameColor"
 }
 
-local DEBUG_NICKNAMES_TEXT = true
+local DEBUG_NICKNAMES_TEXT = false
 
 local NICKNAME_CHAT_MESSAGE_MAX_AGE_MS = 30000
 local NICKNAME_CHAT_MESSAGE_RENDER_MS = 7000
@@ -38,8 +38,12 @@ local NICKNAME_CHAT_MESSAGE_FADE_MS = 1000
 local NICKNAME_CHAT_MESSAGE_MAX_ALPHA = 0.8
 local NICKNAME_CHAT_MESSAGE_WRAP_CHARS = 50
 local NICKNAME_CHAT_MESSAGE_LIMIT_CHARS = 150
+local NICKNAME_CHAT_MESSAGE_OUT_OF_SIGHT_GRACE_MS = 1000
 local INTERNAL_CHAT_LINE_GREEN = { r = 155 / 255, g = 204 / 255, b = 49 / 255 }
 local getNicknameEntryByName
+
+---@type table<integer|string, { startTs: integer, lastSeenMs: integer }>
+local seenChatLineByZombie = {}
 
 ---@param s string
 ---@return string nickname, string rgb, string|nil chatMessage, integer|nil chatMessageTimestampMs
@@ -171,23 +175,23 @@ end
 
 ---@param entry ChaosNicknameEntry|nil
 ---@param nowMs integer
----@return string|nil, integer, number
+---@return string|nil, integer, number, integer
 local function resolveChatMessageState(entry, nowMs)
     if not entry or not entry.chatMessage or entry.chatMessage == "" then
-        return nil, 0, 0
+        return nil, 0, 0, 0
     end
 
     if not ChaosConfig.streamer_mode or ChaosConfig.streamer_mode.render_chat_messages ~= true then
-        return nil, 0, 0
+        return nil, 0, 0, 0
     end
 
     if not entry.internalTimestampMs or entry.internalTimestampMs <= 0 then
-        return nil, 0, 0
+        return nil, 0, 0, 0
     end
 
     local elapsedMs = nowMs - entry.internalTimestampMs
     if elapsedMs < 0 or elapsedMs >= NICKNAME_CHAT_MESSAGE_RENDER_MS then
-        return nil, elapsedMs, 0
+        return nil, elapsedMs, 0, entry.internalTimestampMs
     end
 
     local alpha = NICKNAME_CHAT_MESSAGE_MAX_ALPHA
@@ -199,7 +203,7 @@ local function resolveChatMessageState(entry, nowMs)
         end
     end
 
-    return entry.chatMessage, elapsedMs, alpha
+    return entry.chatMessage, elapsedMs, alpha, entry.internalTimestampMs
 end
 
 function ChaosNicknames.LoadNicknamesFromDisk()
@@ -424,9 +428,10 @@ end
 ---@param colorR number|nil
 ---@param colorG number|nil
 ---@param colorB number|nil
-local function drawZombieLabel(zombie, text, playerNum, alpha, colorR, colorG, colorB)
+---@param skipVisibilityCheck boolean|nil
+local function drawZombieLabel(zombie, text, playerNum, alpha, colorR, colorG, colorB, skipVisibilityCheck)
     if not zombie or zombie:isDead() then return end
-    if zombie:getTargetAlpha(0) < 0.5 then return end
+    if not skipVisibilityCheck and zombie:getTargetAlpha(0) < 0.5 then return end
 
     alpha = alpha or 0.8
 
@@ -462,32 +467,32 @@ end
 
 ---@param zombie IsoZombie
 ---@param nowMs integer
----@return string|nil, integer, number, table|nil
+---@return string|nil, integer, number, table|nil, integer
 local function resolveInternalChatLineState(zombie, nowMs)
     if ChaosMod.enabled == false or not zombie then
-        return nil, 0, 0
+        return nil, 0, 0, nil, 0
     end
 
     local md = zombie:getModData()
     if not md then
-        return nil, 0, 0
+        return nil, 0, 0, nil, 0
     end
 
     local timestampMs = tonumber(md[ChaosZombie.modDataChatLineTimestampKey])
     if not timestampMs or timestampMs <= 0 then
-        return nil, 0, 0
+        return nil, 0, 0, nil, 0
     end
 
     timestampMs = math.floor(timestampMs)
 
     local chatLine = formatChatMessage(md[ChaosZombie.modDataChatLineKey])
     if not chatLine then
-        return nil, 0, 0
+        return nil, 0, 0, nil, 0
     end
 
     local elapsedMs = nowMs - timestampMs
     if elapsedMs < 0 or elapsedMs >= NICKNAME_CHAT_MESSAGE_RENDER_MS then
-        return nil, elapsedMs, 0
+        return nil, elapsedMs, 0, nil, timestampMs
     end
 
     local alpha = NICKNAME_CHAT_MESSAGE_MAX_ALPHA
@@ -501,20 +506,20 @@ local function resolveInternalChatLineState(zombie, nowMs)
 
     local color = md[ChaosZombie.modDataChatLineColorKey]
 
-    return chatLine, elapsedMs, alpha, color
+    return chatLine, elapsedMs, alpha, color, timestampMs
 end
 
 ---@param zombie IsoZombie
 ---@param nowMs integer
----@return string|nil, integer, number
+---@return string|nil, integer, number, integer
 local function resolveExternalChatLineState(zombie, nowMs)
     if not zombie or not ChaosConfig.IsZombieNicknamesEnabled() then
-        return nil, 0, 0
+        return nil, 0, 0, 0
     end
 
     local md = zombie:getModData()
     if not md then
-        return nil, 0, 0
+        return nil, 0, 0, 0
     end
 
     local nickname = md[ChaosNicknames.modDataNameKey] or ""
@@ -526,14 +531,16 @@ end
 
 ---@param zombie IsoZombie
 ---@param nowMs integer
----@return string|nil, integer, number, number, number, number
+---@return string|nil, integer, number, number, number, number, integer
 local function resolveZombieRenderedMessage(zombie, nowMs)
-    local externalMessage, externalElapsedMs, externalAlpha = resolveExternalChatLineState(zombie, nowMs)
+    local externalMessage, externalElapsedMs, externalAlpha, externalStartMs = resolveExternalChatLineState(zombie,
+        nowMs)
     if externalMessage and externalAlpha > 0 then
-        return externalMessage, externalElapsedMs, externalAlpha, 1, 1, 1
+        return externalMessage, externalElapsedMs, externalAlpha, 1, 1, 1, externalStartMs
     end
 
-    local internalMessage, internalElapsedMs, internalAlpha, internalColor = resolveInternalChatLineState(zombie, nowMs)
+    local internalMessage, internalElapsedMs, internalAlpha, internalColor, internalStartMs = resolveInternalChatLineState(
+        zombie, nowMs)
 
     if internalColor == nil then
         internalColor = { r = 0, g = 1, b = 0 }
@@ -545,10 +552,11 @@ local function resolveZombieRenderedMessage(zombie, nowMs)
             internalAlpha,
             internalColor.r,
             internalColor.g,
-            internalColor.b
+            internalColor.b,
+            internalStartMs
     end
 
-    return nil, 0, 0, 0, 0, 0
+    return nil, 0, 0, 0, 0, 0, 0
 end
 
 ---@param nickname string
@@ -687,12 +695,14 @@ end
 function ChaosNicknames.OnPreUIDraw()
     if ChaosMod.enabled == false then
         ChaosNicknames.visibleZombiesForLabel = {}
+        seenChatLineByZombie = {}
         return
     end
 
     local player = getPlayer()
     if not player then
         ChaosNicknames.visibleZombiesForLabel = {}
+        seenChatLineByZombie = {}
         return
     end
 
@@ -711,23 +721,51 @@ function ChaosNicknames.OnPreUIDraw()
             return
         end
 
-        local shouldRender = shouldRenderZombieLabel(zombie)
-        if shouldRender then
-            local chatMessage, _, alpha, colorR, colorG, colorB = resolveZombieRenderedMessage(zombie, nowMs)
-            if chatMessage and alpha > 0 then
-                drawZombieLabel(
-                    zombie,
-                    chatMessage,
-                    0,
-                    alpha,
-                    colorR,
-                    colorG,
-                    colorB
-                )
-            end
+        local chatMessage, _, alpha, colorR, colorG, colorB, chatLineStartMs = resolveZombieRenderedMessage(zombie,
+            nowMs)
+        if not chatMessage or alpha <= 0 then
+            return
         end
+
+        ---@type integer|string
+        local idKey = zombie:getOnlineID()
+        if not idKey or idKey < 0 then
+            idKey = tostring(zombie)
+        end
+
+        local shouldRender = shouldRenderZombieLabel(zombie)
+        local skipVisibilityCheck = false
+        if shouldRender then
+            seenChatLineByZombie[idKey] = { startTs = chatLineStartMs, lastSeenMs = nowMs }
+        else
+            local seen = seenChatLineByZombie[idKey]
+            if not seen or seen.startTs ~= chatLineStartMs then
+                return
+            end
+            if (nowMs - seen.lastSeenMs) > NICKNAME_CHAT_MESSAGE_OUT_OF_SIGHT_GRACE_MS then
+                return
+            end
+            skipVisibilityCheck = true
+        end
+
+        drawZombieLabel(
+            zombie,
+            chatMessage,
+            0,
+            alpha,
+            colorR,
+            colorG,
+            colorB,
+            skipVisibilityCheck
+        )
     end)
     ChaosNicknames.visibleZombiesForLabel = {}
+
+    for id, seen in pairs(seenChatLineByZombie) do
+        if (nowMs - seen.lastSeenMs) > NICKNAME_CHAT_MESSAGE_OUT_OF_SIGHT_GRACE_MS then
+            seenChatLineByZombie[id] = nil
+        end
+    end
 
     if ChaosConfig.IsAnimalsNicknamesEnabled() then
         local playerX = player:getX()

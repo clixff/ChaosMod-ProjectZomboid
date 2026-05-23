@@ -3059,6 +3059,14 @@
             ],
             "enabled_donate": true,
             "price_group": "positive_4"
+        },
+        {
+            "id": "spawn_pirate_companion",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
         }
     ]
 }

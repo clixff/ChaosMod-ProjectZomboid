@@ -338,7 +338,8 @@
         "npc_battle_royale": "NPC Battle Royale",
         "rubber_duck_steps": "Lastik Ördek Adımları",
         "hurricane": "Kasırga",
-        "the_magic_broom": "Sihirli Süpürge"
+        "the_magic_broom": "Sihirli Süpürge",
+        "spawn_pirate_companion": "Korsan Yoldaş Çağır"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
@@ -394,7 +395,9 @@
         "modified_zombies": "%d zombi değiştirildi",
         "npc_need_heal": "İyileşmek için bandaja ihtiyacım var",
         "npc_bandaged_wounds": "Yaralarımı sardım. (%d/100)",
-        "adoring_fan_greeting": "Vay canına, sen en iyisisin! Seni takip edeceğim, seni izleyeceğim ve bastığın toprağa tapacağım! Hadi gidelim!"
+        "adoring_fan_greeting": "Vay canına, sen en iyisisin! Seni takip edeceğim, seni izleyeceğim ve bastığın toprağa tapacağım! Hadi gidelim!",
+        "npc_gifted_item": "Eşya Hediye Edildi: %s",
+        "items_hidden_hint": "Eşyalarım yakınlarda bir yerde olmalı..."
     },
     "meta": {
         "username_activated_effect": "%s şunu etkinleştirdi: %s"

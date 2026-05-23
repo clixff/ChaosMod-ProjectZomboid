@@ -31,8 +31,6 @@ function EffectMathCaptcha.applyWrongAnswer()
         ChaosUtils.TriggerExplosionAt(square)
     end
 
-    ChaosUtils.RemoveRandomItem(player)
-
     local stats = player:getStats()
     if stats and stats:get(CharacterStat.ENDURANCE) > 0.5 then
         stats:set(CharacterStat.ENDURANCE, 0.5)
@@ -54,7 +52,21 @@ function EffectMathCaptcha.applyCorrectAnswer()
     print("[EffectMathCaptcha] Correct answer")
     local player = getPlayer()
     if not player then return end
-    ChaosPlayer.SayLine(player, ChaosLocalization.GetString("misc", "correct_answer"), 0.0, 1.0, 0.0)
+
+    local inventory = player:getInventory()
+    if inventory then
+        local itemId = GetRandomLootboxItem()
+        if itemId then
+            local item = inventory:AddItem(itemId)
+            if item then
+                ChaosPlayer.SayLineNewItem(player, item)
+            end
+        end
+    end
+
+    if player.playGainExperienceLevelSound then
+        player:playGainExperienceLevelSound()
+    end
 end
 
 function EffectMathCaptcha:OnEnd()

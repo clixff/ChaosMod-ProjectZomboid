@@ -338,7 +338,8 @@
         "npc_battle_royale": "NPC大逃杀",
         "rubber_duck_steps": "橡皮鸭脚步声",
         "hurricane": "飓风",
-        "the_magic_broom": "魔法扫帚"
+        "the_magic_broom": "魔法扫帚",
+        "spawn_pirate_companion": "召唤海盗同伴"
     },
     "core": {
         "start_mod": "启动混乱模式",
@@ -394,7 +395,9 @@
         "modified_zombies": "已修改 %d 只僵尸",
         "npc_need_heal": "我需要绷带来疗伤",
         "npc_bandaged_wounds": "我包扎了伤口。(%d/100)",
-        "adoring_fan_greeting": "天哪，你是最棒的！我要跟着你、看着你，还要崇拜你走过的每一寸土地！走吧！"
+        "adoring_fan_greeting": "天哪，你是最棒的！我要跟着你、看着你，还要崇拜你走过的每一寸土地！走吧！",
+        "npc_gifted_item": "赠送物品：%s",
+        "items_hidden_hint": "我的东西一定在附近某处……"
     },
     "meta": {
         "username_activated_effect": "%s 激活了 %s"

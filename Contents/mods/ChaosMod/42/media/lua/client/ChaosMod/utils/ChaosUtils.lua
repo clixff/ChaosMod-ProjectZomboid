@@ -251,6 +251,8 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
         local isSameZ = expZ == playerZ
         if square and isSameZ and ChaosUtils.isInRange(expX, expY, playerX, playerY, explosionRange) then
             player:setKnockedDown(true)
+            ChaosUtils.RemoveRandomItem(player, true)
+            ChaosUtils.DamageAllItems(player, 0.35)
         end
     end
 
@@ -930,7 +932,8 @@ local function _collectItemsFromContainer(container, out)
 end
 
 ---@param player IsoPlayer
-function ChaosUtils.RemoveRandomItem(player)
+---@param asDestroyed boolean? if true, shows "Item Destroyed" red say line instead of the default removed-item line
+function ChaosUtils.RemoveRandomItem(player, asDestroyed)
     if not player then return end
     local inventory = player:getInventory()
     if not inventory then return end
@@ -955,7 +958,36 @@ function ChaosUtils.RemoveRandomItem(player)
         container:Remove(randomItem.item)
     end
 
-    ChaosPlayer.SayLineRemovedItem(player, randomItem.item)
+    if asDestroyed then
+        ChaosPlayer.SayLineDestroyedItem(player, randomItem.item)
+    else
+        ChaosPlayer.SayLineRemovedItem(player, randomItem.item)
+    end
+end
+
+---@param player IsoPlayer
+---@param lossFactor number fraction of max condition lost per item (e.g. 0.35 for 35%)
+function ChaosUtils.DamageAllItems(player, lossFactor)
+    if not player then return end
+    if not lossFactor or lossFactor <= 0 then return end
+    local inventory = player:getInventory()
+    if not inventory then return end
+
+    ---@type table<integer, { item: InventoryItem }>
+    local allItems = {}
+    _collectItemsFromContainer(inventory, allItems)
+
+    for i = 1, #allItems do
+        local item = allItems[i].item
+        if item and item.getConditionMax and item.getCondition and item.setCondition then
+            local maxCondition = item:getConditionMax()
+            if maxCondition and maxCondition > 0 then
+                local loss = maxCondition * lossFactor
+                local newCondition = math.floor(item:getCondition() - loss + 0.5)
+                item:setCondition(math.max(0, newCondition))
+            end
+        end
+    end
 end
 
 ---@param square IsoGridSquare

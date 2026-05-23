@@ -375,6 +375,35 @@ function ChaosPlayer.SayLineRemoveItem(player, item, amount)
 end
 
 ---@param player IsoPlayer
+---@param item InventoryItem
+function ChaosPlayer.SayLineDestroyedItem(player, item)
+    if not player then return end
+    if not item then return end
+
+    local itemDisplayName = item:getDisplayName()
+    if not itemDisplayName then return end
+
+    local imgCode = ChaosUtils.GetImgCodeByItemTexture(item)
+    if not imgCode then return end
+
+    local str = string.format("%s Item Destroyed: %s", imgCode, itemDisplayName)
+
+    player:addLineChatElement(
+        str,
+        ChaosPlayerChatColors.red.r, ChaosPlayerChatColors.red.g, ChaosPlayerChatColors.red.b,
+        UIFont.Dialogue,
+        30.0,
+        "default",
+        true,
+        true,
+        true,
+        false,
+        false,
+        true
+    )
+end
+
+---@param player IsoPlayer
 function ChaosPlayer.UnequipAllClothes(player)
     if not player then return end
     local worn = player:getWornItems()
@@ -436,6 +465,21 @@ function ChaosPlayer.SayLine(player, text, colorR, colorG, colorB)
         false,
         false,
         true
+    )
+end
+
+---@param player IsoPlayer
+function ChaosPlayer.ScheduleItemsHiddenHint(player)
+    if not player then return end
+
+    ChaosSpecialAction.AddNewAction({ player = player }, 4500,
+        function(_deltaMs, _data) end,
+        function(data)
+            local p = data.player
+            if not p or p:isDead() then return end
+            local text = ChaosLocalization.GetString("misc", "items_hidden_hint")
+            ChaosPlayer.SayLine(p, text, 232 / 255, 106 / 255, 81 / 255)
+        end
     )
 end
 

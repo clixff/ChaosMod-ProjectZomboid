@@ -23,6 +23,7 @@ function EffectFanClub:OnStart()
                 zombie:dressInRandomOutfit()
                 npc:initializeHuman()
                 npc.npcGroup = ChaosNPCGroupID.FOLLOWERS
+                npc.canGiftItems = false
                 npc:AddTag("adoring_fan")
             end
         end

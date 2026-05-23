@@ -59,5 +59,7 @@ function EffectHidePlayerWeapons:OnStart()
     if hiddenCount > 0 then
         local str = string.format(ChaosLocalization.GetString("misc", "weapons_hidden"), hiddenCount)
         ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
+
+        ChaosPlayer.ScheduleItemsHiddenHint(player)
     end
 end

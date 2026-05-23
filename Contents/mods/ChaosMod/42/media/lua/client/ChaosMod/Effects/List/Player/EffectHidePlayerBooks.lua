@@ -56,4 +56,6 @@ function EffectHidePlayerBooks:OnStart()
 
     local str = string.format(ChaosLocalization.GetString("misc", "books_hidden"), #books)
     ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
+
+    ChaosPlayer.ScheduleItemsHiddenHint(player)
 end

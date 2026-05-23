@@ -26,6 +26,8 @@
 - NPCs now panic and flee to a nearby spot when surrounded by zombies
 - Added multi-currency support for DonationAlerts so donations in any configured currency convert into your main currency before triggering effects
 - NPCs can now use handguns, rifles, and shotguns: they aim, fire, and reload, and pick up dropped firearms from the ground
+- Explosions now damage every item in the player's inventory and destroy a random one item
+- Friendly NPCs now occasionally gift a random item to the player when standing nearby and out of combat
 
 ### New Effects
 
@@ -44,6 +46,7 @@
 - Rubber Duck Steps
 - Hurricane
 - The Magic Broom
+- Spawn Pirate Companion
 
 ### Mod Fixes
 
@@ -60,6 +63,8 @@
 - Removed debug keybinds that dropped weapons and changed clothes for player
 - Friendly NPCs now consume less stamina when attacking. (25%)
 - Overall NPC and Zombie vs NPC AI improvements
+- Updated pool of random items that generates in effects like "Lootbox", "Find Chest With Loot", "Courier", etc.
+- Zombie chat lines now linger briefly after the zombie goes out of sight so messages do not vanish the instant the player can no longer see them
 
 ### Effect Fixes
 
@@ -84,6 +89,10 @@
 - "Spawn Griefer Santa" now has M16 rifle weapon
 - "NPC Duel" now gives revolvers to spawned NPCs
 - "Spawn Griefer Wizard" now always sets clothes to NPC; Changed weapon from hammer to long stick
+- "Math Captcha" and "Remember Code" effects now reward a random item on success
+- "Lootbox" and "Spawn Gift With Loot" now generates 5 items in a giftbox
+- Hide-items effects (clothes, weapons, books, random items) now show a hint line
+- "Invisible Characters" now hides zombie nicknames
 
 [1.1.1]
 

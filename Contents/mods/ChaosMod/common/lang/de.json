@@ -338,7 +338,8 @@
         "npc_battle_royale": "NPC Battle Royale",
         "rubber_duck_steps": "Quietscheenten-Schritte",
         "hurricane": "Hurrikan",
-        "the_magic_broom": "Zauberbesen"
+        "the_magic_broom": "Zauberbesen",
+        "spawn_pirate_companion": "Piraten-Begleiter beschwören"
     },
     "core": {
         "start_mod": "ChaosMod starten",
@@ -394,7 +395,9 @@
         "modified_zombies": "%d Zombies modifiziert",
         "npc_need_heal": "Ich brauche Verbände, um mich zu heilen",
         "npc_bandaged_wounds": "Ich habe meine Wunden verbunden. (%d/100)",
-        "adoring_fan_greeting": "Meine Güte, du bist der Beste! Ich werde dir folgen, dich beobachten und den Boden verehren, auf dem du gehst! Los geht's!"
+        "adoring_fan_greeting": "Meine Güte, du bist der Beste! Ich werde dir folgen, dich beobachten und den Boden verehren, auf dem du gehst! Los geht's!",
+        "npc_gifted_item": "Gegenstand geschenkt: %s",
+        "items_hidden_hint": "Meine Sachen müssen irgendwo in der Nähe sein..."
     },
     "meta": {
         "username_activated_effect": "%s hat %s aktiviert"

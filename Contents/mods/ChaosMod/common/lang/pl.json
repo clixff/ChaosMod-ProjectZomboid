@@ -338,7 +338,8 @@
         "npc_battle_royale": "Battle royale NPC",
         "rubber_duck_steps": "Kroki gumowej kaczki",
         "hurricane": "Huragan",
-        "the_magic_broom": "Magiczna miotła"
+        "the_magic_broom": "Magiczna miotła",
+        "spawn_pirate_companion": "Przywołaj pirata-towarzysza"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",
@@ -394,7 +395,9 @@
         "modified_zombies": "Zmodyfikowano %d zombie",
         "npc_need_heal": "Potrzebuję bandaży, żeby się wyleczyć",
         "npc_bandaged_wounds": "Opatrzyłem swoje rany. (%d/100)",
-        "adoring_fan_greeting": "Rany, jesteś najlepszy! Będę za tobą chodzić, obserwować cię i czcić ziemię, po której stąpasz! Ruszajmy!"
+        "adoring_fan_greeting": "Rany, jesteś najlepszy! Będę za tobą chodzić, obserwować cię i czcić ziemię, po której stąpasz! Ruszajmy!",
+        "npc_gifted_item": "Podarowany przedmiot: %s",
+        "items_hidden_hint": "Moje rzeczy muszą być gdzieś w pobliżu..."
     },
     "meta": {
         "username_activated_effect": "%s aktywował %s"

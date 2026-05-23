@@ -338,7 +338,8 @@
         "npc_battle_royale": "NPCバトルロイヤル",
         "rubber_duck_steps": "ラバーダックの足音",
         "hurricane": "ハリケーン",
-        "the_magic_broom": "魔法のほうき"
+        "the_magic_broom": "魔法のほうき",
+        "spawn_pirate_companion": "海賊の仲間を召喚"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -394,7 +395,9 @@
         "modified_zombies": "%d 体のゾンビを変更",
         "npc_need_heal": "回復するために包帯が必要だ",
         "npc_bandaged_wounds": "傷に包帯を巻いた。(%d/100)",
-        "adoring_fan_greeting": "わあ、君って最高だ！君についていって、君を見守って、君が歩く地面まで崇めるよ！行こう！"
+        "adoring_fan_greeting": "わあ、君って最高だ！君についていって、君を見守って、君が歩く地面まで崇めるよ！行こう！",
+        "npc_gifted_item": "アイテムをプレゼントした: %s",
+        "items_hidden_hint": "私の持ち物はこの近くにあるはずだ..."
     },
     "meta": {
         "username_activated_effect": "%sが%sをアクティブにしました"

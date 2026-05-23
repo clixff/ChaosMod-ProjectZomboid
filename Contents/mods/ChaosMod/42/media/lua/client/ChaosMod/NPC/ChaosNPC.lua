@@ -59,6 +59,8 @@ require "ChaosMod/NPC/ChaosNPCFirearms"
 ---@field maxHealth number
 ---@field chanceToDropWeaponOnDeath number
 ---@field lastNeedHealLineMs integer
+---@field lastGiftItemTimeMs integer
+---@field canGiftItems boolean
 ---@field panicCheckTimeoutMs integer
 ---@field panicStartTimeMs integer
 ---@field panicTargetSquare? IsoGridSquare
@@ -135,6 +137,8 @@ function ChaosNPC:new(zombie, nickname)
     o.maxHealth = 1.0
     o.chanceToDropWeaponOnDeath = 0.4
     o.lastNeedHealLineMs = 0
+    o.lastGiftItemTimeMs = getTimestampMs()
+    o.canGiftItems = true
     o.panicCheckTimeoutMs = 0
     o.panicStartTimeMs = 0
     o.panicTargetSquare = nil

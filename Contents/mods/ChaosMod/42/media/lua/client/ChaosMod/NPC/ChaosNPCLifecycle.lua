@@ -152,6 +152,33 @@ function ChaosNPC:IsFriendlyToPlayer()
         self.npcGroup == ChaosNPCGroupID.FOLLOWERS
 end
 
+---@param player IsoPlayer
+function ChaosNPC:TryGiftRandomItem(player)
+    if not self.zombie or not player then return end
+
+    local inventory = player:getInventory()
+    if not inventory then return end
+
+    local zombie = self.zombie
+
+    for _ = 1, 5 do
+        local itemType = ChaosItems.GetRandomItemId()
+        if itemType and itemType ~= "" then
+            local newItem = inventory:AddItem(itemType)
+            if newItem then
+                ChaosPlayer.SayLineNewItem(player, newItem)
+
+                local displayName = newItem:getDisplayName() or itemType
+                local line = string.format(ChaosLocalization.GetString("misc", "npc_gifted_item"), displayName)
+                ChaosZombie.AddNewChatLine(zombie, line, ChaosPlayerChatColors.green)
+
+                self.lastGiftItemTimeMs = ChaosMod.lastTimeTickMs or getTimestampMs()
+                return
+            end
+        end
+    end
+end
+
 ---@return boolean
 function ChaosNPC:NeedsHealing()
     if not self.zombie then return false end
