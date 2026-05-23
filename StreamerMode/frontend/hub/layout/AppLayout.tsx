@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LanguageSwitcher } from "./LanguageSwitcher.tsx";
+import { CurrencySwitcher } from "./CurrencySwitcher.tsx";
 
 const NAV_ITEMS = [{ to: "/effects", label: "Effects" }] as const;
 
@@ -31,6 +32,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
         <div className="topbar-spacer" />
+        <CurrencySwitcher />
         <LanguageSwitcher />
       </header>
 

@@ -2,7 +2,7 @@ export interface SharedConfigData {
   effects?: Record<string, Record<string, unknown>>;
   prices?: Record<string, number>;
   rewards?: Record<string, { groups: string[] }>;
-  currency?: string;
+  currencies?: { main: string; list: Record<string, number> };
   bits_override?: number;
   donation_enabled?: boolean;
 }

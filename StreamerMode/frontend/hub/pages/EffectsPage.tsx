@@ -39,6 +39,7 @@ import {
 import { isOwnedConfig } from "../api/editToken.ts";
 import { formatCurrency } from "../api/currency.ts";
 import { SharedConfigModal } from "../components/SharedConfigModal.tsx";
+import { useCurrency, useConvertPrice } from "../currency/CurrencyProvider.tsx";
 
 type SortKey = "numericId" | "name" | "priceGroup" | "price" | "twitchBits";
 type SortDir = "asc" | "desc";
@@ -371,7 +372,11 @@ export function EffectsPage() {
     () => buildRewardsByGroup(sharedConfig),
     [sharedConfig],
   );
-  const currencyCode = sharedConfig?.data.currency ?? null;
+
+  const { setConfigCurrencies } = useCurrency();
+  useEffect(() => {
+    setConfigCurrencies(sharedConfig?.data.currencies ?? null);
+  }, [sharedConfig, setConfigCurrencies]);
 
   const labels = useMemo(
     () => getColumnLabels(langQuery.data, englishQuery.data),
@@ -729,7 +734,6 @@ export function EffectsPage() {
           visibility={visibility}
           sharedConfig={sharedConfig}
           rewardsByGroup={rewardsByGroup}
-          currencyCode={currencyCode}
         />
       )}
 
@@ -806,7 +810,6 @@ function EffectsTable({
   visibility,
   sharedConfig,
   rewardsByGroup,
-  currencyCode,
 }: {
   groups: GroupedSection[];
   groupBy: GroupBy;
@@ -821,7 +824,6 @@ function EffectsTable({
   visibility: VisibilityFlags;
   sharedConfig: SharedConfig | null;
   rewardsByGroup: Map<string, string> | null;
-  currencyCode: string | null;
 }) {
   const totalRows = groups.reduce((acc, g) => acc + g.rows.length, 0);
   if (totalRows === 0) {
@@ -940,7 +942,6 @@ function EffectsTable({
                       visibility={visibility}
                       sharedConfig={sharedConfig}
                       rewardsByGroup={rewardsByGroup}
-                      currencyCode={currencyCode}
                       lastEffect={lastEffect}
                       colSpan={colCount}
                     />
@@ -1005,7 +1006,6 @@ function EffectRowView({
   visibility,
   sharedConfig,
   rewardsByGroup,
-  currencyCode,
   lastEffect,
   colSpan,
 }: {
@@ -1018,10 +1018,10 @@ function EffectRowView({
   visibility: VisibilityFlags;
   sharedConfig: SharedConfig | null;
   rewardsByGroup: Map<string, string> | null;
-  currencyCode: string | null;
   lastEffect: number | null;
   colSpan: number;
 }) {
+  const convertPrice = useConvertPrice();
   const beyondLast =
     lastEffect != null && row.numericId > lastEffect;
   const donationDisabled = sharedConfig
@@ -1087,9 +1087,7 @@ function EffectRowView({
         </td>
         {showPriceCol ? (
           <td className="col-price">
-            {row.enabledDonate
-              ? formatPriceWithCurrency(row.price, currencyCode)
-              : ""}
+            {row.enabledDonate ? formatConverted(convertPrice(row.price)) : ""}
           </td>
         ) : null}
         {showBitsCol ? (
@@ -1155,7 +1153,7 @@ function EffectRowView({
                   <div className="effect-expand-meta-item">
                     <span className="effect-expand-label">{labels.price}</span>
                     <span className="effect-expand-value">
-                      {formatPriceWithCurrency(row.price, currencyCode)}
+                      {formatConverted(convertPrice(row.price))}
                     </span>
                   </div>
                 ) : null}
@@ -1174,7 +1172,6 @@ function EffectRowView({
                 row={row}
                 visibility={visibility}
                 rewardsByGroup={rewardsByGroup}
-                currencyCode={currencyCode}
               />
             </div>
           </td>
@@ -1188,13 +1185,12 @@ function ActivationBlocks({
   row,
   visibility,
   rewardsByGroup,
-  currencyCode,
 }: {
   row: EffectRow;
   visibility: VisibilityFlags;
   rewardsByGroup: Map<string, string> | null;
-  currencyCode: string | null;
 }) {
+  const convertPrice = useConvertPrice();
   const rewardName = rewardsByGroup
     ? (rewardsByGroup.get(row.priceGroup) ?? null)
     : getTwitchRewardNameForGroup(row.priceGroup);
@@ -1270,7 +1266,7 @@ function ActivationBlocks({
             <p>
               1. Set price to{" "}
               <code className="effect-activation-inline-code">
-                {formatPriceWithCurrency(price, currencyCode)}
+                {formatConverted(convertPrice(price))}
               </code>{" "}
               and send donation with message:
             </p>
@@ -1280,6 +1276,12 @@ function ActivationBlocks({
       ) : null}
     </div>
   );
+}
+
+function formatConverted(
+  result: { converted: number | null; currency: string },
+): string {
+  return formatPriceWithCurrency(result.converted, result.currency);
 }
 
 function formatPriceWithCurrency(

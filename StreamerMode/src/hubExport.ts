@@ -14,7 +14,7 @@ export interface HubExportPayload {
     effects: Record<string, Record<string, unknown>>;
     prices: Record<string, number>;
     rewards: Record<string, { groups: string[] }>;
-    currency: string;
+    currencies: { main: string; list: Record<string, number> };
     bits_override: number;
     donation_enabled: boolean;
   };
@@ -158,6 +158,12 @@ export function buildHubExportPayload(input: {
   const bitsMultiplier =
     config.streamer_mode.donation_systems.twitch_bits.price_multiplier;
 
+  const currenciesIn = config.streamer_mode.currencies;
+  const currenciesOut = {
+    main: currenciesIn.main,
+    list: { ...currenciesIn.list },
+  };
+
   return {
     mod_version: version,
     rewards: config.streamer_mode.donation_systems.twitch_points.enabled,
@@ -169,7 +175,7 @@ export function buildHubExportPayload(input: {
       effects: effectsOut,
       prices: pricesOut,
       rewards: rewardsOut,
-      currency: config.streamer_mode.donation_systems.donationalerts.currency,
+      currencies: currenciesOut,
       bits_override: bitsMultiplier,
       donation_enabled: config.streamer_mode.enable_donate,
     },

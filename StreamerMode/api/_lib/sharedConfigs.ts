@@ -31,7 +31,7 @@ export interface SharedConfigData {
   effects?: Record<string, Record<string, unknown>>;
   prices?: Record<string, number>;
   rewards?: Record<string, { groups: string[] }>;
-  currency?: string;
+  currencies?: { main: string; list: Record<string, number> };
   bits_override?: number;
   donation_enabled?: boolean;
 }
@@ -144,6 +144,30 @@ function sanitizeRewards(
   return out;
 }
 
+function sanitizeCurrencies(
+  raw: unknown,
+): { main: string; list: Record<string, number> } | null {
+  if (!isPlainObject(raw)) return null;
+  const mainRaw = raw["main"];
+  if (typeof mainRaw !== "string") return null;
+  const main = mainRaw.trim().toUpperCase();
+  if (main !== "" && !CURRENCY_REGEX.test(main)) return null;
+  const listRaw = raw["list"];
+  const list: Record<string, number> = {};
+  if (listRaw !== undefined) {
+    if (!isPlainObject(listRaw)) return null;
+    for (const [code, rate] of Object.entries(listRaw)) {
+      const upper = code.trim().toUpperCase();
+      if (!CURRENCY_REGEX.test(upper)) continue;
+      if (typeof rate !== "number" || !Number.isFinite(rate) || rate <= 0) {
+        continue;
+      }
+      list[upper] = rate;
+    }
+  }
+  return { main, list };
+}
+
 export function sanitizeSharedConfigData(
   raw: unknown,
 ): SharedConfigData | null {
@@ -175,12 +199,10 @@ export function sanitizeSharedConfigData(
     out.rewards = cleaned;
   }
 
-  if (raw["currency"] !== undefined) {
-    if (typeof raw["currency"] !== "string") return null;
-    if (raw["currency"] !== "" && !CURRENCY_REGEX.test(raw["currency"])) {
-      return null;
-    }
-    out.currency = raw["currency"];
+  if (raw["currencies"] !== undefined) {
+    const cleaned = sanitizeCurrencies(raw["currencies"]);
+    if (cleaned === null) return null;
+    out.currencies = cleaned;
   }
 
   if (raw["bits_override"] !== undefined) {

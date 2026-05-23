@@ -1238,7 +1238,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 80,
+            "duration": 50,
             "disable_effects": [
                 "effect_lags"
             ],
