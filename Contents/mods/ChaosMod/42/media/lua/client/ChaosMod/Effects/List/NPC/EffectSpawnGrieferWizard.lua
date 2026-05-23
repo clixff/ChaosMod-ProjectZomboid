@@ -21,7 +21,7 @@ function EffectSpawnGrieferWizard:OnStart()
     local y2 = randomSquare:getY()
     local z2 = randomSquare:getZ()
 
-    local newZombies = ChaosZombie.SpawnZombieAt(x2, y2, z2, 1, "CostumeWizard", 0)
+    local newZombies = ChaosZombie.SpawnZombieAt(x2, y2, z2, 1, "Naked", 0)
 
     local zombie = newZombies:getFirst()
     if not zombie then return end
@@ -31,6 +31,10 @@ function EffectSpawnGrieferWizard:OnStart()
 
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
-    npc:SetWeapon("Base.Sledgehammer")
+    npc:SetWeapon("Base.LongStick")
+
+    ChaosZombie.AddZombieClothes(zombie, "Base.Hat_Wizard", nil, nil, false)
+    ChaosZombie.AddZombieClothes(zombie, "Base.BlackRobe", nil, nil, true)
+
     npc:EnterPlayerVehicle(player)
 end

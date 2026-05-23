@@ -83,6 +83,7 @@
 - "Spawn Explosive Spiffos" and "Explode Nearby Cars" effects no longer spam explosion sounds when many objects explode at once
 - "Spawn Griefer Santa" now has M16 rifle weapon
 - "NPC Duel" now gives revolvers to spawned NPCs
+- "Spawn Griefer Wizard" now always sets clothes to NPC; Changed weapon from hammer to long stick
 
 [1.1.1]
 
