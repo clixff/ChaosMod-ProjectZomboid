@@ -11,6 +11,7 @@
 ]]
 
 require "ChaosMod/NPC/ChaosNPCConstants"
+require "ChaosMod/NPC/ChaosNPCFirearms"
 
 ---@class ChaosNPC
 ---@field pathfindUpdateMs integer
@@ -62,6 +63,14 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field panicStartTimeMs integer
 ---@field panicTargetSquare? IsoGridSquare
 ---@field panicCooldownEndMs integer
+---@field firearmType? string
+---@field maxAmmo integer
+---@field currentAmmo integer
+---@field firearmAccuracyZombies number
+---@field firearmAccuracyPlayers number
+---@field firearmStateType? string
+---@field firearmStateEndMs integer
+---@field _lastFirearmDiagMs integer
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -130,6 +139,13 @@ function ChaosNPC:new(zombie, nickname)
     o.panicStartTimeMs = 0
     o.panicTargetSquare = nil
     o.panicCooldownEndMs = 0
+    o.firearmType = nil
+    o.maxAmmo = 0
+    o.currentAmmo = 0
+    o.firearmAccuracyZombies = 1.0
+    o.firearmAccuracyPlayers = 0.25
+    o.firearmStateType = nil
+    o.firearmStateEndMs = 0
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o
@@ -235,6 +251,12 @@ function ChaosNPC:CancelAttackState(reason)
     self.attackHitPassed = false
     self.attackObjectTarget = nil
     self.attackObjectType = nil
+
+    if self.firearmStateType then
+        self.firearmStateType = nil
+        self.firearmStateEndMs = 0
+        ChaosNPCFirearms.ForceExitBumpedState(self)
+    end
 end
 
 return ChaosNPC

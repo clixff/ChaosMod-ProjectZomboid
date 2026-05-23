@@ -109,6 +109,12 @@ function ChaosNPC:StartAttackEnemy()
     self.attackObjectTarget = nil
     self.attackObjectType = nil
 
+    if self.firearmType then
+        self:DebugLog("start_firearm_engage", false)
+        ChaosNPCFirearms.StartFirearmEngage(self)
+        return
+    end
+
     if not self:CanAttackTimeout() then
         self:DebugLogThrottled("attack_wait_timeout")
         return
@@ -121,6 +127,12 @@ end
 ---@param deltaMs integer
 function ChaosNPC:OnAttackTick(deltaMs)
     if not self.zombie then return end
+
+    if self.firearmType and self.firearmStateType then
+        ChaosNPCFirearms.OnFirearmAttackTick(self, deltaMs)
+        return
+    end
+
     local zombie = self.zombie
 
     local bumpType = zombie:getVariableString("BumpType")
@@ -188,7 +200,10 @@ function ChaosNPC:OnAttackObjectHit()
             door:destroy()
         else
             door:setHealth(health)
-            local soundFile = self.weaponItemCached:getDoorHitSound()
+            local soundFile = nil
+            if not self.firearmType then
+                soundFile = self.weaponItemCached:getDoorHitSound()
+            end
             if door.getThumpSound then
                 soundFile = door:getThumpSound()
             end
@@ -472,6 +487,10 @@ function ChaosNPC:GetMaxDistanceAttack()
         return 0.0
     end
 
+    if self.firearmType then
+        return ChaosNPCFirearms.FIREARM_ENGAGE_RANGE[self.firearmType] or 4
+    end
+
     return self.weaponItemCached:getMaxRange() - 0.1
 end
 
@@ -590,7 +609,8 @@ function ChaosNPC:StartAttackAnimation()
         zombie:setBumpType(self.attackAnimName)
     end
 
-    if self.weaponItemCached.getSwingSound then
+    local skipWeaponSwingSound = self.firearmType ~= nil and self.attackObjectType == "door"
+    if not skipWeaponSwingSound and self.weaponItemCached.getSwingSound then
         local weaponSound = self.weaponItemCached:getSwingSound()
         if weaponSound then
             zombie:playSound(weaponSound)

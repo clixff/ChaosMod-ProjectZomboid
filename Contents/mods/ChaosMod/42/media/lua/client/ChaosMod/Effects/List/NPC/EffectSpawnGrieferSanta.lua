@@ -32,6 +32,8 @@ function EffectSpawnGrieferSanta:OnStart()
 
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
-    npc:SetWeapon("Base.Sledgehammer")
+    -- npc:SetWeapon("Base.Sledgehammer")
     npc:EnterPlayerVehicle(player)
+
+    npc:SetWeapon("Base.AssaultRifle")
 end

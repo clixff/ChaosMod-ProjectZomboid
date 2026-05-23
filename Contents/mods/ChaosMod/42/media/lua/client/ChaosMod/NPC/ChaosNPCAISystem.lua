@@ -200,7 +200,7 @@ function ChaosNPC:update(deltaMs)
 
     if self.actionType == "pickup_ground_weapon" then
         local actionWorldObj = self.actionWorldObjectTarget
-        if not actionWorldObj or not self:IsGroundMeleeWeaponWorldObject(actionWorldObj) then
+        if not actionWorldObj or not self:IsGroundUsableWeaponWorldObject(actionWorldObj) then
             self:StopMoving(true, "pickup_ground_weapon_invalid")
             self:ClearAction()
         else
@@ -346,7 +346,7 @@ function ChaosNPC:update(deltaMs)
         ChaosUtils.SquareRingSearchTile_2D(px, py, function(square)
             local foundWorldObj = nil
             local hasWeapon = ChaosUtils.ForAllWorldObjectsOnSquare(square, function(worldObj)
-                if self:CanUseGroundMeleeWeaponWorldObject(worldObj) then
+                if self:CanUseGroundUsableWeaponWorldObject(worldObj) then
                     foundWorldObj = worldObj
                     return true
                 end

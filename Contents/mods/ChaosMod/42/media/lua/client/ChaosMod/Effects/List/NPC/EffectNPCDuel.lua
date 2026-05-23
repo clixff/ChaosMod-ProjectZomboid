@@ -47,4 +47,7 @@ function EffectNPCDuel:OnStart()
     npcB.enemy = nil
     npcA.findEnemyTimeoutMs = CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS
     npcB.findEnemyTimeoutMs = CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS
+
+    npcA:SetWeapon("Base.Revolver_Long")
+    npcB:SetWeapon("Base.Revolver_Long")
 end

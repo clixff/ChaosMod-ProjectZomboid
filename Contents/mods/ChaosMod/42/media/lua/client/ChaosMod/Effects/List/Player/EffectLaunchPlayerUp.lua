@@ -4,6 +4,8 @@ EffectLaunchPlayerUp = ChaosEffectBase:derive("EffectLaunchPlayerUp", "launch_pl
 local LAUNCH_HEIGHT = 3.0
 local UP_MS = 350
 local DOWN_MS = 650
+local ZOMBIE_PACIFY_MS = 5000
+local ZOMBIE_PACIFY_RANGE = 20
 
 local function easeOutQuad(t)
     return 1 - (1 - t) * (1 - t)
@@ -95,6 +97,42 @@ local function LaunchPlayerSpecialActionTick(deltaMs, data)
     end
 end
 
+---@param deltaMs integer
+---@param data { affectedZombies: table<IsoZombie, boolean> }
+local function PacifyZombiesTick(deltaMs, data)
+    local player = getPlayer()
+    if not player then return end
+
+    local px, py = player:getX(), player:getY()
+    ChaosZombie.ForEachZombieInRange(px, py, ZOMBIE_PACIFY_RANGE, function(zombie)
+        if not zombie or not zombie:isAlive() then return end
+        if zombie:getTarget() == player then
+            ---@diagnostic disable-next-line: param-type-mismatch
+            zombie:setTarget(nil)
+            zombie:setTargetSeenTime(0)
+        end
+        if not data.affectedZombies[zombie] then
+            zombie:clearAggroList()
+            ---@diagnostic disable-next-line: param-type-mismatch
+            zombie:setTarget(nil)
+            zombie:setTargetSeenTime(0)
+            zombie:setUseless(true)
+            data.affectedZombies[zombie] = true
+        end
+    end, true, nil)
+end
+
+---@param data { affectedZombies: table<IsoZombie, boolean> }
+local function PacifyZombiesEnd(data)
+    if not data or not data.affectedZombies then return end
+    for zombie, _ in pairs(data.affectedZombies) do
+        if zombie then
+            zombie:setUseless(false)
+        end
+    end
+    data.affectedZombies = nil
+end
+
 ---@param data table
 local function LaunchPlayerSpecialActionEnd(data)
     local player = getPlayer()
@@ -133,7 +171,6 @@ function EffectLaunchPlayerUp:OnStart()
 
     ChaosVehicle.ExitVehicle(player)
 
-
     lockFallPhysics(player)
 
     print(string.format("[EffectLaunchPlayerUp] UP_MS: %d, DOWN_MS: %d", UP_MS, DOWN_MS))
@@ -143,6 +180,12 @@ function EffectLaunchPlayerUp:OnStart()
         LaunchPlayerSpecialActionTick,
         LaunchPlayerSpecialActionEnd,
         LaunchPlayerSpecialActionEnd)
+
+    ChaosSpecialAction.AddNewAction({ affectedZombies = {} },
+        ZOMBIE_PACIFY_MS,
+        PacifyZombiesTick,
+        PacifyZombiesEnd,
+        PacifyZombiesEnd)
 end
 
 ---@param deltaMs integer

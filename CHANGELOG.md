@@ -25,6 +25,7 @@
 - Animals now can open doors
 - NPCs now panic and flee to a nearby spot when surrounded by zombies
 - Added multi-currency support for DonationAlerts so donations in any configured currency convert into your main currency before triggering effects
+- NPCs can now use handguns, rifles, and shotguns: they aim, fire, and reload, and pick up dropped firearms from the ground
 
 ### New Effects
 
@@ -77,6 +78,11 @@
 - "Griefer Pig Turret" deals double damage to zombies
 - "Player Falls" effect no longer makes the player fall while standing still or in a car, new duration is 40s
 - "Enable Snow" sets temperature to -30°C / -22 °F
+- "Lags" now lasts 50s instead of 80s
+- "Launch Player Up" makes zombies to ignore player for some time
+- "Spawn Explosive Spiffos" and "Explode Nearby Cars" effects no longer spam explosion sounds when many objects explode at once
+- "Spawn Griefer Santa" now has M16 rifle weapon
+- "NPC Duel" now gives revolvers to spawned NPCs
 
 [1.1.1]
 

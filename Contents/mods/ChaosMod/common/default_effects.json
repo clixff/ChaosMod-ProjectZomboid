@@ -580,10 +580,10 @@
         {
             "id": "spawn_griefer_santa",
             "enabled": true,
-            "chance": 0.75,
+            "chance": 0.7,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "negative_4"
+            "price_group": "negative_5"
         },
         {
             "id": "spawn_angry_policeman",
@@ -2261,10 +2261,10 @@
         {
             "id": "explode_nearby_cars",
             "enabled": true,
-            "chance": 1,
+            "chance": 0.8,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "negative_4"
+            "price_group": "negative_6"
         },
         {
             "id": "cure_zombies_nearby",

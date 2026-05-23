@@ -211,7 +211,7 @@ function ChaosVehicle.AddVehicleImpulseAtExplosion(vehicle, explosionX, explosio
         dx = dx / len
         dy = dy / len
 
-        local strength = 800000.0
+        local strength = 800000.0 * 0.01
         local impulse = Vector3f.new(dx * strength, dy * strength, 0)
         local relPos = Vector3f.new(0, 0, 0)
         v:addImpulse(impulse, relPos)
@@ -289,19 +289,23 @@ end
 function ChaosVehicle.DamageVehicleFromExplosion(vehicle)
     if not vehicle then return end
 
+    local damageMultiplier = 0.25
+
     for _, windowName in ipairs(VEHICLE_WINDOWS) do
         local part = vehicle:getPartById(windowName)
         if part and part:getInventoryItem() then
-            ---@diagnostic disable-next-line: param-type-mismatch
-            part:setInventoryItem(nil, 10)
-            vehicle:transmitPartItem(part)
+            if ChaosUtils.RandInteger(3) == 0 then
+                ---@diagnostic disable-next-line: param-type-mismatch
+                part:setInventoryItem(nil, 10)
+                vehicle:transmitPartItem(part)
+            end
         end
     end
 
     for _, wheelName in ipairs(VEHICLE_TIRES) do
         local part = vehicle:getPartById(wheelName)
         if part and part:getInventoryItem() then
-            if ChaosUtils.RandInteger(2) == 0 then
+            if ChaosUtils.RandInteger(4) == 0 then
                 local wheelId = part:getWheelIndex()
                 if wheelId then
                     vehicle:setTireRemoved(wheelId, true)
@@ -316,7 +320,7 @@ function ChaosVehicle.DamageVehicleFromExplosion(vehicle)
     for _, doorName in ipairs(VEHICLE_DOORS) do
         local part = vehicle:getPartById(doorName)
         if part and part:getInventoryItem() then
-            if ChaosUtils.RandInteger(2) == 0 then
+            if ChaosUtils.RandInteger(3) == 0 then
                 ---@diagnostic disable-next-line: param-type-mismatch
                 part:setInventoryItem(nil, 10)
                 vehicle:transmitPartItem(part)
@@ -326,23 +330,35 @@ function ChaosVehicle.DamageVehicleFromExplosion(vehicle)
 
     local enginePart = vehicle:getPartById("Engine")
     if enginePart then
-        enginePart:damage(50)
+        -- enginePart:damage(math.floor(50 * damageMultiplier))
         vehicle:transmitEngine()
     end
 
     local gasTankPart = vehicle:getPartById("GasTank")
     if gasTankPart then
-        gasTankPart:damage(50)
+        -- gasTankPart:damage(math.floor(50 * damageMultiplier))
         vehicle:transmitPartItem(gasTankPart)
     end
 
     local batteryPart = vehicle:getPartById("Battery")
     if batteryPart then
-        batteryPart:damage(50)
+        -- batteryPart:damage(math.floor(50 * damageMultiplier))
         vehicle:transmitPartItem(batteryPart)
     end
 
-    vehicle:crash(50, true)
+    -- vehicle:crash(50 * damageMultiplier, true)
+
+    for i = 0, vehicle:getPartCount() - 1 do
+        local part = vehicle:getPartByIndex(i)
+        if part then
+            local base = part:getCondition()
+            local damage = ChaosUtils.RandIntegerRange(20, 33)
+            part:setCondition(math.max(0, base - damage))
+            vehicle:transmitPartCondition(part)
+        end
+    end
+
+
     vehicle:updatePartStats()
 end
 

@@ -32,6 +32,7 @@ function ChaosNPC:initializeHuman(shouldHumanize)
     self.spawnTimeMs = ChaosMod.lastTimeTickMs
     zombie:setVariable("Chaos2HandsWeapon", false)
     zombie:setVariable("ChaosSneak", false)
+    zombie:setVariable("ChaosFirearmType", "none")
 
     self:DisableZombieVoice()
 
@@ -42,7 +43,7 @@ end
 
 ---@param worldObj IsoWorldInventoryObject
 ---@return boolean
-function ChaosNPC:IsGroundMeleeWeaponWorldObject(worldObj)
+function ChaosNPC:IsGroundUsableWeaponWorldObject(worldObj)
     if not worldObj then return false end
 
     local item = worldObj:getItem()
@@ -51,13 +52,15 @@ function ChaosNPC:IsGroundMeleeWeaponWorldObject(worldObj)
     end
 
     ---@cast item HandWeapon
-    return item:isMelee()
+    if item:isMelee() then return true end
+
+    return ChaosNPCFirearms.Classify(item) ~= "none"
 end
 
 ---@param worldObj IsoWorldInventoryObject
 ---@return boolean
-function ChaosNPC:CanUseGroundMeleeWeaponWorldObject(worldObj)
-    if not self:IsGroundMeleeWeaponWorldObject(worldObj) then
+function ChaosNPC:CanUseGroundUsableWeaponWorldObject(worldObj)
+    if not self:IsGroundUsableWeaponWorldObject(worldObj) then
         return false
     end
 
@@ -292,6 +295,8 @@ function ChaosNPC:pickGroundItemToPrimary(worldObj)
 
     self.chanceToDropWeaponOnDeath = 1.0
 
+    ChaosNPCFirearms.OnSetFirearm(self, item)
+
     return item
 end
 
@@ -326,6 +331,8 @@ function ChaosNPC:setNPCAsZombie()
     zombie:setVariable("ChaosSneak", false)
     zombie:setUseless(false)
     zombie:Wander()
+
+    ChaosNPCFirearms.ClearFirearm(self)
 
     self.weaponItemCached = nil
     self.enemy = nil
@@ -363,6 +370,8 @@ function ChaosNPC:Destroy()
     end
 
     if not self.zombie then return end
+
+    ChaosNPCFirearms.ClearFirearm(self)
 
     self.zombie:removeFromWorld()
     self.zombie:removeFromSquare()
@@ -418,6 +427,8 @@ function ChaosNPC:OnZombieDead()
             md[CHAOS_NPC_MOD_DATA_KEY] = nil
             md[CHAOS_NPC_MOD_DATA_KEY_2] = nil
         end
+
+        ChaosNPCFirearms.ClearFirearm(self)
     end
 
     local isFollowGroup = self.npcGroup == ChaosNPCGroupID.COMPANIONS or
@@ -482,6 +493,8 @@ function ChaosNPC:SetWeapon(weaponFullType)
         oldWeapon:removeFromWorld()
     end
 
+    ChaosNPCFirearms.ClearFirearm(self)
+
     local newWeapon = instanceItem(weaponFullType)
     if newWeapon then
         self.weaponItemCached = newWeapon
@@ -493,6 +506,8 @@ function ChaosNPC:SetWeapon(weaponFullType)
             ---@diagnostic disable-next-line: param-type-mismatch
             self.zombie:setSecondaryHandItem(nil)
         end
+
+        ChaosNPCFirearms.OnSetFirearm(self, newWeapon)
     end
 end
 

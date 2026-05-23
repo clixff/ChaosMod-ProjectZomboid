@@ -15,22 +15,33 @@ function EffectExplodeNearbyCars:OnStart()
 
     local vehicles = ChaosVehicle.GetVehiclesNearby(square, VEHICLE_RADIUS)
 
+    local px, py = player:getX(), player:getY()
+    local sortedVehicles = {}
     for i = 0, vehicles:size() - 1 do
-        local vehicle = vehicles:get(i)
-        if vehicle then
-            ---@type VehiclePart
-            local part = vehicle:getPartById("Engine")
-            if part then
-                part:damage(35)
-                vehicle:transmitEngine()
-            end
+        local v = vehicles:get(i)
+        if v then
+            sortedVehicles[#sortedVehicles + 1] = {
+                vehicle = v,
+                dist = ChaosUtils.distTo(px, py, v:getX(), v:getY())
+            }
+        end
+    end
+    table.sort(sortedVehicles, function(a, b) return a.dist < b.dist end)
 
-            vehicle:updatePartStats()
+    for i = 1, #sortedVehicles do
+        local vehicle = sortedVehicles[i].vehicle
+        ---@type VehiclePart
+        local part = vehicle:getPartById("Engine")
+        if part then
+            part:damage(35)
+            vehicle:transmitEngine()
+        end
 
-            local vehicleSquare = vehicle:getSquare()
-            if vehicleSquare then
-                ChaosUtils.TriggerExplosionAt(vehicleSquare, EXPLOSION_RADIUS)
-            end
+        vehicle:updatePartStats()
+
+        local vehicleSquare = vehicle:getSquare()
+        if vehicleSquare then
+            ChaosUtils.TriggerExplosionAt(vehicleSquare, EXPLOSION_RADIUS, true, i > 2)
         end
     end
 end

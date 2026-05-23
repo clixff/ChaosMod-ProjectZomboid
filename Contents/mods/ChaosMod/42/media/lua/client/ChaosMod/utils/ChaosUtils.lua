@@ -188,9 +188,11 @@ end
 ---@param square IsoGridSquare
 ---@param explosionRange integer | nil defaults to 5
 ---@param shouldRemoveProps boolean | nil defaults to true
-function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps)
+---@param disableSounds boolean | nil defaults to false; when true the explosion plays no bang sound
+function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps, disableSounds)
     explosionRange = explosionRange or 5
     if shouldRemoveProps == nil then shouldRemoveProps = true end
+    if disableSounds == nil then disableSounds = false end
 
     local prePlayer = getPlayer()
     if prePlayer and prePlayer:getVehicle() then
@@ -226,7 +228,11 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
     trap:setSmokeRange(5)
     trap:setNoiseRange(20)
     trap:setInstantExplosion(false)
-    trap:setExplosionSound("BigExplosion")
+    if disableSounds then
+        trap:setExplosionSound("")
+    else
+        trap:setExplosionSound("BigExplosion")
+    end
 
     ---@diagnostic disable-next-line: deprecated
     trap:triggerExplosion()
