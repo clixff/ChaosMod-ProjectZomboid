@@ -91,7 +91,8 @@ function EffectUFOAbduction:OnStart()
     self.secondSoundPlayed = false
     self.startZ = player:getZ()
 
-    self.soundId = ChaosUtils.PlayUISound("chaos_ufo_1", true)
+    -- self.soundId = ChaosUtils.PlayUISound("chaos_ufo_1", true)
+    self.soundId = player:playSoundLocal("chaos_ufo_1")
     ---@type SoundManager
     local soundManager = getSoundManager()
     if soundManager.getUIEmitter then
@@ -133,7 +134,8 @@ function EffectUFOAbduction:OnTick(deltaMs)
     if not self.secondSoundPlayed and self.elapsedMs >= 5000 then
         self.secondSoundPlayed = true
         local emitter = player:getEmitter()
-        self.soundId = ChaosUtils.PlayUISound("chaos_ufo_2", true)
+        -- self.soundId = player:playSoundLocal("chaos_ufo_2")
+        -- self.soundId = ChaosUtils.PlayUISound("chaos_ufo_2", true)
     end
 
     if not self.phase2Started and self.elapsedMs >= PHASE_2_DELAY_MS then
@@ -178,10 +180,10 @@ function EffectUFOAbduction:OnTick(deltaMs)
     if self.uiEmitter and self.soundId then
         self.uiEmitter:setPos(player:getX(), player:getY(), liftedZ)
         if self.uiEmitter.setVolume then
-            self.uiEmitter:setVolume(self.soundId, 0.35)
+            -- self.uiEmitter:setVolume(self.soundId, 0.35)
         end
         if self.uiEmitter.tick then
-            self.uiEmitter:tick()
+            -- self.uiEmitter:tick()
         end
     end
 end

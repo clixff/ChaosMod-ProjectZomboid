@@ -51,6 +51,7 @@ import { startDebugSubs } from "./src/debugSubs.ts";
 import { Bridge } from "./src/bridge/Bridge.ts";
 import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
 import { DonationManager } from "./src/donations/DonationManager.ts";
+import { fetchExchangeRates } from "./src/utils/currencies.ts";
 import { handleBitsCheer } from "./src/donations/BitsHandler.ts";
 import { SubsHandler } from "./src/donations/SubsHandler.ts";
 import {
@@ -630,7 +631,40 @@ async function main(): Promise<void> {
   daProvider.onDisconnect = () => {
     activityLog.add({ type: "donationalerts_disconnected" });
   };
-  const donationManager = new DonationManager(port);
+  const donationManager = new DonationManager(port, () =>
+    config
+      ? config.streamer_mode.currencies
+      : { main: "", list: {} },
+  );
+
+  // On first DA login (currencies fully empty), default main=RUB and load rates.
+  const autoSetupCurrenciesOnDALogin = async (): Promise<void> => {
+    if (!config || !luaFolder) return;
+    const currencies = config.streamer_mode.currencies;
+    if (
+      currencies.main.trim().length > 0 ||
+      Object.keys(currencies.list).length > 0
+    ) {
+      return;
+    }
+    try {
+      const result = await fetchExchangeRates("RUB");
+      config.streamer_mode.currencies = {
+        main: "RUB",
+        list: result.rates,
+      };
+      saveConfig(luaFolder, config);
+      bridge?.emit("reload_config");
+      logger.info(
+        `[DonationAlerts] Auto-configured currencies: main=RUB with ${Object.keys(result.rates).length} rates loaded.`,
+      );
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.warn(
+        `[DonationAlerts] Failed to auto-load exchange rates: ${msg}`,
+      );
+    }
+  };
   donationManager.onActivationFailed = (info) => {
     const effectName = getString("effects", info.effect_id);
     if (info.type === "price_too_low") {
@@ -660,6 +694,7 @@ async function main(): Promise<void> {
     logger.info(
       `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`,
     );
+    await autoSetupCurrenciesOnDALogin();
   } else {
     const daAppId = daProvider.getAppId();
     const daSecrets = await daProvider.loadSecrets();
@@ -1054,6 +1089,7 @@ async function main(): Promise<void> {
             bridge?.emit("reload_config");
             logger.info("Donate mode enabled.");
           }
+          await autoSetupCurrenciesOnDALogin();
         }
         return user ? { name: user.name } : null;
       },
@@ -1118,6 +1154,37 @@ async function main(): Promise<void> {
           return { success: false, error: "Patch must be an object" };
         }
         const previousUseLocalhost = config.streamer_mode.use_localhost_ip;
+        // streamer_mode.currencies must be replaced wholesale rather than
+        // deep-merged so removed entries in `list` are actually removed.
+        const patchObj = patch as Record<string, unknown>;
+        const sm = patchObj["streamer_mode"];
+        if (isPlainObj(sm) && "currencies" in sm) {
+          const c = sm["currencies"];
+          if (isPlainObj(c)) {
+            const mainRaw = c["main"];
+            const listRaw = c["list"];
+            const main =
+              typeof mainRaw === "string" ? mainRaw.trim().toUpperCase() : "";
+            const list: Record<string, number> = {};
+            if (isPlainObj(listRaw)) {
+              for (const [code, value] of Object.entries(listRaw)) {
+                const upper = code.trim().toUpperCase();
+                if (!/^[A-Z]{3}$/.test(upper)) continue;
+                if (
+                  typeof value !== "number" ||
+                  !Number.isFinite(value) ||
+                  value <= 0
+                ) {
+                  continue;
+                }
+                if (upper === main) continue;
+                list[upper] = value;
+              }
+            }
+            config.streamer_mode.currencies = { main, list };
+            delete sm["currencies"];
+          }
+        }
         deepMergeInto(
           config as unknown as Record<string, unknown>,
           patch as Record<string, unknown>,
@@ -1388,7 +1455,6 @@ async function main(): Promise<void> {
       donationAlertsSetup: async (input: {
         appId: string;
         clientSecret: string;
-        currency: string;
       }) => {
         await daProvider.saveSecrets({
           clientSecret: input.clientSecret,
@@ -1400,10 +1466,6 @@ async function main(): Promise<void> {
           const da = config.streamer_mode.donation_systems.donationalerts;
           if (da.app_id !== input.appId) {
             da.app_id = input.appId;
-            changed = true;
-          }
-          if (da.currency !== input.currency) {
-            da.currency = input.currency;
             changed = true;
           }
           if (!da.enabled) {
@@ -1420,7 +1482,7 @@ async function main(): Promise<void> {
           }
         }
         logger.info(
-          `[DonationAlerts] App credentials saved with currency ${input.currency}. Opening login...`,
+          `[DonationAlerts] App credentials saved. Opening login...`,
         );
         const loginUrl = daProvider.getLoginUrl(port, input.appId);
         try {

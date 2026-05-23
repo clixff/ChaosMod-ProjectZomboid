@@ -52,6 +52,11 @@ export interface DonationSystemsConfig {
   twitch_subs: DonationSystemTwitchSubs;
 }
 
+export interface CurrenciesConfig {
+  main: string;
+  list: Record<string, number>;
+}
+
 export interface StreamerModeConfig {
   streamer_mode_enabled: boolean;
   voting_enabled: boolean;
@@ -70,6 +75,7 @@ export interface StreamerModeConfig {
   hide_votes: boolean;
   youtube_chat_connection_type: "long_polling" | "message_streaming";
   random_effect_in_vote: boolean;
+  currencies: CurrenciesConfig;
 }
 
 export interface ModConfig {
@@ -186,6 +192,7 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   hide_votes: false,
   youtube_chat_connection_type: "long_polling",
   random_effect_in_vote: true,
+  currencies: { main: "", list: {} },
 };
 
 const DEFAULT_CONFIG: ModConfig = {
@@ -314,6 +321,22 @@ function parseDonationSystems(
   };
 }
 
+function parseCurrencies(raw: Record<string, unknown>): CurrenciesConfig {
+  const main = str(raw["main"], "").trim().toUpperCase();
+  const rawList = obj(raw["list"]);
+  const list: Record<string, number> = {};
+  for (const [code, value] of Object.entries(rawList)) {
+    const upper = code.trim().toUpperCase();
+    if (!/^[A-Z]{3}$/.test(upper)) continue;
+    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+      continue;
+    }
+    if (upper === main) continue;
+    list[upper] = value;
+  }
+  return { main, list };
+}
+
 function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
   const d = DEFAULT_STREAMER_MODE;
   return {
@@ -367,6 +390,7 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
       raw["random_effect_in_vote"],
       d.random_effect_in_vote,
     ),
+    currencies: parseCurrencies(obj(raw["currencies"])),
   };
 }
 
@@ -424,6 +448,13 @@ export function saveConfig(luaFolder: string, config: ModConfig): void {
     let existingRaw: Record<string, unknown> = {};
     if (existsSync(configPath)) {
       existingRaw = obj(JSON.parse(readFileSync(configPath, "utf-8")));
+    }
+    // streamer_mode.currencies is a user-managed list of currency rates;
+    // removing an entry must propagate to disk. Drop the existing block so the
+    // merge takes the new in-memory value verbatim instead of merging maps.
+    const existingSm = existingRaw["streamer_mode"];
+    if (isPlainObject(existingSm) && "currencies" in existingSm) {
+      delete existingSm["currencies"];
     }
     const merged = mergeDefaultsPreservingUnknowns(existingRaw, config);
     writeFileSync(configPath, JSON.stringify(merged, null, 4), "utf-8");

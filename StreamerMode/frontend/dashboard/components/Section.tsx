@@ -35,11 +35,12 @@ interface FieldRowProps {
   label: string;
   hint?: string;
   children: ReactNode;
+  alignTop?: boolean;
 }
 
-export function FieldRow({ label, hint, children }: FieldRowProps) {
+export function FieldRow({ label, hint, children, alignTop }: FieldRowProps) {
   return (
-    <div className="field-row">
+    <div className={`field-row${alignTop ? " field-row--top" : ""}`}>
       <div className="field">
         <span className="field-label">{label}</span>
         {hint !== undefined && <span className="field-hint">{hint}</span>}

@@ -19,6 +19,7 @@
 ---@field render_chat_messages boolean
 ---@field use_animals_nicknames boolean
 ---@field random_effect_in_vote boolean -- if true, one of the vote options is a hidden "Random" effect
+---@field currencies table -- opaque, owned by StreamerMode app; Lua only round-trips it through save
 
 ---@class ChaosConfigUI
 ---@field progress_bar_color string
@@ -124,6 +125,7 @@ ChaosConfig = ChaosConfig or {
         render_chat_messages = true,
         use_animals_nicknames = true,
         random_effect_in_vote = true,
+        currencies = { main = "", list = {} },
     }
 }
 
@@ -396,6 +398,10 @@ function ChaosConfig.LoadConfigFromDisk()
             end
             ChaosConfig.streamer_mode.donate_price_groups = groups
         end
+        -- Currencies (StreamerMode-owned, Lua just round-trips it)
+        if type(configData.streamer_mode.currencies) == "table" then
+            ChaosConfig.streamer_mode.currencies = configData.streamer_mode.currencies
+        end
     end
 
     print("[ChaosMod] Config effects_interval_enabled: " .. tostring(ChaosConfig.effects_interval_enabled))
@@ -530,6 +536,7 @@ function ChaosConfig.BuildJsonSnapshot()
             allow_vote_command = sm.allow_vote_command,
             hide_votes = sm.hide_votes,
             random_effect_in_vote = sm.random_effect_in_vote,
+            currencies = sm.currencies or { main = "", list = {} },
         },
     }
 end

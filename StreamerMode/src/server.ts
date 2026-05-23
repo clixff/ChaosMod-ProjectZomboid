@@ -3,6 +3,7 @@ import type { TwitchChatProvider } from "./streamer/index.ts";
 import type { ModConfig } from "./config.ts";
 import type { EffectEntry } from "./effects.ts";
 import type { ActivityEvent } from "./activityLog.ts";
+import { fetchExchangeRates } from "./utils/currencies.ts";
 import obsHtmlFile from "../frontend/obs/index.html";
 import dashboardHtmlFile from "../frontend/dashboard/index.html";
 
@@ -113,7 +114,6 @@ export interface ServerContext {
   donationAlertsSetup?: (input: {
     appId: string;
     clientSecret: string;
-    currency: string;
   }) => Promise<{ success: boolean; error?: string; url?: string }>;
   youtubeLogout?: () => Promise<{ success: boolean; error?: string }>;
   youtubeSetStreamUrl?: (
@@ -336,25 +336,14 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           const appId = typeof b["appId"] === "string" ? b["appId"].trim() : "";
           const clientSecret =
             typeof b["clientSecret"] === "string" ? b["clientSecret"] : "";
-          const currencyRaw =
-            typeof b["currency"] === "string" ? b["currency"].trim() : "";
-          if (!appId || !clientSecret || !currencyRaw) {
-            return new Response(
-              "Missing fields: appId, clientSecret, currency",
-              { status: 400 },
-            );
-          }
-          const currency = currencyRaw.toUpperCase();
-          if (!/^[A-Z]{3}$/.test(currency)) {
-            return new Response(
-              "Currency must be exactly 3 letters (e.g. RUB)",
-              { status: 400 },
-            );
+          if (!appId || !clientSecret) {
+            return new Response("Missing fields: appId, clientSecret", {
+              status: 400,
+            });
           }
           const r = await ctx.donationAlertsSetup({
             appId,
             clientSecret,
-            currency,
           });
           if (!r.success) {
             return new Response(r.error ?? "Setup failed", { status: 400 });
@@ -576,6 +565,30 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
             effects: ctx.getEffectsList(),
             price_groups: ctx.getPriceGroups?.() ?? [],
           });
+        },
+      },
+
+      "/api/currencies/exchange-rates": {
+        GET: async (req: Request) => {
+          const url = new URL(req.url);
+          const base = url.searchParams.get("base") ?? "";
+          const code = base.trim().toUpperCase();
+          if (!/^[A-Z]{3}$/.test(code)) {
+            return new Response(
+              `Invalid base currency code: ${base}`,
+              { status: 400 },
+            );
+          }
+          try {
+            const result = await fetchExchangeRates(code);
+            return Response.json(result);
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            logger.warn(`[currencies] Exchange rate fetch failed: ${msg}`);
+            return new Response(`Exchange rate fetch failed: ${msg}`, {
+              status: 502,
+            });
+          }
         },
       },
 

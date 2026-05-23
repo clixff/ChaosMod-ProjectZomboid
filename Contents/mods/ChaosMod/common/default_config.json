@@ -133,6 +133,10 @@
         "allow_vote_command": true,
         "hide_votes": false,
         "youtube_chat_connection_type": "long_polling",
-        "random_effect_in_vote": true
+        "random_effect_in_vote": true,
+        "currencies": {
+            "main": "",
+            "list": {}
+        }
     }
 }

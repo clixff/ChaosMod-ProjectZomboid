@@ -76,7 +76,7 @@ export function TwitchSubsSettingsModal({
         </div>
         <Checkbox
           checked={draft.show_in_obs}
-          label="Show in OBS"
+          label="Display in OBS"
           onChange={(v) => commit({ show_in_obs: v })}
         />
       </div>

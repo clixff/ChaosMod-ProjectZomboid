@@ -286,6 +286,10 @@ a:focus-visible {
   gap: 16px;
 }
 
+.field-row--top {
+  align-items: flex-start;
+}
+
 .field-label {
   font-size: 13px;
   font-weight: 500;
@@ -552,6 +556,15 @@ a.btn--success:hover {
   100% { box-shadow: 0 0 0 0 rgba(124, 156, 255, 0); }
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
 .btn--ghost {
   background: transparent;
 }
@@ -659,6 +672,99 @@ a.btn--success:hover {
   padding: 60px 20px;
   text-align: center;
   color: var(--text-muted);
+}
+
+.effect-activation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: -8px 0 16px;
+}
+
+.effect-activation-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.effect-activation-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.effect-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+  width: 70%;
+}
+
+.effect-price-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.effect-price-table th,
+.effect-price-table td {
+  padding: 8px 12px;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--border);
+}
+
+.effect-price-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.effect-price-table thead th {
+  background: var(--bg-2);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.effect-price-table thead th:nth-child(2) {
+  text-align: right;
+}
+
+.effect-price-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.effect-price-table td.effect-price-code {
+  color: var(--text-dim);
+  font-weight: 600;
+  text-align: left;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.effect-price-table td.effect-price-value {
+  color: var(--text);
+  font-weight: 500;
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.effect-price-table td.effect-price-name {
+  color: var(--text-muted);
+  font-weight: 400;
+  text-align: left;
 }
 
 .toast {

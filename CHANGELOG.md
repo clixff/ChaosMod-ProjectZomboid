@@ -24,6 +24,7 @@
 - Friendly NPCs now pick up bandages from the ground to heal themselves when out of combat.
 - Animals now can open doors
 - NPCs now panic and flee to a nearby spot when surrounded by zombies
+- Added multi-currency support for DonationAlerts so donations in any configured currency convert into your main currency before triggering effects
 
 ### New Effects
 
@@ -72,7 +73,7 @@
 - "Give Katana" effect now equips the katana to both hands of the player
 - "Spawn Trees" effect now lasts 120 seconds and spawns more trees over a wider area; trees are removed when the effect ends, and the player is no longer damaged by car crashes into them while driving
 - "Spawn Random L4D2 Companion" now gives random melee weapon to NPC
-- "Griefer Pig Turret" effect no longer follows zombies or the player and instead wanders to random squares around the player
+- "Griefer Pig Turret" effect no longer follows zombies and instead wanders to random squares around the player
 - "Griefer Pig Turret" deals double damage to zombies
 - "Player Falls" effect no longer makes the player fall while standing still or in a car, new duration is 40s
 - "Enable Snow" sets temperature to -30°C / -22 °F

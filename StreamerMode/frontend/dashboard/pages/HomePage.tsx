@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
   CircleQuestionMark,
@@ -31,6 +31,7 @@ const STEAM_WORKSHOP_URL =
 const HUB_BASE_URL = "https://chaos-zomboid.com";
 const HUB_EXPORT_URL = `${HUB_BASE_URL}/effects?export=true`;
 import { Modal } from "../components/Modal.tsx";
+import { CurrenciesModal } from "../components/CurrenciesModal.tsx";
 import { YouTubeSetupGuide } from "../components/YouTubeSetupGuide.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
 import { Select } from "../components/Select.tsx";
@@ -59,7 +60,7 @@ import {
 } from "../api.ts";
 import { TwitchPointsSettingsModal } from "../components/TwitchPointsSettingsModal.tsx";
 import { TwitchSubsSettingsModal } from "../components/TwitchSubsSettingsModal.tsx";
-import type { DonationSystemTwitchSubs } from "../api.ts";
+import type { CurrenciesConfig, DonationSystemTwitchSubs } from "../api.ts";
 
 interface HomePageProps {
   onNotify: (message: string, isError?: boolean) => void;
@@ -115,7 +116,6 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [daModal, setDaModal] = useState(false);
   const [daAppId, setDaAppId] = useState("");
   const [daSecret, setDaSecret] = useState("");
-  const [daCurrency, setDaCurrency] = useState("RUB");
   const [config, setConfig] = useState<ModConfig | null>(null);
   const [languages, setLanguages] = useState<string[]>([]);
   const [bitsOptionsModal, setBitsOptionsModal] = useState(false);
@@ -127,6 +127,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [twitchPointsStatus, setTwitchPointsStatus] =
     useState<TwitchPointsStatus | null>(null);
   const [twitchSubsModal, setTwitchSubsModal] = useState(false);
+  const [currenciesModal, setCurrenciesModal] = useState(false);
 
   const refreshTwitchPoints = useCallback(async () => {
     try {
@@ -187,6 +188,22 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
       cancelled = true;
     };
   }, [onNotify]);
+
+  const prevDaConnectedRef = useRef(false);
+  useEffect(() => {
+    const connected = status?.donationalerts.connected ?? false;
+    if (connected && !prevDaConnectedRef.current) {
+      void (async () => {
+        try {
+          const cfg = await getConfig();
+          setConfig(cfg);
+        } catch {
+          /* ignore */
+        }
+      })();
+    }
+    prevDaConnectedRef.current = connected;
+  }, [status?.donationalerts.connected]);
 
   const saveConfigPatch = async (patch: Record<string, unknown>) => {
     try {
@@ -888,6 +905,37 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 {status.donationalerts.name ?? "—"}
               </span>
             </div>
+            {status.donationalerts.connected &&
+              config &&
+              (config.streamer_mode.currencies.main.trim().length === 0 ||
+                Object.keys(config.streamer_mode.currencies.list).length ===
+                  0) && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    padding: "8px 10px",
+                    border: "1px solid rgba(245, 179, 1, 0.4)",
+                    borderRadius: 6,
+                    background: "rgba(245, 179, 1, 0.08)",
+                    color: "#f5b301",
+                    lineHeight: 1.5,
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 8,
+                    fontSize: 13,
+                  }}
+                >
+                  <TriangleAlert
+                    size={16}
+                    aria-hidden="true"
+                    style={{ marginTop: 2, flexShrink: 0 }}
+                  />
+                  <div>
+                    You're using <code>DonationAlerts</code> service, but did
+                    not set currencies exchange rate.
+                  </div>
+                </div>
+              )}
             <div className="card-actions">
               {status.donationalerts.connected ? (
                 <button
@@ -912,7 +960,6 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                       config?.streamer_mode.donation_systems.donationalerts;
                     setDaAppId(da?.app_id ?? "");
                     setDaSecret("");
-                    setDaCurrency(da?.currency ? da.currency : "RUB");
                     setDaModal(true);
                   }}
                 >
@@ -920,6 +967,14 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                   Login
                 </button>
               )}
+              <button
+                className="btn"
+                disabled={busy || !config}
+                onClick={() => setCurrenciesModal(true)}
+              >
+                <Pencil size={14} aria-hidden="true" />
+                Edit Currencies
+              </button>
             </div>
           </div>
           <div className="card-actions">
@@ -929,6 +984,14 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             >
               <Pencil size={14} aria-hidden="true" />
               Edit Price Groups
+            </button>
+            <button
+              className="btn"
+              disabled={!config}
+              onClick={() => setCurrenciesModal(true)}
+            >
+              <Pencil size={14} aria-hidden="true" />
+              Edit Currencies
             </button>
           </div>
         </div>
@@ -1008,6 +1071,9 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             <h3 className="card-title">
               <img src={googleSheetsLogo} alt="" className="card-title-logo" />
               Export effects to Google Sheets
+              <span style={{ color: "var(--text-muted)", marginLeft: 6 }}>
+                (Legacy)
+              </span>
             </h3>
           </div>
           <div className="card-row card-row-inline">
@@ -1135,17 +1201,14 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           busy={busy}
           appId={daAppId}
           secret={daSecret}
-          currency={daCurrency}
           onAppId={setDaAppId}
           onSecret={setDaSecret}
-          onCurrency={setDaCurrency}
           onClose={() => setDaModal(false)}
           onSubmit={() =>
             void wrap(async () => {
               await donationAlertsSetup({
                 appId: daAppId.trim(),
                 clientSecret: daSecret,
-                currency: daCurrency.trim().toUpperCase(),
               });
               setDaModal(false);
               onNotify(
@@ -1247,6 +1310,36 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           onClose={() => setHubExportModal(false)}
           onCopied={(what) => onNotify(`${what} copied to clipboard.`)}
           onError={(msg) => onNotify(msg, true)}
+        />
+      )}
+
+      {currenciesModal && config && (
+        <CurrenciesModal
+          currencies={config.streamer_mode.currencies}
+          priceGroups={config.streamer_mode.donate_price_groups}
+          daFallbackCurrency={
+            config.streamer_mode.donation_systems.donationalerts.currency
+          }
+          onClose={() => setCurrenciesModal(false)}
+          onNotify={onNotify}
+          onSave={(next: CurrenciesConfig) => {
+            setConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    streamer_mode: {
+                      ...prev.streamer_mode,
+                      currencies: next,
+                    },
+                  }
+                : prev,
+            );
+            void saveConfigPatch({
+              streamer_mode: { currencies: next },
+            });
+            setCurrenciesModal(false);
+            onNotify("Currencies saved.");
+          }}
         />
       )}
 
@@ -1613,10 +1706,8 @@ interface DonationAlertsLoginModalProps {
   busy: boolean;
   appId: string;
   secret: string;
-  currency: string;
   onAppId: (v: string) => void;
   onSecret: (v: string) => void;
-  onCurrency: (v: string) => void;
   onClose: () => void;
   onSubmit: () => void;
 }
@@ -1626,19 +1717,14 @@ function DonationAlertsLoginModal({
   busy,
   appId,
   secret,
-  currency,
   onAppId,
   onSecret,
-  onCurrency,
   onClose,
   onSubmit,
 }: DonationAlertsLoginModalProps) {
   const redirectUri = `http://localhost:${port}/provider/donationalerts/success/`;
   const trimmedAppId = appId.trim();
-  const trimmedCurrency = currency.trim().toUpperCase();
-  const currencyValid = /^[A-Z]{3}$/.test(trimmedCurrency);
-  const canSubmit =
-    !busy && trimmedAppId.length > 0 && secret.length > 0 && currencyValid;
+  const canSubmit = !busy && trimmedAppId.length > 0 && secret.length > 0;
 
   return (
     <Modal title="Connect DonationAlerts" onClose={onClose}>
@@ -1669,10 +1755,6 @@ function DonationAlertsLoginModal({
           fields below.
         </li>
         <li>
-          Choose the donation <b>Currency</b> code (3 letters, e.g.{" "}
-          <code>RUB</code>, <code>USD</code>, <code>EUR</code>).
-        </li>
-        <li>
           Click <b>Login</b> — credentials are saved and a DonationAlerts
           authorization page opens in your browser.
         </li>
@@ -1692,15 +1774,31 @@ function DonationAlertsLoginModal({
             placeholder="••••••••"
           />
         </label>
-        <label className="form-field">
-          <span className="form-label">Currency</span>
-          <TextInput
-            value={currency}
-            onChange={(v) => onCurrency(v.toUpperCase().slice(0, 3))}
-            size="mid"
-            placeholder="RUB"
-          />
-        </label>
+      </div>
+
+      <div
+        style={{
+          marginTop: 16,
+          padding: "8px 10px",
+          border: "1px solid rgba(245, 179, 1, 0.4)",
+          borderRadius: 6,
+          background: "rgba(245, 179, 1, 0.08)",
+          color: "#f5b301",
+          lineHeight: 1.5,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 8,
+        }}
+      >
+        <Info
+          size={16}
+          aria-hidden="true"
+          style={{ marginTop: 2, flexShrink: 0 }}
+        />
+        <div>
+          Note: Once you log in, you will need to specify currencies using the
+          &quot;Edit Currencies&quot; button.
+        </div>
       </div>
 
       <div

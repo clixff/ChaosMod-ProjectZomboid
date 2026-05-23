@@ -48,6 +48,11 @@ export interface DonationSystemsConfig {
   twitch_subs: DonationSystemTwitchSubs;
 }
 
+export interface CurrenciesConfig {
+  main: string;
+  list: Record<string, number>;
+}
+
 export interface StreamerModeConfig {
   streamer_mode_enabled: boolean;
   voting_enabled: boolean;
@@ -67,6 +72,7 @@ export interface StreamerModeConfig {
   hide_votes: boolean;
   youtube_chat_connection_type: "long_polling" | "message_streaming";
   random_effect_in_vote: boolean;
+  currencies: CurrenciesConfig;
 }
 
 export interface ModConfig {
@@ -306,7 +312,6 @@ export async function youtubeReconnect(): Promise<void> {
 export async function donationAlertsSetup(input: {
   appId: string;
   clientSecret: string;
-  currency: string;
 }): Promise<{ url: string | null }> {
   const res = await fetch("/api/donationalerts/setup", {
     method: "POST",
@@ -428,6 +433,25 @@ export interface HubExportPayload {
     bits_override: number;
     donation_enabled: boolean;
   };
+}
+
+export interface ExchangeRatesResult {
+  base: string;
+  rates: Record<string, number>;
+  time_last_update_utc: string;
+}
+
+export async function getCurrencyExchangeRates(
+  base: string,
+): Promise<ExchangeRatesResult> {
+  const res = await fetch(
+    `/api/currencies/exchange-rates?base=${encodeURIComponent(base)}`,
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `getCurrencyExchangeRates: ${res.status}`);
+  }
+  return (await res.json()) as ExchangeRatesResult;
 }
 
 export async function getHubExportPayload(): Promise<HubExportPayload> {

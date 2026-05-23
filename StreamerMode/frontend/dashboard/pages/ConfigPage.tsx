@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Info } from "lucide-react";
 import { Section, FieldRow } from "../components/Section.tsx";
 import { TextInput, NumberInput } from "../components/Input.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
@@ -211,7 +212,9 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
         </FieldRow>
         <FieldRow
           label="Recent effects block buffer"
-          hint={"How many of the most recently triggered effects are blocked from being picked again.\n\nRecommended:\nFor default Chaos - 30-100\nFor 4 options vote - 90-130\nFor 5+ options vote - 150+"}
+          hint={
+            "How many of the most recently triggered effects are blocked from being picked again.\n\nRecommended:\nFor default Chaos - 30-100\nFor 4 options vote - 90-130\nFor 5+ options vote - 150+"
+          }
         >
           <NumberInput
             value={config.recent_effects_block_buffer}
@@ -368,12 +371,55 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
         title="Donation Price Groups"
         description="Each group sets the minimum donation amount required for effects assigned to it. Effects pick a group on the Effects page."
       >
+        <div
+          style={{
+            marginBottom: 12,
+            padding: "8px 10px",
+            border: "1px solid rgba(91, 158, 255, 0.4)",
+            borderRadius: 6,
+            background: "rgba(91, 158, 255, 0.08)",
+            color: "#7cb6ff",
+            lineHeight: 1.5,
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 8,
+            fontSize: 13,
+          }}
+        >
+          <Info
+            size={16}
+            aria-hidden="true"
+            style={{ marginTop: 2, flexShrink: 0 }}
+          />
+          <div>
+            Each effect is assigned to a price group. Here, you can configure
+            the price for each group. Prices are set in USD by default.
+            <br />
+            This only works for the specific donation services:
+            <br />
+            <code>- Twitch Bits (currency is ignored)</code>
+            <br />
+            <code>- DonationAlerts</code>
+            <br />
+            <code>- Twitch Rewards (prices and currency are ignored)</code>
+          </div>
+        </div>
         {sm.donate_price_groups.length > 0 && (
           <table className="price-groups-table">
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Price</th>
+                <th>
+                  Price
+                  {(() => {
+                    const main = sm.currencies.main.trim().toUpperCase();
+                    const fallback = sm.donation_systems.donationalerts.currency
+                      .trim()
+                      .toUpperCase();
+                    const c = main || fallback;
+                    return c ? ` (${c})` : "";
+                  })()}
+                </th>
                 <th aria-label="Actions" />
               </tr>
             </thead>
@@ -467,6 +513,68 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             </button>
           </div>
         </FieldRow>
+        {(() => {
+          const prices = sm.donate_price_groups
+            .map((g) => g.price)
+            .filter((p) => Number.isFinite(p) && p > 0);
+          if (prices.length === 0) return null;
+          const exampleN = Math.min(...prices);
+          const ccy = sm.currencies.main.trim().toUpperCase();
+          return (
+            <div
+              style={{
+                marginTop: 12,
+                padding: "8px 10px",
+                border: "1px solid rgba(245, 179, 1, 0.4)",
+                borderRadius: 6,
+                background: "rgba(245, 179, 1, 0.08)",
+                color: "#f5b301",
+                lineHeight: 1.5,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+                fontSize: 13,
+              }}
+            >
+              <Info
+                size={16}
+                aria-hidden="true"
+                style={{ marginTop: 2, flexShrink: 0 }}
+              />
+              <div>
+                Note: These are minimum prices. If an effect costs {exampleN}
+                {ccy ? ` ${ccy}` : ""}, any donation of {exampleN}
+                {ccy ? ` ${ccy}` : ""} or more can activate it.
+              </div>
+            </div>
+          );
+        })()}
+        <div
+          style={{
+            marginTop: 8,
+            padding: "8px 10px",
+            border: "1px solid rgba(245, 179, 1, 0.4)",
+            borderRadius: 6,
+            background: "rgba(245, 179, 1, 0.08)",
+            color: "#f5b301",
+            lineHeight: 1.5,
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 8,
+            fontSize: 13,
+          }}
+        >
+          <Info
+            size={16}
+            aria-hidden="true"
+            style={{ marginTop: 2, flexShrink: 0 }}
+          />
+          <div>
+            Also set currencies on the home tab if you use these services:
+            <br />
+            <code>DonationAlerts</code>
+          </div>
+        </div>
       </Section>
 
       <Section title="UI" description="HUD colors, sizes, and positions.">
