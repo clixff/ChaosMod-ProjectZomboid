@@ -27,6 +27,8 @@ function EffectVampireWeakness:OnTick(deltaMs)
     local openSky = sq and not inRoom and not underRoof or false
     if not openSky then return end
 
+    if player:getVehicle() ~= nil then return end
+
     local bodyDamage = player:getBodyDamage()
     if not bodyDamage then return end
 

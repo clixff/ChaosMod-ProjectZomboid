@@ -339,7 +339,18 @@
         "rubber_duck_steps": "Rubber Duck Steps",
         "hurricane": "Hurricane",
         "the_magic_broom": "The Magic Broom",
-        "spawn_pirate_companion": "Spawn Pirate Companion"
+        "spawn_pirate_companion": "Spawn Pirate Companion",
+        "earthquake": "Earthquake",
+        "equip_bulletproof_vest": "Equip Bulletproof Vest",
+        "give_military_backpack": "Give Military Backpack",
+        "midas_touch": "Midas Touch",
+        "spawn_fire_chickens": "Spawn Fire Chickens",
+        "zombie_fire_steps": "Zombie Fire Steps",
+        "player_fire_steps": "Player Fire Steps",
+        "ignite_recent_player_positions": "Ignite Recent Player Positions",
+        "spawn_griefer_jesus": "Spawn Griefer Jesus",
+        "spawn_griefer_cowboy": "Spawn Griefer Cowboy",
+        "spawn_cowboy_companion": "Spawn Cowboy Companion"
     },
     "core": {
         "start_mod": "Start ChaosMod",

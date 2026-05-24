@@ -33,7 +33,5 @@ function EffectSetPirateOutfit:OnStart()
     player:setWornItem(trousers:getBodyLocation(), trousers)
     player:setWornItem(shoes:getBodyLocation(), shoes)
 
-    player:onWornItemsChanged()
-    player:resetModelNextFrame()
     triggerEvent("OnClothingUpdated", player)
 end

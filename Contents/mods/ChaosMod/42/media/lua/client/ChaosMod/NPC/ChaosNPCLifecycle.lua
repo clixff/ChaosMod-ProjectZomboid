@@ -456,6 +456,11 @@ function ChaosNPC:OnZombieDead()
         end
 
         ChaosNPCFirearms.ClearFirearm(self)
+
+        if self:HasTag("jesus") then
+            self.zombie:removeFromWorld()
+            self.zombie:removeFromSquare()
+        end
     end
 
     local isFollowGroup = self.npcGroup == ChaosNPCGroupID.COMPANIONS or

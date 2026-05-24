@@ -339,7 +339,18 @@
         "rubber_duck_steps": "Pasos de pato de goma",
         "hurricane": "Huracán",
         "the_magic_broom": "Escoba mágica",
-        "spawn_pirate_companion": "Invocar compañero pirata"
+        "spawn_pirate_companion": "Invocar compañero pirata",
+        "earthquake": "Terremoto",
+        "equip_bulletproof_vest": "Equipar chaleco antibalas",
+        "give_military_backpack": "Dar mochila militar",
+        "midas_touch": "Toque de Midas",
+        "spawn_fire_chickens": "Invocar gallinas de fuego",
+        "zombie_fire_steps": "Huellas de fuego de zombis",
+        "player_fire_steps": "Pasos de fuego",
+        "ignite_recent_player_positions": "Incendiar posiciones recientes del jugador",
+        "spawn_griefer_jesus": "Invocar a Jesús griefer",
+        "spawn_griefer_cowboy": "Invocar a un vaquero griefer",
+        "spawn_cowboy_companion": "Invocar a un vaquero compañero"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

@@ -11,23 +11,20 @@ export function LandingPage() {
   return (
     <section className="landing">
       <div className="landing-inner">
-        <h1 className="landing-title landing-anim-fade-up landing-anim-delay-1">
+        <h1 className="landing-title">
           Chaos<span className="landing-title-accent">Mod</span>
         </h1>
 
-        <div
-          className="landing-divider landing-anim-divider"
-          aria-hidden="true"
-        />
+        <div className="landing-divider" aria-hidden="true" />
 
-        <p className="landing-tagline landing-anim-fade-up landing-anim-delay-3">
+        <p className="landing-tagline">
           Mod for Project Zomboid that adds 300+ random effects and Twitch &
           YouTube integration to the game
         </p>
 
         <div className="landing-cta-row">
           <a
-            className="landing-cta landing-cta--steam landing-anim-fade-up landing-anim-delay-4"
+            className="landing-cta landing-cta--steam"
             href={STEAM_WORKSHOP_URL}
             target="_blank"
             rel="noreferrer"
@@ -42,7 +39,7 @@ export function LandingPage() {
           </a>
 
           <a
-            className="landing-cta landing-cta--github landing-anim-fade-up landing-anim-delay-5"
+            className="landing-cta landing-cta--github"
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer"
@@ -56,10 +53,7 @@ export function LandingPage() {
             <span>Open on GitHub</span>
           </a>
 
-          <Link
-            to="/effects"
-            className="landing-cta landing-cta--effects landing-anim-fade-up landing-anim-delay-6"
-          >
+          <Link to="/effects" className="landing-cta landing-cta--effects">
             <ArrowRight size={14} className="landing-cta-icon" />
             <span>Effects List</span>
           </Link>

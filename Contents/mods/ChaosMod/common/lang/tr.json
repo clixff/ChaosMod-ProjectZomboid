@@ -339,7 +339,18 @@
         "rubber_duck_steps": "Lastik Ördek Adımları",
         "hurricane": "Kasırga",
         "the_magic_broom": "Sihirli Süpürge",
-        "spawn_pirate_companion": "Korsan Yoldaş Çağır"
+        "spawn_pirate_companion": "Korsan Yoldaş Çağır",
+        "earthquake": "Deprem",
+        "equip_bulletproof_vest": "Kurşun Geçirmez Yelek Giy",
+        "give_military_backpack": "Askeri Sırt Çantası Ver",
+        "midas_touch": "Midas'ın Dokunuşu",
+        "spawn_fire_chickens": "Ateş Tavukları Çağır",
+        "zombie_fire_steps": "Zombi Ateş İzleri",
+        "player_fire_steps": "Ateş Adımları",
+        "ignite_recent_player_positions": "Oyuncunun Son Konumlarını Tutuştur",
+        "spawn_griefer_jesus": "Griefer İsa Çağır",
+        "spawn_griefer_cowboy": "Griefer Kovboy Çağır",
+        "spawn_cowboy_companion": "Kovboy Yoldaş Çağır"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

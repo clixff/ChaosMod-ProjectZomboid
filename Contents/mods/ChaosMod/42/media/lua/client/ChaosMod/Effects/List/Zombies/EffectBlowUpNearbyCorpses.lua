@@ -23,6 +23,7 @@ function EffectBlowUpNearbyCorpses:OnEnd()
 
     local squaresToExplode = {}
     local seenSquares = {}
+    local px, py = player:getX(), player:getY()
 
     ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
         if not sq then
@@ -40,7 +41,10 @@ function EffectBlowUpNearbyCorpses:OnEnd()
                 local key = string.format("%d:%d:%d", sq:getX(), sq:getY(), sq:getZ())
                 if not seenSquares[key] then
                     seenSquares[key] = true
-                    table.insert(squaresToExplode, sq)
+                    squaresToExplode[#squaresToExplode + 1] = {
+                        square = sq,
+                        dist = ChaosUtils.distTo(px, py, sq:getX(), sq:getY())
+                    }
                 end
                 break
             end
@@ -49,8 +53,10 @@ function EffectBlowUpNearbyCorpses:OnEnd()
         return false
     end, 0, SEARCH_RADIUS, false, false, true, minZ, maxZ)
 
-    for _, corpseSquare in ipairs(squaresToExplode) do
-        ChaosUtils.TriggerExplosionAt(corpseSquare)
+    table.sort(squaresToExplode, function(a, b) return a.dist < b.dist end)
+
+    for i = 1, #squaresToExplode do
+        ChaosUtils.TriggerExplosionAt(squaresToExplode[i].square, nil, true, i > 1)
     end
 
     print("[EffectBlowUpNearbyCorpses] Exploded corpse squares: " .. tostring(#squaresToExplode))

@@ -1,8 +1,8 @@
 EffectStartFire = ChaosEffectBase:derive("EffectStartFire", "start_fire")
 
-local FIRE_COUNT = 8
+local FIRE_COUNT = 30
 local MIN_DISTANCE = 3
-local MAX_DISTANCE = 8
+local MAX_DISTANCE = 10
 local MAX_TRIES = 50
 
 function EffectStartFire:OnStart()
@@ -20,7 +20,7 @@ function EffectStartFire:OnStart()
         local sq = ChaosPlayer.GetRandomSquareAroundPlayer(player, z, MIN_DISTANCE, MAX_DISTANCE, MAX_TRIES, true, true,
             false)
         if sq then
-            IsoFireManager.StartFire(getCell(), sq, true, 100)
+            IsoFireManager.StartFire(getCell(), sq, true, 100, 3000)
         end
     end
 end

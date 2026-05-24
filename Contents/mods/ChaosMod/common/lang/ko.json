@@ -339,7 +339,18 @@
         "rubber_duck_steps": "고무 오리 발소리",
         "hurricane": "허리케인",
         "the_magic_broom": "마법 빗자루",
-        "spawn_pirate_companion": "해적 동료 소환"
+        "spawn_pirate_companion": "해적 동료 소환",
+        "earthquake": "지진",
+        "equip_bulletproof_vest": "방탄조끼 착용",
+        "give_military_backpack": "군용 배낭 지급",
+        "midas_touch": "미다스의 손길",
+        "spawn_fire_chickens": "불의 닭 소환",
+        "zombie_fire_steps": "좀비 불꽃 발자국",
+        "player_fire_steps": "불꽃 발자국",
+        "ignite_recent_player_positions": "플레이어의 최근 위치에 불 지르기",
+        "spawn_griefer_jesus": "그리퍼 예수 소환",
+        "spawn_griefer_cowboy": "그리퍼 카우보이 소환",
+        "spawn_cowboy_companion": "카우보이 동료 소환"
     },
     "core": {
         "start_mod": "ChaosMod 시작",

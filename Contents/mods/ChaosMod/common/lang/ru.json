@@ -339,7 +339,18 @@
         "rubber_duck_steps": "Шаги резиновой уточки",
         "hurricane": "Ураган",
         "the_magic_broom": "Волшебная метла",
-        "spawn_pirate_companion": "Призвать пирата-компаньона"
+        "spawn_pirate_companion": "Призвать пирата-компаньона",
+        "earthquake": "Землетрясение",
+        "equip_bulletproof_vest": "Надеть бронежилет",
+        "give_military_backpack": "Дать военный рюкзак",
+        "midas_touch": "Прикосновение Мидаса",
+        "spawn_fire_chickens": "Огненные курицы",
+        "zombie_fire_steps": "Огненные следы зомби",
+        "player_fire_steps": "Огненные шаги",
+        "ignite_recent_player_positions": "Поджечь недавние позиции игрока",
+        "spawn_griefer_jesus": "Призвать Иисуса-грифера",
+        "spawn_griefer_cowboy": "Призвать ковбоя-грифера",
+        "spawn_cowboy_companion": "Призвать ковбоя-напарника"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

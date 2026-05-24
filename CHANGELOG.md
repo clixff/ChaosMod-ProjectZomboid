@@ -47,6 +47,17 @@
 - Hurricane
 - The Magic Broom
 - Spawn Pirate Companion
+- Earthquake
+- Equip Bulletproof Vest
+- Give Military Backpack
+- Midas Touch
+- Spawn Fire Chickens
+- Zombie Fire Steps
+- Player Fire Steps
+- Ignite Recent Player Positions
+- Spawn Griefer Jesus
+- Spawn Griefer Cowboy
+- Spawn Cowboy Companion
 
 ### Mod Fixes
 
@@ -85,8 +96,8 @@
 - "Enable Snow" sets temperature to -30°C / -22 °F
 - "Lags" now lasts 50s instead of 80s
 - "Launch Player Up" makes zombies to ignore player for some time
-- "Spawn Explosive Spiffos" and "Explode Nearby Cars" effects no longer spam explosion sounds when many objects explode at once
-- "Spawn Griefer Santa" now has M16 rifle weapon
+- "Spawn Explosive Spiffos", "Explode Nearby Cars", and "Blow Up Nearby Corpses" effects no longer spam explosion sounds when many objects explode at once
+- "Spawn Griefer Santa" now has M9 Pistol weapon
 - "NPC Duel" now gives revolvers to spawned NPCs
 - "Spawn Griefer Wizard" now always sets clothes to NPC; Changed weapon from hammer to long stick
 - "Math Captcha" and "Remember Code" effects now reward a random item on success

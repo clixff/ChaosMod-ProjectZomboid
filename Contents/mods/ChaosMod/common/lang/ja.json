@@ -339,7 +339,18 @@
         "rubber_duck_steps": "ラバーダックの足音",
         "hurricane": "ハリケーン",
         "the_magic_broom": "魔法のほうき",
-        "spawn_pirate_companion": "海賊の仲間を召喚"
+        "spawn_pirate_companion": "海賊の仲間を召喚",
+        "earthquake": "地震",
+        "equip_bulletproof_vest": "防弾ベストを装備",
+        "give_military_backpack": "ミリタリーバックパックを与える",
+        "midas_touch": "ミダスタッチ",
+        "spawn_fire_chickens": "炎のニワトリを召喚",
+        "zombie_fire_steps": "ゾンビの炎の足跡",
+        "player_fire_steps": "炎の足跡",
+        "ignite_recent_player_positions": "プレイヤーの最近の位置に着火",
+        "spawn_griefer_jesus": "荒らしイエスを召喚",
+        "spawn_griefer_cowboy": "荒らしカウボーイを召喚",
+        "spawn_cowboy_companion": "カウボーイの仲間を召喚"
     },
     "core": {
         "start_mod": "ChaosModを開始",

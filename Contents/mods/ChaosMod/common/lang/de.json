@@ -339,7 +339,18 @@
         "rubber_duck_steps": "Quietscheenten-Schritte",
         "hurricane": "Hurrikan",
         "the_magic_broom": "Zauberbesen",
-        "spawn_pirate_companion": "Piraten-Begleiter beschwören"
+        "spawn_pirate_companion": "Piraten-Begleiter beschwören",
+        "earthquake": "Erdbeben",
+        "equip_bulletproof_vest": "Schutzweste anlegen",
+        "give_military_backpack": "Militärrucksack geben",
+        "midas_touch": "Midas-Berührung",
+        "spawn_fire_chickens": "Feuerhühner beschwören",
+        "zombie_fire_steps": "Brennende Zombie-Spuren",
+        "player_fire_steps": "Brennende Schritte",
+        "ignite_recent_player_positions": "Letzte Spielerpositionen entzünden",
+        "spawn_griefer_jesus": "Griefer-Jesus spawnen",
+        "spawn_griefer_cowboy": "Griefer-Cowboy spawnen",
+        "spawn_cowboy_companion": "Cowboy-Begleiter spawnen"
     },
     "core": {
         "start_mod": "ChaosMod starten",

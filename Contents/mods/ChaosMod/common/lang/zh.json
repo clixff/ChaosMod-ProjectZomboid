@@ -339,7 +339,18 @@
         "rubber_duck_steps": "橡皮鸭脚步声",
         "hurricane": "飓风",
         "the_magic_broom": "魔法扫帚",
-        "spawn_pirate_companion": "召唤海盗同伴"
+        "spawn_pirate_companion": "召唤海盗同伴",
+        "earthquake": "地震",
+        "equip_bulletproof_vest": "穿上防弹背心",
+        "give_military_backpack": "给予军用背包",
+        "midas_touch": "点石成金",
+        "spawn_fire_chickens": "召唤火焰鸡",
+        "zombie_fire_steps": "僵尸火焰足迹",
+        "player_fire_steps": "火焰足迹",
+        "ignite_recent_player_positions": "点燃玩家最近的位置",
+        "spawn_griefer_jesus": "生成捣蛋鬼耶稣",
+        "spawn_griefer_cowboy": "生成捣蛋鬼牛仔",
+        "spawn_cowboy_companion": "生成牛仔同伴"
     },
     "core": {
         "start_mod": "启动混乱模式",

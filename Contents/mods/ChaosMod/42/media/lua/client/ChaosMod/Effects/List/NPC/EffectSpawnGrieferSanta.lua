@@ -35,5 +35,5 @@ function EffectSpawnGrieferSanta:OnStart()
     -- npc:SetWeapon("Base.Sledgehammer")
     npc:EnterPlayerVehicle(player)
 
-    npc:SetWeapon("Base.AssaultRifle")
+    npc:SetWeapon("Base.Pistol")
 end

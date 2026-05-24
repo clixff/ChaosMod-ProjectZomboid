@@ -11,6 +11,7 @@
 ---@field DEBUG_SQUARE_RING_SEARCH boolean -- When true, SquareRingSearchTile_2D prints a per-ring non-null tile count at Z=0
 ---@field crashDamage { originalValue: boolean|nil, disabled: boolean } -- Tracks the sandbox PlayerDamageFromCrash override state
 ---@field EFFECT_FLYING_CARS_ENABLED boolean -- When true, forces crash damage off regardless of NPC count
+---@field EFFECT_EARTHQUAKE_ENABLED boolean -- When true, forces crash damage off (earthquake violently shakes cars)
 ChaosUtils = ChaosUtils or {
     DEBUG_SQUARE_RING_SEARCH = false,
     lastUsedVehicle = nil,
@@ -23,7 +24,8 @@ ChaosUtils = ChaosUtils or {
     playerPreviousPositions = {},
     playerPreviousPositionsSampleMs = 0,
     crashDamage = { originalValue = nil, disabled = false },
-    EFFECT_FLYING_CARS_ENABLED = false
+    EFFECT_FLYING_CARS_ENABLED = false,
+    EFFECT_EARTHQUAKE_ENABLED = false
 }
 
 local SLEEP_MOD_DATA_KEY = "ChaosMod_SleepData"
@@ -1249,9 +1251,11 @@ function ChaosUtils.CountNPCsInVehicles()
 end
 
 --- Re-evaluates whether the PlayerDamageFromCrash override should be active.
---- Disables crash damage if any NPC is in a vehicle, or if EFFECT_FLYING_CARS_ENABLED is set.
+--- Disables crash damage if any NPC is in a vehicle, if EFFECT_FLYING_CARS_ENABLED is set,
+--- or if EFFECT_EARTHQUAKE_ENABLED is set.
 function ChaosUtils.UpdateCrashDamageOverride()
     local shouldDisable = ChaosUtils.EFFECT_FLYING_CARS_ENABLED
+        or ChaosUtils.EFFECT_EARTHQUAKE_ENABLED
         or ChaosUtils.CountNPCsInVehicles() > 0
     ChaosUtils.SetCrashDamageDisabled(shouldDisable)
 end
@@ -1259,6 +1263,7 @@ end
 --- Resets crash-damage override state at the start of a new world session.
 function ChaosUtils.ResetCrashDamageOverride()
     ChaosUtils.EFFECT_FLYING_CARS_ENABLED = false
+    ChaosUtils.EFFECT_EARTHQUAKE_ENABLED = false
     ChaosUtils.crashDamage.originalValue = nil
     ChaosUtils.crashDamage.disabled = false
 end

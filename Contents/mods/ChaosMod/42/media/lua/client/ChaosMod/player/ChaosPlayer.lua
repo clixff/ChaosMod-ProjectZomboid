@@ -424,6 +424,7 @@ function ChaosPlayer.EquipClothes(player, item)
     if not item then return end
     if item:getBodyLocation() then
         player:setWornItem(item:getBodyLocation(), item, false)
+        triggerEvent("OnClothingUpdated", player)
     end
 end
 

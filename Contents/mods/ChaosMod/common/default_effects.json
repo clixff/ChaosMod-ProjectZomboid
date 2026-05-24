@@ -3067,6 +3067,118 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_5"
+        },
+        {
+            "id": "earthquake",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "earthquake"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "equip_bulletproof_vest",
+            "enabled": true,
+            "chance": 0.75,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_1"
+        },
+        {
+            "id": "give_military_backpack",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "midas_touch",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "midas_touch"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_3"
+        },
+        {
+            "id": "spawn_fire_chickens",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "spawn_fire_chickens"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "zombie_fire_steps",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "zombie_fire_steps"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "player_fire_steps",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "player_fire_steps"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "ignite_recent_player_positions",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "spawn_griefer_jesus",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "spawn_griefer_jesus"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "spawn_griefer_cowboy",
+            "enabled": true,
+            "chance": 0.85,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "spawn_cowboy_companion",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
         }
     ]
 }

@@ -339,7 +339,18 @@
         "rubber_duck_steps": "Pas de canard en plastique",
         "hurricane": "Ouragan",
         "the_magic_broom": "Balai magique",
-        "spawn_pirate_companion": "Invoquer un compagnon pirate"
+        "spawn_pirate_companion": "Invoquer un compagnon pirate",
+        "earthquake": "Tremblement de terre",
+        "equip_bulletproof_vest": "Équiper un gilet pare-balles",
+        "give_military_backpack": "Donner un sac à dos militaire",
+        "midas_touch": "Toucher de Midas",
+        "spawn_fire_chickens": "Invoquer des poules de feu",
+        "zombie_fire_steps": "Pas enflammés des zombies",
+        "player_fire_steps": "Pas enflammés",
+        "ignite_recent_player_positions": "Enflammer les positions récentes du joueur",
+        "spawn_griefer_jesus": "Invoquer Jésus le griefer",
+        "spawn_griefer_cowboy": "Invoquer un cowboy griefer",
+        "spawn_cowboy_companion": "Invoquer un cowboy compagnon"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

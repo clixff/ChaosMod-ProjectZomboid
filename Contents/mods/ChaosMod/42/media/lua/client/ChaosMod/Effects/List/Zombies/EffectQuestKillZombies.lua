@@ -72,6 +72,11 @@ function EffectQuestKillZombies:OnStart()
 
     ChaosUtils.PlayUISound("chaos_quest_start")
     Events.OnZombieDead.Add(OnZombieDead)
+
+    ChaosPlayer.SayLineByColor(getPlayer(),
+        "Quest: Kill 4 Zombies",
+        QUEST_PROGRESS_COLOR)
+    return
 end
 
 function EffectQuestKillZombies:OnEnd()
