@@ -184,12 +184,20 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, upd
     end
 
     if tint then
-        if useAlternativeTintMethod then
-            visual:setTint(ImmutableColor.new(tint.r, tint.g, tint.b))
+        local r, g, b = tint.r or 0, tint.g or 0, tint.b or 0
+        -- Opt-in 0..255 → 0..1 normalization, applied per-channel
+        if tint.normalize then
+            r = r / 255
+            g = g / 255
+            b = b / 255
+        end
+
+        if not useAlternativeTintMethod then
+            visual:setTint(ImmutableColor.new(r, g, b))
         else
-            item:setColorRed(tint.r)
-            item:setColorGreen(tint.g)
-            item:setColorBlue(tint.b)
+            item:setColorRed(r)
+            item:setColorGreen(g)
+            item:setColorBlue(b)
             item:setCustomColor(true)
         end
     end
@@ -201,6 +209,46 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, upd
     end
 
     return visual
+end
+
+---@class ChaosZombieClothesBatchEntry
+---@field type string Full item type, e.g. "Base.Jacket_WhiteTINT".
+---@field tint table? RGB color table `{ r, g, b }` in 0..1. Set `tint.normalize = true` to pass 0..255 channels.
+---@field textureChoice integer? Texture variant index (0-based).
+---@field alternativeTint boolean? Use `ItemVisual:setTint` instead of the item's custom color.
+
+--- Adds multiple clothing items to a zombie in one call and refreshes visuals
+--- once at the end. Prefer this over multiple `AddZombieClothes` calls when
+--- dressing a zombie head-to-toe.
+---@param zombie IsoZombie
+---@param entries ChaosZombieClothesBatchEntry[]
+---@return ItemVisual[] visuals Visuals successfully added (skipped entries are omitted).
+function ChaosZombie.AddZombieClothesBatch(zombie, entries)
+    ---@type ItemVisual[]
+    local visuals = {}
+    if not zombie or not entries then return visuals end
+
+    for i = 1, #entries do
+        local entry = entries[i]
+        if entry and entry.type then
+            local visual = ChaosZombie.AddZombieClothes(
+                zombie,
+                entry.type,
+                entry.tint,
+                entry.textureChoice,
+                false,
+                entry.alternativeTint
+            )
+            if visual then
+                visuals[#visuals + 1] = visual
+            end
+        end
+    end
+
+    zombie:onWornItemsChanged()
+    zombie:resetModelNextFrame()
+
+    return visuals
 end
 
 ---@param zombie IsoZombie

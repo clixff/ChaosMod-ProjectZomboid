@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "플레이어의 최근 위치에 불 지르기",
         "spawn_griefer_jesus": "그리퍼 예수 소환",
         "spawn_griefer_cowboy": "그리퍼 카우보이 소환",
-        "spawn_cowboy_companion": "카우보이 동료 소환"
+        "spawn_cowboy_companion": "카우보이 동료 소환",
+        "sack_on_head": "머리에 자루",
+        "bandage_every_wound": "모든 상처에 붕대 감기",
+        "all_zombies_are_crawlers": "모든 좀비가 기어다님",
+        "spawn_mysterious_stranger": "미스터리한 이방인 소환",
+        "better_call_saul": "베터 콜 사울",
+        "spawn_agent_47": "에이전트 47 스폰",
+        "cant_knockdown_zombies": "플레이어가 좀비를 쓰러뜨릴 수 없음",
+        "random_zombies_are_sprinters": "무작위 좀비가 스프린터가 됨",
+        "teleport_from_zombies": "좀비로부터 순간이동",
+        "military_supply_drop": "군수품 공중 투하",
+        "zombies_magnet": "좀비 자석",
+        "energy_shield": "에너지 방패",
+        "spin_player": "플레이어가 회전함",
+        "tame_caveman": "원시인 길들이기",
+        "cow_the_zombie_killer": "좀비 학살자 소"
     },
     "core": {
         "start_mod": "ChaosMod 시작",

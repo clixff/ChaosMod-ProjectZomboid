@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "Incendiar posiciones recientes del jugador",
         "spawn_griefer_jesus": "Invocar a Jesús griefer",
         "spawn_griefer_cowboy": "Invocar a un vaquero griefer",
-        "spawn_cowboy_companion": "Invocar a un vaquero compañero"
+        "spawn_cowboy_companion": "Invocar a un vaquero compañero",
+        "sack_on_head": "Saco en la cabeza",
+        "bandage_every_wound": "Vendar todas las heridas",
+        "all_zombies_are_crawlers": "Todos los zombis son reptadores",
+        "spawn_mysterious_stranger": "Generar al desconocido misterioso",
+        "better_call_saul": "Better Call Saul",
+        "spawn_agent_47": "Spawnear al Agente 47",
+        "cant_knockdown_zombies": "El jugador no puede derribar zombis",
+        "random_zombies_are_sprinters": "Zombis aleatorios son sprinters",
+        "teleport_from_zombies": "Teletransporte lejos de los zombis",
+        "military_supply_drop": "Lanzamiento de suministros militares",
+        "zombies_magnet": "Imán para zombis",
+        "energy_shield": "Escudo de energía",
+        "spin_player": "El jugador gira",
+        "tame_caveman": "Domar a un cavernícola",
+        "cow_the_zombie_killer": "La vaca asesina de zombis"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

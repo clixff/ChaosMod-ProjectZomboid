@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "Podpal ostatnie pozycje gracza",
         "spawn_griefer_jesus": "Przywołaj Jezusa-griefera",
         "spawn_griefer_cowboy": "Przywołaj kowboja-griefera",
-        "spawn_cowboy_companion": "Przywołaj kowboja-towarzysza"
+        "spawn_cowboy_companion": "Przywołaj kowboja-towarzysza",
+        "sack_on_head": "Worek na głowie",
+        "bandage_every_wound": "Zabandażuj wszystkie rany",
+        "all_zombies_are_crawlers": "Wszystkie zombie są pełzaczami",
+        "spawn_mysterious_stranger": "Zespawnuj tajemniczego nieznajomego",
+        "better_call_saul": "Better Call Saul",
+        "spawn_agent_47": "Zespawnuj Agenta 47",
+        "cant_knockdown_zombies": "Gracz nie może powalać zombie",
+        "random_zombies_are_sprinters": "Losowe zombie są sprinterami",
+        "teleport_from_zombies": "Teleportacja od zombie",
+        "military_supply_drop": "Zrzut zaopatrzenia wojskowego",
+        "zombies_magnet": "Magnes na zombie",
+        "energy_shield": "Tarcza energetyczna",
+        "spin_player": "Gracz się kręci",
+        "tame_caveman": "Oswój jaskiniowca",
+        "cow_the_zombie_killer": "Krowa zabójczyni zombie"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

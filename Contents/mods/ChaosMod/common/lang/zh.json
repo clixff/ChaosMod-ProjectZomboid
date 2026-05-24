@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "点燃玩家最近的位置",
         "spawn_griefer_jesus": "生成捣蛋鬼耶稣",
         "spawn_griefer_cowboy": "生成捣蛋鬼牛仔",
-        "spawn_cowboy_companion": "生成牛仔同伴"
+        "spawn_cowboy_companion": "生成牛仔同伴",
+        "sack_on_head": "头套麻袋",
+        "bandage_every_wound": "包扎所有伤口",
+        "all_zombies_are_crawlers": "所有僵尸变为爬行者",
+        "spawn_mysterious_stranger": "生成神秘陌生人",
+        "better_call_saul": "风骚律师",
+        "spawn_agent_47": "生成特工47",
+        "cant_knockdown_zombies": "玩家无法击倒僵尸",
+        "random_zombies_are_sprinters": "随机僵尸变成奔跑者",
+        "teleport_from_zombies": "从僵尸身边传送",
+        "military_supply_drop": "军事补给空投",
+        "zombies_magnet": "僵尸磁铁",
+        "energy_shield": "能量护盾",
+        "spin_player": "玩家旋转",
+        "tame_caveman": "驯服穴居人",
+        "cow_the_zombie_killer": "奶牛，僵尸杀手"
     },
     "core": {
         "start_mod": "启动混乱模式",

@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "Oyuncunun Son Konumlarını Tutuştur",
         "spawn_griefer_jesus": "Griefer İsa Çağır",
         "spawn_griefer_cowboy": "Griefer Kovboy Çağır",
-        "spawn_cowboy_companion": "Kovboy Yoldaş Çağır"
+        "spawn_cowboy_companion": "Kovboy Yoldaş Çağır",
+        "sack_on_head": "Başında Çuval",
+        "bandage_every_wound": "Tüm Yaraları Sar",
+        "all_zombies_are_crawlers": "Tüm Zombiler Sürünür",
+        "spawn_mysterious_stranger": "Gizemli Yabancı Oluştur",
+        "better_call_saul": "Better Call Saul",
+        "spawn_agent_47": "Ajan 47'yi Spawnla",
+        "cant_knockdown_zombies": "Oyuncu Zombileri Yere Düşüremez",
+        "random_zombies_are_sprinters": "Rastgele Zombiler Sprinter Olur",
+        "teleport_from_zombies": "Zombilerden Uzağa Işınlan",
+        "military_supply_drop": "Askeri İkmal Yardımı",
+        "zombies_magnet": "Zombi Mıknatısı",
+        "energy_shield": "Enerji Kalkanı",
+        "spin_player": "Oyuncu Dönüyor",
+        "tame_caveman": "Mağara Adamını Evcilleştir",
+        "cow_the_zombie_killer": "İnek, Zombi Katili"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

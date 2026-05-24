@@ -52,7 +52,7 @@ function EffectSpawnCarlJohnson:OnStart()
 
     ChaosZombie.AddZombieClothes(zombie, "Base.Vest_DefaultTEXTURE", nil, nil, false)
     ChaosZombie.AddZombieClothes(zombie, "Base.Trousers_JeanBaggy", nil, 2, false)
-    ChaosZombie.AddZombieClothes(zombie, "Base.Shoes_TrainerTINT", { r = 0.5, g = 0.5, b = 0.5 }, 0, true, true)
+    ChaosZombie.AddZombieClothes(zombie, "Base.Shoes_TrainerTINT", { r = 0.5, g = 0.5, b = 0.5 }, 0, true, false)
 
 
     zombie:addItemToSpawnAtDeath(instanceItem("Base.CigaretteRolled"))

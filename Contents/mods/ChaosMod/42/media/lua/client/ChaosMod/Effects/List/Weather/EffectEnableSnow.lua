@@ -3,7 +3,7 @@
 ---@field forceSnowBeforeStart boolean
 EffectEnableSnow = ChaosEffectBase:derive("EffectEnableSnow", "enable_snow")
 
-local TEMP_WINTER_VALUE = -30
+local TEMP_WINTER_VALUE = -22
 
 function EffectEnableSnow:OnStart()
     ChaosEffectBase:OnStart()

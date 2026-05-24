@@ -149,3 +149,28 @@ function ChaosProps.SpawnProp(square, spriteName, north)
 
     return obj
 end
+
+---Makes obj render as if it was at visualZ, relative to baseZ.
+---Example: baseZ=0, visualZ=1.1 => renderYOffset = 105.6
+---@param obj IsoObject
+---@param visualZ number
+---@param baseZ number?
+---@param baseRenderYOffset number?
+---@return number?
+function ChaosProps.SetIsoObjectVisualZ(obj, visualZ, baseZ, baseRenderYOffset)
+    if not obj then return end
+
+    baseZ = baseZ or obj:getZ()
+    baseRenderYOffset = baseRenderYOffset or 0
+
+    local zDelta = visualZ - baseZ
+    local renderYOffset = baseRenderYOffset + (zDelta * 96)
+
+    obj:setRenderYOffset(renderYOffset)
+
+    if obj.invalidateRenderChunkLevel then
+        obj:invalidateRenderChunkLevel(256)
+    end
+
+    return renderYOffset
+end

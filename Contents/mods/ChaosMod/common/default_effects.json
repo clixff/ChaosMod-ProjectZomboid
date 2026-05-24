@@ -3118,7 +3118,7 @@
                 "spawn_fire_chickens"
             ],
             "enabled_donate": true,
-            "price_group": "negative_3"
+            "price_group": "negative_4"
         },
         {
             "id": "zombie_fire_steps",
@@ -3142,7 +3142,7 @@
                 "player_fire_steps"
             ],
             "enabled_donate": true,
-            "price_group": "negative_3"
+            "price_group": "negative_4"
         },
         {
             "id": "ignite_recent_player_positions",
@@ -3179,6 +3179,165 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "positive_4"
+        },
+        {
+            "id": "sack_on_head",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "sack_on_head"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "bandage_every_wound",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "all_zombies_are_crawlers",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "spawn_mysterious_stranger",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "spawn_mysterious_stranger"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "better_call_saul",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "spawn_agent_47",
+            "enabled": true,
+            "chance": 0.85,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "spawn_agent_47"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "cant_knockdown_zombies",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "cant_knockdown_zombies"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_2"
+        },
+        {
+            "id": "random_zombies_are_sprinters",
+            "enabled": true,
+            "chance": 0.65,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "random_zombies_are_sprinters"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_6"
+        },
+        {
+            "id": "teleport_from_zombies",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "teleport_from_zombies"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "military_supply_drop",
+            "enabled": true,
+            "chance": 0.75,
+            "enabled_donate": true,
+            "price_group": "positive_6"
+        },
+        {
+            "id": "zombies_magnet",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "zombies_magnet"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "energy_shield",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "energy_shield"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "spin_player",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "spin_player"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "tame_caveman",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "cow_the_zombie_killer",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "cow_the_zombie_killer"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
         }
     ]
 }

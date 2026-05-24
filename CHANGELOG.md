@@ -23,7 +23,7 @@
 - Added Twitch Subs donation system: every N subs triggers a random effect.
 - Friendly NPCs now pick up bandages from the ground to heal themselves when out of combat.
 - Animals now can open doors
-- NPCs now panic and flee to a nearby spot when surrounded by zombies
+- NPCs now panic and flee to a nearby spot when surrounded by zombies or if their health is low
 - Added multi-currency support for DonationAlerts so donations in any configured currency convert into your main currency before triggering effects
 - NPCs can now use handguns, rifles, and shotguns: they aim, fire, and reload, and pick up dropped firearms from the ground
 - Explosions now damage every item in the player's inventory and destroy a random one item
@@ -58,6 +58,21 @@
 - Spawn Griefer Jesus
 - Spawn Griefer Cowboy
 - Spawn Cowboy Companion
+- Sack Over Head
+- Bandage Every Wound
+- All Zombies Are Crawlers
+- Spawn Mysterious Stranger
+- Better Call Saul
+- Spawn Agent 47
+- Player Can't Knock Down Zombies
+- Random Zombies Are Sprinters
+- Teleport From Zombies
+- Military Supply Drop
+- Zombies Magnet
+- Energy Shield
+- Player Spins
+- Tame a Caveman
+- Cow, the Zombie Killer
 
 ### Mod Fixes
 
@@ -93,7 +108,7 @@
 - "Griefer Pig Turret" effect no longer follows zombies and instead wanders to random squares around the player
 - "Griefer Pig Turret" deals double damage to zombies
 - "Player Falls" effect no longer makes the player fall while standing still or in a car, new duration is 40s
-- "Enable Snow" sets temperature to -30°C / -22 °F
+- "Enable Snow" sets temperature to -22 °C / -7.6 °F
 - "Lags" now lasts 50s instead of 80s
 - "Launch Player Up" makes zombies to ignore player for some time
 - "Spawn Explosive Spiffos", "Explode Nearby Cars", and "Blow Up Nearby Corpses" effects no longer spam explosion sounds when many objects explode at once
@@ -104,6 +119,7 @@
 - "Lootbox" and "Spawn Gift With Loot" now generates 5 items in a giftbox
 - Hide-items effects (clothes, weapons, books, random items) now show a hint line
 - "Invisible Characters" now hides zombie nicknames
+- "Swap Mouse Buttons": fixed effect behaviour in combat
 
 [1.1.1]
 

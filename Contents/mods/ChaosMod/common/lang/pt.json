@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "Incendiar Posições Recentes do Jogador",
         "spawn_griefer_jesus": "Invocar Jesus Griefer",
         "spawn_griefer_cowboy": "Invocar Cowboy Griefer",
-        "spawn_cowboy_companion": "Invocar Cowboy Companheiro"
+        "spawn_cowboy_companion": "Invocar Cowboy Companheiro",
+        "sack_on_head": "Saco na cabeça",
+        "bandage_every_wound": "Enfaixar todas as feridas",
+        "all_zombies_are_crawlers": "Todos os Zumbis São Rastejadores",
+        "spawn_mysterious_stranger": "Invocar Estranho Misterioso",
+        "better_call_saul": "Better Call Saul",
+        "spawn_agent_47": "Spawnar Agente 47",
+        "cant_knockdown_zombies": "Jogador Não Pode Derrubar Zumbis",
+        "random_zombies_are_sprinters": "Zumbis Aleatórios São Velocistas",
+        "teleport_from_zombies": "Teleportar para Longe dos Zumbis",
+        "military_supply_drop": "Lançamento de Suprimentos Militares",
+        "zombies_magnet": "Ímã de Zumbis",
+        "energy_shield": "Escudo de Energia",
+        "spin_player": "O Jogador Gira",
+        "tame_caveman": "Domar um Homem das Cavernas",
+        "cow_the_zombie_killer": "A Vaca Matadora de Zumbis"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

@@ -282,7 +282,7 @@ function ChaosNPC:OnAttackEnemyHit()
     print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Attacking enemy with weapon: %s",
         tostring(zombie:getID()), tostring(enemy:getID()), tostring(weaponId)))
 
-    if weaponId == "Base.BareHands" then
+    if weaponId == "Base.BareHands" or maxDamage < 1.0 then
         minDamage = 0.5
         maxDamage = 1.5
     end

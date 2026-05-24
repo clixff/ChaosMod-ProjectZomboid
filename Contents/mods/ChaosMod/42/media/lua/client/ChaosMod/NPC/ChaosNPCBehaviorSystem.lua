@@ -51,6 +51,29 @@ function ChaosNPC:CountThreateningZombiesNearby()
     return count
 end
 
+---@param x number
+---@param y number
+---@param z number
+---@param maxDist number
+---@return boolean
+local function HasNonNPCZombieWithin(x, y, z, maxDist)
+    local cell = getCell()
+    if not cell then return false end
+    local allZombies = cell:getZombieList()
+    if not allZombies then return false end
+    for i = allZombies:size() - 1, 0, -1 do
+        local zb = allZombies:get(i)
+        if zb and zb:isAlive() and not ChaosNPCUtils.IsNPC(zb) then
+            if math.abs(zb:getZ() - z) < 0.5 then
+                if ChaosUtils.isInRange(x, y, zb:getX(), zb:getY(), maxDist) then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
 ---@return IsoGridSquare?
 function ChaosNPC:FindPanicFleeSquare()
     if not self.zombie then return nil end
@@ -69,6 +92,9 @@ function ChaosNPC:FindPanicFleeSquare()
     local maxRadius = CHAOS_NPC_PANIC_FLEE_MAX_RADIUS
     local minSq = minRadius * minRadius
     local maxSq = maxRadius * maxRadius
+    local safeRadius = CHAOS_NPC_PANIC_FLEE_SAFE_RADIUS
+
+    local fallback = nil
 
     for _ = 1, CHAOS_NPC_PANIC_FLEE_MAX_TRIES do
         local dx = ChaosUtils.RandIntegerRange(-maxRadius, maxRadius + 1)
@@ -77,17 +103,21 @@ function ChaosNPC:FindPanicFleeSquare()
         if distSq >= minSq and distSq <= maxSq then
             local sq = cell:getGridSquare(x + dx, y + dy, z)
             if sq and sq:isSolidFloor() and sq:isFree(false) then
-                return sq
+                if not HasNonNPCZombieWithin(sq:getX(), sq:getY(), sq:getZ(), safeRadius) then
+                    return sq
+                end
+                fallback = fallback or sq
             end
         end
     end
 
-    return nil
+    return fallback
 end
 
 ---@param reason string
 function ChaosNPC:EnterPanic(reason)
     if not self.zombie then return end
+    if not self.canBePanicked then return end
     if self:IsPanicking() then return end
 
     local fleeSquare = self:FindPanicFleeSquare()
@@ -159,6 +189,19 @@ function ChaosNPC:UpdatePanic(deltaMs)
     self.panicCheckTimeoutMs = (self.panicCheckTimeoutMs or 0) + deltaMs
     if self.panicCheckTimeoutMs < CHAOS_NPC_PANIC_CHECK_INTERVAL_MS then return end
     self.panicCheckTimeoutMs = 0
+
+    local currentHealth = zombie:getHealth()
+    local lastHealth = self.panicLastSeenHealth
+    if lastHealth < 0 then lastHealth = currentHealth end
+    local tookDamage = currentHealth < lastHealth
+    self.panicLastSeenHealth = currentHealth
+
+    if tookDamage and not self:IsFriendlyToPlayer() and
+        currentHealth < CHAOS_NPC_PANIC_LOW_HEALTH_THRESHOLD and
+        (self.maxHealth or 0) > CHAOS_NPC_PANIC_LOW_HEALTH_THRESHOLD then
+        self:EnterPanic(string.format("low_health=%.2f", currentHealth))
+        return
+    end
 
     local threshold = self:HasEquippedWeapon() and
         CHAOS_NPC_PANIC_THRESHOLD_ARMED or CHAOS_NPC_PANIC_THRESHOLD_UNARMED

@@ -55,7 +55,7 @@ function ChaosNPCUtils.FindNewTargetForNPC(npc)
 
     local allZombies = cell:getZombieList()
 
-    local maxDist = 5.0
+    local maxDist = npc.enemyDistanceFindRadius or 5.0
 
     ---@type IsoGameCharacter?
     local nearestTarget = nil

@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "プレイヤーの最近の位置に着火",
         "spawn_griefer_jesus": "荒らしイエスを召喚",
         "spawn_griefer_cowboy": "荒らしカウボーイを召喚",
-        "spawn_cowboy_companion": "カウボーイの仲間を召喚"
+        "spawn_cowboy_companion": "カウボーイの仲間を召喚",
+        "sack_on_head": "頭に麻袋",
+        "bandage_every_wound": "すべての傷に包帯を巻く",
+        "all_zombies_are_crawlers": "全ゾンビが這いずりに",
+        "spawn_mysterious_stranger": "謎の男をスポーン",
+        "better_call_saul": "ベター・コール・ソウル",
+        "spawn_agent_47": "エージェント47をスポーン",
+        "cant_knockdown_zombies": "プレイヤーはゾンビを倒せない",
+        "random_zombies_are_sprinters": "ランダムなゾンビがスプリンターになる",
+        "teleport_from_zombies": "ゾンビから離れてテレポート",
+        "military_supply_drop": "軍用物資の投下",
+        "zombies_magnet": "ゾンビマグネット",
+        "energy_shield": "エネルギーシールド",
+        "spin_player": "プレイヤーが回転する",
+        "tame_caveman": "原始人を手懐ける",
+        "cow_the_zombie_killer": "ゾンビキラー牛"
     },
     "core": {
         "start_mod": "ChaosModを開始",

@@ -9,7 +9,7 @@ function EffectNPCsBetrayPlayer:OnStart()
     for i = 0, npcList:size() - 1 do
         ---@type ChaosNPC
         local npc = npcList:get(i)
-        if npc and npc.zombie and npc.zombie:isAlive() then
+        if npc and npc.zombie and npc.zombie:isAlive() and not npc:HasTag("mysterious_stranger") then
             local isFriendlyGroup = npc.npcGroup == ChaosNPCGroupID.COMPANIONS or
                 npc.npcGroup == ChaosNPCGroupID.FOLLOWERS
             if isFriendlyGroup then

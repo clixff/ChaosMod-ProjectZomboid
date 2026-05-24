@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "Letzte Spielerpositionen entzünden",
         "spawn_griefer_jesus": "Griefer-Jesus spawnen",
         "spawn_griefer_cowboy": "Griefer-Cowboy spawnen",
-        "spawn_cowboy_companion": "Cowboy-Begleiter spawnen"
+        "spawn_cowboy_companion": "Cowboy-Begleiter spawnen",
+        "sack_on_head": "Sack über dem Kopf",
+        "bandage_every_wound": "Alle Wunden verbinden",
+        "all_zombies_are_crawlers": "Alle Zombies sind Krabbler",
+        "spawn_mysterious_stranger": "Mysteriösen Fremden spawnen",
+        "better_call_saul": "Better Call Saul",
+        "spawn_agent_47": "Agent 47 spawnen",
+        "cant_knockdown_zombies": "Spieler kann Zombies nicht umstoßen",
+        "random_zombies_are_sprinters": "Zufällige Zombies sind Sprinter",
+        "teleport_from_zombies": "Von Zombies wegteleportieren",
+        "military_supply_drop": "Militärischer Versorgungsluftabwurf",
+        "zombies_magnet": "Zombie-Magnet",
+        "energy_shield": "Energieschild",
+        "spin_player": "Spieler dreht sich",
+        "tame_caveman": "Höhlenmensch zähmen",
+        "cow_the_zombie_killer": "Die Kuh, die Zombiekillerin"
     },
     "core": {
         "start_mod": "ChaosMod starten",

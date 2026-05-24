@@ -65,6 +65,8 @@ require "ChaosMod/NPC/ChaosNPCFirearms"
 ---@field panicStartTimeMs integer
 ---@field panicTargetSquare? IsoGridSquare
 ---@field panicCooldownEndMs integer
+---@field panicLastSeenHealth number
+---@field canBePanicked boolean
 ---@field firearmType? string
 ---@field maxAmmo integer
 ---@field currentAmmo integer
@@ -73,6 +75,7 @@ require "ChaosMod/NPC/ChaosNPCFirearms"
 ---@field firearmStateType? string
 ---@field firearmStateEndMs integer
 ---@field _lastFirearmDiagMs integer
+---@field enemyDistanceFindRadius number
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -143,6 +146,8 @@ function ChaosNPC:new(zombie, nickname)
     o.panicStartTimeMs = 0
     o.panicTargetSquare = nil
     o.panicCooldownEndMs = 0
+    o.panicLastSeenHealth = -1
+    o.canBePanicked = true
     o.firearmType = nil
     o.maxAmmo = 0
     o.currentAmmo = 0
@@ -150,6 +155,7 @@ function ChaosNPC:new(zombie, nickname)
     o.firearmAccuracyPlayers = 0.25
     o.firearmStateType = nil
     o.firearmStateEndMs = 0
+    o.enemyDistanceFindRadius = 5.0
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o

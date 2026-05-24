@@ -89,7 +89,7 @@ function EffectSpawnHomerSimpson:OnStart()
     zombie:getItemVisuals():clear()
     zombie:clearWornItems()
 
-    ChaosZombie.AddZombieClothes(zombie, "Base.Tshirt_WhiteTINT", { r = 1, g = 1, b = 1 }, nil, false, true)
+    ChaosZombie.AddZombieClothes(zombie, "Base.Tshirt_WhiteTINT", { r = 1, g = 1, b = 1 }, nil, false, false)
     ChaosZombie.AddZombieClothes(zombie, "Base.Trousers_Scrubs", nil, 0, true)
     ChaosZombie.AddZombieClothes(zombie, "Base.Shoes_Black", nil, nil, true)
 

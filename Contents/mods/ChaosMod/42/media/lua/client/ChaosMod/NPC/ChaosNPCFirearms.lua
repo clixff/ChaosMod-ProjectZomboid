@@ -315,12 +315,47 @@ function ChaosNPCFirearms.AlertNearbyHostileNPCs(shooterNpc, soundRadius)
 end
 
 ---@param npc ChaosNPC
+---@return boolean
+function ChaosNPCFirearms.IsNPCInPlayerShieldRadius(npc)
+    if not npc or not npc.zombie then return false end
+    local player = getPlayer()
+    if not player then return false end
+
+    local modData = player:getModData()
+    if not modData or not modData.CHAOS_SHIELD_ENABLED then return false end
+
+    local radius = modData.CHAOS_SHIELD_RADIUS or 0
+    if radius <= 0 then return false end
+
+    local zombie = npc.zombie
+    if zombie:getZ() ~= player:getZ() then return false end
+
+    local dist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), player:getX(), player:getY())
+    return dist <= radius
+end
+
+---@param npc ChaosNPC
 ---@param weapon HandWeapon
 ---@param enemy IsoGameCharacter
 function ChaosNPCFirearms.ApplyShotHit(npc, weapon, enemy)
     if not npc.zombie or not enemy or enemy:isDead() then return end
     if not weapon then return end
     local zombie = npc.zombie
+
+    if not enemy:isZombie() then
+        local player = getPlayer()
+        if player and enemy == player then
+            local modData = player:getModData()
+            if modData and modData.CHAOS_SHIELD_ENABLED then
+                if not ChaosNPCFirearms.IsNPCInPlayerShieldRadius(npc) then
+                    print(string.format(
+                        "[ChaosNPCFirearms][npc=%s] shot blocked by player energy shield",
+                        tostring(zombie:getID())))
+                    return
+                end
+            end
+        end
+    end
 
     local minDamage = (weapon.getMinDamage and weapon:getMinDamage()) or 0.8
     local maxDamage = (weapon.getMaxDamage and weapon:getMaxDamage()) or 1.2
@@ -588,9 +623,9 @@ function ChaosNPCFirearms.EnterReload(npc)
     if not npc.zombie then return end
     npc.firearmStateType = "reload"
     npc.firearmStateEndMs = ChaosMod.lastTimeTickMs + ChaosNPCFirearms.FIREARM_RELOAD_MS
-    npc.attackAnimName = nil
-    -- Don't force-clear BumpType so any in-flight bump (e.g. attack) finishes
-    -- naturally before the reload "stand still" window begins.
+    npc.attackAnimName = "ZombieReloadFirearm"
+    npc.zombie:setBumpType("ZombieReloadFirearm")
+    npc.zombie:setVariable("BumpAnimFinished", false)
     print(string.format("[ChaosNPCFirearms][npc=%s] reload_start ms=%d",
         tostring(npc.zombie:getID()), ChaosNPCFirearms.FIREARM_RELOAD_MS))
 end

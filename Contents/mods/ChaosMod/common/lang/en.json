@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "Ignite Recent Player Positions",
         "spawn_griefer_jesus": "Spawn Griefer Jesus",
         "spawn_griefer_cowboy": "Spawn Griefer Cowboy",
-        "spawn_cowboy_companion": "Spawn Cowboy Companion"
+        "spawn_cowboy_companion": "Spawn Cowboy Companion",
+        "sack_on_head": "Sack Over Head",
+        "bandage_every_wound": "Bandage Every Wound",
+        "all_zombies_are_crawlers": "All Zombies Are Crawlers",
+        "spawn_mysterious_stranger": "Spawn Mysterious Stranger",
+        "better_call_saul": "Better Call Saul",
+        "spawn_agent_47": "Spawn Agent 47",
+        "cant_knockdown_zombies": "Player Can't Knock Down Zombies",
+        "random_zombies_are_sprinters": "Random Zombies Are Sprinters",
+        "teleport_from_zombies": "Teleport From Zombies",
+        "military_supply_drop": "Military Supply Drop",
+        "zombies_magnet": "Zombies Magnet",
+        "energy_shield": "Energy Shield",
+        "spin_player": "Player Spins",
+        "tame_caveman": "Tame a Caveman",
+        "cow_the_zombie_killer": "Cow, the Zombie Killer"
     },
     "core": {
         "start_mod": "Start ChaosMod",

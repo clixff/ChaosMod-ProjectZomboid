@@ -350,7 +350,22 @@
         "ignite_recent_player_positions": "Enflammer les positions récentes du joueur",
         "spawn_griefer_jesus": "Invoquer Jésus le griefer",
         "spawn_griefer_cowboy": "Invoquer un cowboy griefer",
-        "spawn_cowboy_companion": "Invoquer un cowboy compagnon"
+        "spawn_cowboy_companion": "Invoquer un cowboy compagnon",
+        "sack_on_head": "Sac sur la tête",
+        "bandage_every_wound": "Bander toutes les blessures",
+        "all_zombies_are_crawlers": "Tous les zombies sont des rampants",
+        "spawn_mysterious_stranger": "Faire apparaître un étranger mystérieux",
+        "better_call_saul": "Better Call Saul",
+        "spawn_agent_47": "Faire apparaître l'Agent 47",
+        "cant_knockdown_zombies": "Le joueur ne peut pas faire tomber les zombies",
+        "random_zombies_are_sprinters": "Des zombies aléatoires deviennent des sprinteurs",
+        "teleport_from_zombies": "Téléportation loin des zombies",
+        "military_supply_drop": "Largage de ravitaillement militaire",
+        "zombies_magnet": "Aimant à zombies",
+        "energy_shield": "Bouclier d'énergie",
+        "spin_player": "Le joueur tourne",
+        "tame_caveman": "Apprivoiser un homme des cavernes",
+        "cow_the_zombie_killer": "La vache tueuse de zombies"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
