@@ -14,6 +14,8 @@ local FLIGHT_Z = 0.85
 ---@type number
 local MAX_SPEED = 40.0
 ---@type number
+local MIN_SPEED = 4.0
+---@type number
 local ACCELERATION = 15.0
 ---@type number
 local DECELERATION = 20.0
@@ -177,7 +179,7 @@ function EffectTheMagicBroom:OnTick(deltaMs)
         self.currentSpeed = math.min(MAX_SPEED, self.currentSpeed + ACCELERATION * delta)
     end
     if isKeyDown(Keyboard.KEY_S) then
-        self.currentSpeed = math.max(0, self.currentSpeed - DECELERATION * delta)
+        self.currentSpeed = math.max(MIN_SPEED, self.currentSpeed - DECELERATION * delta)
     end
     if isKeyDown(Keyboard.KEY_A) then
         self.heading = normalize360(self.heading - TURN_RATE * delta)

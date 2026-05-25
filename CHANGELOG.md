@@ -70,9 +70,40 @@
 - Military Supply Drop
 - Zombies Magnet
 - Energy Shield
-- Player Spins
 - Tame a Caveman
 - Cow, the Zombie Killer
+- Every Room Has A Zombie
+- Female Zombies Spotted You
+- Spinning Characters
+- Steal Shoes From Every Zombie
+- Vertical Video
+- Cinema
+- Infinite Endurance
+- Serial Killer Hunt
+- Replace Food With Cat Food
+- Replace Food With Dead Rats
+- Insane Gravity
+- Teleport Into Random Building
+- Player Is A Rat
+- Repair Cars Nearby
+- Add Positive Trait
+- Add Negative Trait
+- Remove All Positive Traits
+- Remove All Negative Traits
+- Add Character Trait
+- Remove Character Trait
+- Need For Speed
+- Very Slow Cars
+- Player Rolls Effects
+- Cursed Clothes
+- Sword Aura
+- Shadow Clones
+- Teleport To Random Old Position
+- Spiffo Apocalypse
+- Teleport Malfunction
+- Reveal Full Map
+- Random Skill Max Level
+- All Zombies Look Like You
 
 ### Mod Fixes
 
@@ -120,6 +151,8 @@
 - Hide-items effects (clothes, weapons, books, random items) now show a hint line
 - "Invisible Characters" now hides zombie nicknames
 - "Swap Mouse Buttons": fixed effect behaviour in combat
+- "Teleport To Nearest Basement" effect now falls back to the most recently scanned basement near the player when no basement is found nearby
+- "Nearby Zombies Are Naked" no longer marks affected zombies as reanimated players
 
 [1.1.1]
 

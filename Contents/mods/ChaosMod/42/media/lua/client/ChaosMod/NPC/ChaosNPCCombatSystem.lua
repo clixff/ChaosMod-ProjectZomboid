@@ -64,6 +64,11 @@ function ChaosNPC:SetAsTargetEnemy(newEnemy)
     if not newEnemy then return end
     if not self.zombie then return end
 
+    if not newEnemy:isZombie() and ChaosNPCUtils.IsNPCIgnorePlayerActive() and
+        instanceof(newEnemy, "IsoPlayer") then
+        return
+    end
+
     self.enemy = newEnemy
     self:DebugLog("set_enemy " .. tostring(newEnemy:getID()), false)
     self:MoveToCharacter(newEnemy)
@@ -263,6 +268,11 @@ function ChaosNPC:OnAttackEnemyHit()
     local zombie = self.zombie
     local enemy = self.enemy
     if zombie:isDead() or enemy:isDead() or not self.weaponItemCached then
+        return
+    end
+
+    if not enemy:isZombie() and instanceof(enemy, "IsoPlayer") and
+        ChaosNPCUtils.IsNPCIgnorePlayerActive() then
         return
     end
 

@@ -387,8 +387,13 @@ function ChaosNPC:setNPCAsZombie()
     self.zombie = nil
 end
 
-function ChaosNPC:Destroy()
+---@param dropWeapon? boolean
+function ChaosNPC:Destroy(dropWeapon)
     if not self.zombie then return end
+
+    if dropWeapon then
+        self:TryDropWeaponOnDeath()
+    end
 
     local md = self.zombie:getModData()
     if md then

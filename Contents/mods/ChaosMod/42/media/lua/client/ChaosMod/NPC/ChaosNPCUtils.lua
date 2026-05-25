@@ -1,10 +1,38 @@
 ---@class ChaosNPCUtils
 ---@field npcList ArrayList<ChaosNPC>
 ---@field cleanupAccumMs integer
+---@field NPCIgnorePlayerEffectsActive string[]
 ChaosNPCUtils = ChaosNPCUtils or {
     npcList = ArrayList:new(),
     cleanupAccumMs = 0,
+    NPCIgnorePlayerEffectsActive = {},
 }
+
+---@param effectId string
+function ChaosNPCUtils.AddNPCIgnorePlayerEffect(effectId)
+    if not effectId then return end
+    local list = ChaosNPCUtils.NPCIgnorePlayerEffectsActive
+    for i = 1, #list do
+        if list[i] == effectId then return end
+    end
+    table.insert(list, effectId)
+end
+
+---@param effectId string
+function ChaosNPCUtils.RemoveNPCIgnorePlayerEffect(effectId)
+    if not effectId then return end
+    local list = ChaosNPCUtils.NPCIgnorePlayerEffectsActive
+    for i = #list, 1, -1 do
+        if list[i] == effectId then
+            table.remove(list, i)
+        end
+    end
+end
+
+---@return boolean
+function ChaosNPCUtils.IsNPCIgnorePlayerActive()
+    return #ChaosNPCUtils.NPCIgnorePlayerEffectsActive > 0
+end
 
 local CLEANUP_INTERVAL_MS = 5000
 local ZOMBIE_NPC_BITE_DAMAGE_DELAY_MS = 600
@@ -84,7 +112,7 @@ function ChaosNPCUtils.FindNewTargetForNPC(npc)
 
     -- Check player as potential target
     local player = getPlayer()
-    if player then
+    if player and not ChaosNPCUtils.IsNPCIgnorePlayerActive() then
         local playerRel = ChaosNPCRelations.GetRelationForNPC(npc, player)
         if playerRel == ChaosNPCRelationType.ATTACK then
             local dist = ChaosUtils.distTo(x1, y1, player:getX(), player:getY())

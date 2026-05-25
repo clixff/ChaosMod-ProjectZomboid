@@ -3308,18 +3308,6 @@
             "price_group": "positive_5"
         },
         {
-            "id": "spin_player",
-            "enabled": true,
-            "chance": 1,
-            "withDuration": true,
-            "duration": 60,
-            "disable_effects": [
-                "spin_player"
-            ],
-            "enabled_donate": true,
-            "price_group": "negative_4"
-        },
-        {
             "id": "tame_caveman",
             "enabled": true,
             "chance": 1,
@@ -3338,6 +3326,318 @@
             ],
             "enabled_donate": true,
             "price_group": "positive_5"
+        },
+        {
+            "id": "every_room_has_a_zombie",
+            "enabled": true,
+            "chance": 0.5,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_4"
+        },
+        {
+            "id": "female_zombies_spotted_you",
+            "enabled": true,
+            "chance": 0.85,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "spinning_characters",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "spinning_characters"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_4"
+        },
+        {
+            "id": "steal_shoes_from_every_zombie",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_3"
+        },
+        {
+            "id": "vertical_video",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "vertical_video"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_4"
+        },
+        {
+            "id": "cinema",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 60,
+            "disable_effects": [
+                "cinema"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_4"
+        },
+        {
+            "id": "infinite_endurance",
+            "enabled": true,
+            "chance": 0.95,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "infinite_endurance"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "serial_killer_hunt",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "replace_food_with_cat_food",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "replace_food_with_dead_rats",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "insane_gravity",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "insane_gravity"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_3"
+        },
+        {
+            "id": "teleport_into_random_building",
+            "enabled": true,
+            "chance": 0.4,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_3"
+        },
+        {
+            "id": "player_is_a_rat",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 80,
+            "disable_effects": [
+                "player_is_a_rat"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_4"
+        },
+        {
+            "id": "repair_cars_nearby",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "add_random_positive_trait",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "add_random_negative_trait",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "remove_all_positive_traits",
+            "enabled": true,
+            "chance": 0.7,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_6"
+        },
+        {
+            "id": "remove_all_negative_traits",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_6"
+        },
+        {
+            "id": "add_random_character_trait",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_4"
+        },
+        {
+            "id": "remove_random_character_trait",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_5"
+        },
+        {
+            "id": "need_for_speed",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 90,
+            "disable_effects": [
+                "need_for_speed"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "very_slow_cars",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": true,
+            "duration": 90,
+            "disable_effects": [
+                "very_slow_cars"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "player_rolls_effects",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": true,
+            "duration": 180,
+            "disable_effects": [
+                "player_rolls_effects"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_5"
+        },
+        {
+            "id": "cursed_clothes",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": true,
+            "duration": 80,
+            "disable_effects": [
+                "cursed_clothes"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "sword_aura",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 70,
+            "disable_effects": [
+                "sword_aura"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "shadow_clones",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 90,
+            "disable_effects": [
+                "shadow_clones"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "teleport_to_random_old_position",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "spiffo_apocalypse",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_2"
+        },
+        {
+            "id": "teleport_malfunction",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": true,
+            "duration": 15,
+            "disable_effects": [
+                "teleport_malfunction"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "reveal_map_to_player",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "reveal_map_to_player"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "random_skill_max_level",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "all_zombies_look_like_you",
+            "enabled": true,
+            "chance": 0.95,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_4"
         }
     ]
 }

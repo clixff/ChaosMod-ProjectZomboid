@@ -33,7 +33,7 @@ function EffectSpawnGrieferJesus:OnStart()
 
     local humanVisual = zombie:getHumanVisual()
     if humanVisual then
-        humanVisual:setHairModel("Metal")
+        humanVisual:setHairModel("Fabian")
         humanVisual:setBeardModel("Full")
         local hairColor = ImmutableColor.new(89 / 255, 73 / 255, 50 / 255)
         humanVisual:setHairColor(hairColor)

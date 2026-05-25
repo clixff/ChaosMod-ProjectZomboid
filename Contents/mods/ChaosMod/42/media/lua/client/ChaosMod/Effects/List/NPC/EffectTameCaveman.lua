@@ -32,7 +32,7 @@ function EffectTameCaveman:OnStart()
 
     --- Hair / beard
     local humanVisual = zombie:getHumanVisual()
-    humanVisual:setHairModel("LongBraids02")
+    humanVisual:setHairModel("Fabian")
     humanVisual:setBeardModel("Long")
     local hairColor = ImmutableColor.new(89 / 255, 56 / 255, 30 / 255)
     humanVisual:setHairColor(hairColor)
@@ -48,11 +48,17 @@ function EffectTameCaveman:OnStart()
     ChaosZombie.AddZombieClothesBatch(zombie, {
         { type = "Base.Underpants_Hide" },
         { type = "Base.Vest_Hide" },
+        { type = "Base.Skirt_Short_FaunHide" }
     })
 
     zombie:resetModelNextFrame()
 
     npc:SetWeapon("Base.LargeBoneClub")
+
+    npc.DamageMultiplier = 1.5
+
+    ---@diagnostic disable-next-line: param-type-mismatch
+    zombie:addLotsOfDirt(nil, 200, true)
 end
 
 function EffectTameCaveman:OnEnd()

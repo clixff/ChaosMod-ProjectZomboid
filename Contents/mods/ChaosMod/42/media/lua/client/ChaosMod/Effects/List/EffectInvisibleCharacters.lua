@@ -3,25 +3,23 @@ EffectInvisibleCharacters = ChaosEffectBase:derive("EffectInvisibleCharacters", 
 
 local MAX_DIST = 25
 
----@param character IsoGameCharacter
-local function handleCharacterUpdate(character)
-    if not character then return end
+---@param zombie IsoZombie
+local function handleZombieUpdate(zombie)
+    if not zombie then return end
 
-    if instanceof(character, "IsoZombie") then
-        local player = getPlayer()
-        if not player then return end
-        if not ChaosUtils.isInRange(player:getX(), player:getY(), character:getX(), character:getY(), MAX_DIST) then
-            return
-        end
+    local player = getPlayer()
+    if not player then return end
+    if not ChaosUtils.isInRange(player:getX(), player:getY(), zombie:getX(), zombie:getY(), MAX_DIST) then
+        return
     end
 
-    character:setTargetAlpha(0.0)
+    zombie:setTargetAlpha(0.0)
 end
 
 function EffectInvisibleCharacters:OnStart()
     ChaosEffectBase:OnStart()
-    Events.OnPlayerUpdate.Add(handleCharacterUpdate)
-    Events.OnZombieUpdate.Add(handleCharacterUpdate)
+    getCore():setDisplayPlayerModel(false)
+    Events.OnZombieUpdate.Add(handleZombieUpdate)
 end
 
 ---@param deltaMs integer
@@ -51,6 +49,6 @@ end
 function EffectInvisibleCharacters:OnEnd()
     ChaosEffectBase:OnEnd()
 
-    Events.OnPlayerUpdate.Remove(handleCharacterUpdate)
-    Events.OnZombieUpdate.Remove(handleCharacterUpdate)
+    getCore():setDisplayPlayerModel(true)
+    Events.OnZombieUpdate.Remove(handleZombieUpdate)
 end

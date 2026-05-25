@@ -27,6 +27,13 @@ function EffectTeleportToNearestBasement:OnStart()
 
 
     if not bestSq then
+        local fallback = ChaosUtils.ScannedBasementLatest
+        if fallback then
+            local fx, fy, fz = math.floor(fallback.x), math.floor(fallback.y), math.floor(fallback.z)
+            player:teleportTo(fx, fy, fz)
+            return
+        end
+
         ChaosPlayer.SayLineByColor(player, ChaosLocalization.GetString("misc", "no_basement_found"),
             ChaosPlayerChatColors.red)
         print("[EffectTeleportToNearestBasement] No basement found")

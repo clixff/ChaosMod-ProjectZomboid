@@ -104,6 +104,7 @@ function EffectSpawnWalterWhite:OnStart()
     local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc:initializeHuman()
+    npc.DamageMultiplier = 1.333
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
 
     ChaosZombie.HumanizeZombie(zombie)

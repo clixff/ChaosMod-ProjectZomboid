@@ -105,6 +105,7 @@ function ChaosMod.StopMod()
     ChaosUIManager:HideEffectsUI()
     ChaosEffectsManager.iterationIndex = 0
     ChaosMod.specialAnimalsFollowers = {}
+    ChaosNPCUtils.NPCIgnorePlayerEffectsActive = {}
     if ChaosBridge.enabled then
         local modVersion = "0"
         if ChaosMod.modData then

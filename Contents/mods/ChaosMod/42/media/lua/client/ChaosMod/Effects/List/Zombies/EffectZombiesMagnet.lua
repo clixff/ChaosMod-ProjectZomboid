@@ -3,7 +3,7 @@
 EffectZombiesMagnet = ChaosEffectBase:derive("EffectZombiesMagnet", "zombies_magnet")
 
 local SEARCH_RADIUS = 35.0
-local ORBIT_RADIUS  = 6.0
+local ORBIT_RADIUS  = 8.0
 local PULL_SPEED    = 5.0
 
 ---@param sq1 IsoGridSquare

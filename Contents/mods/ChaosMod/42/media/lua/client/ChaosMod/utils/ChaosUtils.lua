@@ -6,8 +6,9 @@
 ---@field lastIsSleeping boolean -- Whether the player was sleeping last tick
 ---@field sleepWorldLocation {x: number, y: number, z: number} | nil -- World position where player last fell asleep
 ---@field playerSpawnPoint {x: number, y: number, z: number} | nil -- World position where player first spawned this save
----@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 2 recorded player world positions, oldest first
----@field playerPreviousPositionsSampleMs integer
+---@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 20 recorded player world positions, oldest first
+---@field playerPreviousPositionsTimer ChaosManualTimer | nil
+---@field ScannedBasementLatest {x: number, y: number, z: number} | nil -- Most recently scanned nearby basement square (Z=-1), updated alongside playerPreviousPositions
 ---@field DEBUG_SQUARE_RING_SEARCH boolean -- When true, SquareRingSearchTile_2D prints a per-ring non-null tile count at Z=0
 ---@field crashDamage { originalValue: boolean|nil, disabled: boolean } -- Tracks the sandbox PlayerDamageFromCrash override state
 ---@field EFFECT_FLYING_CARS_ENABLED boolean -- When true, forces crash damage off regardless of NPC count
@@ -22,7 +23,8 @@ ChaosUtils = ChaosUtils or {
     sleepWorldLocation = nil,
     playerSpawnPoint = nil,
     playerPreviousPositions = {},
-    playerPreviousPositionsSampleMs = 0,
+    playerPreviousPositionsTimer = nil,
+    ScannedBasementLatest = nil,
     crashDamage = { originalValue = nil, disabled = false },
     EFFECT_FLYING_CARS_ENABLED = false,
     EFFECT_EARTHQUAKE_ENABLED = false
@@ -78,7 +80,8 @@ end
 local POSITION_SAMPLE_INTERVAL_MS = 1000
 local POSITION_HISTORY_MAX = 120
 local PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS = 60000
-local PREVIOUS_LOCATION_MAX = 2
+local PREVIOUS_LOCATION_MAX = 20
+local PREVIOUS_LOCATION_BASEMENT_SCAN_RADIUS = 100
 
 --- Records the local player's position once per second (call only when ChaosMod is enabled).
 ---@param deltaMs integer
@@ -102,13 +105,44 @@ function ChaosUtils.TrackPlayerPosition(deltaMs)
     end
 end
 
---- Records the player's location every 60 seconds, keeping only the last 2 entries (oldest first).
+--- Scans for the nearest valid Z=-1 basement square within radius of the player and caches it.
+---@param player IsoPlayer
+local function scanNearestBasement(player)
+    local square = player:getSquare()
+    if not square then return end
+
+    local px, py = square:getX(), square:getY()
+    ---@type IsoGridSquare | nil
+    local found = nil
+
+    ChaosUtils.SquareRingSearchTile_2D(px, py, function(sq)
+        if sq and sq:getWall() == nil then
+            found = sq
+            return true
+        end
+    end, 0, PREVIOUS_LOCATION_BASEMENT_SCAN_RADIUS, true, true, true, -1, -1)
+
+    if found then
+        ChaosUtils.ScannedBasementLatest = {
+            x = found:getX(),
+            y = found:getY(),
+            z = found:getZ()
+        }
+    end
+end
+
+--- Records the player's location every 60 seconds, keeping only the last 20 entries (oldest first).
+--- Also scans for and caches the nearest valid basement square (Z=-1) on each sample.
 ---@param deltaMs integer
 function ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
-    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs + deltaMs
-    if ChaosUtils.playerPreviousPositionsSampleMs < PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS then return end
-    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs -
-        PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS
+    if not ChaosUtils.playerPreviousPositionsTimer then
+        ChaosUtils.playerPreviousPositionsTimer = ChaosManualTimer.new(PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS)
+    end
+
+    local timer = ChaosUtils.playerPreviousPositionsTimer
+    timer:add(deltaMs)
+    if not timer:isEnded() then return end
+    timer:reset()
 
     local player = getPlayer()
     if not player then return end
@@ -123,6 +157,8 @@ function ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
     while #ChaosUtils.playerPreviousPositions > PREVIOUS_LOCATION_MAX do
         table.remove(ChaosUtils.playerPreviousPositions, 1)
     end
+
+    scanNearestBasement(player)
 end
 
 ---@param obj IsoObject
@@ -1074,6 +1110,17 @@ end
 ---@return integer
 function ChaosUtils.RandArrayIndex(array)
     return math.floor(ZombRand(#array)) + 1
+end
+
+---Normalizes any angle (in degrees) into the [0, 360) range.
+---@param angle number
+---@return number
+function ChaosUtils.Normalize360(angle)
+    angle = angle % 360
+    if angle < 0 then
+        angle = angle + 360
+    end
+    return angle
 end
 
 ---@param worldObject IsoWorldInventoryObject

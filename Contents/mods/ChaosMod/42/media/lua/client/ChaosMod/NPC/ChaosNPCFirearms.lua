@@ -343,6 +343,9 @@ function ChaosNPCFirearms.ApplyShotHit(npc, weapon, enemy)
     local zombie = npc.zombie
 
     if not enemy:isZombie() then
+        if instanceof(enemy, "IsoPlayer") and ChaosNPCUtils.IsNPCIgnorePlayerActive() then
+            return
+        end
         local player = getPlayer()
         if player and enemy == player then
             local modData = player:getModData()

@@ -143,6 +143,16 @@ function ChaosNPC:update(deltaMs)
         self.enemy = nil
     end
 
+    if self.enemy and not self.enemy:isZombie() and instanceof(self.enemy, "IsoPlayer") and
+        ChaosNPCUtils.IsNPCIgnorePlayerActive() then
+        if self.enemy == self.moveTargetCharacter then
+            self.moveTargetCharacter = nil
+            self:StopMoving(true, "ignore_player_effect_active")
+        end
+        self:CancelAttackState("ignore_player_effect_active")
+        self.enemy = nil
+    end
+
     local shouldFindNewEnemy = self.enemy == nil and not self.isAttacking and not isPanicking
     if shouldFindNewEnemy and canFindNewEnemyThisFrame then
         self:UpdateNextEnemyTarget()

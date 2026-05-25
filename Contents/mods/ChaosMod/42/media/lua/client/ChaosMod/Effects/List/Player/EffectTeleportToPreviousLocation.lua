@@ -11,7 +11,7 @@ function EffectTeleportToPreviousLocation:OnStart()
     local points = ChaosUtils.playerPreviousPositions
     if not points or #points == 0 then return end
 
-    local loc = points[1]
+    local loc = points[2] or points[1]
     if not loc then return end
 
     ChaosVehicle.ExitVehicle(player)

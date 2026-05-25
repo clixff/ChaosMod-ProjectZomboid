@@ -733,3 +733,66 @@ function ChaosZombie.PlaySoundLine(zombie, soundname, key, timeout)
     zombie:playSound(soundname)
     return true
 end
+
+---@param player IsoPlayer
+---@param zombie IsoZombie
+function ChaosZombie.CopyPlayerAppearanceToNormalZombie(player, zombie)
+    if not player or not zombie then return end
+
+    -- Keep it a normal zombie
+    zombie:setReanimatedPlayer(false)
+
+    -- Sex must match before visual/model refresh
+    zombie:setFemaleEtc(player:isFemale())
+
+    -- Copy body/face/hair/skin
+    zombie:getHumanVisual():copyFrom(player:getHumanVisual())
+
+    -- Clear current zombie clothing visuals
+    local zombieVisuals = zombie:getItemVisuals()
+    zombieVisuals:clear()
+
+    -- Optional but recommended: clear worn items too, so corpse/drop data matches
+    zombie:clearWornItems()
+
+    local inv = zombie:getInventory()
+    local playerWorn = player:getWornItems()
+
+    for i = 0, playerWorn:size() - 1 do
+        local wornItem = playerWorn:getItemByIndex(i)
+        if wornItem then
+            local location = playerWorn:getLocation(wornItem)
+
+            -- Make a real copy for zombie wornItems/inventory
+            local newItem = inv:AddItem(wornItem:getFullType())
+            if newItem then
+                if wornItem:getVisual() and newItem:getVisual() then
+                    newItem:getVisual():copyFrom(wornItem:getVisual())
+                end
+
+                if wornItem:isCustomColor() then
+                    newItem:setColor(wornItem:getColor())
+                    newItem:setCustomColor(true)
+                end
+
+                newItem:setCondition(wornItem:getCondition())
+
+                if location then
+                    zombie:setWornItem(location, newItem)
+                end
+
+                -- IMPORTANT: add/copy into normal zombie itemVisuals
+                local scriptItem = newItem:getScriptItem()
+                local zombieItemVisual =
+                    zombie:getHumanVisual():addClothingItem(zombieVisuals, scriptItem)
+                if zombieItemVisual and newItem:getVisual() then
+                    zombieItemVisual:copyFrom(newItem:getVisual())
+                    zombieItemVisual:setInventoryItem(newItem)
+                end
+            end
+        end
+    end
+
+    zombie:onWornItemsChanged()
+    zombie:resetModelNextFrame()
+end
