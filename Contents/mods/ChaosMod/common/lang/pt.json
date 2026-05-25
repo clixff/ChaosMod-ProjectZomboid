@@ -396,7 +396,15 @@
         "teleport_malfunction": "Falha de Teletransporte",
         "reveal_map_to_player": "Revelar Mapa Inteiro",
         "random_skill_max_level": "Habilidade Aleatória no Nível Máximo",
-        "all_zombies_look_like_you": "Todos os Zumbis Se Parecem com Você"
+        "all_zombies_look_like_you": "Todos os Zumbis Se Parecem com Você",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "Dar Arma Aleatória",
+        "give_random_melee_weapon": "Dar Arma Branca Aleatória",
+        "give_random_firearm_weapon": "Dar Arma de Fogo Aleatória",
+        "refuel_cars_nearby": "Reabastecer Carros Próximos",
+        "spawn_shaun_of_the_dead": "Gerar Shaun",
+        "zombies_dead_by_daylight": "Zumbis Morrem à Luz do Dia",
+        "zombies_have_all_car_keys": "Zumbis Têm Todas as Chaves de Carro"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

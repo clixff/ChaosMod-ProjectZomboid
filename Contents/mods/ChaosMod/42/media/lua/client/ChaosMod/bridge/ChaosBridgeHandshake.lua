@@ -74,9 +74,10 @@ end
 
 ---@param category string
 ---@return ChaosModalWindowButton
-local function makeCloseButton(category)
+local function makeCloseButton(category, countdownSeconds)
     return {
         label = "Close",
+        countdownSeconds = countdownSeconds,
         onClick = function(window)
             markDismissed(category)
             window:closeWindow()
@@ -89,7 +90,8 @@ end
 ---@param title string
 ---@param body string
 ---@param withGitHubButton boolean
-local function openOrUpdateModal(category, priority, title, body, withGitHubButton)
+---@param closeCountdownSeconds integer?
+local function openOrUpdateModal(category, priority, title, body, withGitHubButton, closeCountdownSeconds)
     local current = ChaosModalWindow.current
 
     -- If a modal of the SAME category is open, update its content in place (no shown flip).
@@ -116,7 +118,7 @@ local function openOrUpdateModal(category, priority, title, body, withGitHubButt
     if withGitHubButton then
         table.insert(buttons, makeOpenGitHubButton(category))
     end
-    table.insert(buttons, makeCloseButton(category))
+    table.insert(buttons, makeCloseButton(category, closeCountdownSeconds))
 
     ChaosModalWindow.Open({
         category = category,
@@ -215,7 +217,8 @@ function ChaosBridgeHandshake.Tick(deltaMs)
 
     local body = "The Streamer App is not running or has an outdated version\n"
         .. "(This is shown to you because you have voting_enabled or enable_donate in settings)"
-    openOrUpdateModal(CATEGORY_FAILED, PRIORITY_FAILED, "StreamerApp: Failed to connect", body, false)
+    body = body .. "\nRecommended: Launch StreamerApp or update it from GitHub"
+    openOrUpdateModal(CATEGORY_FAILED, PRIORITY_FAILED, "StreamerApp: Failed to connect", body, false, 5)
 end
 
 --- Called from ChaosBridge.Init when streamer mode starts. Resets per-StartMod

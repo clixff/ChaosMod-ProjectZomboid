@@ -1,4 +1,4 @@
-[1.1.2]
+[1.2.0]
 
 ### New mod features
 
@@ -104,6 +104,14 @@
 - Reveal Full Map
 - Random Skill Max Level
 - All Zombies Look Like You
+- Grove Street Gang
+- Give Random Weapon
+- Give Random Melee Weapon
+- Give Random Firearm Weapon
+- Refuel Cars Nearby
+- Spawn Shaun of the Dead
+- Zombies Dead by Daylight
+- Zombies Have All Car Keys
 
 ### Mod Fixes
 

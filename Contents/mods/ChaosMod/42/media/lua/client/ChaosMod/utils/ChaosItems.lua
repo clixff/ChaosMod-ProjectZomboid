@@ -45,3 +45,75 @@ function ChaosItems.GetRandomItemId()
     local itemType = string.format("%s.%s", module, randomItemScript:getName())
     return itemType
 end
+
+---@type { all: string[]?, melee: string[]?, firearm: string[]? }
+local RandomWeaponIDs = {
+    all = nil,
+    melee = nil,
+    firearm = nil,
+}
+
+---@param item Item
+---@return boolean
+local function isValidWeaponItem(item)
+    if not item then return false end
+    if item:isHidden() then return false end
+    if item:getObsolete() then return false end
+    if not item:canSpawnAsLoot() then return false end
+
+    local cat = item:getDisplayCategory()
+    if not cat then return false end
+
+    return string.find(cat, "Weapon", 1, true) ~= nil
+end
+
+local function buildWeaponLists()
+    if RandomWeaponIDs.all then return end
+
+    RandomWeaponIDs.all = {}
+    RandomWeaponIDs.melee = {}
+    RandomWeaponIDs.firearm = {}
+
+    local items = getAllItems()
+
+    for i = 0, items:size() - 1 do
+        local item = items:get(i)
+
+        if isValidWeaponItem(item) then
+            local id = item:getFullName()
+
+            table.insert(RandomWeaponIDs.all, id)
+
+            if item:isRanged() then
+                table.insert(RandomWeaponIDs.firearm, id)
+            else
+                table.insert(RandomWeaponIDs.melee, id)
+            end
+        end
+    end
+end
+
+---@param list string[]?
+---@return string?
+local function randomFrom(list)
+    if not list or #list == 0 then return nil end
+    return list[ChaosUtils.RandArrayIndex(list)]
+end
+
+---@return string?
+function ChaosItems.GetRandomWeaponID()
+    buildWeaponLists()
+    return randomFrom(RandomWeaponIDs.all)
+end
+
+---@return string?
+function ChaosItems.GetRandomMeleeWeaponID()
+    buildWeaponLists()
+    return randomFrom(RandomWeaponIDs.melee)
+end
+
+---@return string?
+function ChaosItems.GetRandomFirearmWeaponID()
+    buildWeaponLists()
+    return randomFrom(RandomWeaponIDs.firearm)
+end

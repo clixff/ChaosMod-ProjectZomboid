@@ -396,7 +396,15 @@
         "teleport_malfunction": "Işınlanma Arızası",
         "reveal_map_to_player": "Tüm Haritayı Göster",
         "random_skill_max_level": "Rastgele Yeteneği Maks. Seviyeye Çıkar",
-        "all_zombies_look_like_you": "Tüm Zombiler Sana Benziyor"
+        "all_zombies_look_like_you": "Tüm Zombiler Sana Benziyor",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "Rastgele Silah Ver",
+        "give_random_melee_weapon": "Rastgele Yakın Dövüş Silahı Ver",
+        "give_random_firearm_weapon": "Rastgele Ateşli Silah Ver",
+        "refuel_cars_nearby": "Yakındaki Arabaları Doldur",
+        "spawn_shaun_of_the_dead": "Shaun'u Spawnla",
+        "zombies_dead_by_daylight": "Zombiler Gün Işığında Ölür",
+        "zombies_have_all_car_keys": "Zombilerde Tüm Araba Anahtarları Var"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

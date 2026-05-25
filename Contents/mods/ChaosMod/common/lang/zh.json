@@ -396,7 +396,15 @@
         "teleport_malfunction": "传送故障",
         "reveal_map_to_player": "显示完整地图",
         "random_skill_max_level": "随机技能升至最高等级",
-        "all_zombies_look_like_you": "所有僵尸都长得像你"
+        "all_zombies_look_like_you": "所有僵尸都长得像你",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "给予随机武器",
+        "give_random_melee_weapon": "给予随机近战武器",
+        "give_random_firearm_weapon": "给予随机枪械",
+        "refuel_cars_nearby": "为附近车辆加满油",
+        "spawn_shaun_of_the_dead": "生成肖恩",
+        "zombies_dead_by_daylight": "僵尸在日光下死亡",
+        "zombies_have_all_car_keys": "僵尸身上有所有车钥匙"
     },
     "core": {
         "start_mod": "启动混乱模式",

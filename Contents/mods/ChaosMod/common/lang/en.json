@@ -396,7 +396,15 @@
         "teleport_malfunction": "Teleport Malfunction",
         "reveal_map_to_player": "Reveal Full Map",
         "random_skill_max_level": "Random Skill Max Level",
-        "all_zombies_look_like_you": "All Zombies Look Like You"
+        "all_zombies_look_like_you": "All Zombies Look Like You",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "Give Random Weapon",
+        "give_random_melee_weapon": "Give Random Melee Weapon",
+        "give_random_firearm_weapon": "Give Random Firearm Weapon",
+        "refuel_cars_nearby": "Refuel Cars Nearby",
+        "spawn_shaun_of_the_dead": "Spawn Shaun of the Dead",
+        "zombies_dead_by_daylight": "Zombies Dead by Daylight",
+        "zombies_have_all_car_keys": "Zombies Have All Car Keys"
     },
     "core": {
         "start_mod": "Start ChaosMod",

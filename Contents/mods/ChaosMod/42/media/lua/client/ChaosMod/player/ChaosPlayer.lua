@@ -293,6 +293,12 @@ function ChaosPlayer.EquipWeapon(player, item, bothHands)
         return
     end
 
+    local isBothHandItem = item:isTwoHandWeapon()
+
+    if isBothHandItem then
+        bothHands = true
+    end
+
     player:setPrimaryHandItem(item)
     if bothHands then
         player:setSecondaryHandItem(item)

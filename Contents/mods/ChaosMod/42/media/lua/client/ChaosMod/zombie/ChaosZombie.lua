@@ -158,14 +158,21 @@ function ChaosZombie.CanPlayerSeeZombieLineTrace(player, zombie)
     return resultString == "Clear"
 end
 
+---@class ChaosZombieRGBTint
+---@field r number Red channel in 0..1, or 0..255 when `normalize = true`.
+---@field g number Green channel in 0..1, or 0..255 when `normalize = true`.
+---@field b number Blue channel in 0..1, or 0..255 when `normalize = true`.
+---@field normalize boolean? When true, treat `r`, `g`, and `b` as 0..255 and convert them to 0..1.
+
 ---@param zombie IsoZombie
 ---@param fullType string
----@param tint table?
+---@param tint ChaosZombieRGBTint?
 ---@param textureChoice integer?
 ---@param updateVisuals boolean?
 ---@param useAlternativeTintMethod boolean?
+---@param baseTexture integer?
 ---@return ItemVisual?
-function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, updateVisuals, useAlternativeTintMethod)
+function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, updateVisuals, useAlternativeTintMethod, baseTexture)
     if not zombie or not fullType or fullType == "" then return nil end
 
     local item = instanceItem(fullType)
@@ -183,8 +190,13 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, upd
         visual:setTextureChoice(textureChoice)
     end
 
+    if baseTexture ~= nil then
+        visual:setBaseTexture(baseTexture)
+    end
+
+    local r, g, b = 0.0, 0.0, 0.0
     if tint then
-        local r, g, b = tint.r or 0, tint.g or 0, tint.b or 0
+        r, g, b = tint.r or 0, tint.g or 0, tint.b or 0
         -- Opt-in 0..255 → 0..1 normalization, applied per-channel
         if tint.normalize then
             r = r / 255
@@ -195,6 +207,7 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, upd
         if not useAlternativeTintMethod then
             visual:setTint(ImmutableColor.new(r, g, b))
         else
+            item:setColor(Color.new(r, g, b))
             item:setColorRed(r)
             item:setColorGreen(g)
             item:setColorBlue(b)
@@ -202,7 +215,35 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, upd
         end
     end
 
-    zombie:getWornItems():setFromItemVisuals(zombie:getItemVisuals())
+    local wornItems = zombie:getWornItems()
+    wornItems:setFromItemVisuals(zombie:getItemVisuals())
+
+    if tint and useAlternativeTintMethod then
+        local location = scriptItem:getBodyLocation()
+        if not location and item.getBodyLocation then
+            location = item:getBodyLocation()
+        end
+        if not location and item.canBeEquipped then
+            location = item:canBeEquipped()
+        end
+
+        local wornItem = location and wornItems:getItem(location) or nil
+        if wornItem then
+            wornItem:setColor(Color.new(r, g, b))
+            wornItem:setColorRed(r)
+            wornItem:setColorGreen(g)
+            wornItem:setColorBlue(b)
+            wornItem:setCustomColor(true)
+
+            local wornVisual = wornItem:getVisual()
+            if wornVisual then
+                wornVisual:setInventoryItem(wornItem)
+                wornVisual:setTint(ImmutableColor.new(r, g, b))
+                visual = wornVisual
+            end
+        end
+    end
+
     if updateVisuals then
         zombie:onWornItemsChanged()
         zombie:resetModelNextFrame()
@@ -213,9 +254,10 @@ end
 
 ---@class ChaosZombieClothesBatchEntry
 ---@field type string Full item type, e.g. "Base.Jacket_WhiteTINT".
----@field tint table? RGB color table `{ r, g, b }` in 0..1. Set `tint.normalize = true` to pass 0..255 channels.
+---@field tint ChaosZombieRGBTint? RGB color table.
 ---@field textureChoice integer? Texture variant index (0-based).
----@field alternativeTint boolean? Use `ItemVisual:setTint` instead of the item's custom color.
+---@field baseTexture integer? Base texture index (0-based).
+---@field alternativeTint boolean? Use the item's custom color instead of `ItemVisual:setTint`.
 
 --- Adds multiple clothing items to a zombie in one call and refreshes visuals
 --- once at the end. Prefer this over multiple `AddZombieClothes` calls when
@@ -237,7 +279,8 @@ function ChaosZombie.AddZombieClothesBatch(zombie, entries)
                 entry.tint,
                 entry.textureChoice,
                 false,
-                entry.alternativeTint
+                entry.alternativeTint,
+                entry.baseTexture
             )
             if visual then
                 visuals[#visuals + 1] = visual

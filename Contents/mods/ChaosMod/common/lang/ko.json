@@ -396,7 +396,15 @@
         "teleport_malfunction": "순간이동 오작동",
         "reveal_map_to_player": "전체 지도 공개",
         "random_skill_max_level": "무작위 스킬 최대 레벨",
-        "all_zombies_look_like_you": "모든 좀비가 당신처럼 보임"
+        "all_zombies_look_like_you": "모든 좀비가 당신처럼 보임",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "무작위 무기 지급",
+        "give_random_melee_weapon": "무작위 근접 무기 지급",
+        "give_random_firearm_weapon": "무작위 총기 지급",
+        "refuel_cars_nearby": "주변 차량에 급유",
+        "spawn_shaun_of_the_dead": "숀 소환",
+        "zombies_dead_by_daylight": "좀비는 햇빛에 죽음",
+        "zombies_have_all_car_keys": "좀비가 모든 차 열쇠를 가지고 있음"
     },
     "core": {
         "start_mod": "ChaosMod 시작",

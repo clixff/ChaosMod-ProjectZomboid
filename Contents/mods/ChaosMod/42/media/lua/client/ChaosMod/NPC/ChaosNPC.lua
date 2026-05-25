@@ -76,6 +76,7 @@ require "ChaosMod/NPC/ChaosNPCFirearms"
 ---@field firearmStateEndMs integer
 ---@field _lastFirearmDiagMs integer
 ---@field enemyDistanceFindRadius number
+---@field disableAIEffects table<string, boolean>
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -156,6 +157,7 @@ function ChaosNPC:new(zombie, nickname)
     o.firearmStateType = nil
     o.firearmStateEndMs = 0
     o.enemyDistanceFindRadius = 5.0
+    o.disableAIEffects = {}
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o
@@ -168,6 +170,37 @@ function ChaosNPC.SetTargetInner(npc, target)
 
     ---@diagnostic disable-next-line: param-type-mismatch
     npc:setTarget(target)
+end
+
+---@param effectId string
+function ChaosNPC:AddDisableAiEffect(effectId)
+    if not effectId or effectId == "" then return end
+    if not self.disableAIEffects then self.disableAIEffects = {} end
+    self.disableAIEffects[effectId] = true
+end
+
+---@param effectId string
+function ChaosNPC:RemoveDisableAiEffect(effectId)
+    if not effectId then return end
+    if not self.disableAIEffects then return end
+    self.disableAIEffects[effectId] = nil
+end
+
+---@param effectId string
+---@return boolean
+function ChaosNPC:HasDisableAiEffect(effectId)
+    if not effectId then return false end
+    if not self.disableAIEffects then return false end
+    return self.disableAIEffects[effectId] == true
+end
+
+---@return boolean
+function ChaosNPC:HasAnyDisableAiEffect()
+    if not self.disableAIEffects then return false end
+    for _ in pairs(self.disableAIEffects) do
+        return true
+    end
+    return false
 end
 
 ---@param tag string

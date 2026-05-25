@@ -1123,6 +1123,27 @@ function ChaosUtils.Normalize360(angle)
     return angle
 end
 
+---@class ChaosRGB
+---@field r number Red channel in 0..1.
+---@field g number Green channel in 0..1.
+---@field b number Blue channel in 0..1.
+
+---Builds an RGB color table. When `normalize` is true, the input channels are
+---treated as 0..255 and divided by 255 to fit the 0..1 range.
+---@param r number
+---@param g number
+---@param b number
+---@param normalize boolean?
+---@return ChaosRGB
+function ChaosUtils.MakeRGB(r, g, b, normalize)
+    if normalize then
+        r = r / 255
+        g = g / 255
+        b = b / 255
+    end
+    return { r = r, g = g, b = b }
+end
+
 ---@param worldObject IsoWorldInventoryObject
 ---@param removeInventoryItem boolean | nil
 ---@return InventoryItem | nil

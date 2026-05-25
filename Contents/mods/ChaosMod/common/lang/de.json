@@ -396,7 +396,15 @@
         "teleport_malfunction": "Teleportationsstörung",
         "reveal_map_to_player": "Gesamte Karte aufdecken",
         "random_skill_max_level": "Zufällige Fertigkeit auf Maximum",
-        "all_zombies_look_like_you": "Alle Zombies sehen aus wie du"
+        "all_zombies_look_like_you": "Alle Zombies sehen aus wie du",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "Zufällige Waffe geben",
+        "give_random_melee_weapon": "Zufällige Nahkampfwaffe geben",
+        "give_random_firearm_weapon": "Zufällige Schusswaffe geben",
+        "refuel_cars_nearby": "Autos in der Nähe auftanken",
+        "spawn_shaun_of_the_dead": "Shaun spawnen",
+        "zombies_dead_by_daylight": "Zombies sterben bei Tageslicht",
+        "zombies_have_all_car_keys": "Zombies haben alle Autoschlüssel"
     },
     "core": {
         "start_mod": "ChaosMod starten",

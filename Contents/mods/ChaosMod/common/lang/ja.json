@@ -396,7 +396,15 @@
         "teleport_malfunction": "テレポート不具合",
         "reveal_map_to_player": "マップ全体を表示",
         "random_skill_max_level": "ランダムなスキルを最大レベルに",
-        "all_zombies_look_like_you": "全てのゾンビがあなたの姿になる"
+        "all_zombies_look_like_you": "全てのゾンビがあなたの姿になる",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "ランダムな武器を与える",
+        "give_random_melee_weapon": "ランダムな近接武器を与える",
+        "give_random_firearm_weapon": "ランダムな銃器を与える",
+        "refuel_cars_nearby": "近くの車に給油",
+        "spawn_shaun_of_the_dead": "ショーンをスポーン",
+        "zombies_dead_by_daylight": "ゾンビは日光で死ぬ",
+        "zombies_have_all_car_keys": "ゾンビが全ての車の鍵を持っている"
     },
     "core": {
         "start_mod": "ChaosModを開始",

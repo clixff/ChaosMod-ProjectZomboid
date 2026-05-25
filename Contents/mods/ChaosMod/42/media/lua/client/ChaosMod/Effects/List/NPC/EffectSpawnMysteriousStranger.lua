@@ -50,12 +50,13 @@ function EffectSpawnMysteriousStranger:OnStart()
 
 
     ChaosZombie.AddZombieClothesBatch(zombie, {
-        { type = "Base.Jacket_WhiteTINT", tint = { r = 118, g = 107, b = 77, normalize = true } },
-        { type = "Base.Shirt_FormalTINT", tint = { r = 1.0, g = 1.0, b = 1.0 }, },
-        { type = "Base.Tie_Full",         textureChoice = 5 },
+        -- { type = "Base.Jacket_WhiteTINT", tint = { r = 118, g = 107, b = 77, normalize = true } },
+        { type = "Base.JacketLong_Random", textureChoice = 1 },
+        { type = "Base.Shirt_FormalTINT",  tint = { r = 1.0, g = 1.0, b = 1.0 }, },
+        { type = "Base.Tie_Full",          textureChoice = 5 },
         { type = "Base.Trousers_Black" },
         { type = "Base.Shoes_Brown" },
-        { type = "Base.Hat_Fedora",       textureChoice = 1 }
+        { type = "Base.Hat_Fedora",        textureChoice = 1 }
     })
 
     humanVisual:setHairModel("")

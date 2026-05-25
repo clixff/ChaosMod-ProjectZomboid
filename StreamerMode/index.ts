@@ -114,7 +114,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.1.2";
+const VERSION = "1.2.0";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -533,7 +533,8 @@ async function main(): Promise<void> {
   });
 
   const subsHandler = new SubsHandler();
-  const pendingSubActivations: Array<{ nickname: string; threshold: number }> = [];
+  const pendingSubActivations: Array<{ nickname: string; threshold: number }> =
+    [];
 
   if (bridge) {
     bridge.on("mod_change_status", (payload) => {
@@ -632,9 +633,7 @@ async function main(): Promise<void> {
     activityLog.add({ type: "donationalerts_disconnected" });
   };
   const donationManager = new DonationManager(port, () =>
-    config
-      ? config.streamer_mode.currencies
-      : { main: "", list: {} },
+    config ? config.streamer_mode.currencies : { main: "", list: {} },
   );
 
   // On first DA login (currencies fully empty), default main=RUB and load rates.
@@ -1505,9 +1504,7 @@ async function main(): Promise<void> {
             bridge?.emit("reload_config");
           }
         }
-        logger.info(
-          `[DonationAlerts] App credentials saved. Opening login...`,
-        );
+        logger.info(`[DonationAlerts] App credentials saved. Opening login...`);
         const loginUrl = daProvider.getLoginUrl(port, input.appId);
         try {
           await open(loginUrl);

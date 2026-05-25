@@ -18,6 +18,18 @@ function ChaosNPC:update(deltaMs)
 
     self:DisableZombieVoice()
 
+    if self:HasAnyDisableAiEffect() then
+        if self.isAttacking then
+            self:CancelAttackState("disable_ai_effect")
+        end
+        if self.moving then
+            self:StopMoving(true, "disable_ai_effect")
+        end
+        zombie:setUseless(true)
+        ChaosNPC.SetTargetInner(zombie, nil)
+        return
+    end
+
     if self.isAttacking then
         self:OnAttackTick(deltaMs)
     end

@@ -40,6 +40,8 @@ function EffectShadowClones:OnStart()
                 npc.maxHealth = 5.0
                 zombie:setHealth(npc.maxHealth)
 
+                npc:AddTag("shadow_clone")
+
                 table.insert(self.npcs, npc)
             end
         end

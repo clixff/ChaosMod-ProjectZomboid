@@ -5,6 +5,7 @@ require "ISUI/ISButton"
 ---@field label string
 ---@field onClick fun(window: ChaosModalWindow)
 ---@field accent string? -- "accept" → green styling like the in-game Start button. Default: neutral.
+---@field countdownSeconds integer? -- Disables the button and shows N..1 before restoring `label`.
 
 ---@class ChaosModalWindow : ISPanel
 ---@field category string -- Category key used for replacement and shown-tracking
@@ -13,6 +14,8 @@ require "ISUI/ISButton"
 ---@field bodyLines string[]
 ---@field buttons ChaosModalWindowButton[]
 ---@field buttonIndexByName table<string, integer>
+---@field buttonWidgets table<integer, ISButton>
+---@field buttonCountdowns table<integer, integer>
 ---@field onCloseCallback fun(window: ChaosModalWindow)?
 ---@field paused boolean
 ChaosModalWindow = ISPanel:derive("ChaosModalWindow")
@@ -134,10 +137,39 @@ function ChaosModalWindow:new(opts)
     o.bodyLines = bodyLines
     o.buttons = buttons
     o.buttonIndexByName = {}
+    o.buttonWidgets = {}
+    o.buttonCountdowns = {}
     o.onCloseCallback = opts.onClose
     o.paused = false
 
     return o
+end
+
+local function updateTimedButton(self, index)
+    local btn = self.buttonWidgets[index]
+    local def = self.buttons[index]
+    if not btn or not def then return end
+
+    local endMs = self.buttonCountdowns[index]
+    if not endMs then return end
+
+    local remainingMs = endMs - getTimestampMs()
+    if remainingMs > 0 then
+        local secondsLeft = math.ceil(remainingMs / 1000)
+        btn:setTitle(tostring(secondsLeft))
+        btn:setEnable(false)
+        btn:enableDisabledColor()
+        return
+    end
+
+    self.buttonCountdowns[index] = nil
+    btn:setTitle(def.label or "")
+    btn:setEnable(true)
+    if def.accent == "accept" then
+        btn:enableAcceptColor()
+    else
+        btn:restoreDefaultColors()
+    end
 end
 
 function ChaosModalWindow:createChildren()
@@ -174,7 +206,15 @@ function ChaosModalWindow:createChildren()
                 btn:enableAcceptColor()
             end
             self.buttonIndexByName[internalName] = i
+            self.buttonWidgets[i] = btn
             self:addChild(btn)
+
+            local countdownSeconds = def.countdownSeconds or 0
+            if countdownSeconds > 0 then
+                self.buttonCountdowns[i] = math.floor(getTimestampMs() + (countdownSeconds * 1000))
+                updateTimedButton(self, i)
+            end
+
             cursorX = cursorX + w + BTN_GAP
         end
     end
@@ -182,6 +222,10 @@ end
 
 function ChaosModalWindow:prerender()
     ISPanel.prerender(self)
+
+    for i, _ in pairs(self.buttonCountdowns) do
+        updateTimedButton(self, i)
+    end
 
     if self.title and self.title ~= "" then
         local titleX = math.floor((self.width - getTextManager():MeasureStringX(UIFont.Large, self.title)) / 2)

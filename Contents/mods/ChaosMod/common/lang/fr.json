@@ -396,7 +396,15 @@
         "teleport_malfunction": "Dysfonctionnement de téléportation",
         "reveal_map_to_player": "Révéler toute la carte",
         "random_skill_max_level": "Compétence aléatoire au niveau max",
-        "all_zombies_look_like_you": "Tous les zombies te ressemblent"
+        "all_zombies_look_like_you": "Tous les zombies te ressemblent",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "Donner une arme aléatoire",
+        "give_random_melee_weapon": "Donner une arme de mêlée aléatoire",
+        "give_random_firearm_weapon": "Donner une arme à feu aléatoire",
+        "refuel_cars_nearby": "Faire le plein des voitures à proximité",
+        "spawn_shaun_of_the_dead": "Faire apparaître Shaun",
+        "zombies_dead_by_daylight": "Les zombies meurent à la lumière du jour",
+        "zombies_have_all_car_keys": "Les zombies ont toutes les clés de voiture"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

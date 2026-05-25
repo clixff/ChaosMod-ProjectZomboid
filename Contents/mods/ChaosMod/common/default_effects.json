@@ -3638,6 +3638,78 @@
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "neutral_4"
+        },
+        {
+            "id": "grove_street_gang",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 100,
+            "disable_effects": [
+                "grove_street_gang"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "give_random_weapon",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "give_random_melee_weapon",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "give_random_firearm_weapon",
+            "enabled": true,
+            "chance": 0.85,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "refuel_cars_nearby",
+            "enabled": true,
+            "chance": 0.95,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "spawn_shaun_of_the_dead",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "zombies_dead_by_daylight",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "zombies_dead_by_daylight"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_6"
+        },
+        {
+            "id": "zombies_have_all_car_keys",
+            "enabled": true,
+            "chance": 0.95,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
         }
     ]
 }

@@ -396,7 +396,15 @@
         "teleport_malfunction": "Сбой телепортации",
         "reveal_map_to_player": "Открыть всю карту",
         "random_skill_max_level": "Прокачать случайный навык до максимума",
-        "all_zombies_look_like_you": "Все зомби выглядят как ты"
+        "all_zombies_look_like_you": "Все зомби выглядят как ты",
+        "grove_street_gang": "Grove Street Gang",
+        "give_random_weapon": "Дать случайное оружие",
+        "give_random_melee_weapon": "Дать случайное холодное оружие",
+        "give_random_firearm_weapon": "Дать случайное огнестрельное оружие",
+        "refuel_cars_nearby": "Заправить машины рядом",
+        "spawn_shaun_of_the_dead": "Заспавнить Шона",
+        "zombies_dead_by_daylight": "Зомби умирают при свете дня",
+        "zombies_have_all_car_keys": "У зомби есть ключи от всех машин"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
