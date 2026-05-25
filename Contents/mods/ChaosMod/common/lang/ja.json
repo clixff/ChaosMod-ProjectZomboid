@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "近くの車に給油",
         "spawn_shaun_of_the_dead": "ショーンをスポーン",
         "zombies_dead_by_daylight": "ゾンビは日光で死ぬ",
-        "zombies_have_all_car_keys": "ゾンビが全ての車の鍵を持っている"
+        "zombies_have_all_car_keys": "ゾンビが全ての車の鍵を持っている",
+        "electric_zombies": "電気ゾンビ",
+        "electric_weapons": "電気武器",
+        "pet_cemetery": "ペット・セメタリー",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "旅の商人"
     },
     "core": {
         "start_mod": "ChaosModを開始",

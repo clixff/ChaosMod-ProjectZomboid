@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "Autos in der Nähe auftanken",
         "spawn_shaun_of_the_dead": "Shaun spawnen",
         "zombies_dead_by_daylight": "Zombies sterben bei Tageslicht",
-        "zombies_have_all_car_keys": "Zombies haben alle Autoschlüssel"
+        "zombies_have_all_car_keys": "Zombies haben alle Autoschlüssel",
+        "electric_zombies": "Elektrische Zombies",
+        "electric_weapons": "Elektrische Waffen",
+        "pet_cemetery": "Tierfriedhof",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "Reisender Händler"
     },
     "core": {
         "start_mod": "ChaosMod starten",

@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "Refuel Cars Nearby",
         "spawn_shaun_of_the_dead": "Spawn Shaun of the Dead",
         "zombies_dead_by_daylight": "Zombies Dead by Daylight",
-        "zombies_have_all_car_keys": "Zombies Have All Car Keys"
+        "zombies_have_all_car_keys": "Zombies Have All Car Keys",
+        "electric_zombies": "Electric Zombies",
+        "electric_weapons": "Electric Weapons",
+        "pet_cemetery": "Pet Cemetery",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "Traveling Merchant"
     },
     "core": {
         "start_mod": "Start ChaosMod",

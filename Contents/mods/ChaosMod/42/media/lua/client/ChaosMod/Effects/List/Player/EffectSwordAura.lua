@@ -131,15 +131,9 @@ local function damageZombiesInBand(self, player)
         local weapon = instanceItem(SWORD_ITEM_ID)
         if not weapon then return end
 
-        local attacker = getFakeAttacker()
-        attacker:setX(px)
-        attacker:setY(py)
-        attacker:setZ(pz)
-        attacker:setForwardDirection(zx - px, zy - py)
-        attacker:setAttackTargetSquare(zombie:getSquare())
 
         local maxDamage = weapon:getMaxDamage()
-        zombie:Hit(weapon, attacker, maxDamage, false, 5.0, false)
+        zombie:Hit(weapon, player, maxDamage, false, 5.0, false)
     end, false, pz)
 end
 

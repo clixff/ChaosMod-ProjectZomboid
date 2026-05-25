@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "Zatankuj pobliskie samochody",
         "spawn_shaun_of_the_dead": "Zespawnuj Shauna",
         "zombies_dead_by_daylight": "Zombie giną w świetle dnia",
-        "zombies_have_all_car_keys": "Zombie mają wszystkie kluczyki do samochodów"
+        "zombies_have_all_car_keys": "Zombie mają wszystkie kluczyki do samochodów",
+        "electric_zombies": "Elektryczne zombie",
+        "electric_weapons": "Elektryczna broń",
+        "pet_cemetery": "Cmentarz zwierząt",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "Wędrowny kupiec"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",

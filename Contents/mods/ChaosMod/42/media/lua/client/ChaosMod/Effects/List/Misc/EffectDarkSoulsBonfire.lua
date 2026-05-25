@@ -1,6 +1,38 @@
 local BONFIRE_COLOR = { r = 1.0, g = 0.84, b = 0.2 }
+local SWORD_REMOVAL_DELAY_MS = 30000
 
 EffectDarkSoulsBonfire = ChaosEffectBase:derive("EffectDarkSoulsBonfire", "dark_souls_bonfire")
+
+local function BonfireSwordRemovalTick(_deltaMs, _data) end
+
+---@param data { item: InventoryItem }
+---@return boolean?
+local function BonfireSwordRemovalEnd(data)
+    local item = data.item
+    if not item then return true end
+
+    local worldObj = item:getWorldItem()
+    if worldObj then
+        local sq = worldObj:getSquare()
+        if sq then
+            sq:transmitRemoveItemFromSquare(worldObj)
+        else
+            pcall(function() worldObj:removeFromWorld() end)
+        end
+        return true
+    end
+
+    local player = getPlayer()
+    if player then
+        pcall(function() player:removeFromHands(item) end)
+    end
+
+    local container = item:getContainer()
+    if container then
+        container:Remove(item)
+    end
+    return true
+end
 
 function EffectDarkSoulsBonfire:OnStart()
     ChaosEffectBase:OnStart()
@@ -24,7 +56,7 @@ function EffectDarkSoulsBonfire:OnStart()
     end, 2, 10, true, true, true, z, z)
 
     if not targetSquare then return end
-    if not ChaosProps.SpawnCampfire(targetSquare) then return end
+    if not ChaosProps.SpawnCampfire(targetSquare, true) then return end
 
     ChaosPlayer.SayLineByColor(player, "Bonfire Lit", BONFIRE_COLOR)
     ChaosUtils.PlayUISound("bonfire_lit")
@@ -45,6 +77,15 @@ function EffectDarkSoulsBonfire:OnStart()
                 worldObj:setExtendedPlacement(true)
                 worldObj:syncExtendedPlacement()
             end
+
+            ChaosSpecialAction.AddNewAction(
+                { item = placedItem },
+                SWORD_REMOVAL_DELAY_MS,
+                BonfireSwordRemovalTick,
+                BonfireSwordRemovalEnd,
+                nil,
+                false
+            )
         end
     end
 

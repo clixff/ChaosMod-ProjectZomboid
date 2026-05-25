@@ -2,7 +2,7 @@
 
 [b]A single-player Chaos Mod v1.1.1 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
 
-This mod triggers a random effect every 45 seconds. There are currently [b]310+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
+This mod triggers a random effect every 45 seconds. There are currently [b]400+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
 
 [b]Twitch and YouTube integration[/b] is optional and allows your viewers to vote for the next effect. You can play without it.
 

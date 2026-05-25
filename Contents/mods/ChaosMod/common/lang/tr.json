@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "Yakındaki Arabaları Doldur",
         "spawn_shaun_of_the_dead": "Shaun'u Spawnla",
         "zombies_dead_by_daylight": "Zombiler Gün Işığında Ölür",
-        "zombies_have_all_car_keys": "Zombilerde Tüm Araba Anahtarları Var"
+        "zombies_have_all_car_keys": "Zombilerde Tüm Araba Anahtarları Var",
+        "electric_zombies": "Elektrikli Zombiler",
+        "electric_weapons": "Elektrikli Silahlar",
+        "pet_cemetery": "Hayvan Mezarlığı",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "Gezgin Tüccar"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",

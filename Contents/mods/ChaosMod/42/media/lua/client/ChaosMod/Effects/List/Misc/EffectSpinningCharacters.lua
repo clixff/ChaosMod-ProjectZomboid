@@ -64,6 +64,11 @@ function EffectSpinningCharacters:OnTick(deltaMs)
             affectedZombies[zombie] = data
             if not ChaosNPCUtils.IsNPC(zombie) then
                 zombie:setUseless(true)
+            else
+                local npc = ChaosNPCUtils.GetNPCFromZombie(zombie)
+                if npc then
+                    npc:AddDisableAiEffect("spinning_characters")
+                end
             end
         end
 
@@ -81,8 +86,15 @@ function EffectSpinningCharacters:OnEnd()
 
     if self.affectedZombies then
         for zombie, data in pairs(self.affectedZombies) do
-            if zombie and zombie:isAlive() and not ChaosNPCUtils.IsNPC(zombie) then
-                zombie:setUseless(data.wasUseless)
+            if zombie and zombie:isAlive() then
+                if not ChaosNPCUtils.IsNPC(zombie) then
+                    zombie:setUseless(data.wasUseless)
+                else
+                    local npc = ChaosNPCUtils.GetNPCFromZombie(zombie)
+                    if npc then
+                        npc:RemoveDisableAiEffect("spinning_characters")
+                    end
+                end
             end
         end
         self.affectedZombies = {}

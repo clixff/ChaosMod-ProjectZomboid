@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "Faire le plein des voitures à proximité",
         "spawn_shaun_of_the_dead": "Faire apparaître Shaun",
         "zombies_dead_by_daylight": "Les zombies meurent à la lumière du jour",
-        "zombies_have_all_car_keys": "Les zombies ont toutes les clés de voiture"
+        "zombies_have_all_car_keys": "Les zombies ont toutes les clés de voiture",
+        "electric_zombies": "Zombies électriques",
+        "electric_weapons": "Armes électriques",
+        "pet_cemetery": "Cimetière des animaux",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "Marchand itinérant"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",

@@ -30,25 +30,26 @@ LOOTBOX_ITEMS = {
     },
     rare = {
         "Base.Axe",
+        "Base.Sledgehammer",
         "Base.Crowbar",
         "Base.Machete",
         "Base.HuntingKnife",
-        "Base.Pistol",
-        "Base.Shotgun",
         "Base.Bag_ALICEpack",
         "Base.Pills",
         "Base.Antibiotics",
+        "Base.Pistol2",
+        "Base.Pistol3",
     },
     legendary = {
         "Base.Katana",
-        "Base.Sledgehammer",
         "Base.PetrolCan",
         "Base.Generator",
         "Base.CarBattery1",
         "Base.AssaultRifle",
-        "Base.Pistol3",
         "Base.Revolver_Long",
-        "Base.Pistol2"
+        "Base.Vest_BulletPolice",
+        "Base.Pistol",
+        "Base.Shotgun",
     },
 }
 

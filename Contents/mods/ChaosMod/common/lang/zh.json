@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "为附近车辆加满油",
         "spawn_shaun_of_the_dead": "生成肖恩",
         "zombies_dead_by_daylight": "僵尸在日光下死亡",
-        "zombies_have_all_car_keys": "僵尸身上有所有车钥匙"
+        "zombies_have_all_car_keys": "僵尸身上有所有车钥匙",
+        "electric_zombies": "电击僵尸",
+        "electric_weapons": "电击武器",
+        "pet_cemetery": "宠物坟场",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "流浪商人"
     },
     "core": {
         "start_mod": "启动混乱模式",

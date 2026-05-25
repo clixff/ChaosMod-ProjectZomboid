@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "Repostar coches cercanos",
         "spawn_shaun_of_the_dead": "Generar a Shaun",
         "zombies_dead_by_daylight": "Los zombis mueren con la luz del día",
-        "zombies_have_all_car_keys": "Los zombis tienen todas las llaves de coche"
+        "zombies_have_all_car_keys": "Los zombis tienen todas las llaves de coche",
+        "electric_zombies": "Zombis eléctricos",
+        "electric_weapons": "Armas eléctricas",
+        "pet_cemetery": "Cementerio de mascotas",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "Mercader ambulante"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",

@@ -112,6 +112,11 @@
 - Spawn Shaun of the Dead
 - Zombies Dead by Daylight
 - Zombies Have All Car Keys
+- Electric Zombies
+- Electric Weapons
+- Pet Cemetery
+- Lootbox Roll
+- Traveling Merchant
 
 ### Mod Fixes
 
@@ -161,6 +166,9 @@
 - "Swap Mouse Buttons": fixed effect behaviour in combat
 - "Teleport To Nearest Basement" effect now falls back to the most recently scanned basement near the player when no basement is found nearby
 - "Nearby Zombies Are Naked" no longer marks affected zombies as reanimated players
+- "Spawn Stalker" now turns hostile and attacks the player after 90 seconds if left alone
+- "Spinning Characters" now also disables AI for NPCs caught in the effect
+- "Dark Souls Bonfire" sword now disappears 30 seconds after the bonfire is lit
 
 [1.1.1]
 

@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "주변 차량에 급유",
         "spawn_shaun_of_the_dead": "숀 소환",
         "zombies_dead_by_daylight": "좀비는 햇빛에 죽음",
-        "zombies_have_all_car_keys": "좀비가 모든 차 열쇠를 가지고 있음"
+        "zombies_have_all_car_keys": "좀비가 모든 차 열쇠를 가지고 있음",
+        "electric_zombies": "전기 좀비",
+        "electric_weapons": "전기 무기",
+        "pet_cemetery": "공포의 묘지",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "떠돌이 상인"
     },
     "core": {
         "start_mod": "ChaosMod 시작",

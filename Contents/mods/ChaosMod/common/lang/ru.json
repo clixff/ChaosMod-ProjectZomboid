@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "Заправить машины рядом",
         "spawn_shaun_of_the_dead": "Заспавнить Шона",
         "zombies_dead_by_daylight": "Зомби умирают при свете дня",
-        "zombies_have_all_car_keys": "У зомби есть ключи от всех машин"
+        "zombies_have_all_car_keys": "У зомби есть ключи от всех машин",
+        "electric_zombies": "Электрические зомби",
+        "electric_weapons": "Электрическое оружие",
+        "pet_cemetery": "Кладбище домашних животных",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "Странствующий торговец"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",

@@ -18,7 +18,7 @@ export function LandingPage() {
         <div className="landing-divider" aria-hidden="true" />
 
         <p className="landing-tagline">
-          Mod for Project Zomboid that adds 300+ random effects and Twitch &
+          Mod for Project Zomboid that adds 400+ random effects and Twitch &
           YouTube integration to the game
         </p>
 

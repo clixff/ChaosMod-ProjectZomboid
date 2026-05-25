@@ -404,7 +404,12 @@
         "refuel_cars_nearby": "Reabastecer Carros Próximos",
         "spawn_shaun_of_the_dead": "Gerar Shaun",
         "zombies_dead_by_daylight": "Zumbis Morrem à Luz do Dia",
-        "zombies_have_all_car_keys": "Zumbis Têm Todas as Chaves de Carro"
+        "zombies_have_all_car_keys": "Zumbis Têm Todas as Chaves de Carro",
+        "electric_zombies": "Zumbis Elétricos",
+        "electric_weapons": "Armas Elétricas",
+        "pet_cemetery": "Cemitério de Animais",
+        "lootbox_roll": "Lootbox Roll",
+        "traveling_merchant": "Mercador Viajante"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
