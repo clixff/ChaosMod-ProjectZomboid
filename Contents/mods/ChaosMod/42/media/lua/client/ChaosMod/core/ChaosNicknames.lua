@@ -30,7 +30,7 @@ ChaosNicknames = ChaosNicknames or {
     modDataColorKey = "ChaosModNicknameColor"
 }
 
-local DEBUG_NICKNAMES_TEXT = false
+local DEBUG_NICKNAMES_TEXT = true
 
 local NICKNAME_CHAT_MESSAGE_MAX_AGE_MS = 30000
 local NICKNAME_CHAT_MESSAGE_RENDER_MS = 7000
@@ -539,8 +539,9 @@ local function resolveZombieRenderedMessage(zombie, nowMs)
         return externalMessage, externalElapsedMs, externalAlpha, 1, 1, 1, externalStartMs
     end
 
-    local internalMessage, internalElapsedMs, internalAlpha, internalColor, internalStartMs = resolveInternalChatLineState(
-        zombie, nowMs)
+    local internalMessage, internalElapsedMs, internalAlpha, internalColor, internalStartMs =
+        resolveInternalChatLineState(
+            zombie, nowMs)
 
     if internalColor == nil then
         internalColor = { r = 0, g = 1, b = 0 }
@@ -661,9 +662,10 @@ function ChaosNicknames.GetDebugNicknamesText(zombie)
         targetDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), target:getX(), target:getY())
     end
 
-    return string.format("Z id=%s hp=%.2f state=%s bump=%s hit=%s\ntarget=%s dist=%.2f", id, health, actionState,
+    return string.format("Z id=%s hp=%.2f state=%s bump=%s hit=%s\ntarget=%s dist=%.2f reanim=%s", id, health,
+        actionState,
         bumpType,
-        hitReaction, targetId, targetDist)
+        hitReaction, targetId, targetDist, tostring(zombie:isReanimatedPlayer()))
 end
 
 ---@param zombie IsoZombie

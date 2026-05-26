@@ -68,8 +68,20 @@ end
 function ChaosUIManager.onDonateEffectActivated(username, effectId)
     local effectData = ChaosEffectsRegistry.effects[effectId]
     if not effectData then return end
+    local displayName = effectData.name
+    if ChaosEffectsManager and ChaosEffectsManager.activeEffects then
+        for i = #ChaosEffectsManager.activeEffects, 1, -1 do
+            local effect = ChaosEffectsManager.activeEffects[i]
+            if effect and effect.effectId == effectId then
+                if effect.fakeEffectNameId and effect.fakeEffectNameId ~= "" then
+                    displayName = ChaosLocalization.GetString("effects", effect.fakeEffectNameId)
+                end
+                break
+            end
+        end
+    end
     local fmt = ChaosLocalization.GetString("meta", "username_activated_effect")
-    local msg = string.format(fmt, username, effectData.name)
+    local msg = string.format(fmt, username, displayName)
     if ChaosUIManager.hud then
         ChaosUIManager.hud:AddMessage(msg)
     end

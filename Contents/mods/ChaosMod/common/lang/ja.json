@@ -409,7 +409,29 @@
         "electric_weapons": "電気武器",
         "pet_cemetery": "ペット・セメタリー",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "旅の商人"
+        "traveling_merchant": "旅の商人",
+        "wrath_of_the_gods": "神々の怒り",
+        "spawn_race_car": "レースカーをスポーン",
+        "spawn_sports_car": "スポーツカーをスポーン",
+        "meteor_shower": "流星群",
+        "kill_zombies_with_lightning": "雷でゾンビを倒す",
+        "short_circuit": "ショート",
+        "q_to_spawn_items": "Qでアイテムを生成",
+        "christmas": "クリスマス",
+        "medical_supplies_drop": "医療物資の投下",
+        "add_new_loot_to_containers": "コンテナにランダムなアイテムを追加",
+        "explode_nearby_electronics": "近くの電子機器を爆発させる",
+        "poison_player_food": "プレイヤーの食料に毒を盛る",
+        "poison_nearby_food": "周辺の食料に毒を盛る",
+        "give_molotov_cocktails": "火炎瓶を与える",
+        "knockback_hits": "ノックバック攻撃",
+        "teleport_to_last_death": "最後の死亡地点へテレポート",
+        "skip_to_winter": "冬にスキップ",
+        "fire_snake": "炎の蛇",
+        "zoom_pulse": "カメラパルス",
+        "zombie_spawner_nearby": "近くにゾンビスポーン地点",
+        "skyrim_shout": "スカイリムの叫び",
+        "fake_teleport": "フェイクテレポート"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s %d個の食料を死んだネズミに置き換えました",
         "no_building_found": "近くに建物が見つかりません...",
         "traits_removed_count": "%d個の特性を削除しました",
-        "skill_maxed_out": "%s スキル 最大"
+        "skill_maxed_out": "%s スキル 最大",
+        "food_poisoned": "%s %d個の食料に毒を仕込みました",
+        "failed_to_find_last_death": "最後の死亡地点が見つかりません"
     },
     "meta": {
         "username_activated_effect": "%sが%sをアクティブにしました"

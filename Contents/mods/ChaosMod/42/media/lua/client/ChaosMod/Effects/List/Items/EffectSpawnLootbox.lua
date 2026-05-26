@@ -106,6 +106,9 @@ function EffectSpawnLootbox:OnStart()
     local itemsToAdd = 5
 
     for i = 1, itemsToAdd do
-        container:AddItem(GetRandomLootboxItem())
+        local item = container:AddItem(GetRandomLootboxItem())
+        if item then
+            ChaosItems.SetFullAmmoIfWeapon(item)
+        end
     end
 end

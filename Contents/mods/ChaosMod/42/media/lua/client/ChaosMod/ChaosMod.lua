@@ -278,7 +278,10 @@ end
 
 ---@param player IsoPlayer
 function ChaosMod.OnPlayerDeath(player)
-    ChaosUtils.SetCrashDamageDisabled(false)
+    if ChaosMod.enabled and player then
+        ChaosUtils.SetCrashDamageDisabled(false)
+        ChaosUtils.SaveDeathPosition(player:getX(), player:getY(), player:getZ())
+    end
 end
 
 function ChaosMod.RegisterBridgeHandlers()

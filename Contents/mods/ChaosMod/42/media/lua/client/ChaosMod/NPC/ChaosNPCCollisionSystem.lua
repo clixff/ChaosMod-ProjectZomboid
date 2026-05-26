@@ -87,6 +87,7 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
                 return true
             end
         elseif window:canClimbThrough(zombie) then
+            print(string.format("[ChaosNPCCollisionSystem][npc=%s] Climbing through window", tostring(zombie:getID())))
             self:StopMoving(true, "clim_window")
             zombie:climbThroughWindow(window)
             return true
@@ -122,10 +123,33 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
             canOpenDoor = false
         end
 
-        print(string.format("[ChaosNPCCollisionSystem][npc=%s] canOpenDoor=%s", tostring(zombie:getID()), tostring(canOpenDoor)))
+        print(string.format("[ChaosNPCCollisionSystem][npc=%s] canOpenDoor=%s locked=%s", tostring(zombie:getID()),
+            tostring(canOpenDoor), tostring(isLocked)))
 
         if canOpenDoor then
-            door:ToggleDoor(getPlayer())
+            if door.setLockedByKey then
+                door:setLockedByKey(false)
+            end
+            if door.setIsLocked then
+                door:setIsLocked(false)
+            end
+            if door.setLocked then
+                door:setLocked(false)
+            end
+            door:ToggleDoorSilent()
+            ChaosSpecialAction.AddNewAction(
+                { door = door },
+                800,
+                nil,
+                function(data)
+                    ---@type IsoDoor
+                    local door = data.door
+                    local player = getPlayer()
+                    if door and door:IsOpen() and player then
+                        door:ToggleDoorSilent()
+                    end
+                end
+            )
             return true
         elseif isHostileToPlayer then
             local isGarageDoor = IsoDoor.getGarageDoorIndex(door) ~= -1

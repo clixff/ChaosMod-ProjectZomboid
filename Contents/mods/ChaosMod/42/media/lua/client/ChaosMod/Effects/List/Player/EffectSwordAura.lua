@@ -110,7 +110,6 @@ local function damageZombiesInBand(self, player)
     local py = player:getY()
     local pz = player:getZ()
     local outerBand = ORBIT_RADIUS + DAMAGE_BAND
-    local innerBand = ORBIT_RADIUS - DAMAGE_BAND
     local now = getTimestampMs()
 
     ChaosZombie.ForEachZombieInRange(px, py, outerBand, function(zombie)
@@ -119,7 +118,6 @@ local function damageZombiesInBand(self, player)
         local dx = zx - px
         local dy = zy - py
         local dist = math.sqrt(dx * dx + dy * dy)
-        if dist < innerBand then return end
         if not isValidTarget(zombie, player) then return end
 
         local id = zombie:getID()
@@ -134,6 +132,8 @@ local function damageZombiesInBand(self, player)
 
         local maxDamage = weapon:getMaxDamage()
         zombie:Hit(weapon, player, maxDamage, false, 5.0, false)
+        zombie:knockDown(false)
+        print("Hit with damage " .. maxDamage)
     end, false, pz)
 end
 

@@ -29,7 +29,12 @@ local function buildEffectString(effect)
     if ChaosEffectsUI.hideEffectNames and not effect.showNameAlways then
         return "???"
     end
-    local effectString = tostring(effect.effectName)
+    local effectString
+    if effect.fakeEffectNameId and effect.fakeEffectNameId ~= "" then
+        effectString = ChaosLocalization.GetString("effects", effect.fakeEffectNameId)
+    else
+        effectString = tostring(effect.effectName)
+    end
     if effect.withDuration then
         local msToEnd = effect.maxTicks - effect.ticksActiveTime
         if effect.effectNickname and effect.effectNickname ~= "" then

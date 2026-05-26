@@ -99,7 +99,10 @@ function EffectFindChestWithLoot:OnStart()
     for _ = 1, ITEM_COUNT do
         local itemId = GetRandomLootboxItem()
         if itemId then
-            container:AddItem(itemId)
+            local item = container:AddItem(itemId)
+            if item then
+                ChaosItems.SetFullAmmoIfWeapon(item)
+            end
         end
     end
 

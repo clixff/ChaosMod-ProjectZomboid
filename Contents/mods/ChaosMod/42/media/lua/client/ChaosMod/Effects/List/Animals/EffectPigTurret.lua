@@ -6,6 +6,7 @@
 ---@field worldGunObj IsoWorldInventoryObject?
 ---@field lastShotMs integer
 ---@field lastWanderMs integer
+---@field hitPlayerCount integer
 EffectPigTurret = ChaosEffectBase:derive("EffectPigTurret", "pig_turret")
 
 ---@type integer
@@ -42,10 +43,16 @@ local PLAYER_MISS_CHANCE = 0.8
 ---@param dist number
 ---@return number
 local function getPlayerHitChanceForDist(dist)
-    if dist <= 1.0 then return 0.45 end
+    local maxChance = 0.45
+    local minChance = 0.1
+
+    local minDist = 1.0
+    local maxDist = 15.0
+
+    if dist <= 1.0 then return maxChance end
     if dist <= 10.0 then
         local t = (dist - 1.0) / (10.0 - 1.0)
-        return 0.45 + (0.1 - 0.45) * t
+        return maxChance + (0.1 - maxChance) * t
     end
     if dist <= 15.0 then
         local t = (dist - 10.0) / (15.0 - 10.0)
@@ -405,6 +412,11 @@ local function firePigTurret(self)
 
     local missChance
     if instanceof(target, "IsoPlayer") then
+        if self.hitPlayerCount >= 2 then
+            return
+        end
+
+
         local dist = ChaosUtils.distTo(pigSquare:getX(), pigSquare:getY(), target:getX(), target:getY())
         missChance = 1.0 - getPlayerHitChanceForDist(dist)
     else
@@ -413,6 +425,8 @@ local function firePigTurret(self)
     if ChaosUtils.RandFloat(0, 1) <= missChance then
         return
     end
+
+
 
     local attacker = createFakeAttacker(pigSquare, target)
     applyShotDamage(target, weapon, attacker)
@@ -445,6 +459,7 @@ function EffectPigTurret:OnStart()
     self.pig:updateStress()
     self.lastShotMs = 0
     self.lastWanderMs = 0
+    self.hitPlayerCount = 0
 
     PigWeaponAttach.update(self.pig, self)
 end

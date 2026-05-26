@@ -115,7 +115,7 @@
         "remove_player_weapons": "Waffen des Spielers entfernen",
         "give_schoolbag": "Schultasche geben",
         "give_random_tool": "Zufälliges Werkzeug geben",
-        "give_random_item": "Zufälligen Gegenstand geben",
+        "give_random_item": "Zufällige Gegenstände geben",
         "honk_vehicles_nearby": "Fahrzeuge in der Nähe hupen",
         "disable_vehicle_engine": "Fahrzeugmotor deaktivieren",
         "exit_current_vehicle": "Aktuelles Fahrzeug verlassen",
@@ -409,7 +409,29 @@
         "electric_weapons": "Elektrische Waffen",
         "pet_cemetery": "Tierfriedhof",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "Reisender Händler"
+        "traveling_merchant": "Reisender Händler",
+        "wrath_of_the_gods": "Zorn der Götter",
+        "spawn_race_car": "Rennwagen spawnen",
+        "spawn_sports_car": "Sportwagen spawnen",
+        "meteor_shower": "Meteoritenschauer",
+        "kill_zombies_with_lightning": "Zombies mit Blitzen töten",
+        "short_circuit": "Kurzschluss",
+        "q_to_spawn_items": "Q zum Spawnen von Items",
+        "christmas": "Weihnachten",
+        "medical_supplies_drop": "Sanitätsabwurf",
+        "add_new_loot_to_containers": "Zufällige Gegenstände zu Behältern hinzufügen",
+        "explode_nearby_electronics": "Elektronik in der Nähe explodieren lassen",
+        "poison_player_food": "Essen des Spielers vergiften",
+        "poison_nearby_food": "Essen in der Nähe vergiften",
+        "give_molotov_cocktails": "Molotowcocktails geben",
+        "knockback_hits": "Treffer mit Rückstoß",
+        "teleport_to_last_death": "Zum letzten Todesort teleportieren",
+        "skip_to_winter": "Zum Winter springen",
+        "fire_snake": "Feuerschlange",
+        "zoom_pulse": "Kamerapuls",
+        "zombie_spawner_nearby": "Zombiespawner in der Nähe",
+        "skyrim_shout": "Skyrim-Schrei",
+        "fake_teleport": "Fake-Teleport"
     },
     "core": {
         "start_mod": "ChaosMod starten",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s %d Lebensmittel durch tote Ratten ersetzt",
         "no_building_found": "Ich kann kein Gebäude in der Nähe finden...",
         "traits_removed_count": "%d Eigenschaften entfernt",
-        "skill_maxed_out": "%s Fertigkeit auf Maximum"
+        "skill_maxed_out": "%s Fertigkeit auf Maximum",
+        "food_poisoned": "%s %d Lebensmittel vergiftet",
+        "failed_to_find_last_death": "Letzter Todesort nicht gefunden"
     },
     "meta": {
         "username_activated_effect": "%s hat %s aktiviert"

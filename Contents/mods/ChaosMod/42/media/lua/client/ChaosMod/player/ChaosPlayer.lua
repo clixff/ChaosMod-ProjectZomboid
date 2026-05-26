@@ -10,6 +10,8 @@ ChaosPlayerChatColors = ChaosPlayerChatColors or {
     removedItem = { r = 1.0, g = 0.3, b = 0.3 },
     red = { r = 1.0, g = 0.3, b = 0.3 },
     line = { r = 1.0, g = 1.0, b = 1.0 },
+    blue = { r = 0.0, g = 0.5, b = 1.0 },
+    blue2 = { r = 0.5, g = 1.0, b = 1.0 },
 }
 
 ---@param player IsoPlayer
@@ -61,17 +63,36 @@ end
 ---@param shouldCheckEmpty boolean
 ---@param allowInteriors boolean
 ---@param returnPlayerSquare boolean
+---@param forceAllowInteriorsEvenWhenPlayerNotInRoom boolean?
 ---@return IsoGridSquare | nil
 function ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius, maxTries, shouldCheckEmpty,
-                                                 allowInteriors, returnPlayerSquare)
+                                                 allowInteriors, returnPlayerSquare,
+                                                 forceAllowInteriorsEvenWhenPlayerNotInRoom)
     if not player then return nil end
     local square = player:getSquare()
     if not square then return nil end
+
+    -- When the player is outside but interiors are allowed, prefer an outdoor result
+    -- so the spawn stays in the player's line of sight. Only fall back to interiors
+    -- if no outdoor square was found. The override flag short-circuits this to avoid
+    -- infinite recursion on the fallback pass.
+    if allowInteriors == true
+        and forceAllowInteriorsEvenWhenPlayerNotInRoom ~= true
+        and player:isInARoom() == false then
+        local outdoorSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius, maxTries,
+            shouldCheckEmpty, false, false, false)
+        if outdoorSquare then return outdoorSquare end
+        return ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius, maxTries,
+            shouldCheckEmpty, true, returnPlayerSquare, true)
+    end
+
     local x = square:getX()
     local y = square:getY()
     local newZ = z ~= nil and z or square:getZ()
 
     local cell = square:getCell()
+
+    local allowInteriorThisCheck = allowInteriors
 
     maxTries = maxTries or 50
     for i = 1, maxTries do
@@ -89,7 +110,7 @@ function ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius
             if sq and sq:isSolidFloor() then
                 local interiorCheck = true
 
-                if allowInteriors == false then
+                if allowInteriorThisCheck == false then
                     if sq:isOutside() == false then
                         interiorCheck = false
                     end
@@ -116,7 +137,7 @@ function ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius
 
     if newZ ~= 0 then
         return ChaosPlayer.GetRandomSquareAroundPlayer(player, 0, minRadius, maxRadius, maxTries, shouldCheckEmpty,
-            allowInteriors, returnPlayerSquare)
+            allowInteriors, returnPlayerSquare, forceAllowInteriorsEvenWhenPlayerNotInRoom)
     end
 
     return nil

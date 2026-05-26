@@ -115,7 +115,7 @@
         "remove_player_weapons": "Oyuncu Silahlarını Kaldır",
         "give_schoolbag": "Okul Çantası Ver",
         "give_random_tool": "Rastgele Araç Ver",
-        "give_random_item": "Rastgele Eşya Ver",
+        "give_random_item": "Rastgele Eşyalar Ver",
         "honk_vehicles_nearby": "Yakındaki Araçların Kornasını Çal",
         "disable_vehicle_engine": "Araç Motorunu Devre Dışı Bırak",
         "exit_current_vehicle": "Mevcut Araçtan Çık",
@@ -409,7 +409,29 @@
         "electric_weapons": "Elektrikli Silahlar",
         "pet_cemetery": "Hayvan Mezarlığı",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "Gezgin Tüccar"
+        "traveling_merchant": "Gezgin Tüccar",
+        "wrath_of_the_gods": "Tanrıların Gazabı",
+        "spawn_race_car": "Yarış Arabası Oluştur",
+        "spawn_sports_car": "Spor Araba Oluştur",
+        "meteor_shower": "Meteor Yağmuru",
+        "kill_zombies_with_lightning": "Zombileri Yıldırımla Öldür",
+        "short_circuit": "Kısa Devre",
+        "q_to_spawn_items": "Eşya Spawnlamak İçin Q",
+        "christmas": "Noel",
+        "medical_supplies_drop": "Tıbbi Malzeme Atışı",
+        "add_new_loot_to_containers": "Konteynerlere Rastgele Eşyalar Ekle",
+        "explode_nearby_electronics": "Yakındaki Elektronikleri Patlat",
+        "poison_player_food": "Oyuncunun Yiyeceğini Zehirle",
+        "poison_nearby_food": "Yakındaki Yiyeceği Zehirle",
+        "give_molotov_cocktails": "Molotof Kokteyli Ver",
+        "knockback_hits": "Geri İten Vuruşlar",
+        "teleport_to_last_death": "Son Ölüm Yerine Işınlan",
+        "skip_to_winter": "Kışa Atla",
+        "fire_snake": "Ateş Yılanı",
+        "zoom_pulse": "Kamera Nabzı",
+        "zombie_spawner_nearby": "Yakında Zombi Üretici",
+        "skyrim_shout": "Skyrim Çığlığı",
+        "fake_teleport": "Sahte ışınlanma"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s %d yiyecek ölü farelerle değiştirildi",
         "no_building_found": "Yakınlarda bina bulamıyorum...",
         "traits_removed_count": "%d özellik kaldırıldı",
-        "skill_maxed_out": "%s Yeteneği maks. seviyede"
+        "skill_maxed_out": "%s Yeteneği maks. seviyede",
+        "food_poisoned": "%s %d yiyecek zehirlendi",
+        "failed_to_find_last_death": "Son ölüm yeri bulunamadı"
     },
     "meta": {
         "username_activated_effect": "%s şunu etkinleştirdi: %s"

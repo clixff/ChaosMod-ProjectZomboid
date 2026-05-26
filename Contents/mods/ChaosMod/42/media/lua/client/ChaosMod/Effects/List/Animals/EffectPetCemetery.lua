@@ -1,7 +1,10 @@
 ---@class EffectPetCemetery : ChaosEffectBase
 ---@field animals IsoAnimal[]
 ---@field specialAnimals SpecialAnimal[]
+---@field knockdownCooldownMs integer
 EffectPetCemetery = ChaosEffectBase:derive("EffectPetCemetery", "pet_cemetery")
+
+local KNOCKDOWN_COOLDOWN_MS = 3500
 
 ---@type string[]
 local COW_BREEDS = { "holstein", "angus", "simmental" }
@@ -54,6 +57,7 @@ function EffectPetCemetery:OnStart()
 
     self.animals = {}
     self.specialAnimals = {}
+    self.knockdownCooldownMs = 0
 
     local cowBreed = COW_BREEDS[ChaosUtils.RandArrayIndex(COW_BREEDS)]
     if cowBreed then
@@ -80,7 +84,10 @@ end
 
 ---@param deltaMs integer
 function EffectPetCemetery:OnTick(deltaMs)
-    local _ = deltaMs
+    if self.knockdownCooldownMs > 0 then
+        self.knockdownCooldownMs = self.knockdownCooldownMs - deltaMs
+        if self.knockdownCooldownMs > 0 then return end
+    end
 
     local player = getPlayer()
     if not player then return end
@@ -96,6 +103,7 @@ function EffectPetCemetery:OnTick(deltaMs)
             local animalSquare = animal:getSquare()
             if animalSquare == playerSquare then
                 player:setKnockedDown(true)
+                self.knockdownCooldownMs = KNOCKDOWN_COOLDOWN_MS
                 return
             end
         end

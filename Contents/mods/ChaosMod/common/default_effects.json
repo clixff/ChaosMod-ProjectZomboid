@@ -632,7 +632,7 @@
         {
             "id": "filter_mexico",
             "enabled": true,
-            "chance": 0.2,
+            "chance": 0.4,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -644,7 +644,7 @@
         {
             "id": "filter_fallout3",
             "enabled": true,
-            "chance": 0.2,
+            "chance": 0.4,
             "withDuration": true,
             "duration": 60,
             "disable_effects": [
@@ -656,7 +656,7 @@
         {
             "id": "black_and_white",
             "enabled": true,
-            "chance": 0.2,
+            "chance": 0.5,
             "withDuration": true,
             "duration": 180,
             "disable_effects": [
@@ -1316,7 +1316,7 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "negative_5"
+            "price_group": "negative_6"
         },
         {
             "id": "explode_on_sleep",
@@ -3770,6 +3770,219 @@
             ],
             "enabled_donate": true,
             "price_group": "positive_4"
+        },
+        {
+            "id": "wrath_of_the_gods",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "wrath_of_the_gods"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "spawn_race_car",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "spawn_sports_car",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "meteor_shower",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "meteor_shower"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "kill_zombies_with_lightning",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "short_circuit",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "q_to_spawn_items",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "q_to_spawn_items"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "christmas",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 120,
+            "disable_effects": [
+                "christmas",
+                "enable_snow"
+            ],
+            "enabled_donate": true,
+            "price_group": "neutral_4"
+        },
+        {
+            "id": "medical_supplies_drop",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "add_new_loot_to_containers",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_4"
+        },
+        {
+            "id": "explode_nearby_electronics",
+            "enabled": true,
+            "chance": 0.8,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "poison_player_food",
+            "enabled": true,
+            "chance": 0.85,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "poison_nearby_food",
+            "enabled": true,
+            "chance": 0.85,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "give_molotov_cocktails",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "knockback_hits",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 80,
+            "disable_effects": [
+                "knockback_hits"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "teleport_to_last_death",
+            "enabled": true,
+            "chance": 0.65,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "negative_6"
+        },
+        {
+            "id": "skip_to_winter",
+            "enabled": true,
+            "chance": 0.7,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_5"
+        },
+        {
+            "id": "fire_snake",
+            "enabled": true,
+            "chance": 0.65,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "fire_snake"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_6"
+        },
+        {
+            "id": "zoom_pulse",
+            "enabled": true,
+            "chance": 0.7,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "zoom_pulse"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_4"
+        },
+        {
+            "id": "zombie_spawner_nearby",
+            "enabled": true,
+            "chance": 0.85,
+            "withDuration": true,
+            "duration": 30,
+            "disable_effects": [
+                "zombie_spawner_nearby"
+            ],
+            "enabled_donate": true,
+            "price_group": "negative_5"
+        },
+        {
+            "id": "skyrim_shout",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 80,
+            "disable_effects": [
+                "skyrim_shout"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
+        },
+        {
+            "id": "fake_teleport",
+            "enabled": true,
+            "chance": 0.9,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "neutral_5"
         }
     ]
 }

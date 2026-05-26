@@ -117,6 +117,28 @@
 - Pet Cemetery
 - Lootbox Roll
 - Traveling Merchant
+- Wrath of the Gods
+- Spawn Race Car
+- Spawn Sports Car
+- Meteor Shower
+- Kill Zombies With Lightning
+- Short Circuit
+- Q to Spawn Items
+- Christmas
+- Medical Supplies Drop
+- Add Random Items to Containers
+- Explode Nearby Electronics
+- Player's Food Is Poisoned
+- Nearby Food Is Poisoned
+- Give Molotov Cocktails
+- Knockback Hits
+- Teleport To Last Death
+- Skip To Winter
+- Fire Snake
+- Camera Pulse
+- Zombie Spawner Nearby
+- Skyrim Shout
+- Fake Teleport
 
 ### Mod Fixes
 
@@ -135,6 +157,8 @@
 - Overall NPC and Zombie vs NPC AI improvements
 - Updated pool of random items that generates in effects like "Lootbox", "Find Chest With Loot", "Courier", etc.
 - Zombie chat lines now linger briefly after the zombie goes out of sight so messages do not vanish the instant the player can no longer see them
+- Weapons in lootboxes and other effects now spawns with full ammo
+- NPCs now close doors behind them after opening
 
 ### Effect Fixes
 
@@ -144,7 +168,8 @@
 - The game now stays paused during the reveal in card-select, random-card, and dice-roll effects, and only unpauses after the window closes
 - The Necromancy effect now spawns zombies if the game couldn't find any valid corpse to reanimate, instead of doing nothing
 - "Player Can't Exit Car": change duration from 100s to 70s
-- Toxic Rain no longer damages the player while inside a car, and now damages car parts
+- Toxic Rain no longer damages the player while inside a car with intact windows on the player's seat, and now damages car parts
+- Vampire Weakness now damages the player inside a car if a window on the player's seat is open, broken, or missing
 - "Break Nearby Windows" effect now also smashes the windows of nearby cars
 - "Give Katana" effect now equips the katana to both hands of the player
 - "Spawn Trees" effect now lasts 120 seconds and spawns more trees over a wider area; trees are removed when the effect ends, and the player is no longer damaged by car crashes into them while driving
@@ -168,7 +193,9 @@
 - "Nearby Zombies Are Naked" no longer marks affected zombies as reanimated players
 - "Spawn Stalker" now turns hostile and attacks the player after 90 seconds if left alone
 - "Spinning Characters" now also disables AI for NPCs caught in the effect
-- "Dark Souls Bonfire" sword now disappears 30 seconds after the bonfire is lit
+- "Dark Souls Bonfire" sword now spawns broken
+- Fixed item pool that is used in effects like "Spawn Items On Walk"
+- "Give Random Item" is renamed to "Give Random Items" and now gives 3 items
 
 [1.1.1]
 

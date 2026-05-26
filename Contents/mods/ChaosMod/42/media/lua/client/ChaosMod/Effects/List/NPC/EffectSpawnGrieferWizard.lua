@@ -36,5 +36,12 @@ function EffectSpawnGrieferWizard:OnStart()
     ChaosZombie.AddZombieClothes(zombie, "Base.Hat_Wizard", nil, nil, false)
     ChaosZombie.AddZombieClothes(zombie, "Base.BlackRobe", nil, nil, true)
 
+    ChaosZombie.SetHairstyleAndBeard(zombie, {
+        hairModel = "Messy",
+        beardModel = "LongScruffy",
+        useHairColorForBeard = true,
+        hairColor = ChaosUtils.MakeRGB(255, 255, 255, true),
+    })
+
     npc:EnterPlayerVehicle(player)
 end

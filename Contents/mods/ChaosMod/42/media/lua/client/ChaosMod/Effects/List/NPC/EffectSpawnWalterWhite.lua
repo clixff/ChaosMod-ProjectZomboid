@@ -58,21 +58,18 @@ local function ApplyWalterWhiteVisuals(zombie)
     zombie:getItemVisuals():clear()
     zombie:getWornItems():clear()
 
-    AddClothing(zombie, "Base.Shirt_FormalTINT", MakeTint(112, 163, 101))
-    -- AddClothing(zombie, "Base.Suit_Jacket")
-    AddClothing(zombie, "Base.Trousers_Suit")
-    AddClothing(zombie, "Base.Shoes_Black")
-    AddClothing(zombie, "Base.Glasses_Normal", nil, 0)
-    -- AddClothing(zombie, "Base.Hat_Fedora", MakeTint(15, 15, 15))
+    ChaosZombie.AddZombieClothesBatch(zombie, {
+        { type = "Trousers_Suit" },
+        { type = "Shoes_Black" },
+        { type = "Glasses_Normal",   textureChoice = 0 },
+        { type = "Shirt_FormalTINT", tint = ChaosUtils.MakeRGB(112, 163, 101, true) },
+    })
 
-    humanVisual:setHairModel("")
-
-    ---@diagnostic disable-next-line: param-type-mismatch
-    humanVisual:setBeardModel("Goatee")
-
-    local beardColor = ImmutableColor.new(102 / 255, 74 / 255, 35 / 255)
-    humanVisual:setBeardColor(beardColor)
-    humanVisual:setNaturalBeardColor(beardColor)
+    ChaosZombie.SetHairstyleAndBeard(zombie, {
+        hairModel = "",
+        beardModel = "Goatee",
+        beardColor = ChaosUtils.MakeRGB(102, 74, 74, true),
+    })
 
     zombie:getWornItems():setFromItemVisuals(zombie:getItemVisuals())
     zombie:resetModelNextFrame()

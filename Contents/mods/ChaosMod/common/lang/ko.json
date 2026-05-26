@@ -409,7 +409,29 @@
         "electric_weapons": "전기 무기",
         "pet_cemetery": "공포의 묘지",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "떠돌이 상인"
+        "traveling_merchant": "떠돌이 상인",
+        "wrath_of_the_gods": "신들의 분노",
+        "spawn_race_car": "레이싱 카 소환",
+        "spawn_sports_car": "스포츠카 소환",
+        "meteor_shower": "유성우",
+        "kill_zombies_with_lightning": "번개로 좀비 처치",
+        "short_circuit": "합선",
+        "q_to_spawn_items": "Q로 아이템 생성",
+        "christmas": "크리스마스",
+        "medical_supplies_drop": "의료 보급품 투하",
+        "add_new_loot_to_containers": "컨테이너에 무작위 아이템 추가",
+        "explode_nearby_electronics": "주변 전자기기 폭발",
+        "poison_player_food": "플레이어 음식에 독 타기",
+        "poison_nearby_food": "주변 음식에 독 타기",
+        "give_molotov_cocktails": "화염병 지급",
+        "knockback_hits": "넉백 공격",
+        "teleport_to_last_death": "마지막 사망 위치로 순간이동",
+        "skip_to_winter": "겨울로 건너뛰기",
+        "fire_snake": "불뱀",
+        "zoom_pulse": "카메라 펄스",
+        "zombie_spawner_nearby": "근처에 좀비 생성기",
+        "skyrim_shout": "스카이림 외침",
+        "fake_teleport": "가짜 순간이동"
     },
     "core": {
         "start_mod": "ChaosMod 시작",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s %d개의 음식이 죽은 쥐로 교체되었습니다",
         "no_building_found": "근처에서 건물을 찾을 수 없습니다...",
         "traits_removed_count": "특성 %d개 제거됨",
-        "skill_maxed_out": "%s 스킬 최대치"
+        "skill_maxed_out": "%s 스킬 최대치",
+        "food_poisoned": "%s %d개의 음식에 독을 탔습니다",
+        "failed_to_find_last_death": "마지막 사망 위치를 찾을 수 없습니다"
     },
     "meta": {
         "username_activated_effect": "%s 님이 %s 효과를 활성화했습니다"

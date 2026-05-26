@@ -172,7 +172,8 @@ end
 ---@param useAlternativeTintMethod boolean?
 ---@param baseTexture integer?
 ---@return ItemVisual?
-function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, updateVisuals, useAlternativeTintMethod, baseTexture)
+function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, updateVisuals, useAlternativeTintMethod,
+                                      baseTexture)
     if not zombie or not fullType or fullType == "" then return nil end
 
     local item = instanceItem(fullType)
@@ -837,5 +838,80 @@ function ChaosZombie.CopyPlayerAppearanceToNormalZombie(player, zombie)
     end
 
     zombie:onWornItemsChanged()
+    zombie:resetModelNextFrame()
+end
+
+---@param zombie IsoZombie
+---@param damage number
+---@param damageDealer IsoGameCharacter?
+function ChaosZombie.DamageZombie(zombie, damage, damageDealer)
+    if not zombie or not damage then return end
+
+    local newHealth = zombie:getHealth() - damage
+    if newHealth < 0.0 then
+        newHealth = 0.0
+    end
+
+    zombie:setHealth(newHealth)
+
+    if newHealth <= 0.0 then
+        if not damageDealer then
+            damageDealer = getFakeAttacker()
+        end
+        zombie:Kill(damageDealer)
+    end
+end
+
+---@param zombie IsoZombie
+---@param hairTable ChaosHairstyleTable
+function ChaosZombie.SetHairstyleAndBeard(zombie, hairTable)
+    if not zombie then return end
+    local humanVisual = zombie:getHumanVisual()
+    if not humanVisual then return end
+
+    local hairstyleName = hairTable.hairModel
+    local beardName = hairTable.beardModel
+    local hairColor = hairTable.hairColor
+    local beardColor = hairTable.beardColor
+    local useHairColorForBeard = hairTable.useHairColorForBeard
+
+    if useHairColorForBeard == nil then
+        useHairColorForBeard = true
+    end
+
+    if useHairColorForBeard then
+        beardColor = hairColor
+    end
+    if type(hairstyleName) == "string" then
+        if hairstyleName == "None" then
+            hairstyleName = ""
+        end
+
+        print("[ChaosZombie.SetHairstyleAndBeard] Setting hairstyle: " .. tostring(hairstyleName))
+
+        humanVisual:setHairModel(hairstyleName)
+    end
+
+
+    if type(beardName) == "string" then
+        if beardName == "None" then
+            beardName = ""
+        end
+
+        humanVisual:setBeardModel(beardName)
+    end
+
+    if hairColor ~= nil then
+        local imColor = ImmutableColor.new(hairColor.r, hairColor.g, hairColor.b)
+        humanVisual:setHairColor(imColor)
+        humanVisual:setNaturalHairColor(imColor)
+    end
+
+    if beardColor ~= nil then
+        local imColor = ImmutableColor.new(beardColor.r, beardColor.g, beardColor.b)
+        humanVisual:setBeardColor(imColor)
+        humanVisual:setNaturalBeardColor(imColor)
+    end
+
     zombie:resetModelNextFrame()
 end

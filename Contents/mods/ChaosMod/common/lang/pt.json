@@ -115,7 +115,7 @@
         "remove_player_weapons": "Remover Armas do Jogador",
         "give_schoolbag": "Dar Mochila Escolar",
         "give_random_tool": "Dar Ferramenta Aleatória",
-        "give_random_item": "Dar Item Aleatório",
+        "give_random_item": "Dar Itens Aleatórios",
         "honk_vehicles_nearby": "Buzinar Veículos Próximos",
         "disable_vehicle_engine": "Desativar Motor do Veículo",
         "exit_current_vehicle": "Sair do Veículo Atual",
@@ -409,7 +409,29 @@
         "electric_weapons": "Armas Elétricas",
         "pet_cemetery": "Cemitério de Animais",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "Mercador Viajante"
+        "traveling_merchant": "Mercador Viajante",
+        "wrath_of_the_gods": "Ira dos Deuses",
+        "spawn_race_car": "Gerar Carro de Corrida",
+        "spawn_sports_car": "Gerar Carro Esportivo",
+        "meteor_shower": "Chuva de Meteoros",
+        "kill_zombies_with_lightning": "Matar Zumbis com Relâmpagos",
+        "short_circuit": "Curto-Circuito",
+        "q_to_spawn_items": "Q para Gerar Itens",
+        "christmas": "Natal",
+        "medical_supplies_drop": "Queda de Suprimentos Médicos",
+        "add_new_loot_to_containers": "Adicionar Itens Aleatórios aos Contêineres",
+        "explode_nearby_electronics": "Explodir Eletrônicos Próximos",
+        "poison_player_food": "Envenenar Comida do Jogador",
+        "poison_nearby_food": "Envenenar Comida Próxima",
+        "give_molotov_cocktails": "Dar Coquetéis Molotov",
+        "knockback_hits": "Golpes com Repulsão",
+        "teleport_to_last_death": "Teleportar Para o Último Local de Morte",
+        "skip_to_winter": "Pular Para o Inverno",
+        "fire_snake": "Cobra de Fogo",
+        "zoom_pulse": "Pulso da Câmera",
+        "zombie_spawner_nearby": "Gerador de Zumbis por Perto",
+        "skyrim_shout": "Grito de Skyrim",
+        "fake_teleport": "Teletransporte falso"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s %d alimentos substituídos por ratos mortos",
         "no_building_found": "Não encontrei nenhum prédio por perto...",
         "traits_removed_count": "%d traços removidos",
-        "skill_maxed_out": "Habilidade %s no máximo"
+        "skill_maxed_out": "Habilidade %s no máximo",
+        "food_poisoned": "%s Envenenou %d itens de comida",
+        "failed_to_find_last_death": "Não foi possível encontrar o último local de morte"
     },
     "meta": {
         "username_activated_effect": "%s ativou %s"

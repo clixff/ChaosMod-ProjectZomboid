@@ -115,7 +115,7 @@
         "remove_player_weapons": "Usuń broń gracza",
         "give_schoolbag": "Daj plecak szkolny",
         "give_random_tool": "Daj losowe narzędzie",
-        "give_random_item": "Daj losowy przedmiot",
+        "give_random_item": "Daj losowe przedmioty",
         "honk_vehicles_nearby": "Trąbienie pobliskich pojazdów",
         "disable_vehicle_engine": "Wyłącz silnik pojazdu",
         "exit_current_vehicle": "Wyjdź z pojazdu",
@@ -409,7 +409,29 @@
         "electric_weapons": "Elektryczna broń",
         "pet_cemetery": "Cmentarz zwierząt",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "Wędrowny kupiec"
+        "traveling_merchant": "Wędrowny kupiec",
+        "wrath_of_the_gods": "Gniew bogów",
+        "spawn_race_car": "Zespawnuj samochód wyścigowy",
+        "spawn_sports_car": "Zespawnuj samochód sportowy",
+        "meteor_shower": "Deszcz meteorytów",
+        "kill_zombies_with_lightning": "Zabij zombie piorunami",
+        "short_circuit": "Krótkie spięcie",
+        "q_to_spawn_items": "Q, aby zespawnować przedmioty",
+        "christmas": "Boże Narodzenie",
+        "medical_supplies_drop": "Zrzut zapasów medycznych",
+        "add_new_loot_to_containers": "Dodaj losowe przedmioty do pojemników",
+        "explode_nearby_electronics": "Wysadź pobliską elektronikę",
+        "poison_player_food": "Zatruj jedzenie gracza",
+        "poison_nearby_food": "Zatruj jedzenie w pobliżu",
+        "give_molotov_cocktails": "Daj koktajle Mołotowa",
+        "knockback_hits": "Ciosy z odrzutem",
+        "teleport_to_last_death": "Teleport do miejsca ostatniej śmierci",
+        "skip_to_winter": "Przeskocz do zimy",
+        "fire_snake": "Ognisty wąż",
+        "zoom_pulse": "Puls kamery",
+        "zombie_spawner_nearby": "Spawner zombie w pobliżu",
+        "skyrim_shout": "Krzyk ze Skyrim",
+        "fake_teleport": "Fałszywa teleportacja"
     },
     "core": {
         "start_mod": "Uruchom ChaosMod",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s Zamieniono %d produktów na martwe szczury",
         "no_building_found": "Nie widzę nigdzie budynku...",
         "traits_removed_count": "Usunięto cech: %d",
-        "skill_maxed_out": "%s Umiejętność na maksimum"
+        "skill_maxed_out": "%s Umiejętność na maksimum",
+        "food_poisoned": "%s Zatruto %d jedzenia",
+        "failed_to_find_last_death": "Nie znaleziono miejsca ostatniej śmierci"
     },
     "meta": {
         "username_activated_effect": "%s aktywował %s"

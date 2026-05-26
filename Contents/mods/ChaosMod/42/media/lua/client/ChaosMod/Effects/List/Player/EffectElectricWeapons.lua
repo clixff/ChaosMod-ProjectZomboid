@@ -4,6 +4,34 @@ EffectElectricWeapons = ChaosEffectBase:derive("EffectElectricWeapons", "electri
 ---@type table<integer, {target: IsoZombie, hitFromBehind: boolean}>
 local pendingKnockdowns = {}
 
+---@param character IsoGameCharacter
+local function ApplyElectricHighlight(character)
+    if not character then return end
+
+    ChaosSpecialAction.AddNewAction({ character = character }, 350,
+        function(_deltaMs, data)
+            ---@type IsoGameCharacter
+            local c = data.character
+            if c then
+                c:setOutlineHighlight(0, true)
+                c:setOutlineHighlightCol(0, 0.3, 1.0, 1.0, 1.0)
+            end
+        end,
+        function(data)
+            local c = data.character
+            if c then
+                c:setOutlineHighlight(0, false)
+            end
+        end,
+        function(data)
+            local c = data.character
+            if c then
+                c:setOutlineHighlight(0, false)
+            end
+        end
+    )
+end
+
 local function ProcessPendingKnockdowns()
     if #pendingKnockdowns == 0 then return end
 
@@ -19,12 +47,24 @@ local function ProcessPendingKnockdowns()
 end
 
 ---@param attacker IsoGameCharacter
+---@return boolean
+local function IsAllowedAttacker(attacker)
+    if not attacker then return false end
+    if instanceof(attacker, "IsoPlayer") then return true end
+    if instanceof(attacker, "IsoZombie") then
+        ---@cast attacker IsoZombie
+        return ChaosNPCUtils.IsNPC(attacker)
+    end
+    return false
+end
+
+---@param attacker IsoGameCharacter
 ---@param target IsoGameCharacter
 ---@param weapon HandWeapon
 ---@param damage number
 local function OnPlayerHit(attacker, target, weapon, damage)
     if not target or not attacker then return end
-    if not instanceof(attacker, "IsoPlayer") then return end
+    if not IsAllowedAttacker(attacker) then return end
     if not instanceof(target, "IsoZombie") then return end
 
     ---@cast target IsoZombie
@@ -55,7 +95,11 @@ local function OnPlayerHit(attacker, target, weapon, damage)
         hitFromBehind = attacker:isBehind(target)
     })
 
-    target:setHealth(target:getHealth() - 0.25)
+    ApplyElectricHighlight(target)
+
+    ---@type IsoZombie
+    local zombie = target
+    ChaosZombie.DamageZombie(zombie, 0.25, attacker)
 end
 
 function EffectElectricWeapons:OnStart()

@@ -409,7 +409,29 @@
         "electric_weapons": "电击武器",
         "pet_cemetery": "宠物坟场",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "流浪商人"
+        "traveling_merchant": "流浪商人",
+        "wrath_of_the_gods": "众神之怒",
+        "spawn_race_car": "生成赛车",
+        "spawn_sports_car": "生成跑车",
+        "meteor_shower": "流星雨",
+        "kill_zombies_with_lightning": "用闪电杀死僵尸",
+        "short_circuit": "短路",
+        "q_to_spawn_items": "按 Q 生成物品",
+        "christmas": "圣诞节",
+        "medical_supplies_drop": "医疗补给空投",
+        "add_new_loot_to_containers": "向容器添加随机物品",
+        "explode_nearby_electronics": "引爆附近的电子设备",
+        "poison_player_food": "毒化玩家食物",
+        "poison_nearby_food": "毒化附近食物",
+        "give_molotov_cocktails": "给予燃烧瓶",
+        "knockback_hits": "击退攻击",
+        "teleport_to_last_death": "传送到上次死亡位置",
+        "skip_to_winter": "跳到冬季",
+        "fire_snake": "火焰之蛇",
+        "zoom_pulse": "镜头脉冲",
+        "zombie_spawner_nearby": "附近的僵尸生成器",
+        "skyrim_shout": "上古卷轴龙吼",
+        "fake_teleport": "假传送"
     },
     "core": {
         "start_mod": "启动混乱模式",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s 已将 %d 件食物替换为死老鼠",
         "no_building_found": "我找不到附近的建筑...",
         "traits_removed_count": "已移除 %d 个特质",
-        "skill_maxed_out": "%s 技能等级已满"
+        "skill_maxed_out": "%s 技能等级已满",
+        "food_poisoned": "%s 毒化了 %d 件食物",
+        "failed_to_find_last_death": "未找到上次死亡位置"
     },
     "meta": {
         "username_activated_effect": "%s 激活了 %s"

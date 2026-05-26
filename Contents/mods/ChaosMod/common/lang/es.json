@@ -115,7 +115,7 @@
         "remove_player_weapons": "Quitar armas del jugador",
         "give_schoolbag": "Dar mochila escolar",
         "give_random_tool": "Dar herramienta aleatoria",
-        "give_random_item": "Dar objeto aleatorio",
+        "give_random_item": "Dar objetos aleatorios",
         "honk_vehicles_nearby": "Bocinas cercanas sonando",
         "disable_vehicle_engine": "Apagar motor del vehículo",
         "exit_current_vehicle": "Salir del vehículo actual",
@@ -409,7 +409,29 @@
         "electric_weapons": "Armas eléctricas",
         "pet_cemetery": "Cementerio de mascotas",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "Mercader ambulante"
+        "traveling_merchant": "Mercader ambulante",
+        "wrath_of_the_gods": "Ira de los dioses",
+        "spawn_race_car": "Generar coche de carreras",
+        "spawn_sports_car": "Generar coche deportivo",
+        "meteor_shower": "Lluvia de meteoritos",
+        "kill_zombies_with_lightning": "Matar zombis con rayos",
+        "short_circuit": "Cortocircuito",
+        "q_to_spawn_items": "Q para generar objetos",
+        "christmas": "Navidad",
+        "medical_supplies_drop": "Caída de suministros médicos",
+        "add_new_loot_to_containers": "Añadir objetos aleatorios a los contenedores",
+        "explode_nearby_electronics": "Explotar electrónica cercana",
+        "poison_player_food": "Envenenar la comida del jugador",
+        "poison_nearby_food": "Envenenar la comida cercana",
+        "give_molotov_cocktails": "Dar cócteles molotov",
+        "knockback_hits": "Golpes con retroceso",
+        "teleport_to_last_death": "Teletransporte al último lugar de muerte",
+        "skip_to_winter": "Saltar al invierno",
+        "fire_snake": "Serpiente de fuego",
+        "zoom_pulse": "Pulso de cámara",
+        "zombie_spawner_nearby": "Generador de zombis cercano",
+        "skyrim_shout": "Grito de Skyrim",
+        "fake_teleport": "Teletransporte falso"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s Se reemplazaron %d alimentos por ratas muertas",
         "no_building_found": "No encuentro ningún edificio cerca...",
         "traits_removed_count": "%d rasgos eliminados",
-        "skill_maxed_out": "%s Habilidad al máximo"
+        "skill_maxed_out": "%s Habilidad al máximo",
+        "food_poisoned": "%s Se envenenaron %d alimentos",
+        "failed_to_find_last_death": "No se encontró el último lugar de muerte"
     },
     "meta": {
         "username_activated_effect": "%s activó %s"

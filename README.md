@@ -78,7 +78,7 @@ Both `<number>` and `!vote <number>` formats are supported. The option numbers a
 
 ### StreamerApp Installation
 
-1. Launch the game with the mod enabled at least once.
+1. Launch the game with the mod enabled at least once. You need to load game world and activate the mod once.
 2. Download the latest release from [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
 3. Extract **ZomboidStreamerApp.exe** to any folder.
 4. Launch **ZomboidStreamerApp.exe** — the dashboard opens in your browser.

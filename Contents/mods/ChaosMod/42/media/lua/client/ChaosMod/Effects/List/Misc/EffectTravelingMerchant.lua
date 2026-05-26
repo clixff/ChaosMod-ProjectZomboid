@@ -80,6 +80,10 @@ function EffectTravelingMerchant:onBuyPressed(cardIndex)
     card.purchasesLeft = card.purchasesLeft - 1
 
     ChaosPlayer.SayLineNewItem(player, item)
+
+    if item then
+        ChaosItems.SetFullAmmoIfWeapon(item)
+    end
 end
 
 function EffectTravelingMerchant:onClosePressed()

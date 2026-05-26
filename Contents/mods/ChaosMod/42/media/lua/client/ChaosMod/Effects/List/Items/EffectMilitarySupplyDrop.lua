@@ -1,4 +1,5 @@
 ---@class EffectMilitarySupplyDrop : ChaosEffectBase
+---@fied zLevel integer
 EffectMilitarySupplyDrop = ChaosEffectBase:derive("EffectMilitarySupplyDrop", "military_supply_drop")
 
 local FALL_DURATION_MS = 5000
@@ -78,7 +79,11 @@ local function spawnLoot(caseItem)
     if not container then return end
 
     for _ = 1, 5 do
-        container:AddItem(GetRandomLootboxItem())
+        local item = container:AddItem(GetRandomLootboxItem())
+
+        if item then
+            ChaosItems.SetFullAmmoIfWeapon(item)
+        end
     end
 
     for _, ammoItemId in ipairs(MILITARY_AMMO_IDS) do
@@ -90,7 +95,10 @@ local function spawnLoot(caseItem)
     for _, entry in ipairs(MILITARY_ITEMS) do
         for _ = 1, entry.count do
             if ChaosUtils.RandFloat(0, 100) < 50.0 then
-                container:AddItem(entry.type)
+                local item = container:AddItem(entry.type)
+                if item then
+                    ChaosItems.SetFullAmmoIfWeapon(item)
+                end
             end
         end
     end
@@ -102,13 +110,20 @@ local function FallTick(deltaMs, data)
     data.elapsedMs = data.elapsedMs + deltaMs
     local t = data.elapsedMs / FALL_DURATION_MS
     if t > 1 then t = 1 end
-    local z = ChaosUtils.Lerp(FALL_START_Z, FALL_END_Z, t)
+
+    if not data.square then return end
+
+    local baseZ = 0
+
+    local z = ChaosUtils.Lerp(baseZ + FALL_START_Z, baseZ + FALL_END_Z, t)
     setWorldItemVisualZ(data.worldItem, z, false)
 end
 
 ---@param data { caseItem: InventoryContainer, worldItem: IsoWorldInventoryObject, square: IsoGridSquare }
 local function FallEnd(data)
-    setWorldItemVisualZ(data.worldItem, FALL_END_Z, true)
+    if not data.square then return end
+    local baseZ = 0
+    setWorldItemVisualZ(data.worldItem, baseZ + FALL_END_Z, true)
 
     spawnLoot(data.caseItem)
 
@@ -145,7 +160,14 @@ function EffectMilitarySupplyDrop:OnStart()
     if not player then return end
 
     local square = ChaosPlayer.GetRandomSquareAroundPlayer(player, 0, 5, 20, 80, true, false, false)
-    if not square then return end
+    if not square then
+        square = ChaosPlayer.GetRandomSquareAroundPlayer(player, 0, 20, 40, 100, true, false, false)
+    end
+
+    if not square then
+        ChaosPlayer.SayLineByColor(player, "Failed to find free square nearby", ChaosPlayerChatColors.red)
+        square = player:getSquare()
+    end
 
     ---@type InventoryContainer
     ---@diagnostic disable-next-line: assign-type-mismatch
@@ -159,7 +181,9 @@ function EffectMilitarySupplyDrop:OnStart()
     local worldItem = caseItem:getWorldItem()
     if not worldItem then return end
 
-    setWorldItemVisualZ(worldItem, FALL_START_Z, true)
+    self.zLevel = 0
+
+    setWorldItemVisualZ(worldItem, self.zLevel + FALL_START_Z, true)
 
     ChaosSpecialAction.AddNewAction(
         { caseItem = caseItem, worldItem = worldItem, square = square, elapsedMs = 0 },

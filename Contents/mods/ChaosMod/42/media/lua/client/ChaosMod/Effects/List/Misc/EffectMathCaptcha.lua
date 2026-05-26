@@ -59,6 +59,7 @@ function EffectMathCaptcha.applyCorrectAnswer()
         if itemId then
             local item = inventory:AddItem(itemId)
             if item then
+                ChaosItems.SetFullAmmoIfWeapon(item)
                 ChaosPlayer.SayLineNewItem(player, item)
             end
         end

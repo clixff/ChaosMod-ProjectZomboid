@@ -115,7 +115,7 @@
         "remove_player_weapons": "Remove Player Weapons",
         "give_schoolbag": "Give Schoolbag",
         "give_random_tool": "Give Random Tool",
-        "give_random_item": "Give Random Item",
+        "give_random_item": "Give Random Items",
         "honk_vehicles_nearby": "Honk Vehicles Nearby",
         "disable_vehicle_engine": "Disable Vehicle Engine",
         "exit_current_vehicle": "Exit Current Vehicle",
@@ -409,7 +409,29 @@
         "electric_weapons": "Electric Weapons",
         "pet_cemetery": "Pet Cemetery",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "Traveling Merchant"
+        "traveling_merchant": "Traveling Merchant",
+        "wrath_of_the_gods": "Wrath of the Gods",
+        "spawn_race_car": "Spawn Race Car",
+        "spawn_sports_car": "Spawn Sports Car",
+        "meteor_shower": "Meteor Shower",
+        "kill_zombies_with_lightning": "Kill Zombies With Lightning",
+        "short_circuit": "Short Circuit",
+        "q_to_spawn_items": "Q to Spawn Items",
+        "christmas": "Christmas",
+        "medical_supplies_drop": "Medical Supplies Drop",
+        "add_new_loot_to_containers": "Add Random Items to Containers",
+        "explode_nearby_electronics": "Explode Nearby Electronics",
+        "poison_player_food": "Player's Food Is Poisoned",
+        "poison_nearby_food": "Nearby Food Is Poisoned",
+        "give_molotov_cocktails": "Give Molotov Cocktails",
+        "knockback_hits": "Knockback Hits",
+        "teleport_to_last_death": "Teleport To Last Death",
+        "skip_to_winter": "Skip To Winter",
+        "fire_snake": "Fire Snake",
+        "zoom_pulse": "Camera Pulse",
+        "zombie_spawner_nearby": "Zombie Spawner Nearby",
+        "skyrim_shout": "Skyrim Shout",
+        "fake_teleport": "Fake Teleport"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s Replaced %d food items with dead rats",
         "no_building_found": "I can't find a building nearby...",
         "traits_removed_count": "Removed %d traits",
-        "skill_maxed_out": "%s Skill maxed out"
+        "skill_maxed_out": "%s Skill maxed out",
+        "food_poisoned": "%s Poisoned %d food items",
+        "failed_to_find_last_death": "Failed to find last death"
     },
     "meta": {
         "username_activated_effect": "%s activated %s"

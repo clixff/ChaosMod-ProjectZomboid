@@ -2,9 +2,12 @@
 ---@field elapsedMs integer
 ---@field previousPrecipitationIsSnow boolean
 ---@field vehicleDamageBuffer number
+---@field damageCheckTimer ChaosManualTimer
+---@field doDamage boolean
 EffectToxicRain = ChaosEffectBase:derive("EffectToxicRain", "toxic_rain")
 
 local DAMAGE_DELAY_MS = 5000
+local DAMAGE_CHECK_INTERVAL_MS = 500
 local DAMAGE_PER_SECOND = 0.5
 local VEHICLE_DAMAGE_RADIUS = 50
 local VEHICLE_DAMAGE_PER_SECOND = 0.5
@@ -18,10 +21,25 @@ local function IsSquareUnderOpenSky(square)
     return true
 end
 
+---@param player IsoPlayer
+---@return boolean
+local function ShouldDamagePlayer(player)
+    local playerSquare = player:getCurrentSquare()
+    if not IsSquareUnderOpenSky(playerSquare) then return false end
+
+    if player:getVehicle() and not ChaosVehicle.IsAnySeatWindowOpenMissingOrDestroyed(player) then
+        return false
+    end
+
+    return true
+end
+
 function EffectToxicRain:OnStart()
     ChaosEffectBase:OnStart()
     self.elapsedMs = 0
     self.vehicleDamageBuffer = 0
+    self.damageCheckTimer = ChaosManualTimer.new(DAMAGE_CHECK_INTERVAL_MS)
+    self.doDamage = false
 
     local cm = ClimateManager.getInstance()
     if not cm then return end
@@ -47,10 +65,16 @@ function EffectToxicRain:OnTick(deltaMs)
     self.elapsedMs = self.elapsedMs + deltaMs
     if self.elapsedMs < DAMAGE_DELAY_MS then return end
 
+    self.damageCheckTimer:add(deltaMs)
+    if self.damageCheckTimer:isEnded() then
+        self.damageCheckTimer:reset()
+        self.doDamage = ShouldDamagePlayer(player)
+    end
+
     local playerSquare = player:getCurrentSquare()
     local deltaSeconds = deltaMs / 1000
 
-    if not player:getVehicle() and IsSquareUnderOpenSky(playerSquare) then
+    if self.doDamage then
         local bodyDamage = player:getBodyDamage()
         if bodyDamage then
             bodyDamage:ReduceGeneralHealth(deltaSeconds * DAMAGE_PER_SECOND)

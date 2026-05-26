@@ -62,6 +62,7 @@ function EffectSpawnNPCWithLoot:OnStart()
         if itemId then
             local item = instanceItem(itemId)
             if item then
+                ChaosItems.SetFullAmmoIfWeapon(item)
                 zombie:addItemToSpawnAtDeath(item)
             end
         end

@@ -32,18 +32,88 @@ function ChaosItems.GetRandomFoodItemId()
     return randomFoodItemId
 end
 
+---@param item Item
+---@return boolean
+local function isBadRandomItem(item)
+    if not item then return true end
+
+    -- Moveable/world-object style items
+    local itemType = item:getItemType()
+    if itemType == ItemType.MOVEABLE or tostring(itemType) == "base:moveable" then
+        return true
+    end
+
+    -- Hidden/internal items
+    if item:isHidden() then
+        return true
+    end
+
+    local displayCategory = item:getDisplayCategory()
+    if displayCategory == "Hidden" then
+        return true
+    end
+
+    local name = item:getName() or ""
+    local fullType = item:getFullName() or ""
+
+    -- Heuristics for dev/test/internal stuff
+    if string.find(name, "DEV", 1, true)
+        or string.find(name, "DEBUG", 1, true)
+        or string.find(name, "Test", 1, true)
+        or string.find(name, "Dummy", 1, true)
+        or string.find(fullType, "DEV", 1, true)
+        or string.find(fullType, "DEBUG", 1, true)
+        or string.find(fullType, "Test", 1, true)
+        or string.find(fullType, "Dummy", 1, true) then
+        return true
+    end
+
+    -- Exact blacklist for odd leftovers
+    local bad = {
+        ["Base.FISH_DEV_ITEM"] = true,
+        ["Base.BucketWaterDebug"] = true,
+        ["Base.TestCanPopCommon"] = true,
+        ["Base.WaterRationCan_Open"] = true,
+        ["Base.Animal_Item_Dummy"] = true,
+        ["Base.YardstickDEBUG"] = true,
+        ["Base.DentedCan_Open"] = true,
+        ["Base.Hat_SantaHatDebug"] = true,
+        ["Base.TestHotDrink"] = true,
+        ["Base.TestMug"] = true,
+        ["Base.TestWaterMug"] = true,
+        ["Base.DebugFluid"] = true,
+        ["Base.TestDebugWater"] = true,
+        ["Base.Stairs"] = true,
+        ["Base.MysteryCan_Open"] = true,
+        ["Base.WaterDrop"] = true,
+    }
+
+    if bad[fullType] then
+        return true
+    end
+
+    if string.find(fullType, "Base.Bandage_", 1, true) == 1
+        or string.find(fullType, "Base.Wound_", 1, true) == 1 then
+        return true
+    end
+
+    return false
+end
+
 ---@return string
 function ChaosItems.GetRandomItemId()
     local allItems = getAllItems()
-    local randomIndex = math.floor(ZombRand(allItems:size()))
-    local randomItemScript = allItems:get(randomIndex)
-    if not randomItemScript then return "" end
+    if not allItems or allItems:isEmpty() then return "" end
 
-    local module = randomItemScript:getModuleName() or "Base"
+    for _ = 1, 500 do
+        local randomIndex = ChaosUtils.RandInteger(allItems:size())
+        local item = allItems:get(randomIndex)
+        if item and not isBadRandomItem(item) then
+            return item:getFullName() or ""
+        end
+    end
 
-
-    local itemType = string.format("%s.%s", module, randomItemScript:getName())
-    return itemType
+    return ""
 end
 
 ---@type { all: string[]?, melee: string[]?, firearm: string[]? }
@@ -52,7 +122,6 @@ local RandomWeaponIDs = {
     melee = nil,
     firearm = nil,
 }
-
 ---@param item Item
 ---@return boolean
 local function isValidWeaponItem(item)
@@ -116,4 +185,18 @@ end
 function ChaosItems.GetRandomFirearmWeaponID()
     buildWeaponLists()
     return randomFrom(RandomWeaponIDs.firearm)
+end
+
+---@param item InventoryItem?
+function ChaosItems.SetFullAmmoIfWeapon(item)
+    if not item then return end
+
+    if not instanceof(item, "HandWeapon") then return end
+
+    ---@cast item HandWeapon
+
+    if item.isRanged and item:isRanged() then
+        item:setCurrentAmmoCount(item:getMaxAmmo() - 1)
+        item:setRoundChambered(true)
+    end
 end

@@ -38,7 +38,7 @@ function EffectZombiesDeadByDaylight:OnTick(deltaMs)
         if zsq:haveRoofFull() then return end
 
         zombie:SetOnFire()
-        zombie:setHealth(zombie:getHealth() - DAMAGE_PER_TICK)
+        ChaosZombie.DamageZombie(zombie, DAMAGE_PER_TICK)
 
         if zombie:getHealth() <= 0 and zombie:isAlive() then
             ---@diagnostic disable-next-line: param-type-mismatch

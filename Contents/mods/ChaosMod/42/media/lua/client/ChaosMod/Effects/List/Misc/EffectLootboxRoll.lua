@@ -63,6 +63,7 @@ function EffectLootboxRoll:onRollPressed()
         itemId = pickItemIdForRoll(nextIndex)
         if itemId and itemId ~= "" then
             item = inventory:AddItem(itemId)
+            ChaosItems.SetFullAmmoIfWeapon(item)
             if item then break end
         end
     end

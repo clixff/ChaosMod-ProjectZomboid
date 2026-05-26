@@ -26,6 +26,8 @@ function EffectSpawnGrieferJesus:OnStart()
     local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:initializeHuman()
     npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
+    npc.maxHealth = 5.0
+    zombie:setHealth(npc.maxHealth)
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
     npc.chanceToDropWeaponOnDeath = 0
     npc:AddTag("jesus")

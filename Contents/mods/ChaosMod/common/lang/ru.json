@@ -114,7 +114,7 @@
         "remove_player_weapons": "Удалить оружие у игрока",
         "give_schoolbag": "Дать школьный рюкзак",
         "give_random_tool": "Дать случайный инструмент",
-        "give_random_item": "Дать случайный предмет",
+        "give_random_item": "Дать случайные предметы",
         "honk_vehicles_nearby": "Посигналить машинами поблизости",
         "disable_vehicle_engine": "Заглушить двигатель транспорта",
         "exit_current_vehicle": "Выйти из текущего транспорта",
@@ -409,7 +409,29 @@
         "electric_weapons": "Электрическое оружие",
         "pet_cemetery": "Кладбище домашних животных",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "Странствующий торговец"
+        "traveling_merchant": "Странствующий торговец",
+        "wrath_of_the_gods": "Гнев богов",
+        "spawn_race_car": "Заспавнить гоночный автомобиль",
+        "spawn_sports_car": "Заспавнить спорткар",
+        "meteor_shower": "Метеоритный дождь",
+        "kill_zombies_with_lightning": "Убить зомби молниями",
+        "short_circuit": "Короткое замыкание",
+        "q_to_spawn_items": "Q для спавна предметов",
+        "christmas": "Рождество",
+        "medical_supplies_drop": "Сброс медицинских припасов",
+        "add_new_loot_to_containers": "Добавить случайные предметы в контейнеры",
+        "explode_nearby_electronics": "Взорвать электронику поблизости",
+        "poison_player_food": "Отравить еду игрока",
+        "poison_nearby_food": "Отравить еду поблизости",
+        "give_molotov_cocktails": "Выдать коктейли Молотова",
+        "knockback_hits": "Удары с отбрасыванием",
+        "teleport_to_last_death": "Телепорт к месту последней смерти",
+        "skip_to_winter": "Перейти к зиме",
+        "fire_snake": "Огненная змея",
+        "zoom_pulse": "Пульс камеры",
+        "zombie_spawner_nearby": "Спавнер зомби рядом",
+        "skyrim_shout": "Крик из Skyrim",
+        "fake_teleport": "Фейковый телепорт"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s Заменено %d продуктов на мёртвых крыс",
         "no_building_found": "Я не могу найти здание поблизости...",
         "traits_removed_count": "Удалено черт: %d",
-        "skill_maxed_out": "%s Навык на максимум"
+        "skill_maxed_out": "%s Навык на максимум",
+        "food_poisoned": "%s Отравлено %d еды",
+        "failed_to_find_last_death": "Не удалось найти место последней смерти"
     },
     "meta": {
         "username_activated_effect": "%s активировал %s"

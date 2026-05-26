@@ -1,5 +1,13 @@
 EffectSpawnGrieferSanta = ChaosEffectBase:derive("EffectSpawnGrieferSanta", "spawn_griefer_santa")
 
+local SANTA_OUTFIT = {
+    { type = "Base.Hat_SantaHat" },
+    { type = "Base.JacketLong_Santa" },
+    { type = "Base.Trousers_Santa" },
+    { type = "Base.Gloves_LongWomenGloves" },
+    { type = "Base.Shoes_BlackBoots" },
+}
+
 function EffectSpawnGrieferSanta:OnStart()
     ChaosEffectBase:OnStart()
     print("[EffectSpawnGrieferSanta] OnStart" .. tostring(self.effectId))
@@ -21,7 +29,7 @@ function EffectSpawnGrieferSanta:OnStart()
     local y2 = randomSquare:getY()
     local z2 = randomSquare:getZ()
 
-    local newZombies = ChaosZombie.SpawnZombieAt(x2, y2, z2, 1, "Santa", 0)
+    local newZombies = ChaosZombie.SpawnZombieAt(x2, y2, z2, 1, "Naked", 0)
 
     local zombie = newZombies:getFirst()
     if not zombie then return end
@@ -36,4 +44,13 @@ function EffectSpawnGrieferSanta:OnStart()
     npc:EnterPlayerVehicle(player)
 
     npc:SetWeapon("Base.Pistol")
+
+    ChaosZombie.SetHairstyleAndBeard(zombie, {
+        hairModel = "Messy",
+        beardModel = "LongScruffy",
+        useHairColorForBeard = true,
+        hairColor = ChaosUtils.MakeRGB(255, 255, 255, true),
+    })
+
+    ChaosZombie.AddZombieClothesBatch(zombie, SANTA_OUTFIT)
 end

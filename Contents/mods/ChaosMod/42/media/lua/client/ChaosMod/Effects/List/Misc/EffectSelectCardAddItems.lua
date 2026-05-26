@@ -90,8 +90,12 @@ function EffectSelectCardAddItems:onCardSelected(cardIndex)
     local item1 = inventory:AddItem(pair.id1)
     if item1 then ChaosPlayer.SayLineNewItem(player, item1) end
 
+    ChaosItems.SetFullAmmoIfWeapon(item1)
+
     local item2 = inventory:AddItem(pair.id2)
     if item2 then ChaosPlayer.SayLineNewItem(player, item2) end
+
+    ChaosItems.SetFullAmmoIfWeapon(item2)
 end
 
 ---@param deltaMs integer

@@ -30,6 +30,7 @@ local function RewardPlayer(player)
         if itemType then
             local rewardItem = inventory:AddItem(itemType)
             if rewardItem then
+                ChaosItems.SetFullAmmoIfWeapon(rewardItem)
                 ChaosPlayer.SayLineNewItem(player, rewardItem)
             end
         end

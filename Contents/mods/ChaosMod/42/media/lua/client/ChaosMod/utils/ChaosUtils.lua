@@ -77,6 +77,29 @@ function ChaosUtils.sleepHandleTick()
     end
 end
 
+local LAST_DEATH_FILE = "ChaosMod/last_death.txt"
+
+--- Writes the player's death position (floored) to last_death.txt as "x y z".
+---@param x number
+---@param y number
+---@param z number
+function ChaosUtils.SaveDeathPosition(x, y, z)
+    local text = string.format("%d %d %d", math.floor(x), math.floor(y), math.floor(z))
+    ChaosFileReader.WriteTextToCache(LAST_DEATH_FILE, text)
+end
+
+--- Reads the last recorded death position from last_death.txt.
+---@return number? x
+---@return number? y
+---@return number? z
+function ChaosUtils.GetLatestDeathPosition()
+    local content = ChaosFileReader.ReadFileFromCacheAllLines(LAST_DEATH_FILE)
+    if not content then return nil end
+    local xs, ys, zs = content:match("(%-?%d+)%s+(%-?%d+)%s+(%-?%d+)")
+    if not (xs and ys and zs) then return nil end
+    return tonumber(xs), tonumber(ys), tonumber(zs)
+end
+
 local POSITION_SAMPLE_INTERVAL_MS = 1000
 local POSITION_HISTORY_MAX = 120
 local PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS = 60000
@@ -174,6 +197,17 @@ function ChaosUtils.RemovePropExplosion(obj)
         return
     end
 
+    if instanceof(obj, "IsoDoor") or instanceof(obj, "IsoThumpable") then
+        ---@type IsoDoor | IsoThumpable
+        local door = obj
+
+        if door.isDoor and not door:isDoor() then
+            return
+        end
+
+        door:destroy()
+    end
+
     local containerCount = obj:getContainerCount()
     local sq = obj:getSquare()
     if not sq then return end
@@ -247,7 +281,6 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
         ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
             if sq then
                 ChaosUtils.ForAllObjectsInSquare(sq, function(obj)
-                    print("obj: " .. obj:getObjectName())
                     ChaosUtils.RemovePropExplosion(obj)
                 end)
             end
@@ -304,10 +337,23 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
     local nearbyVehicles = ChaosVehicle.GetVehiclesNearby(square, explosionRange + 2)
     for i = 0, nearbyVehicles:size() - 1 do
         local nearbyVehicle = nearbyVehicles:get(i)
-        if nearbyVehicle then
+        if nearbyVehicle and expZ == 0 then
             ChaosVehicle.DamageVehicleFromExplosion(nearbyVehicle)
             ChaosVehicle.AddVehicleImpulseAtExplosion(nearbyVehicle, expX, expY, expZ)
         end
+    end
+
+    local cell = getCell()
+    if cell then
+        local light = IsoLightSource.new(
+            expX,
+            expY,
+            math.floor(expZ),
+            1.0, 0.5, 0.0,
+            14,
+            12
+        )
+        cell:addLamppost(light)
     end
 end
 
@@ -534,6 +580,31 @@ function ChaosUtils.GetRandomSquareAroundPosition(x, y, z, minRadius, maxRadius,
     end
 
     return nil
+end
+
+--- Finds the highest valid square in a vertical stack at (x, y) starting from Z=0.
+--- Walks upward through Z levels while each square exists (and optionally `:isSolidFloor()` is true),
+--- and returns the last valid square before the stack breaks. Returns nil if Z=0 is not valid.
+---@param x integer
+---@param y integer
+---@param checkSolidFloor boolean? defaults to true; when true each square must pass `:isSolidFloor()` to count
+---@return IsoGridSquare | nil
+function ChaosUtils.FindHighestZSquare(x, y, checkSolidFloor)
+    local cell = getCell()
+    if not cell then return nil end
+
+    if checkSolidFloor == nil then checkSolidFloor = true end
+
+    local lastValidSquare = nil
+    for z = 0, 31 do
+        local square = cell:getGridSquare(x, y, z)
+        if not square or (checkSolidFloor and not square:isSolidFloor()) then
+            return lastValidSquare
+        end
+        lastValidSquare = square
+    end
+
+    return lastValidSquare
 end
 
 ---@param value unknown
@@ -1334,4 +1405,57 @@ function ChaosUtils.ResetCrashDamageOverride()
     ChaosUtils.EFFECT_EARTHQUAKE_ENABLED = false
     ChaosUtils.crashDamage.originalValue = nil
     ChaosUtils.crashDamage.disabled = false
+end
+
+---@param x number
+---@param y number
+---@param z integer
+---@param doSound boolean
+---@param doThunder boolean
+---@param spawnFire boolean
+---@param spawnFireNearby boolean
+---@param doZombieDamage boolean
+function ChaosUtils.SpawnLightningStrikeAt(x, y, z, doSound, doThunder, spawnFire, spawnFireNearby, doZombieDamage)
+    local cell = getCell()
+    if not cell then return end
+    local sq = cell:getGridSquare(x, y, z)
+    if not sq then return end
+
+    local iX = math.floor(x)
+    local iY = math.floor(y)
+
+    if spawnFire then
+        IsoFireManager.StartFire(cell, sq, true, 100, 3000)
+        if spawnFireNearby then
+            ChaosUtils.SquareRingSearchTile_2D(iX, iY, function(square)
+                if square and ChaosUtils.RandFloat(0, 100) < 50 then
+                    IsoFireManager.StartFire(cell, square, true, 100, 3000)
+                end
+            end, 1, 2, false, false, true, z, z)
+        end
+    end
+
+    if doZombieDamage then
+        ChaosZombie.ForEachZombieInRange(x + 0.5, y + 0.5, 1.5, function(zombie)
+            local zx = math.floor(zombie:getX())
+            local zy = math.floor(zombie:getY())
+            if zx == x and zy == y then
+                zombie:SetOnFire()
+                ChaosZombie.DamageZombie(zombie, 0.6)
+            end
+        end, false, z)
+    end
+
+    if doThunder then
+        getClimateManager():getThunderStorm():triggerThunderEvent(
+            iX, iY,
+            doSound, -- doStrike: plays "Thunder"
+            true,    -- doLightning: visual flash
+            false    -- doRumble
+        )
+    end
+
+    --- sound for zombies AI
+    ---@diagnostic disable-next-line: param-type-mismatch
+    addSound(nil, x, y, 0, 180, 180)
 end

@@ -30,15 +30,13 @@ function EffectTameCaveman:OnStart()
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
 
-    --- Hair / beard
-    local humanVisual = zombie:getHumanVisual()
-    humanVisual:setHairModel("Fabian")
-    humanVisual:setBeardModel("Long")
-    local hairColor = ImmutableColor.new(89 / 255, 56 / 255, 30 / 255)
-    humanVisual:setHairColor(hairColor)
-    humanVisual:setNaturalHairColor(hairColor)
-    humanVisual:setBeardColor(hairColor)
-    humanVisual:setNaturalBeardColor(hairColor)
+    ChaosZombie.SetHairstyleAndBeard(zombie, {
+        hairModel = "Fabian",
+        beardModel = "LongScruffy",
+        hairColor = ChaosUtils.MakeRGB(89, 56, 30, true),
+        useHairColorForBeard = true
+    })
+
 
     --- Remove default clothes
     zombie:getItemVisuals():clear()

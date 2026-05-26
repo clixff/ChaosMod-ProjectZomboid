@@ -1,6 +1,34 @@
 ---@class EffectElectricZombies : ChaosEffectBase
 EffectElectricZombies = ChaosEffectBase:derive("EffectElectricZombies", "electric_zombies")
 
+---@param character IsoGameCharacter
+local function ApplyElectricHighlight(character)
+    if not character then return end
+
+    ChaosSpecialAction.AddNewAction({ character = character }, 500,
+        function(_deltaMs, data)
+            ---@type IsoGameCharacter
+            local c = data.character
+            if c then
+                c:setOutlineHighlight(0, true)
+                c:setOutlineHighlightCol(0, 0.3, 1.0, 1.0, 1.0)
+            end
+        end,
+        function(data)
+            local c = data.character
+            if c then
+                c:setOutlineHighlight(0, false)
+            end
+        end,
+        function(data)
+            local c = data.character
+            if c then
+                c:setOutlineHighlight(0, false)
+            end
+        end
+    )
+end
+
 ---@param attacker IsoGameCharacter
 ---@param target IsoGameCharacter
 ---@param weapon HandWeapon
@@ -40,6 +68,8 @@ local function OnHitZombie(attacker, target, weapon, damage)
     end
 
     attacker:setKnockedDown(true)
+
+    ApplyElectricHighlight(attacker)
 end
 
 function EffectElectricZombies:OnStart()

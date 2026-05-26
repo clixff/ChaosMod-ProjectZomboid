@@ -96,6 +96,7 @@ local function giveItems(effect, player)
             local item = inventory:AddItem(itemId)
             if item then
                 ChaosPlayer.SayLineNewItem(player, item)
+                ChaosItems.SetFullAmmoIfWeapon(item)
             end
         end
     end

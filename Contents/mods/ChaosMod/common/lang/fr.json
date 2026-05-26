@@ -115,7 +115,7 @@
         "remove_player_weapons": "Retirer les armes du joueur",
         "give_schoolbag": "Donner un sac d'école",
         "give_random_tool": "Donner un outil aléatoire",
-        "give_random_item": "Donner un objet aléatoire",
+        "give_random_item": "Donner des objets aléatoires",
         "honk_vehicles_nearby": "Klaxonner les véhicules à proximité",
         "disable_vehicle_engine": "Couper le moteur du véhicule",
         "exit_current_vehicle": "Sortir du véhicule actuel",
@@ -409,7 +409,29 @@
         "electric_weapons": "Armes électriques",
         "pet_cemetery": "Cimetière des animaux",
         "lootbox_roll": "Lootbox Roll",
-        "traveling_merchant": "Marchand itinérant"
+        "traveling_merchant": "Marchand itinérant",
+        "wrath_of_the_gods": "Colère des dieux",
+        "spawn_race_car": "Faire apparaître une voiture de course",
+        "spawn_sports_car": "Faire apparaître une voiture de sport",
+        "meteor_shower": "Pluie de météorites",
+        "kill_zombies_with_lightning": "Tuer les zombies avec la foudre",
+        "short_circuit": "Court-circuit",
+        "q_to_spawn_items": "Q pour faire apparaître des objets",
+        "christmas": "Noël",
+        "medical_supplies_drop": "Largage de fournitures médicales",
+        "add_new_loot_to_containers": "Ajouter des objets aléatoires aux conteneurs",
+        "explode_nearby_electronics": "Faire exploser l'électronique à proximité",
+        "poison_player_food": "Empoisonner la nourriture du joueur",
+        "poison_nearby_food": "Empoisonner la nourriture à proximité",
+        "give_molotov_cocktails": "Donner des cocktails Molotov",
+        "knockback_hits": "Coups avec recul",
+        "teleport_to_last_death": "Téléportation au dernier lieu de mort",
+        "skip_to_winter": "Passer à l'hiver",
+        "fire_snake": "Serpent de feu",
+        "zoom_pulse": "Pulsation de caméra",
+        "zombie_spawner_nearby": "Apparition de zombies à proximité",
+        "skyrim_shout": "Cri de Skyrim",
+        "fake_teleport": "Fausse téléportation"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
@@ -473,7 +495,9 @@
         "food_replaced_with_dead_rats": "%s %d aliments remplacés par des rats morts",
         "no_building_found": "Je ne trouve pas de bâtiment à proximité...",
         "traits_removed_count": "%d traits retirés",
-        "skill_maxed_out": "Compétence %s au max"
+        "skill_maxed_out": "Compétence %s au max",
+        "food_poisoned": "%s %d aliments empoisonnés",
+        "failed_to_find_last_death": "Impossible de trouver le dernier lieu de mort"
     },
     "meta": {
         "username_activated_effect": "%s a activé %s"

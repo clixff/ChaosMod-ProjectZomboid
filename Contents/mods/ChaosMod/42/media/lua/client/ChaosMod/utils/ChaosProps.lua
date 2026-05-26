@@ -113,6 +113,57 @@ function ChaosProps.GetFurnitureType(obj)
     return nil
 end
 
+---@param obj IsoObject
+---@return string | nil
+function ChaosProps.GetElectronicKind(obj)
+    if not obj then return nil end
+
+    if instanceof(obj, "IsoLightSwitch") then
+        local props = obj:getProperties()
+        if props and props:has("IsMoveAble") then
+            return "lamp"
+        end
+        return "light_switch"
+    end
+
+    if instanceof(obj, "IsoRadio") then
+        return "radio"
+    end
+
+    if instanceof(obj, "IsoTelevision") then
+        return "tv"
+    end
+
+    if instanceof(obj, "IsoStove") then
+        ---@cast obj IsoStove
+        local container = obj:getContainer()
+        if obj:isMicrowave() or (container and container:getType() == "microwave") then
+            return "microwave"
+        end
+        return "stove"
+    end
+
+    local container = obj:getContainer()
+    if container then
+        local ctype = container:getType()
+        if ctype == "fridge" then
+            return "fridge"
+        end
+        if ctype == "vendingsnack" or ctype == "vendingpop" then
+            return "vending_machine"
+        end
+    end
+
+    local props = obj:getProperties()
+    if props then
+        if props:has("CustomName") and props:get("CustomName") == "Computer" then
+            return "computer"
+        end
+    end
+
+    return nil
+end
+
 ---@param square IsoGridSquare
 ---@param lit boolean?
 ---@return SCampfireGlobalObject?
