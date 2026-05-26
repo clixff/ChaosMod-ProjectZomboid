@@ -159,6 +159,7 @@
 - Zombie chat lines now linger briefly after the zombie goes out of sight so messages do not vanish the instant the player can no longer see them
 - Weapons in lootboxes and other effects now spawns with full ammo
 - NPCs now close doors behind them after opening
+- Fixed a bug when the effects interval would not stop while the game was paused
 
 ### Effect Fixes
 

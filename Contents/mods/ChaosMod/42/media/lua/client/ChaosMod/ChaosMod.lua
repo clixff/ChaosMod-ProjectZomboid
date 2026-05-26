@@ -255,6 +255,15 @@ function ChaosMod.OnTick()
     -- Calculate delta time in milliseconds since last tick
     local deltaMs = msNow - ChaosMod.lastTimeTickMs
     ChaosMod.lastTimeTickMs = msNow
+
+    if isGamePaused() or getGameSpeed() == 0 then
+        return
+    end
+
+    if deltaMs > 250 then
+        deltaMs = 250
+    end
+
     -- Tick all active effects
     ChaosEffectsManager.OnTick(deltaMs)
     -- Flush pending recent-effects blocklist writes when the throttle window has elapsed
@@ -376,8 +385,8 @@ Events.OnInitWorld.Add(ChaosMod.OnInitWorld)
 Events.OnWeaponHitCharacter.Add(ChaosMod.OnWeaponHitCharacter)
 Events.OnGameStart.Add(ChaosMod.OnGameStart)
 Events.OnZombieUpdate.Add(ChaosMod.OnZombieUpdate)
-Events.OnTick.Add(ChaosMod.OnTick)
-Events.OnTick.Add(ChaosMod.OnSpecialAnimalsTick)
+Events.OnTickEvenPaused.Add(ChaosMod.OnTick)
+Events.OnTickEvenPaused.Add(ChaosMod.OnSpecialAnimalsTick)
 Events.OnZombieDead.Add(ChaosMod.OnZombieDead)
 Events.OnEnterVehicle.Add(ChaosMod.OnEnterVehicle)
 Events.OnPlayerDeath.Add(ChaosMod.OnPlayerDeath)
