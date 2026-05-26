@@ -159,6 +159,7 @@ function ChaosSettingsWindow:OnSaveClicked()
     -- restarting the global effects iteration.
     local prevEffectsInterval = ChaosConfig.effects_interval
     local prevVoteStartTime = ChaosConfig.vote_start_time
+    local prevEffectsIntervalEnabled = ChaosConfig.effects_interval_enabled
 
     -- Persist working config snapshot to disk, then reload to repopulate ChaosConfig.
     if not ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", self.workingConfig) then
@@ -171,7 +172,8 @@ function ChaosSettingsWindow:OnSaveClicked()
     -- restart the global iteration so the progress bar reflects the new timing.
     if ChaosMod.enabled
         and (ChaosConfig.effects_interval ~= prevEffectsInterval
-            or ChaosConfig.vote_start_time ~= prevVoteStartTime) then
+            or ChaosConfig.vote_start_time ~= prevVoteStartTime
+            or ChaosConfig.effects_interval_enabled ~= prevEffectsIntervalEnabled) then
         ChaosEffectsManager.StartGlobalTimer()
     end
 

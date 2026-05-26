@@ -160,6 +160,7 @@
 - Weapons in lootboxes and other effects now spawns with full ammo
 - NPCs now close doors behind them after opening
 - Fixed a bug when the effects interval would not stop while the game was paused
+- Fixed effects triggering nonstop when the effects interval was turned back on after running with it disabled
 
 ### Effect Fixes
 

@@ -52,10 +52,8 @@ function ChaosMod.StartMod()
     ChaosMod.enabled = true;
     -- Set last time tick milliseconds to current time for next tick function call
     ChaosMod.lastTimeTickMs = getTimestampMs()
-    -- Start global effects countdown timer if effects are enabled
-    if ChaosConfig.IsEffectsEnabled() then
-        ChaosEffectsManager.StartGlobalTimer()
-    end
+    -- Always initialize the global effects countdown timer; OnTick gates firing on IsEffectsEnabled()
+    ChaosEffectsManager.StartGlobalTimer()
     print("[ChaosMod] Mod started")
     local modVersion = "0"
     -- Update internal mod version string
