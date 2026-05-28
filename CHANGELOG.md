@@ -206,7 +206,6 @@
 - Knockback Hits
 - Teleport To Last Death
 - Skip To Winter
-- Fire Snake
 - Camera Pulse
 - Zombie Spawner Nearby
 - Skyrim Shout

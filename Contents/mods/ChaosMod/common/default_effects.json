@@ -3908,18 +3908,6 @@
             "price_group": "neutral_5"
         },
         {
-            "id": "fire_snake",
-            "enabled": true,
-            "chance": 0.65,
-            "withDuration": true,
-            "duration": 30,
-            "disable_effects": [
-                "fire_snake"
-            ],
-            "enabled_donate": true,
-            "price_group": "negative_5"
-        },
-        {
             "id": "zoom_pulse",
             "enabled": true,
             "chance": 0.7,
