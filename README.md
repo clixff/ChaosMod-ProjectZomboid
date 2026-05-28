@@ -74,12 +74,6 @@ For example:
 2
 ```
 
-or
-
-```txt
-Messages Text Allowed 2
-```
-
 Both `<number>` and `!vote <number>` formats are supported. The option numbers are displayed in OBS.
 
 ### StreamerApp Installation
@@ -122,25 +116,28 @@ Currently supported donation services:
 
 - **Twitch Bits**
 - **Twitch Channel Points Rewards**
+- **Twitch Subs**
 - **DonationAlerts**
 
-Viewers can activate effects by donating a specific amount of money (or cheering with bits on Twitch) and including an effect ID in their donation message.
+Viewers can activate effects by donating a specific amount of money, or by cheering with Bits on Twitch, and including an effect ID in the donation message.
 
-Supported tag formats:
-
-- `#numeric_id` — uses the numeric ID from `/export csv` and `/mod/effects`
-- `№<number>` — numeric ID prefixed with `№`
-- `!<number>` — numeric ID prefixed with `!`
-- `<number>` — bare numeric ID anywhere in the message
+To activate a specific effect, they only need to include the effect ID number in the message.
 
 Example donation messages:
 
 ```txt
-#50 Some message
-Hello! №41
-!137
-Hello! 22
+50
 ```
+
+or
+
+```txt
+Some message! 51
+```
+
+You can find effect IDs on [Chaos Mod Hub](https://chaos-zomboid.com/effects), or create your own config there.
+
+Note: Twitch subscriptions do not activate effects by ID. Instead, they activate a random effect every N subscriptions.
 
 ### Twitch Bits Setup
 
@@ -155,6 +152,12 @@ The amount of bits required to activate an effect is calculated from the effect'
 You can enable Twitch Bits in the StreamerApp dashboard.
 You can create rewards for each Tier of Price group of effects.
 
+### Twitch Subs Setup
+
+You can enable Twitch Subs in the StreamerApp dashboard.
+
+Note: Twitch subscriptions do not activate effects by ID. Instead, they activate a random effect every N subscriptions.
+
 ### DonationAlerts Setup
 
 You can set up DonationAlerts in the StreamerApp dashboard.
@@ -163,7 +166,7 @@ You can set up DonationAlerts in the StreamerApp dashboard.
 
 Use "Export To Hub" in component to get unique URL for all your settings. You can share that link.
 
-#### Excel export
+#### Excel export (legacy)
 
 You can export donation prices to a XLSX file on StreamerApp dashboard. The XLSX includes a `Price` column when DonationAlerts is enabled and a `Twitch Bits` column when Twitch Bits is enabled.
 

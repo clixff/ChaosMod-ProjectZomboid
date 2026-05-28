@@ -30,6 +30,8 @@ const STEAM_WORKSHOP_URL =
 
 const HUB_BASE_URL = "https://chaos-zomboid.com";
 const HUB_EXPORT_URL = `${HUB_BASE_URL}/effects?export=true`;
+const HUB_ALT_BASE_URL = "https://chaos-zomboid.vercel.app";
+const HUB_EXPORT_URL_ALT = `${HUB_ALT_BASE_URL}/effects?export=true`;
 import { Modal } from "../components/Modal.tsx";
 import { CurrenciesModal } from "../components/CurrenciesModal.tsx";
 import { YouTubeSetupGuide } from "../components/YouTubeSetupGuide.tsx";
@@ -1307,6 +1309,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
       {hubExportModal && (
         <HubExportModal
           url={HUB_EXPORT_URL}
+          altUrl={HUB_EXPORT_URL_ALT}
           onClose={() => setHubExportModal(false)}
           onCopied={(what) => onNotify(`${what} copied to clipboard.`)}
           onError={(msg) => onNotify(msg, true)}
@@ -1457,6 +1460,7 @@ function GoogleSheetsInstructions({ kind }: GoogleSheetsInstructionsProps) {
 
 interface HubExportModalProps {
   url: string;
+  altUrl: string;
   onClose: () => void;
   onCopied: (what: string) => void;
   onError: (message: string) => void;
@@ -1464,6 +1468,7 @@ interface HubExportModalProps {
 
 function HubExportModal({
   url,
+  altUrl,
   onClose,
   onCopied,
   onError,
@@ -1515,6 +1520,18 @@ function HubExportModal({
             <CopyButton
               value={url}
               onCopied={() => onCopied("Hub URL")}
+              onError={onError}
+            />
+          </div>
+        </label>
+
+        <label className="form-field">
+          <span className="form-label">Alternative Hub URL</span>
+          <div className="card-link card-link--with-copy">
+            <span className="card-link-text">{altUrl}</span>
+            <CopyButton
+              value={altUrl}
+              onCopied={() => onCopied("Alternative Hub URL")}
               onError={onError}
             />
           </div>

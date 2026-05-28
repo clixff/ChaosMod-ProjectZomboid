@@ -2,7 +2,7 @@
 
 [b]A single-player Chaos Mod v1.1.1 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
 
-This mod triggers a random effect every 45 seconds. There are currently [b]400+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
+This mod triggers a random effect every 45 seconds. There are currently [b]450+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
 
 [b]Twitch and YouTube integration[/b] is optional and allows your viewers to vote for the next effect. You can play without it.
 
@@ -15,9 +15,16 @@ This mod triggers a random effect every 45 seconds. There are currently [b]400+ 
 [*] YouTube Live Integration (Experimental)
 [*] Twitch Bits Donation System (Experimental)
 [*] Twitch Channel Point Rewards (Experimental)
-[*] New Chaos Project Hud WebApp with shared configs 
+[*] Twitch Subs Integration (Experimental)
+[*] DonationAlerts multicurrency support (Experemental)
+[*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
 [*] Recent Effects Blocklist preserves between sessions
-[*] N+ new effects
+[*] NPCs update: smarter, stronger, and with firearms
+[*] 135+ new effects!
+[*] Meta Effects system that trigger every 15 minutes
+[*] And many other improvements
+
+[url=https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest]Full changelog[/url]
 
 [/list]
 
@@ -48,7 +55,7 @@ Full list of effects: [url=https://chaos-zomboid.com/effects]Chaos Mod Hub[/url]
 Viewers can vote for the next effect, and Twitch or YouTube nicknames can appear above zombies.
 To enable Twitch or YouTube support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
 
-You can also activate effects with donations through [b]Twitch Bits[/b], [b]Twitch Channel Point Rewards[/b] or [b]DonationAlerts[/b]. Viewers cheer or donate with an effect ID in the message to trigger that specific effect.
+You can also activate effects with donations through [b]Twitch Bits[/b], [b]Twitch Channel Point Rewards[/b], [b]Twitch Subs[/b] or [b]DonationAlerts[/b]. Viewers cheer or donate with an effect ID in the message to trigger that specific effect.
 
 You can read more about Twitch, YouTube, and donation integration on the mod's GitHub page.
 
@@ -100,6 +107,8 @@ It is designed for single-player only.
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_09.png[/img]
 
+
+
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_0_1.png[/img]
 
 [list]
@@ -120,7 +129,7 @@ It is designed for single-player only.
 [*]New Effects
 [/list]
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_1_current.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_1.png[/img]
 
 [list]
 [*]Update to game version 42.18.0
@@ -129,20 +138,27 @@ It is designed for single-player only.
 [*]Updated effect chances
 [/list]
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_2_future.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_2_0_current.png[/img]
 
 [list]
-[*]New effects
-[*]Meta effects system
-[*]Context aware effects system
-[*]Twitch Bits donation system
-[*]YouTube chat integration
-[/list]
+[*] Bug fixes for many effects and crashes
+[*] YouTube Live Integration (Experimental)
+[*] Twitch Bits Donation System (Experimental)
+[*] Twitch Channel Point Rewards (Experimental)
+[*] Twitch Subs Integration (Experimental)
+[*] DonationAlerts multicurrency support (Experemental)
+[*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
+[*] Recent Effects Blocklist preserves between sessions
+[*] NPCs update: smarter, stronger, and with firearms
+[*] 135+ new effects!
+[*] And many other improvements
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_3_0_future.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/future_versions.png[/img]
 
 [list]
-[*]Multiplayer support (?)
+[*] Context aware system for effects
+[*] New effects
+[*] Multiplayer support (?)
 [/list]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_10.png[/img]
