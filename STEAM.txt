@@ -1,6 +1,6 @@
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_01.png[/img]
 
-[b]A single-player Chaos Mod v1.1.1 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
+[b]A single-player Chaos Mod v1.2.0 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
 
 This mod triggers a random effect every 45 seconds. There are currently [b]450+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
 
@@ -16,7 +16,7 @@ This mod triggers a random effect every 45 seconds. There are currently [b]450+ 
 [*] Twitch Bits Donation System (Experimental)
 [*] Twitch Channel Point Rewards (Experimental)
 [*] Twitch Subs Integration (Experimental)
-[*] DonationAlerts multicurrency support (Experemental)
+[*] DonationAlerts multicurrency support (Experimental)
 [*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
 [*] Recent Effects Blocklist preserves between sessions
 [*] NPCs update: smarter, stronger, and with firearms
@@ -146,7 +146,7 @@ It is designed for single-player only.
 [*] Twitch Bits Donation System (Experimental)
 [*] Twitch Channel Point Rewards (Experimental)
 [*] Twitch Subs Integration (Experimental)
-[*] DonationAlerts multicurrency support (Experemental)
+[*] DonationAlerts multicurrency support (Experimental)
 [*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
 [*] Recent Effects Blocklist preserves between sessions
 [*] NPCs update: smarter, stronger, and with firearms

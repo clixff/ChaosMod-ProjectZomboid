@@ -2,11 +2,11 @@
 
 ## New Services Support
 
-- Added Twitch Bits support for donation-triggered effects. [Experemental]
-- Added Twitch Channel Points support for donation-triggered effects. [Experemental]
-- Added Twitch Subs support: every N subs can trigger a random effect. [Experemental]
-- Added YouTube live chat support for voting and zombie nicknames using your own YouTube Data API key. [Experemental]
-- Added multi-currency support for DonationAlerts. Donations in configured currencies are converted into your main currency before triggering effects. [Experemental]
+- Added Twitch Bits support for donation-triggered effects. [Experimental]
+- Added Twitch Channel Points support for donation-triggered effects. [Experimental]
+- Added Twitch Subs support: every N subs can trigger a random effect. [Experimental]
+- Added YouTube live chat support for voting and zombie nicknames using your own YouTube Data API key. [Experimental]
+- Added multi-currency support for DonationAlerts. Donations in configured currencies are converted into your main currency before triggering effects. [Experimental]
 
 ## Meta Effects System
 
