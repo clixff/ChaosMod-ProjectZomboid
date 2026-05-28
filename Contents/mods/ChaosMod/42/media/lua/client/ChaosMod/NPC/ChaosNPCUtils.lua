@@ -42,8 +42,6 @@ local ZOMBIE_NPC_BITE_CANCEL_WINDOW_FRACTION = 0.5
 local ZOMBIE_NPC_BITE_CANCEL_WINDOW_MS = ZOMBIE_NPC_BITE_DAMAGE_DELAY_MS * ZOMBIE_NPC_BITE_CANCEL_WINDOW_FRACTION
 local ZOMBIE_NPC_HITREACTION_RECOVERY_MS = 1500
 
-local DEBUG_ZOMBIES_NPC_UTILS_LOGS = false
-
 ---@return boolean
 local function ChaosNPCDebugLogsEnabled()
     return CHAOS_NPC_DEBUG_LOGS == true
@@ -209,7 +207,7 @@ end
 ---@param message string
 ---@param intervalMs? integer
 local function LogZombieNPCDebug(zombie, message, intervalMs)
-    if DEBUG_ZOMBIES_NPC_UTILS_LOGS ~= true then return end
+    if CHAOS_NPC_DEBUG_LOGS ~= true then return end
     if not zombie then return end
     intervalMs = intervalMs or 1000
 

@@ -10,6 +10,7 @@ import {
   getLanguages,
   type ModConfig,
   type DonatePriceGroup,
+  type MetaEffectEntry,
 } from "../api.ts";
 import { formatLanguageLabel } from "../languageLabels.ts";
 
@@ -25,6 +26,25 @@ function formatPriceGroupName(name: string): string {
     .filter((part) => part.length > 0)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join(" ");
+}
+
+function formatSnakeCaseName(name: string): string {
+  return name
+    .split("_")
+    .filter((part) => part.length > 0)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+const META_VARIABLE_LABELS: Record<string, string> = {
+  min_time: "Min Time",
+  time_multipier: "Time Multiplier",
+  time_multiplier: "Time Multiplier",
+  effects_count: "Effects Count",
+};
+
+function formatMetaVariableLabel(key: string): string {
+  return META_VARIABLE_LABELS[key] ?? formatSnakeCaseName(key);
 }
 
 function parsePriceGroupName(name: string): {
@@ -151,6 +171,28 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
       prev ? { ...prev, ui: { ...prev.ui, [key]: value } } : prev,
     );
     void save({ ui: { [key]: value } });
+  };
+
+  const setMeta = <K extends keyof ModConfig["meta_effects"]>(
+    key: K,
+    value: ModConfig["meta_effects"][K],
+  ) => {
+    setConfig((prev) =>
+      prev
+        ? { ...prev, meta_effects: { ...prev.meta_effects, [key]: value } }
+        : prev,
+    );
+    void save({ meta_effects: { [key]: value } });
+  };
+
+  // Meta effect entries live inside an array; the server's deep-merge overwrites
+  // arrays wholesale, so we always send the whole `list` when any entry field
+  // changes.
+  const setMetaList = (list: MetaEffectEntry[]) => {
+    setConfig((prev) =>
+      prev ? { ...prev, meta_effects: { ...prev.meta_effects, list } } : prev,
+    );
+    void save({ meta_effects: { list } });
   };
 
   const setPriceGroups = (groups: DonatePriceGroup[]) => {
@@ -281,6 +323,24 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
           <Checkbox
             checked={config.hide_effect_names}
             onChange={(v) => setField("hide_effect_names", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Explosions damage items"
+          hint="When on, explosions damage every item in the player's inventory."
+        >
+          <Checkbox
+            checked={config.explosions_damage_items}
+            onChange={(v) => setField("explosions_damage_items", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Explosions destroy random item"
+          hint="When on, explosions destroy one random item from the player's inventory."
+        >
+          <Checkbox
+            checked={config.explosions_destroy_random_item}
+            onChange={(v) => setField("explosions_destroy_random_item", v)}
           />
         </FieldRow>
         <FieldRow label="Use voting progress bar color">
@@ -744,6 +804,99 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setUI("vote_background_color", v)}
           />
         </FieldRow>
+      </Section>
+
+      <Section
+        title="Meta Effects"
+        description="Rare long-cooldown effects that warp how regular effects work (e.g. faster intervals, multiple effects per cycle)."
+      >
+        <FieldRow label="Meta effects enabled">
+          <Checkbox
+            checked={config.meta_effects.enabled}
+            onChange={(v) => setMeta("enabled", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Meta effects interval (seconds)"
+          hint="How often the mod rolls for a meta effect."
+        >
+          <NumberInput
+            value={config.meta_effects.interval_sec}
+            min={1}
+            onChange={(v) => setMeta("interval_sec", v)}
+          />
+        </FieldRow>
+      </Section>
+
+      <Section
+        title="Meta Effects List"
+        description="Per-effect tuning. Variables are hardcoded to each effect; you can change their numeric values but cannot add or remove them."
+      >
+        {config.meta_effects.list.length === 0 && (
+          <span className="field-hint">No meta effects configured.</span>
+        )}
+        {config.meta_effects.list.map((entry, index) => {
+          const variableKeys = Object.keys(entry.variables)
+            .filter((k) => typeof entry.variables[k] === "number")
+            .sort();
+          const updateEntry = (patch: Partial<MetaEffectEntry>) => {
+            const nextList = config.meta_effects.list.map((e, i) =>
+              i === index ? { ...e, ...patch } : e,
+            );
+            setMetaList(nextList);
+          };
+          const updateVariable = (key: string, value: number) => {
+            const nextVariables = { ...entry.variables, [key]: value };
+            const nextList = config.meta_effects.list.map((e, i) =>
+              i === index ? { ...e, variables: nextVariables } : e,
+            );
+            setMetaList(nextList);
+          };
+          return (
+            <div key={entry.id} style={{ marginBottom: 18 }}>
+              <h4 style={{ margin: "12px 0 8px 0", color: "#f5b301" }}>
+                [META] {formatSnakeCaseName(entry.id)}
+              </h4>
+              <FieldRow label="Enabled">
+                <Checkbox
+                  checked={entry.enabled}
+                  onChange={(v) => updateEntry({ enabled: v })}
+                />
+              </FieldRow>
+              <FieldRow label="Voting only">
+                <Checkbox
+                  checked={entry.voting_only}
+                  onChange={(v) => updateEntry({ voting_only: v })}
+                />
+              </FieldRow>
+              <FieldRow label="Duration (seconds)">
+                <NumberInput
+                  value={entry.duration}
+                  min={0}
+                  step={1}
+                  onChange={(v) => updateEntry({ duration: v })}
+                />
+              </FieldRow>
+              <FieldRow label="Chance">
+                <NumberInput
+                  value={entry.chance}
+                  min={0}
+                  step={0.1}
+                  onChange={(v) => updateEntry({ chance: v })}
+                />
+              </FieldRow>
+              {variableKeys.map((key) => (
+                <FieldRow key={key} label={formatMetaVariableLabel(key)}>
+                  <NumberInput
+                    value={Number(entry.variables[key] ?? 0)}
+                    step={0.1}
+                    onChange={(v) => updateVariable(key, v)}
+                  />
+                </FieldRow>
+              ))}
+            </div>
+          );
+        })}
       </Section>
     </>
   );

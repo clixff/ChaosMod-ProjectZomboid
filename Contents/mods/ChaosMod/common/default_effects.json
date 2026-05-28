@@ -2956,18 +2956,6 @@
             "price_group": "neutral_3"
         },
         {
-            "id": "night_vision",
-            "enabled": true,
-            "chance": 0.4,
-            "withDuration": true,
-            "duration": 90,
-            "disable_effects": [
-                "night_vision"
-            ],
-            "enabled_donate": true,
-            "price_group": "neutral_4"
-        },
-        {
             "id": "zombies_can_smell_you",
             "enabled": true,
             "chance": 0.85,

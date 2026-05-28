@@ -38,6 +38,8 @@ function ChaosMod.StartMod()
     ChaosUIManager:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
+    -- Load meta effects registry from ChaosConfig.meta_effects.list
+    ChaosMetaEffectsRegistry.Initialize()
     -- Clear position history so it starts fresh from this session
     ChaosUtils.playerPositionHistory = {}
     ChaosUtils.positionSampleMs = 0
@@ -54,6 +56,8 @@ function ChaosMod.StartMod()
     ChaosMod.lastTimeTickMs = getTimestampMs()
     -- Always initialize the global effects countdown timer; OnTick gates firing on IsEffectsEnabled()
     ChaosEffectsManager.StartGlobalTimer()
+    -- Reset meta-effects interval timer for this StartMod cycle
+    ChaosMetaEffectsManager.Start()
     print("[ChaosMod] Mod started")
     local modVersion = "0"
     -- Update internal mod version string
@@ -90,6 +94,7 @@ function ChaosMod.StartMod()
 end
 
 function ChaosMod.StopMod()
+    ChaosMetaEffectsManager.StopAllMetaEffects()
     ChaosEffectsManager.StopAllEffects()
     ChaosSpecialAction.StopAll()
     ChaosEffectsManager.ClearGlobalTimer()
@@ -188,6 +193,8 @@ function ChaosMod.OnGameStart()
     ChaosUIManager:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
+    -- Load meta effects from ChaosConfig.meta_effects.list
+    ChaosMetaEffectsRegistry.Initialize()
 
     ChaosMod.RegisterBridgeHandlers()
 
@@ -264,6 +271,8 @@ function ChaosMod.OnTick()
 
     -- Tick all active effects
     ChaosEffectsManager.OnTick(deltaMs)
+    -- Tick meta effects (active effects + interval timer)
+    ChaosMetaEffectsManager.OnTick(deltaMs)
     -- Flush pending recent-effects blocklist writes when the throttle window has elapsed
     ChaosEffectsRegistry.TickRecentEffectsSave()
     -- Tick zombie nicknames if enabled
@@ -296,6 +305,7 @@ function ChaosMod.RegisterBridgeHandlers()
         print("[ChaosMod] Reloading config and effects via bridge")
         ChaosConfig.LoadConfigFromDisk()
         ChaosEffectsRegistry.Initialize()
+        ChaosMetaEffectsRegistry.Initialize()
         ChaosLocalization.ReloadLanguages()
         if ChaosUIManager and ChaosUIManager.OnLanguageLoaded then
             ChaosUIManager:OnLanguageLoaded()

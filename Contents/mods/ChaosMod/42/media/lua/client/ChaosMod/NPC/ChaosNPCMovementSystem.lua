@@ -1,3 +1,8 @@
+local function debugLog(...)
+    if CHAOS_NPC_DEBUG_LOGS ~= true then return end
+    print(...)
+end
+
 ---@param character IsoGameCharacter
 function ChaosNPC:MoveToCharacter(character)
     if not self.zombie then return end
@@ -201,7 +206,7 @@ function ChaosNPC:VehiclesTick()
             self.moveTargetCharacter:getVehicle() == zombieVehicle
 
         if not enemyInVehicle and not moveTargetInVehicle then
-            print(string.format("[ChaosNPC][%s] VehiclesTick: exit - enemy/move_target not in same vehicle",
+            debugLog(string.format("[ChaosNPC][%s] VehiclesTick: exit - enemy/move_target not in same vehicle",
                 tostring(self.zombie:getID())))
             zombieVehicle:exit(self.zombie)
         end
@@ -231,7 +236,7 @@ function ChaosNPC:VehiclesTick()
 
     if not ChaosUtils.isInRange(x1, y1, x2, y2, 4.0) then return end
 
-    print(string.format("[ChaosNPC][%s] VehiclesTick: enter - following move_target into vehicle",
+    debugLog(string.format("[ChaosNPC][%s] VehiclesTick: enter - following move_target into vehicle",
         tostring(self.zombie:getID())))
     moveTargetVehicle:enter(seat, self.zombie)
 end
@@ -254,14 +259,14 @@ function ChaosNPC:EnterPlayerVehicle(player)
 
     local vehicle = player:getVehicle()
     if not vehicle then
-        print(string.format("[ChaosNPC][%s] EnterPlayerVehicle: abort - player has no vehicle",
+        debugLog(string.format("[ChaosNPC][%s] EnterPlayerVehicle: abort - player has no vehicle",
             tostring(self.zombie:getID())))
         return
     end
 
     local seat = ChaosVehicle.FindFreeSeat(vehicle, true)
     if seat < 1 then
-        print(string.format("[ChaosNPC][%s] EnterPlayerVehicle: abort - no free seat",
+        debugLog(string.format("[ChaosNPC][%s] EnterPlayerVehicle: abort - no free seat",
             tostring(self.zombie:getID())))
         return
     end
@@ -269,6 +274,6 @@ function ChaosNPC:EnterPlayerVehicle(player)
     vehicle:enter(seat, self.zombie)
     self:SetAsTargetEnemy(player)
 
-    print(string.format("[ChaosNPC][%s] EnterPlayerVehicle: NPC seated in player vehicle, targeting player=%s",
+    debugLog(string.format("[ChaosNPC][%s] EnterPlayerVehicle: NPC seated in player vehicle, targeting player=%s",
         tostring(self.zombie:getID()), tostring(player:getID())))
 end

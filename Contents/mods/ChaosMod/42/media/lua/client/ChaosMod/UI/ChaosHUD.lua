@@ -208,10 +208,16 @@ function ChaosHUD:prerender()
         local uiCfg = ChaosConfig.ui
         -- Colored on left (elapsed)
         if fgWidth > 0 then
+            ---@type {r: number, g: number, b: number}
             local c = uiCfg.progress_bar_rgb
             local sm = ChaosConfig.streamer_mode
             if ChaosConfig.use_voting_progress_bar_color and sm and sm.streamer_mode_enabled == true and sm.voting_enabled == true and ChaosEffectsManager.voteStartedThisInterval then
                 c = uiCfg.progress_bar_voting_rgb
+            end
+            -- Meta gradient takes precedence over both the default and voting colors.
+            if ChaosMetaEffectsManager and ChaosMetaEffectsManager.HasActiveMeta and ChaosMetaEffectsManager.HasActiveMeta() then
+                local meta = ChaosEffectsUI.GetMetaGradientColor()
+                c = { r = meta.r or 1, g = meta.g or 1, b = meta.b or 1 }
             end
             self:drawRect(0, barY, fgWidth, barHeight, uiCfg.progress_bar_opacity, c.r, c.g, c.b)
         end

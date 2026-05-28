@@ -1,3 +1,8 @@
+local function debugLog(...)
+    if CHAOS_NPC_DEBUG_LOGS ~= true then return end
+    print(...)
+end
+
 ---@param deltaMs integer
 function ChaosNPC:UpdateEndurance(deltaMs)
     local deltaSeconds = deltaMs / 1000.0
@@ -289,7 +294,7 @@ function ChaosNPC:OnAttackEnemyHit()
     if maxDamage <= 0 then maxDamage = 4 end
 
     local weaponId = self.weaponItemCached:getFullType()
-    print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Attacking enemy with weapon: %s",
+    debugLog(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Attacking enemy with weapon: %s",
         tostring(zombie:getID()), tostring(enemy:getID()), tostring(weaponId)))
 
     if weaponId == "Base.BareHands" or maxDamage < 1.0 then
@@ -299,18 +304,18 @@ function ChaosNPC:OnAttackEnemyHit()
 
     local damage = ChaosUtils.RandFloat(minDamage, maxDamage)
 
-    print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Damage min: %.2f, max: %.2f, result: %.2f",
+    debugLog(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Damage min: %.2f, max: %.2f, result: %.2f",
         tostring(zombie:getID()), tostring(enemy:getID()), minDamage, maxDamage, damage))
 
     local damageMod = 4.0
 
-    print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Damage mod: %s",
+    debugLog(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Damage mod: %s",
         tostring(zombie:getID()), tostring(enemy:getID()), tostring(damageMod)))
 
 
     damage = damage * self.DamageMultiplier * damageMod
 
-    print(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Total damage after mods: %s",
+    debugLog(string.format("[ChaosNPCCombatSystem][npc=%s enemy=%s] Total damage after mods: %s",
         tostring(zombie:getID()), tostring(enemy:getID()), tostring(damage)))
 
     if damage <= 0.1 then
@@ -380,7 +385,7 @@ function ChaosNPC:OnAttackEnemyHit()
             end
         end
 
-        print(string.format(
+        debugLog(string.format(
             "[ChaosNPCCombatSystem] Zombie native hit result npc=%s enemy=%s requestedDamage=%.2f appliedDamage=%.2f oldHealth=%.2f newHealth=%.2f alive=%s state=%s bump=%s hit=%s stagger=%s",
             tostring(zombie:getID()),
             tostring(enemyZombie:getID()),
@@ -412,7 +417,7 @@ function ChaosNPC:OnAttackEnemyHit()
                 if elapsedMs <= cancelWindowMs then
                     biteData.cancelled = true
                     enemyModData["ZombieAttackBiteData"] = nil
-                    print(string.format(
+                    debugLog(string.format(
                         "[ChaosNPCCombatSystem] NPC attack cancelled zombie bite npc=%s zombie=%s elapsed=%d cancelWindow=%d",
                         tostring(zombie:getID()),
                         tostring(enemyZombie:getID()),
@@ -420,7 +425,7 @@ function ChaosNPC:OnAttackEnemyHit()
                         cancelWindowMs
                     ))
                 else
-                    print(string.format(
+                    debugLog(string.format(
                         "[ChaosNPCCombatSystem] NPC attack too late to cancel zombie bite npc=%s zombie=%s elapsed=%d cancelWindow=%d",
                         tostring(zombie:getID()),
                         tostring(enemyZombie:getID()),
@@ -481,7 +486,7 @@ function ChaosNPC:OnAttackEnemyHit()
 
         minDamage, maxDamage = self:GetMinMaxDamageToPlayer()
         damage = ChaosUtils.RandFloat(minDamage, maxDamage)
-        print(string.format("[ChaosNPCCombatSystem][npc=%s player=%s] Damage to player min=%.2f max=%.2f result=%.2f",
+        debugLog(string.format("[ChaosNPCCombatSystem][npc=%s player=%s] Damage to player min=%.2f max=%.2f result=%.2f",
             tostring(zombie:getID()), tostring(enemy:getID()), minDamage, maxDamage, damage))
 
         bodyDamage:ReduceGeneralHealth(damage)

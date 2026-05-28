@@ -47,6 +47,19 @@
 ---@field vote_background_color string
 ---@field vote_background_rgb {r: number, g: number, b: number}
 
+---@class ChaosMetaEffectJsonEntry
+---@field id string
+---@field enabled boolean
+---@field voting_only boolean
+---@field duration number
+---@field chance number
+---@field variables table
+
+---@class ChaosMetaEffectsConfig
+---@field enabled boolean
+---@field interval_sec number
+---@field list ChaosMetaEffectJsonEntry[]
+
 ---@class ChaosConfig
 ---@field lang string -- Language code (e.g. "en", "fr")
 ---@field effects_interval_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
@@ -58,11 +71,14 @@
 ---@field hide_progress_bar boolean
 ---@field use_voting_progress_bar_color boolean
 ---@field hide_effect_names boolean -- If true, all effect names are rendered as "???" for the player
+---@field explosions_damage_items boolean -- If true, explosions damage every item in the player's inventory
+---@field explosions_destroy_random_item boolean -- If true, explosions destroy one random item from the player's inventory
 ---@field ui ChaosConfigUI
 ---@field ui_sounds_enabled boolean
 ---@field ignore_effect_chances boolean -- If true, all effects have equal chance 1 during selection
 ---@field npc_voicelines_enabled boolean -- If false, NPC/zombie voicelines (ChaosZombie.PlaySoundLine) are suppressed
 ---@field npc_gifts_enabled boolean -- If false, friendly NPCs will not gift items to the player
+---@field meta_effects ChaosMetaEffectsConfig
 ---@field streamer_mode ChaosConfigStreamerMode
 ChaosConfig = ChaosConfig or {
     lang = "en",
@@ -75,6 +91,8 @@ ChaosConfig = ChaosConfig or {
     hide_progress_bar = false,
     use_voting_progress_bar_color = false,
     hide_effect_names = false,
+    explosions_damage_items = true,
+    explosions_destroy_random_item = true,
     ui = {
         progress_bar_color         = "9f211f",
         progress_bar_opacity       = 0.9,
@@ -99,6 +117,11 @@ ChaosConfig = ChaosConfig or {
     ignore_effect_chances = false,
     npc_voicelines_enabled = true,
     npc_gifts_enabled = true,
+    meta_effects = {
+        enabled = true,
+        interval_sec = 900,
+        list = {},
+    },
     streamer_mode = {
         streamer_mode_enabled = false,
         voting_enabled = false,
@@ -202,6 +225,49 @@ end
 
 ChaosConfig._mergeMissingKeys = mergeMissingKeys
 
+--- If the stored mod version in VERSION.txt differs from the current mod version,
+--- overwrite the user's `meta_effects.list` with the defaults so newly-shipped
+--- meta effects propagate to existing installs. The same VERSION.txt is later
+--- updated by `ChaosEffectsRegistry.SyncEffectsForModVersion`.
+---@param configData table | nil
+---@param defaultConfig table | nil
+---@return boolean changed
+local function syncMetaEffectsForModVersion(configData, defaultConfig)
+    if not configData or not defaultConfig then return false end
+    if type(defaultConfig.meta_effects) ~= "table" then return false end
+
+    local currentVersion = ""
+    if ChaosMod and ChaosMod.modData then
+        currentVersion = ChaosMod.modData:getModVersion() or ""
+    end
+    local storedRaw = ChaosFileReader.ReadFileFromCacheAllLines("ChaosMod/VERSION.txt")
+    local storedVersion = ""
+    if storedRaw then
+        storedVersion = storedRaw:match("^%s*(.-)%s*$") or ""
+    end
+    if storedVersion == currentVersion then return false end
+
+    if type(configData.meta_effects) ~= "table" then
+        configData.meta_effects = {}
+    end
+    -- Deep-copy the default list so later mutations don't bleed into the cached default.
+    local defaultList = defaultConfig.meta_effects.list
+    local newList = {}
+    if type(defaultList) == "table" then
+        for _, item in ipairs(defaultList) do
+            if type(item) == "table" then
+                local copy = {}
+                for k, v in pairs(item) do copy[k] = v end
+                table.insert(newList, copy)
+            end
+        end
+    end
+    configData.meta_effects.list = newList
+    print(string.format("[ChaosConfig] Mod version changed ('%s' -> '%s'); replacing meta_effects.list with defaults",
+        storedVersion, currentVersion))
+    return true
+end
+
 function ChaosConfig.LoadConfigFromDisk()
     ---@type table | nil
     local defaultConfig = ChaosFileReader.ReadJsonFile("default_config.json")
@@ -218,9 +284,10 @@ function ChaosConfig.LoadConfigFromDisk()
             configData = defaultConfig
         end
     elseif defaultConfig then
+        local metaChanged = syncMetaEffectsForModVersion(configData, defaultConfig)
         local _, changed = mergeMissingKeys(configData, defaultConfig)
-        if changed then
-            print("[ChaosConfig] Added missing keys from default_config.json; saving config.json")
+        if changed or metaChanged then
+            print("[ChaosConfig] Updating config.json on disk")
             ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", configData)
         end
     end
@@ -271,6 +338,14 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.hide_effect_names) == "boolean" then
         ChaosConfig.hide_effect_names = configData.hide_effect_names
+    end
+
+    if type(configData.explosions_damage_items) == "boolean" then
+        ChaosConfig.explosions_damage_items = configData.explosions_damage_items
+    end
+
+    if type(configData.explosions_destroy_random_item) == "boolean" then
+        ChaosConfig.explosions_destroy_random_item = configData.explosions_destroy_random_item
     end
 
     if configData.ui then
@@ -352,6 +427,33 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.npc_gifts_enabled) == "boolean" then
         ChaosConfig.npc_gifts_enabled = configData.npc_gifts_enabled
+    end
+
+    if type(configData.meta_effects) == "table" then
+        local mm = configData.meta_effects
+        local dst = ChaosConfig.meta_effects
+        if type(mm.enabled) == "boolean" then
+            dst.enabled = mm.enabled
+        end
+        if type(mm.interval_sec) == "number" and mm.interval_sec > 0 then
+            dst.interval_sec = mm.interval_sec
+        end
+        if type(mm.list) == "table" then
+            local parsed = {}
+            for _, item in ipairs(mm.list) do
+                if type(item) == "table" and type(item.id) == "string" and item.id ~= "" then
+                    table.insert(parsed, {
+                        id = item.id,
+                        enabled = item.enabled == true,
+                        voting_only = item.voting_only == true,
+                        duration = tonumber(item.duration) or 0,
+                        chance = tonumber(item.chance) or 0,
+                        variables = type(item.variables) == "table" and item.variables or {},
+                    })
+                end
+            end
+            dst.list = parsed
+        end
     end
 
     if configData.streamer_mode then
@@ -566,6 +668,8 @@ function ChaosConfig.BuildJsonSnapshot()
         hide_progress_bar = ChaosConfig.hide_progress_bar,
         use_voting_progress_bar_color = ChaosConfig.use_voting_progress_bar_color,
         hide_effect_names = ChaosConfig.hide_effect_names,
+        explosions_damage_items = ChaosConfig.explosions_damage_items,
+        explosions_destroy_random_item = ChaosConfig.explosions_destroy_random_item,
         ui = {
             progress_bar_color = ui.progress_bar_color,
             progress_bar_opacity = ui.progress_bar_opacity,
@@ -583,6 +687,29 @@ function ChaosConfig.BuildJsonSnapshot()
         ignore_effect_chances = ChaosConfig.ignore_effect_chances,
         npc_voicelines_enabled = ChaosConfig.npc_voicelines_enabled,
         npc_gifts_enabled = ChaosConfig.npc_gifts_enabled,
+        meta_effects = (function()
+            local m = ChaosConfig.meta_effects or {}
+            local list = {}
+            if type(m.list) == "table" then
+                for _, item in ipairs(m.list) do
+                    if type(item) == "table" and type(item.id) == "string" then
+                        table.insert(list, {
+                            id = item.id,
+                            enabled = item.enabled == true,
+                            voting_only = item.voting_only == true,
+                            duration = tonumber(item.duration) or 0,
+                            chance = tonumber(item.chance) or 0,
+                            variables = item.variables or {},
+                        })
+                    end
+                end
+            end
+            return {
+                enabled = m.enabled == true,
+                interval_sec = tonumber(m.interval_sec) or 0,
+                list = list,
+            }
+        end)(),
         streamer_mode = {
             streamer_mode_enabled = sm.streamer_mode_enabled,
             voting_enabled = sm.voting_enabled,

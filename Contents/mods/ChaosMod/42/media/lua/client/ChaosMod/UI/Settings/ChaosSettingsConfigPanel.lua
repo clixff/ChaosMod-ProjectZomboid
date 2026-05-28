@@ -197,6 +197,22 @@ function ChaosSettingsConfigPanel:rebuild()
     table.insert(children, self.controls.hide_effect_names)
     y = y + rowH + rowGap
 
+    addLabelled("explosions_damage_items")
+    self.controls.explosions_damage_items = W.MakeCheckbox(self, controlX, y, "",
+        cfg.explosions_damage_items ~= false, function(checked)
+            cfg.explosions_damage_items = checked
+        end)
+    table.insert(children, self.controls.explosions_damage_items)
+    y = y + rowH + rowGap
+
+    addLabelled("explosions_destroy_random_item")
+    self.controls.explosions_destroy_random_item = W.MakeCheckbox(self, controlX, y, "",
+        cfg.explosions_destroy_random_item ~= false, function(checked)
+            cfg.explosions_destroy_random_item = checked
+        end)
+    table.insert(children, self.controls.explosions_destroy_random_item)
+    y = y + rowH + rowGap
+
     addLabelled("ui_sounds_enabled")
     self.controls.ui_sounds_enabled = W.MakeCheckbox(self, controlX, y, "", cfg.ui_sounds_enabled == true,
         function(checked)
@@ -527,6 +543,95 @@ function ChaosSettingsConfigPanel:rebuild()
     table.insert(children, self.controls.vote_background_color)
     y = y + rowH + rowGap
 
+    -- ---------- Meta Effects ----------
+    local meta = getSection(cfg, "meta_effects")
+    addHeader("section_meta_effects")
+
+    addLabelled("meta_effects_enabled")
+    self.controls.meta_effects_enabled = W.MakeCheckbox(self, controlX, y, "", meta.enabled == true, function(c)
+        meta.enabled = c
+    end)
+    table.insert(children, self.controls.meta_effects_enabled)
+    y = y + rowH + rowGap
+
+    addLabelled("meta_effects_interval_sec")
+    self.controls.meta_effects_interval_sec = W.MakeNumberInput(self, controlX, y, controlW,
+        meta.interval_sec or 900, { float = false, maxLen = 8 })
+    table.insert(children, self.controls.meta_effects_interval_sec)
+    y = y + rowH + rowGap
+
+    -- ---------- Meta Effects List ----------
+    if type(meta.list) ~= "table" then meta.list = {} end
+    addHeader("section_meta_effects_list")
+
+    self.controls.metaEffects = {}
+    for i, entry in ipairs(meta.list) do
+        ---@type table<string, any>
+        local controls = { variables = {} }
+        local id = tostring(entry.id or "")
+        local localizedName = ChaosLocalization.GetString("effects", id)
+        local displayName = (localizedName ~= "effects_" .. id and localizedName ~= "") and localizedName or id
+
+        local header = W.MakeSectionHeader(self, labelX, y, self.width - pad * 2, "[META] " .. displayName)
+        table.insert(children, header)
+        y = y + sectionH + rowGap
+
+        addLabelled("meta_effect_enabled")
+        controls.enabled = W.MakeCheckbox(self, controlX, y, "", entry.enabled == true, function(c)
+            entry.enabled = c
+        end)
+        table.insert(children, controls.enabled)
+        y = y + rowH + rowGap
+
+        addLabelled("meta_effect_voting_only")
+        controls.voting_only = W.MakeCheckbox(self, controlX, y, "", entry.voting_only == true, function(c)
+            entry.voting_only = c
+        end)
+        table.insert(children, controls.voting_only)
+        y = y + rowH + rowGap
+
+        addLabelled("meta_effect_duration")
+        controls.duration = W.MakeNumberInput(self, controlX, y, controlW, entry.duration or 0,
+            { float = true, maxLen = 8 })
+        table.insert(children, controls.duration)
+        y = y + rowH + rowGap
+
+        addLabelled("meta_effect_chance")
+        controls.chance = W.MakeNumberInput(self, controlX, y, controlW, entry.chance or 0,
+            { float = true, maxLen = 8 })
+        table.insert(children, controls.chance)
+        y = y + rowH + rowGap
+
+        if type(entry.variables) == "table" then
+            -- Render numeric variables; iterate in a stable sorted order so the
+            -- UI doesn't reshuffle on each rebuild.
+            local varKeys = {}
+            for k, v in pairs(entry.variables) do
+                if type(v) == "number" then
+                    table.insert(varKeys, k)
+                end
+            end
+            table.sort(varKeys)
+            for _, k in ipairs(varKeys) do
+                local labelKey = "meta_effect_var_" .. tostring(k)
+                local labelText = ChaosLocalization.GetString("settings", labelKey)
+                -- Fallback to the raw key when no translation exists.
+                if labelText == "settings_" .. labelKey or labelText == "" then
+                    labelText = tostring(k)
+                end
+                local lbl = W.MakeLabel(self, labelX, y, labelW, labelText)
+                table.insert(children, lbl)
+                local input = W.MakeNumberInput(self, controlX, y, controlW, entry.variables[k] or 0,
+                    { float = true, maxLen = 12 })
+                table.insert(children, input)
+                controls.variables[k] = input
+                y = y + rowH + rowGap
+            end
+        end
+
+        self.controls.metaEffects[i] = controls
+    end
+
     self:setScrollHeight(y + pad)
 end
 
@@ -597,6 +702,37 @@ function ChaosSettingsConfigPanel:CommitWorkingState()
     end
     if self.controls.vote_background_color then
         ui.vote_background_color = self.controls.vote_background_color:getInternalText() or ui.vote_background_color
+    end
+
+    -- Meta effects: top-level interval + per-entry numeric fields
+    local meta = getSection(cfg, "meta_effects")
+    if self.controls.meta_effects_interval_sec then
+        local v = W.GetIntFromBox(self.controls.meta_effects_interval_sec, meta.interval_sec or 900)
+        if v < 1 then v = 1 end
+        meta.interval_sec = v
+    end
+    if self.controls.metaEffects and type(meta.list) == "table" then
+        for i, ctl in ipairs(self.controls.metaEffects) do
+            ---@type ChaosMetaEffectJsonEntry | nil
+            local entry = meta.list[i]
+            if entry then
+                if ctl.duration then
+                    local v = W.GetFloatFromBox(ctl.duration, entry.duration or 0)
+                    if v < 0 then v = 0 end
+                    entry.duration = v
+                end
+                if ctl.chance then
+                    local v = W.GetFloatFromBox(ctl.chance, entry.chance or 0)
+                    if v < 0 then v = 0 end
+                    entry.chance = v
+                end
+                if ctl.variables and type(entry.variables) == "table" then
+                    for k, box in pairs(ctl.variables) do
+                        entry.variables[k] = W.GetFloatFromBox(box, entry.variables[k] or 0)
+                    end
+                end
+            end
+        end
     end
 
     -- Donate groups: read name + price text inputs and rename references on effects.

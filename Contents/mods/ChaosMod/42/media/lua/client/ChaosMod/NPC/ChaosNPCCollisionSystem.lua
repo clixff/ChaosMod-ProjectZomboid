@@ -1,3 +1,8 @@
+local function debugLog(...)
+    if CHAOS_NPC_DEBUG_LOGS ~= true then return end
+    print(...)
+end
+
 ---@param npc ChaosNPC
 ---@return boolean
 local function canOpenWindowsAndDoorsWithoutDamage(npc)
@@ -87,7 +92,7 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
                 return true
             end
         elseif window:canClimbThrough(zombie) then
-            print(string.format("[ChaosNPCCollisionSystem][npc=%s] Climbing through window", tostring(zombie:getID())))
+            debugLog(string.format("[ChaosNPCCollisionSystem][npc=%s] Climbing through window", tostring(zombie:getID())))
             self:StopMoving(true, "clim_window")
             zombie:climbThroughWindow(window)
             return true
@@ -123,7 +128,7 @@ function ChaosNPC:HandleCollisionWithObject(zombie, object)
             canOpenDoor = false
         end
 
-        print(string.format("[ChaosNPCCollisionSystem][npc=%s] canOpenDoor=%s locked=%s", tostring(zombie:getID()),
+        debugLog(string.format("[ChaosNPCCollisionSystem][npc=%s] canOpenDoor=%s locked=%s", tostring(zombie:getID()),
             tostring(canOpenDoor), tostring(isLocked)))
 
         if canOpenDoor then

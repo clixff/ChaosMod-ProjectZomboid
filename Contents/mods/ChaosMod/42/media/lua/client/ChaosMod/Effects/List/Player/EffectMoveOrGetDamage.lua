@@ -9,7 +9,7 @@ EffectMoveOrGetDamage = ChaosEffectBase:derive("EffectMoveOrGetDamage", "move_or
 
 local CHECK_INTERVAL_MS = 1000
 local MOVE_THRESHOLD = 1.0
-local DAMAGE_COOLDOWN_MS = 5000
+local DAMAGE_COOLDOWN_MS = 7500
 
 function EffectMoveOrGetDamage:OnStart()
     ChaosEffectBase:OnStart()

@@ -33,12 +33,64 @@ local function spawnRedLightAtPlayer(cell, x, y, z)
     print("[EffectUFOAbduction] addLamppost result: " .. tostring(result))
 end
 
----@param item InventoryItem
-local function removeClothingItem(item)
-    if not item then return end
-    if not item:IsClothing() then return end
-    if item:IsInventoryContainer() then return end
-    item:Remove()
+---@param container ItemContainer
+---@param out InventoryItem[]
+local function collectClothes(container, out)
+    if not container then return end
+    if not container.getItems then return end
+    local items = container:getItems()
+    if not items then return end
+
+    for i = 0, items:size() - 1 do
+        local item = items:get(i)
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
+            if item:IsInventoryContainer() then
+                ---@type InventoryContainer
+                local inner = item
+                collectClothes(inner:getInventory(), out)
+            elseif item:IsClothing() then
+                table.insert(out, item)
+            end
+        end
+    end
+end
+
+---@param player IsoPlayer
+local function hidePlayerClothes(player)
+    if not player or player:isDead() then return end
+
+    local inventory = player:getInventory()
+    if not inventory then return end
+
+    ---@type InventoryItem[]
+    local clothes = {}
+    collectClothes(inventory, clothes)
+
+    if #clothes == 0 then return end
+
+    local sq = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 3, 20, 50, true, true, false)
+    if not sq then return end
+
+    for _, clothing in ipairs(clothes) do
+        local worn = player:getWornItems()
+        if worn and worn:contains(clothing) then
+            player:removeWornItem(clothing)
+        end
+        local container = clothing:getContainer()
+        if container then
+            container:Remove(clothing)
+        end
+        sq:AddWorldInventoryItem(clothing, 0.5, 0.5, 0)
+    end
+
+    player:onWornItemsChanged()
+    player:resetModelNextFrame()
+    triggerEvent("OnClothingUpdated", player)
+
+    local str = string.format(ChaosLocalization.GetString("misc", "clothes_hidden"), #clothes)
+    ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
+
+    ChaosPlayer.ScheduleItemsHiddenHint(player)
 end
 
 ---@param player IsoPlayer
@@ -204,16 +256,15 @@ function EffectUFOAbduction:OnEnd()
             teleportPlayerToSquare(player, self.targetSquare)
         end
 
-        local inventory = player:getInventory()
-        if inventory then
-            ChaosPlayer.RecursiveInventoryLookup(inventory, true, true, removeClothingItem)
-            player:onWornItemsChanged()
-            player:resetModelNextFrame()
-            triggerEvent("OnClothingUpdated", player)
-        end
-
         player:getBodyDamage():RestoreToFullHealth()
         ChaosPlayer.SayLineByColor(player, "Health was fully restored", ChaosPlayerChatColors.green)
+
+        ChaosSpecialAction.AddNewAction({ player = player }, 1000,
+            function(_deltaMs, _data) end,
+            function(data)
+                hidePlayerClothes(data.player)
+            end
+        )
     end
 
     if self.hud then

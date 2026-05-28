@@ -261,7 +261,7 @@ function EffectGameBattleRoyale:OnTick(deltaMs)
                     npc.enemy = nil
                     npc.moveTargetCharacter = nil
                     npc.moveTargetLocation = nil
-                    print("Regrouping NPC " .. zombie:getID())
+                    -- print("Regrouping NPC " .. zombie:getID())
                     if self.centerSquare then
                         npc:MoveToLocation(self.centerSquare)
                     end

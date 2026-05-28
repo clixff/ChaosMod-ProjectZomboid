@@ -65,19 +65,86 @@ function ChaosEffectsManager.ClearGlobalTimer()
     ChaosEffectsManager.voteStartedThisInterval = false
 end
 
+--- Returns how many effects this cycle should activate (1 by default; >1 when
+--- combo_time meta effect is active). Streamer-side voting branch handles its
+--- own multi-winner selection via meta state tracking.
+---@return integer
+local function getEffectsCountForThisCycle()
+    if not ChaosMetaEffectsManager or not ChaosMetaEffectsManager.GetActive then
+        return 1
+    end
+    ---@type MetaEffectComboTime | nil
+    local combo = ChaosMetaEffectsManager.GetActive("combo_time")
+    if not combo or not combo.GetEffectsCount then return 1 end
+    local n = combo:GetEffectsCount()
+    if type(n) ~= "number" or n < 1 then return 1 end
+    return math.floor(n)
+end
+
+--- Picks N effects via weighted random, dropping picks that conflict with
+--- already-chosen picks via `disable_effects` and re-rolling from the remaining
+--- pool. May return fewer than N if the pool runs dry.
+---@param amount integer
+---@return string[]
+local function pickComboEffects(amount)
+    if amount <= 1 then
+        return ChaosEffectsRegistry.GetRandomEffects(1, "default")
+    end
+
+    local chosen = {} ---@type string[]
+    local chosenSet = {} ---@type table<string, boolean>
+    local pickedTries = 0
+    local maxTries = amount * 4
+    while #chosen < amount and pickedTries < maxTries do
+        pickedTries = pickedTries + 1
+        local rolled = ChaosEffectsRegistry.GetRandomEffects(1, "default")
+        local candidate = rolled and rolled[1] or nil
+        if not candidate then break end
+        if chosenSet[candidate] then
+            -- Already picked this exact id; try again.
+        else
+            local conflict = false
+            local candidateData = ChaosEffectsRegistry.effects[candidate]
+            local candidateDisables = candidateData and candidateData.disableEffects or {}
+            for _, otherId in ipairs(chosen) do
+                if otherId == candidate then conflict = true; break end
+                for _, d in ipairs(candidateDisables) do
+                    if d == otherId then conflict = true; break end
+                end
+                if conflict then break end
+                local otherData = ChaosEffectsRegistry.effects[otherId]
+                local otherDisables = otherData and otherData.disableEffects or {}
+                for _, d in ipairs(otherDisables) do
+                    if d == candidate then conflict = true; break end
+                end
+                if conflict then break end
+            end
+            if not conflict then
+                table.insert(chosen, candidate)
+                chosenSet[candidate] = true
+            end
+        end
+    end
+    return chosen
+end
+
 function ChaosEffectsManager.OnGlobalEffectsTimerEnd()
     if not ChaosConfig.IsEffectsEnabled() then return end
     local sm = ChaosConfig.streamer_mode
     if not sm or sm.streamer_mode_enabled == false or sm.voting_enabled == false then
-        local effectIds = ChaosEffectsRegistry.GetRandomEffects(1, "default")
-        if effectIds and effectIds[1] then
-            ChaosEffectsManager.StartEffect(effectIds[1], nil, ChaosEffectActivationType.INTERVAL)
+        local count = getEffectsCountForThisCycle()
+        local effectIds = pickComboEffects(count)
+        for _, id in ipairs(effectIds) do
+            ChaosEffectsManager.StartEffect(id, nil, ChaosEffectActivationType.INTERVAL)
         end
     end
     if sm and sm.streamer_mode_enabled == true then
         ChaosEffectsManager.iterationIndex = ChaosEffectsManager.iterationIndex + 1
         ChaosEffectsManager.voteStartedThisInterval = false
-        ChaosBridge.Emit("interval_start", { iteration = ChaosEffectsManager.iterationIndex })
+        ChaosBridge.Emit("interval_start", {
+            iteration = ChaosEffectsManager.iterationIndex,
+            meta_effects = ChaosMetaEffectsManager.GetActiveIds(),
+        })
     end
 end
 
@@ -187,7 +254,10 @@ function ChaosEffectsManager.OnTick(deltaMs)
                     and math.max(0, optionsCount - 1)
                     or math.max(0, optionsCount)
                 local visibleEffects = ChaosEffectsRegistry.GetRandomEffects(visibleCount, "default", true)
-                local payload = { effects = visibleEffects }
+                local payload = {
+                    effects = visibleEffects,
+                    meta_effects = ChaosMetaEffectsManager.GetActiveIds(),
+                }
                 if includeRandom then
                     local secretEffects = ChaosEffectsRegistry.GetRandomEffects(1, "default", false)
                     if secretEffects[1] then

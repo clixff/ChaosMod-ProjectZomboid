@@ -9,6 +9,8 @@
     "hide_progress_bar": false,
     "use_voting_progress_bar_color": false,
     "hide_effect_names": false,
+    "explosions_damage_items": true,
+    "explosions_destroy_random_item": true,
     "ui": {
         "progress_bar_color": "9f211f",
         "progress_bar_opacity": 0.9,
@@ -139,14 +141,41 @@
         "youtube_chat_connection_type": "long_polling",
         "random_effect_in_vote": true,
         "voting_fake_effects_enabled": true,
-        "voting_fake_effects_chance": 5.0,
+        "voting_fake_effects_chance": 3.0,
         "voting_hidden_effects_enabled": true,
-        "voting_hidden_effects_chance": 5.0,
+        "voting_hidden_effects_chance": 3.0,
         "reveal_hidden_effect_after_delay": true,
         "reveal_fake_effect_after_delay": true,
         "currencies": {
             "main": "",
             "list": {}
         }
+    },
+    "meta_effects": {
+        "enabled": true,
+        "interval_sec": 900,
+        "list": [
+            {
+                "id": "total_chaos",
+                "enabled": true,
+                "voting_only": false,
+                "duration": 180,
+                "chance": 1.0,
+                "variables": {
+                    "min_time": 15,
+                    "time_multipier": 0.5
+                }
+            },
+            {
+                "id": "combo_time",
+                "enabled": true,
+                "voting_only": false,
+                "chance": 1.0,
+                "duration": 100,
+                "variables": {
+                    "effects_count": 2
+                }
+            }
+        ]
     }
 }

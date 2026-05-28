@@ -482,6 +482,32 @@ async function main(): Promise<void> {
   const bridge = luaFolder ? new Bridge(luaFolder) : null;
   let modEnabled = false;
   let iterationIndex = 0;
+  // Tracks meta effect ids reported active by Lua via meta_effect_start/_end.
+  // Cleared on mod_change_status:false. Used to compute desired winner count
+  // for combo_time and to gate other meta-aware logic.
+  const activeMetas = new Set<string>();
+
+  function getComboTimeEffectsCount(): number {
+    if (!activeMetas.has("combo_time")) return 1;
+    if (!config) return 1;
+    const entry = config.meta_effects.list.find((e) => e.id === "combo_time");
+    if (!entry) return 1;
+    const raw = entry.variables["effects_count"];
+    const n = typeof raw === "number" ? Math.floor(raw) : 1;
+    return n >= 1 ? n : 1;
+  }
+
+  // Replaces activeMetas wholesale from a snapshot the mod includes on
+  // interval_start / vote_start. Used as a self-correcting safety net on top
+  // of meta_effect_start / meta_effect_end edge events.
+  function syncActiveMetasFromPayload(payload: Record<string, unknown>): void {
+    const raw = payload["meta_effects"];
+    if (!Array.isArray(raw)) return;
+    activeMetas.clear();
+    for (const id of raw) {
+      if (typeof id === "string" && id !== "") activeMetas.add(id);
+    }
+  }
 
   type HandshakePayload = {
     streamer_mode_version: string;
@@ -541,6 +567,9 @@ async function main(): Promise<void> {
       const enabled = payload.enabled === true;
       modEnabled = enabled;
       logger.debug(`[Bridge] mod_change_status: enabled=${enabled}`);
+      // Any change to the mod's run state invalidates the active-meta tracking;
+      // it gets repopulated by subsequent meta_effect_start events.
+      activeMetas.clear();
       if (enabled) {
         lastSentHandshake = null;
         emitHandshakeIfChanged();
@@ -566,38 +595,58 @@ async function main(): Promise<void> {
     });
 
     bridge.on("interval_start", (payload) => {
+      syncActiveMetasFromPayload(payload);
       const iter =
         typeof payload.iteration === "number" ? payload.iteration : 0;
       iterationIndex = iter;
       logger.debug(`[Bridge] interval_start: iteration=${iter}`);
       if (votingManager.isActive) {
-        votingManager.stop();
-        const winnerEffectId = votingManager.lastWinnerEffectId;
-        if (winnerEffectId) {
-          const winnerEntry: {
-            id: string;
-            type: string;
-            fake_option_type?: number;
-          } = { id: winnerEffectId, type: "vote" };
-          const winnerTag = votingManager.lastWinnerOptionTag;
-          if (winnerTag === "fake") {
-            winnerEntry.fake_option_type = 1;
-          } else if (winnerTag === "hidden") {
-            winnerEntry.fake_option_type = 2;
+        const desiredCount = getComboTimeEffectsCount();
+        votingManager.stop(desiredCount);
+        const winners = votingManager.lastWinnersBatch;
+        if (winners.length > 0) {
+          const winnerEntries = winners
+            .filter((w) => !!w.effectId)
+            .map((w) => {
+              const entry: {
+                id: string;
+                type: string;
+                fake_option_type?: number;
+              } = { id: w.effectId, type: "vote" };
+              if (w.tag === "fake") entry.fake_option_type = 1;
+              else if (w.tag === "hidden") entry.fake_option_type = 2;
+              return entry;
+            });
+          if (winnerEntries.length > 0) {
+            bridge.emit("activate_effects", { effects: winnerEntries });
+            for (const w of winnerEntries) {
+              activityLog.add({
+                type: "vote",
+                effect_id: w.id,
+                effect_name: getString("effects", w.id),
+              });
+            }
           }
-          bridge.emit("activate_effects", {
-            effects: [winnerEntry],
-          });
-          activityLog.add({
-            type: "vote",
-            effect_id: winnerEffectId,
-            effect_name: getString("effects", winnerEffectId),
-          });
         }
       }
     });
 
+    bridge.on("meta_effect_start", (payload) => {
+      const id = typeof payload["id"] === "string" ? payload["id"] : "";
+      if (!id) return;
+      activeMetas.add(id);
+      logger.debug(`[Bridge] meta_effect_start: ${id}`);
+    });
+
+    bridge.on("meta_effect_end", (payload) => {
+      const id = typeof payload["id"] === "string" ? payload["id"] : "";
+      if (!id) return;
+      activeMetas.delete(id);
+      logger.debug(`[Bridge] meta_effect_end: ${id}`);
+    });
+
     bridge.on("vote_start", (payload) => {
+      syncActiveMetasFromPayload(payload);
       logger.debug("[Bridge] vote_start");
       if (!config?.streamer_mode.voting_enabled) return;
       const rawEffects = payload["effects"];

@@ -332,8 +332,12 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
         if square and isSameZ and ChaosUtils.isInRange(expX, expY, playerX, playerY, explosionRange) then
             playerWasInRadius = true
             player:setKnockedDown(true)
-            ChaosUtils.RemoveRandomItem(player, true)
-            ChaosUtils.DamageAllItems(player, 0.35)
+            if ChaosConfig.explosions_destroy_random_item ~= false then
+                ChaosUtils.RemoveRandomItem(player, true)
+            end
+            if ChaosConfig.explosions_damage_items ~= false then
+                ChaosUtils.DamageAllItems(player, 0.35)
+            end
         end
     end
 

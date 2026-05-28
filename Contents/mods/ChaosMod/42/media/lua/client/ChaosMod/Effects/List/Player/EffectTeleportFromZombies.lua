@@ -50,6 +50,8 @@ function EffectTeleportFromZombies:OnTick(deltaMs)
     local nearby = ChaosZombie.GetNearestZombies(px, py, DANGER_RADIUS, false, pz)
     if nearby:size() == 0 then return end
 
+    if player:getVehicle() ~= nil then return end
+
     tryTeleportPlayerAwayFromZombies(player)
 end
 

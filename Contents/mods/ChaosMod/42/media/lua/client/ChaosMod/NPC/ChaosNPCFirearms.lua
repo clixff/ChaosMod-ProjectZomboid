@@ -1,6 +1,11 @@
 ---@diagnostic disable: undefined-field
 require "ChaosMod/NPC/ChaosNPCConstants"
 
+local function debugLog(...)
+    if CHAOS_NPC_DEBUG_LOGS ~= true then return end
+    print(...)
+end
+
 ChaosNPCFirearms = ChaosNPCFirearms or {}
 
 ChaosNPCFirearms.FIREARM_MAX_RANGE = { handgun = 8, shotgun = 8, rifle = 20 }
@@ -111,7 +116,7 @@ function ChaosNPCFirearms.OnSetFirearm(npc, weapon)
 
     npc.zombie:setVariable("ChaosFirearmType", fType)
 
-    print(string.format(
+    debugLog(string.format(
         "[ChaosNPCFirearms][npc=%s] equipped firearm=%s type=%s ammo=%d",
         tostring(npc.zombie:getID()),
         tostring(weapon:getFullType()),
@@ -306,7 +311,7 @@ function ChaosNPCFirearms.AlertNearbyHostileNPCs(shooterNpc, soundRadius)
         local rel = ChaosNPCRelations.GetRelationForNPC(otherNpc, shooterZombie)
         if rel ~= ChaosNPCRelationType.ATTACK then return end
 
-        print(string.format(
+        debugLog(string.format(
             "[ChaosNPCFirearms][npc=%s] gunshot alerted hostile npc=%s -> new enemy",
             tostring(shooterZombie:getID()),
             tostring(otherZombie:getID())))
@@ -351,7 +356,7 @@ function ChaosNPCFirearms.ApplyShotHit(npc, weapon, enemy)
             local modData = player:getModData()
             if modData and modData.CHAOS_SHIELD_ENABLED then
                 if not ChaosNPCFirearms.IsNPCInPlayerShieldRadius(npc) then
-                    print(string.format(
+                    debugLog(string.format(
                         "[ChaosNPCFirearms][npc=%s] shot blocked by player energy shield",
                         tostring(zombie:getID())))
                     return
@@ -402,7 +407,7 @@ function ChaosNPCFirearms.ApplyShotHit(npc, weapon, enemy)
         zEnemy:clearVariable("ZombieBiteDone")
         zEnemy:setAttackOutcome("interrupted")
 
-        print(string.format(
+        debugLog(string.format(
             "[ChaosNPCFirearms][npc=%s zEnemy=%s] hit dmg=%.2f applied=%.2f old=%.2f new=%.2f alive=%s",
             tostring(zombie:getID()), tostring(zEnemy:getID()),
             damage, appliedDamage or -1, oldHealth, zEnemy:getHealth(),
@@ -416,7 +421,7 @@ function ChaosNPCFirearms.ApplyShotHit(npc, weapon, enemy)
         if enemy.playBloodSplatterSound then
             enemy:playBloodSplatterSound()
         end
-        print(string.format(
+        debugLog(string.format(
             "[ChaosNPCFirearms][npc=%s pEnemy=%s] hit dmg=%.2f",
             tostring(zombie:getID()), tostring(enemy:getID()), damage
         ))
@@ -467,7 +472,7 @@ function ChaosNPCFirearms.FireShot(npc)
     if hitChance > 1 then hitChance = 1 end
 
     local roll = ChaosUtils.RandFloat(0, 1)
-    print(string.format(
+    debugLog(string.format(
         "[ChaosNPCFirearms][npc=%s enemy=%s] fired type=%s dist=%.2f baseAcc=%.2f accMul=%.2f hitChance=%.2f roll=%.2f vehicle=%s ammo=%d/%d",
         tostring(zombie:getID()), tostring(enemy:getID()),
         tostring(fType), dist, baseAcc, accMul, hitChance, roll,
@@ -475,7 +480,7 @@ function ChaosNPCFirearms.FireShot(npc)
     ))
 
     if roll > hitChance then
-        print(string.format("[ChaosNPCFirearms][npc=%s enemy=%s] missed",
+        debugLog(string.format("[ChaosNPCFirearms][npc=%s enemy=%s] missed",
             tostring(zombie:getID()), tostring(enemy:getID())))
         return
     end
@@ -485,7 +490,7 @@ function ChaosNPCFirearms.FireShot(npc)
     if hadVehicle and ChaosUtils.RandFloat(0, 1) < ChaosNPCFirearms.FIREARM_TIRE_POP_CHANCE then
         local enemyVehicle = enemy:getVehicle()
         if enemyVehicle and popRandomInflatedTire(enemyVehicle) then
-            print(string.format("[ChaosNPCFirearms][npc=%s enemy=%s] popped tire on vehicle hit",
+            debugLog(string.format("[ChaosNPCFirearms][npc=%s enemy=%s] popped tire on vehicle hit",
                 tostring(zombie:getID()), tostring(enemy:getID())))
         end
     end
@@ -504,7 +509,7 @@ function ChaosNPCFirearms.EnterAim(npc)
     npc.attackAnimName = "ZombieAimFirearm"
     faceTarget(npc.zombie, npc.enemy)
     npc.zombie:setBumpType("ZombieAimFirearm")
-    print(string.format("[ChaosNPCFirearms][npc=%s] enter_aim type=%s aim_ms=%d",
+    debugLog(string.format("[ChaosNPCFirearms][npc=%s] enter_aim type=%s aim_ms=%d",
         tostring(npc.zombie:getID()),
         tostring(npc.firearmType),
         ChaosNPCFirearms.FIREARM_AIM_MS[npc.firearmType] or 700))
@@ -521,7 +526,7 @@ function ChaosNPCFirearms.EnterCooldown(npc)
     -- still needs to play out. The engine clears the bump variable itself
     -- when the bump animation finishes; the cooldown tick re-arms the aim
     -- bump as soon as it goes empty so the NPC visually stays in aim pose.
-    print(string.format("[ChaosNPCFirearms][npc=%s] enter_cooldown type=%s ms=%d",
+    debugLog(string.format("[ChaosNPCFirearms][npc=%s] enter_cooldown type=%s ms=%d",
         tostring(npc.zombie:getID()),
         tostring(npc.firearmType),
         ChaosNPCFirearms.FIREARM_SHOT_COOLDOWN[npc.firearmType] or 800))
@@ -580,7 +585,7 @@ local function reArmAimBumpIfMissing(zombie, tag)
     if bt == nil or bt == "" or (as == "idle" and bt ~= "ZombieAimFirearm") then
         zombie:setBumpType("ZombieAimFirearm")
         zombie:setVariable("BumpAnimFinished", false)
-        print(string.format(
+        debugLog(string.format(
             "[ChaosNPCFirearms][npc=%s] rearm_aim_bump tag=%s prevBump=%s actionState=%s",
             tostring(zombie:getID()),
             tostring(tag),
@@ -597,7 +602,7 @@ local function diagFirearmTick(npc, zombie, state)
     if not npc._lastFirearmDiagMs then npc._lastFirearmDiagMs = 0 end
     if now - npc._lastFirearmDiagMs < 250 then return end
     npc._lastFirearmDiagMs = now
-    print(string.format(
+    debugLog(string.format(
         "[ChaosNPCFirearms][npc=%s] diag state=%s bt=%s af=%s as=%s endIn=%d",
         tostring(zombie:getID()),
         tostring(state),
@@ -617,7 +622,7 @@ function ChaosNPCFirearms.EnterPostEngage(npc, reason)
     npc.attackHitPassed = true
     npc.attackAnimName = "ZombieAimFirearm"
     reArmAimBumpIfMissing(npc.zombie, "post_enter")
-    print(string.format("[ChaosNPCFirearms][npc=%s] post_engage reason=%s",
+    debugLog(string.format("[ChaosNPCFirearms][npc=%s] post_engage reason=%s",
         tostring(npc.zombie:getID()), tostring(reason)))
 end
 
@@ -629,7 +634,7 @@ function ChaosNPCFirearms.EnterReload(npc)
     npc.attackAnimName = "ZombieReloadFirearm"
     npc.zombie:setBumpType("ZombieReloadFirearm")
     npc.zombie:setVariable("BumpAnimFinished", false)
-    print(string.format("[ChaosNPCFirearms][npc=%s] reload_start ms=%d",
+    debugLog(string.format("[ChaosNPCFirearms][npc=%s] reload_start ms=%d",
         tostring(npc.zombie:getID()), ChaosNPCFirearms.FIREARM_RELOAD_MS))
 end
 
@@ -638,7 +643,7 @@ end
 function ChaosNPCFirearms.CancelFirearmState(npc, reason)
     if not npc then return end
     if npc.firearmStateType then
-        print(string.format("[ChaosNPCFirearms][npc=%s] cancel_state state=%s reason=%s",
+        debugLog(string.format("[ChaosNPCFirearms][npc=%s] cancel_state state=%s reason=%s",
             tostring(npc.zombie and npc.zombie:getID() or "?"),
             tostring(npc.firearmStateType),
             tostring(reason)))
@@ -784,7 +789,7 @@ function ChaosNPCFirearms.OnFirearmAttackTick(npc, deltaMs)
         diagFirearmTick(npc, zombie, "reload")
         if now >= npc.firearmStateEndMs then
             npc.currentAmmo = npc.maxAmmo or ChaosNPCFirearms.DEFAULT_MAX_AMMO
-            print(string.format("[ChaosNPCFirearms][npc=%s] reload_finished ammo=%d",
+            debugLog(string.format("[ChaosNPCFirearms][npc=%s] reload_finished ammo=%d",
                 tostring(zombie:getID()), npc.currentAmmo))
             ChaosNPCFirearms.CancelFirearmState(npc, "reload_done")
             npc.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS

@@ -3,9 +3,14 @@ require "ISUI/ISScrollingListBox"
 require "ISUI/ISButton"
 require "ISUI/ISTextEntryBox"
 
+---@class ChaosEffectsWindowItem
+---@field kind string | nil -- "random" | "meta" | nil (regular effect)
+---@field id string
+---@field name string
+
 ---@class ChaosEffectsWindow : ISCollapsableWindow
 ---@field effects table<string, ChaosEffectDataEntry>
----@field selectedEffect ChaosEffectDataEntry | nil
+---@field selectedEffect ChaosEffectsWindowItem | ChaosEffectDataEntry | nil
 ---@field searchText string
 ChaosEffectsWindow = ISCollapsableWindow:derive("ChaosEffectsWindow")
 
@@ -99,7 +104,7 @@ function ChaosEffectsWindow:onListMouseDown(target, item)
     print("[ChaosMod] Item: " .. tostring(item))
 end
 
-local RANDOM_EFFECT_ITEM = { id = "__random__", name = "Random Effect" }
+local RANDOM_EFFECT_ITEM = { kind = "random", id = "__random__", name = "Random Effect" }
 
 function ChaosEffectsWindow:fillWithEffects()
     self.list:clear()
@@ -110,11 +115,35 @@ function ChaosEffectsWindow:fillWithEffects()
     end
 
     local firstItem = nil
+
+    -- Meta effects render first, before the numbered regular effects. The
+    -- numbering for regular effects ("0. Random Effect", "1.", "2.", ...) is
+    -- unchanged regardless of how many meta effects exist.
+    if ChaosMetaEffectsRegistry and ChaosMetaEffectsRegistry.order then
+        for _, metaId in ipairs(ChaosMetaEffectsRegistry.order) do
+            local entry = ChaosMetaEffectsRegistry.effects[metaId]
+            if entry then
+                local matches = true
+                if needle then
+                    local nameMatch = string.find(string.lower(entry.name or ""), needle, 1, true)
+                    local idMatch = string.find(string.lower(entry.id or ""), needle, 1, true)
+                    matches = (nameMatch or idMatch) and true or false
+                end
+                if matches then
+                    local item = { kind = "meta", id = entry.id, name = entry.name }
+                    local line = string.format("[META] %s", entry.name or entry.id)
+                    self.list:addItem(line, item)
+                    if not firstItem then firstItem = item end
+                end
+            end
+        end
+    end
+
     local i = 0
 
     if not needle then
         self.list:addItem("0. " .. RANDOM_EFFECT_ITEM.name, RANDOM_EFFECT_ITEM)
-        firstItem = RANDOM_EFFECT_ITEM
+        if not firstItem then firstItem = RANDOM_EFFECT_ITEM end
     end
 
     for _, effectData in pairs(ChaosEffectsRegistry.effects) do
@@ -140,10 +169,19 @@ end
 function ChaosEffectsWindow:onActivateClicked()
     if not self.selectedEffect then return end
 
-    if self.selectedEffect == RANDOM_EFFECT_ITEM then
+    local kind = self.selectedEffect.kind
+
+    if kind == "random" then
         local picked = ChaosEffectsRegistry.GetRandomEffects(1, "default")
         if picked[1] then
             ChaosEffectsManager.StartEffect(picked[1], nil, ChaosEffectActivationType.CHEAT)
+        end
+        return
+    end
+
+    if kind == "meta" then
+        if ChaosMetaEffectsManager and ChaosMetaEffectsManager.ActivateById then
+            ChaosMetaEffectsManager.ActivateById(self.selectedEffect.id)
         end
         return
     end

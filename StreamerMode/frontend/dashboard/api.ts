@@ -81,6 +81,21 @@ export interface StreamerModeConfig {
   currencies: CurrenciesConfig;
 }
 
+export interface MetaEffectEntry {
+  id: string;
+  enabled: boolean;
+  voting_only: boolean;
+  duration: number;
+  chance: number;
+  variables: Record<string, unknown>;
+}
+
+export interface MetaEffectsConfig {
+  enabled: boolean;
+  interval_sec: number;
+  list: MetaEffectEntry[];
+}
+
 export interface ModConfig {
   lang: string;
   effects_interval_enabled: boolean;
@@ -92,11 +107,14 @@ export interface ModConfig {
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
   hide_effect_names: boolean;
+  explosions_damage_items: boolean;
+  explosions_destroy_random_item: boolean;
   ui: UIConfig;
   ui_sounds_enabled: boolean;
   ignore_effect_chances: boolean;
   npc_voicelines_enabled: boolean;
   npc_gifts_enabled: boolean;
+  meta_effects: MetaEffectsConfig;
   streamer_mode: StreamerModeConfig;
 }
 

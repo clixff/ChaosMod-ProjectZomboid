@@ -84,6 +84,21 @@ export interface StreamerModeConfig {
   currencies: CurrenciesConfig;
 }
 
+export interface MetaEffectEntry {
+  id: string;
+  enabled: boolean;
+  voting_only: boolean;
+  duration: number;
+  chance: number;
+  variables: Record<string, unknown>;
+}
+
+export interface MetaEffectsConfig {
+  enabled: boolean;
+  interval_sec: number;
+  list: MetaEffectEntry[];
+}
+
 export interface ModConfig {
   lang: string;
   effects_interval_enabled: boolean;
@@ -95,11 +110,14 @@ export interface ModConfig {
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
   hide_effect_names: boolean;
+  explosions_damage_items: boolean;
+  explosions_destroy_random_item: boolean;
   ui: UIConfig;
   ui_sounds_enabled: boolean;
   ignore_effect_chances: boolean;
   npc_voicelines_enabled: boolean;
   npc_gifts_enabled: boolean;
+  meta_effects: MetaEffectsConfig;
   streamer_mode: StreamerModeConfig;
 }
 
@@ -211,6 +229,12 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   currencies: { main: "", list: {} },
 };
 
+const DEFAULT_META_EFFECTS: MetaEffectsConfig = {
+  enabled: true,
+  interval_sec: 900,
+  list: [],
+};
+
 const DEFAULT_CONFIG: ModConfig = {
   lang: "en",
   effects_interval_enabled: true,
@@ -222,13 +246,51 @@ const DEFAULT_CONFIG: ModConfig = {
   hide_progress_bar: false,
   use_voting_progress_bar_color: false,
   hide_effect_names: false,
+  explosions_damage_items: true,
+  explosions_destroy_random_item: true,
   ui: DEFAULT_UI,
   ui_sounds_enabled: true,
   ignore_effect_chances: false,
   npc_voicelines_enabled: true,
   npc_gifts_enabled: true,
+  meta_effects: DEFAULT_META_EFFECTS,
   streamer_mode: DEFAULT_STREAMER_MODE,
 };
+
+function parseMetaEffects(raw: Record<string, unknown>): MetaEffectsConfig {
+  const d = DEFAULT_META_EFFECTS;
+  const list: MetaEffectEntry[] = [];
+  const rawList = raw["list"];
+  if (Array.isArray(rawList)) {
+    for (const item of rawList) {
+      if (item === null || typeof item !== "object" || Array.isArray(item)) {
+        continue;
+      }
+      const r = item as Record<string, unknown>;
+      if (typeof r["id"] !== "string" || r["id"] === "") continue;
+      const variables =
+        r["variables"] !== null &&
+        typeof r["variables"] === "object" &&
+        !Array.isArray(r["variables"])
+          ? (r["variables"] as Record<string, unknown>)
+          : {};
+      list.push({
+        id: r["id"],
+        enabled: typeof r["enabled"] === "boolean" ? r["enabled"] : false,
+        voting_only:
+          typeof r["voting_only"] === "boolean" ? r["voting_only"] : false,
+        duration: typeof r["duration"] === "number" ? r["duration"] : 0,
+        chance: typeof r["chance"] === "number" ? r["chance"] : 0,
+        variables,
+      });
+    }
+  }
+  return {
+    enabled: bool(raw["enabled"], d.enabled),
+    interval_sec: num(raw["interval_sec"], d.interval_sec),
+    list,
+  };
+}
 
 function cloneConfig(config: ModConfig): ModConfig {
   return JSON.parse(JSON.stringify(config)) as ModConfig;
@@ -576,6 +638,14 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
       d.use_voting_progress_bar_color,
     ),
     hide_effect_names: bool(raw["hide_effect_names"], d.hide_effect_names),
+    explosions_damage_items: bool(
+      raw["explosions_damage_items"],
+      d.explosions_damage_items,
+    ),
+    explosions_destroy_random_item: bool(
+      raw["explosions_destroy_random_item"],
+      d.explosions_destroy_random_item,
+    ),
     ui: parseUI(obj(raw["ui"])),
     ui_sounds_enabled: bool(raw["ui_sounds_enabled"], d.ui_sounds_enabled),
     ignore_effect_chances: bool(
@@ -587,6 +657,7 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
       d.npc_voicelines_enabled,
     ),
     npc_gifts_enabled: bool(raw["npc_gifts_enabled"], d.npc_gifts_enabled),
+    meta_effects: parseMetaEffects(obj(raw["meta_effects"])),
     streamer_mode: parseStreamerMode(obj(raw["streamer_mode"])),
   };
 }
