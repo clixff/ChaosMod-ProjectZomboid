@@ -24,8 +24,6 @@ local SHOUT_SOUND          = "chaos_skyrim_shout"
 local function hasWallOrFenceBetween(sq1, sq2)
     if not sq1 or not sq2 or sq1 == sq2 then return false end
     if sq1:isWallTo(sq2) then return true end
-    if sq1:isHoppableTo(sq2) then return true end
-    if sq1:getHoppableThumpableTo(sq2) ~= nil then return true end
     return false
 end
 

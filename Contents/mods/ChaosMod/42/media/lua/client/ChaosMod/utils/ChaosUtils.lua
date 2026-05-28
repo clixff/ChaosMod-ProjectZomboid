@@ -13,6 +13,9 @@
 ---@field crashDamage { originalValue: boolean|nil, disabled: boolean } -- Tracks the sandbox PlayerDamageFromCrash override state
 ---@field EFFECT_FLYING_CARS_ENABLED boolean -- When true, forces crash damage off regardless of NPC count
 ---@field EFFECT_EARTHQUAKE_ENABLED boolean -- When true, forces crash damage off (earthquake violently shakes cars)
+---@field EFFECT_HURRICANE_ENABLED boolean -- When true, forces crash damage off (hurricane flings cars across the ground)
+---@field EFFECT_BLACK_HOLE_ENABLED boolean -- When true, forces crash damage off (black hole pulls cars toward a center)
+---@field EFFECT_DOOMSDAY_ENABLED boolean -- When true, forces crash damage off (doomsday flings cars across the ground)
 ChaosUtils = ChaosUtils or {
     DEBUG_SQUARE_RING_SEARCH = false,
     lastUsedVehicle = nil,
@@ -27,7 +30,10 @@ ChaosUtils = ChaosUtils or {
     ScannedBasementLatest = nil,
     crashDamage = { originalValue = nil, disabled = false },
     EFFECT_FLYING_CARS_ENABLED = false,
-    EFFECT_EARTHQUAKE_ENABLED = false
+    EFFECT_EARTHQUAKE_ENABLED = false,
+    EFFECT_HURRICANE_ENABLED = false,
+    EFFECT_BLACK_HOLE_ENABLED = false,
+    EFFECT_DOOMSDAY_ENABLED = false
 }
 
 local SLEEP_MOD_DATA_KEY = "ChaosMod_SleepData"
@@ -261,6 +267,7 @@ end
 ---@param explosionRange integer | nil defaults to 5
 ---@param shouldRemoveProps boolean | nil defaults to true
 ---@param disableSounds boolean | nil defaults to false; when true the explosion plays no bang sound
+---@return boolean playerWasInRadius true if the player was within the explosion radius
 function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps, disableSounds)
     explosionRange = explosionRange or 5
     if shouldRemoveProps == nil then shouldRemoveProps = true end
@@ -312,6 +319,8 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
     local expY = square:getY()
     local expZ = square:getZ()
 
+    local playerWasInRadius = false
+
     local player = getPlayer()
     if player then
         local square = player:getSquare()
@@ -321,6 +330,7 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
         local playerZ = player:getZ()
         local isSameZ = expZ == playerZ
         if square and isSameZ and ChaosUtils.isInRange(expX, expY, playerX, playerY, explosionRange) then
+            playerWasInRadius = true
             player:setKnockedDown(true)
             ChaosUtils.RemoveRandomItem(player, true)
             ChaosUtils.DamageAllItems(player, 0.35)
@@ -355,6 +365,8 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
         )
         cell:addLamppost(light)
     end
+
+    return playerWasInRadius
 end
 
 ---@type table<integer, PerkFactory.Perk>
@@ -463,7 +475,8 @@ end
 ---@param soundname string
 ---@param skipCheck boolean | nil
 ---@param volume number | nil
-function ChaosUtils.PlayUISound(soundname, skipCheck, volume)
+---@param skipPlayerVolumeSettings boolean?
+function ChaosUtils.PlayUISound(soundname, skipCheck, volume, skipPlayerVolumeSettings)
     skipCheck = skipCheck or false
     if not skipCheck and not ChaosConfig.IsUISoundsEnabled() then
         return nil
@@ -489,6 +502,11 @@ function ChaosUtils.PlayUISound(soundname, skipCheck, volume)
     end
 
     local settingsVolume = getCore():getRealOptionSoundVolume()
+
+    if skipPlayerVolumeSettings then
+        settingsVolume = 1.0
+    end
+
     emitter:setVolume(handle, volume * settingsVolume)
 
     return handle
@@ -1390,11 +1408,15 @@ function ChaosUtils.CountNPCsInVehicles()
 end
 
 --- Re-evaluates whether the PlayerDamageFromCrash override should be active.
---- Disables crash damage if any NPC is in a vehicle, if EFFECT_FLYING_CARS_ENABLED is set,
---- or if EFFECT_EARTHQUAKE_ENABLED is set.
+--- Disables crash damage if any NPC is in a vehicle, or if any of
+--- EFFECT_FLYING_CARS_ENABLED / EFFECT_EARTHQUAKE_ENABLED / EFFECT_HURRICANE_ENABLED /
+--- EFFECT_BLACK_HOLE_ENABLED is set.
 function ChaosUtils.UpdateCrashDamageOverride()
     local shouldDisable = ChaosUtils.EFFECT_FLYING_CARS_ENABLED
         or ChaosUtils.EFFECT_EARTHQUAKE_ENABLED
+        or ChaosUtils.EFFECT_HURRICANE_ENABLED
+        or ChaosUtils.EFFECT_BLACK_HOLE_ENABLED
+        or ChaosUtils.EFFECT_DOOMSDAY_ENABLED
         or ChaosUtils.CountNPCsInVehicles() > 0
     ChaosUtils.SetCrashDamageDisabled(shouldDisable)
 end
@@ -1403,6 +1425,9 @@ end
 function ChaosUtils.ResetCrashDamageOverride()
     ChaosUtils.EFFECT_FLYING_CARS_ENABLED = false
     ChaosUtils.EFFECT_EARTHQUAKE_ENABLED = false
+    ChaosUtils.EFFECT_HURRICANE_ENABLED = false
+    ChaosUtils.EFFECT_BLACK_HOLE_ENABLED = false
+    ChaosUtils.EFFECT_DOOMSDAY_ENABLED = false
     ChaosUtils.crashDamage.originalValue = nil
     ChaosUtils.crashDamage.disabled = false
 end
@@ -1415,7 +1440,9 @@ end
 ---@param spawnFire boolean
 ---@param spawnFireNearby boolean
 ---@param doZombieDamage boolean
-function ChaosUtils.SpawnLightningStrikeAt(x, y, z, doSound, doThunder, spawnFire, spawnFireNearby, doZombieDamage)
+---@param doRumble boolean?
+function ChaosUtils.SpawnLightningStrikeAt(x, y, z, doSound, doThunder, spawnFire, spawnFireNearby, doZombieDamage,
+                                           doRumble)
     local cell = getCell()
     if not cell then return end
     local sq = cell:getGridSquare(x, y, z)
@@ -1446,16 +1473,38 @@ function ChaosUtils.SpawnLightningStrikeAt(x, y, z, doSound, doThunder, spawnFir
         end, false, z)
     end
 
+    if doRumble == nil then
+        doRumble = false
+    end
+
     if doThunder then
         getClimateManager():getThunderStorm():triggerThunderEvent(
             iX, iY,
             doSound, -- doStrike: plays "Thunder"
             true,    -- doLightning: visual flash
-            false    -- doRumble
+            doRumble -- doRumble
         )
     end
 
     --- sound for zombies AI
     ---@diagnostic disable-next-line: param-type-mismatch
     addSound(nil, x, y, 0, 180, 180)
+end
+
+---@param playerIndex integer
+---@param character IsoGameCharacter
+---@param r number
+---@param g number
+---@param b number
+---@param a number
+function ChaosUtils.SetCharacterOutlineHighlightEnabled(playerIndex, character, r, g, b, a)
+    if not character then return end
+
+    character:setOutlineHighlight(playerIndex, true)
+    character:setOutlineHighlightCol(playerIndex, r, g, b, a)
+end
+
+function ChaosUtils.SetCharacterOutlineHighlightDisabled(character)
+    if not character then return end
+    character:setOutlineHighlight(0, false)
 end

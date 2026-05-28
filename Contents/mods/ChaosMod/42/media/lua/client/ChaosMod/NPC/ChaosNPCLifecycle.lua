@@ -155,6 +155,7 @@ end
 ---@param player IsoPlayer
 function ChaosNPC:TryGiftRandomItem(player)
     if not self.zombie or not player then return end
+    if ChaosConfig.npc_gifts_enabled == false then return end
 
     local inventory = player:getInventory()
     if not inventory then return end
@@ -172,7 +173,9 @@ function ChaosNPC:TryGiftRandomItem(player)
                 local line = string.format(ChaosLocalization.GetString("misc", "npc_gifted_item"), displayName)
                 ChaosZombie.AddNewChatLine(zombie, line, ChaosPlayerChatColors.green)
 
-                self.lastGiftItemTimeMs = ChaosMod.lastTimeTickMs or getTimestampMs()
+                local nowMs = ChaosMod.lastTimeTickMs or getTimestampMs()
+                self.lastGiftItemTimeMs = nowMs
+                ChaosNPCUtils.lastGiftItemTimeMs = nowMs
                 return
             end
         end

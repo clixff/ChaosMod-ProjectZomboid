@@ -72,6 +72,12 @@ export interface StreamerModeConfig {
   hide_votes: boolean;
   youtube_chat_connection_type: "long_polling" | "message_streaming";
   random_effect_in_vote: boolean;
+  voting_fake_effects_enabled: boolean;
+  voting_fake_effects_chance: number;
+  voting_hidden_effects_enabled: boolean;
+  voting_hidden_effects_chance: number;
+  reveal_hidden_effect_after_delay: boolean;
+  reveal_fake_effect_after_delay: boolean;
   currencies: CurrenciesConfig;
 }
 
@@ -81,12 +87,16 @@ export interface ModConfig {
   effects_interval: number;
   effects_duration_multiplier: number;
   recent_effects_block_buffer: number;
+  persist_recent_effects: boolean;
   vote_start_time: number;
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
+  hide_effect_names: boolean;
   ui: UIConfig;
   ui_sounds_enabled: boolean;
   ignore_effect_chances: boolean;
+  npc_voicelines_enabled: boolean;
+  npc_gifts_enabled: boolean;
   streamer_mode: StreamerModeConfig;
 }
 

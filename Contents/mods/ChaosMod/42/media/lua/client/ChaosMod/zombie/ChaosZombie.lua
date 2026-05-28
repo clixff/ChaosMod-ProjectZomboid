@@ -768,6 +768,9 @@ function ChaosZombie.PlaySoundLine(zombie, soundname, key, timeout)
     if not zombie or not soundname or not key then
         return false
     end
+    if ChaosConfig.npc_voicelines_enabled == false then
+        return false
+    end
     local now = getTimestampMs()
     local lastTime = ChaosZombie.lastSoundLineTimestampsByKey[key]
     if lastTime and (now - lastTime) < timeout then
@@ -778,19 +781,19 @@ function ChaosZombie.PlaySoundLine(zombie, soundname, key, timeout)
     return true
 end
 
----@param player IsoPlayer
+---@param char IsoPlayer|IsoZombie
 ---@param zombie IsoZombie
-function ChaosZombie.CopyPlayerAppearanceToNormalZombie(player, zombie)
-    if not player or not zombie then return end
+function ChaosZombie.CopyAppearanceToNormalZombie(char, zombie)
+    if not char or not zombie then return end
 
     -- Keep it a normal zombie
     zombie:setReanimatedPlayer(false)
 
     -- Sex must match before visual/model refresh
-    zombie:setFemaleEtc(player:isFemale())
+    zombie:setFemaleEtc(char:isFemale())
 
     -- Copy body/face/hair/skin
-    zombie:getHumanVisual():copyFrom(player:getHumanVisual())
+    zombie:getHumanVisual():copyFrom(char:getHumanVisual())
 
     -- Clear current zombie clothing visuals
     local zombieVisuals = zombie:getItemVisuals()
@@ -800,7 +803,7 @@ function ChaosZombie.CopyPlayerAppearanceToNormalZombie(player, zombie)
     zombie:clearWornItems()
 
     local inv = zombie:getInventory()
-    local playerWorn = player:getWornItems()
+    local playerWorn = char:getWornItems()
 
     for i = 0, playerWorn:size() - 1 do
         local wornItem = playerWorn:getItemByIndex(i)
@@ -879,7 +882,7 @@ function ChaosZombie.SetHairstyleAndBeard(zombie, hairTable)
         useHairColorForBeard = true
     end
 
-    if useHairColorForBeard then
+    if useHairColorForBeard and beardColor == nil then
         beardColor = hairColor
     end
     if type(hairstyleName) == "string" then
@@ -914,4 +917,19 @@ function ChaosZombie.SetHairstyleAndBeard(zombie, hairTable)
     end
 
     zombie:resetModelNextFrame()
+end
+
+---@param zombie IsoZombie
+---@param x number|integer
+---@param y number|integer
+---@param z number|integer
+function ChaosZombie.MoveToSound(zombie, x, y, z)
+    if zombie and zombie:isAlive() then
+        x = math.floor(x)
+        y = math.floor(y)
+        z = math.floor(z)
+        zombie:pathToSound(x, y, z)
+
+        zombie:setLastHeardSound(x, y, z)
+    end
 end

@@ -54,9 +54,18 @@ LOOTBOX_ITEMS = {
 }
 
 -- Roll rarity: 60% common, 25% uncommon, 12% rare, 3% legendary
+-- With rollCount > 1, generate that many rolls and keep the highest (better rarity)
+---@param rollCount integer? Number of rolls (nil = 1)
 ---@return string
-local function rollRarity()
+local function rollRarity(rollCount)
+    rollCount = rollCount or 1
     local roll = ChaosUtils.RandInteger(100)
+    for _ = 2, rollCount do
+        local nextRoll = ChaosUtils.RandInteger(100)
+        if nextRoll > roll then
+            roll = nextRoll
+        end
+    end
     if roll < 60 then
         return "common"
     elseif roll < 85 then
@@ -68,9 +77,10 @@ local function rollRarity()
     end
 end
 
+---@param rollCount integer? Number of rarity rolls (nil = 1); highest roll wins
 ---@return string
-function GetRandomLootboxItem()
-    local rarity = rollRarity()
+function GetRandomLootboxItem(rollCount)
+    local rarity = rollRarity(rollCount)
     local pool = LOOTBOX_ITEMS[rarity]
     return pool[ChaosUtils.RandArrayIndex(pool)]
 end

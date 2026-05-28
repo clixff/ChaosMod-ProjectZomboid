@@ -20,19 +20,38 @@ local function NormalizeActivationType(activationType)
     return ChaosEffectActivationType.INTERVAL
 end
 
+---@class ChaosFakeVisualEffect
+---@field displayName string
+---@field timeMs number -- remaining display time in ms
+
 ---@class ChaosEffectsManager
 ---@field activeEffects table<integer, ChaosEffectBase>
+---@field fakeVisualEffects ChaosFakeVisualEffect[] -- UI-only decoy rows shown for fake vote effects
 ---@field globalTimerMs number -- current elapsed ms, counts 0 → globalTimerMaxMs
 ---@field globalTimerMaxMs number -- effects_interval in ms
 ---@field iterationIndex integer -- increments each time globalTimer fires
 ---@field voteStartedThisInterval boolean -- true after vote_start has been emitted in the current interval
 ChaosEffectsManager = ChaosEffectsManager or {
     activeEffects = {},
+    fakeVisualEffects = {},
     globalTimerMs = 0,
     globalTimerMaxMs = 0,
     iterationIndex = 0,
     voteStartedThisInterval = false,
 }
+
+-- Fake (1) / Hidden (2) vote effects are concealed in the effects UI for a while
+-- before being revealed with a "[Fake] " / "[Hidden] " prefix.
+--
+-- Hidden: concealed 20s, then revealed. No-duration shows for 10s after reveal (30s total).
+ChaosEffectsManager.HIDDEN_REVEAL_DELAY_MS = 20 * 1000       -- how long a hidden effect stays concealed
+ChaosEffectsManager.HIDDEN_NO_DURATION_MAX_TICKS = 30 * 1000 -- 20s concealed + 10s revealed
+--
+-- Fake: decoy shown 15s, then 10s of nothing, then the real effect revealed at 25s.
+-- No-duration shows for 10s after reveal (35s total).
+ChaosEffectsManager.FAKE_DECOY_MS = 15 * 1000              -- how long the decoy row is shown
+ChaosEffectsManager.FAKE_REVEAL_DELAY_MS = 25 * 1000       -- 15s decoy + 10s gap before the real effect is revealed
+ChaosEffectsManager.FAKE_NO_DURATION_MAX_TICKS = 35 * 1000 -- 25s concealed + 10s revealed
 
 function ChaosEffectsManager.StartGlobalTimer()
     ChaosEffectsManager.globalTimerMaxMs = math.floor(ChaosConfig.effects_interval * 1000)
@@ -65,8 +84,9 @@ end
 ---@param effectId string
 ---@param effectNickname string | nil
 ---@param activationType ChaosEffectActivationType | nil
+---@param voteFakeType integer | nil -- 1 = fake vote effect, 2 = hidden vote effect (concealed in UI)
 ---@return ChaosEffectBase | nil
-function ChaosEffectsManager.StartEffect(effectId, effectNickname, activationType)
+function ChaosEffectsManager.StartEffect(effectId, effectNickname, activationType, voteFakeType)
     if not effectId or effectId == "" then
         print("[ChaosEffectsManager] Effect ID is required")
         return
@@ -99,7 +119,14 @@ function ChaosEffectsManager.StartEffect(effectId, effectNickname, activationTyp
     if not newEffect then return end
 
     newEffect:OnStart()
-    ChaosUtils.PlayUISound("UIPauseMenuEnter")
+
+    -- Fake (1) / Hidden (2) vote effects are concealed in the UI. Hidden effects
+    -- also suppress the activation sound so nothing tips off the streamer; fake
+    -- effects keep the sound, since a decoy row appears in their place.
+    local fakeType = (voteFakeType == 1 or voteFakeType == 2) and voteFakeType or nil
+    if fakeType ~= 2 then
+        ChaosUtils.PlayUISound("UIPauseMenuEnter")
+    end
 
     local msNow = getTimestampMs()
 
@@ -109,6 +136,30 @@ function ChaosEffectsManager.StartEffect(effectId, effectNickname, activationTyp
 
     if newEffect.withDuration == false then
         newEffect.maxTicks = 15 * 1000
+    end
+
+    if fakeType then
+        newEffect.uiHidden = true
+        local sm = ChaosConfig.streamer_mode
+        -- When reveal-after-delay is off, leave uiRevealDelayMs unset so the effect
+        -- stays concealed for its whole life (and skip the no-duration display bump).
+        if fakeType == 1 then
+            newEffect.uiRevealPrefix = "[Fake] "
+            if not sm or sm.reveal_fake_effect_after_delay ~= false then
+                newEffect.uiRevealDelayMs = ChaosEffectsManager.FAKE_REVEAL_DELAY_MS
+                if newEffect.withDuration == false then
+                    newEffect.maxTicks = ChaosEffectsManager.FAKE_NO_DURATION_MAX_TICKS
+                end
+            end
+        else
+            newEffect.uiRevealPrefix = "[Hidden] "
+            if not sm or sm.reveal_hidden_effect_after_delay ~= false then
+                newEffect.uiRevealDelayMs = ChaosEffectsManager.HIDDEN_REVEAL_DELAY_MS
+                if newEffect.withDuration == false then
+                    newEffect.maxTicks = ChaosEffectsManager.HIDDEN_NO_DURATION_MAX_TICKS
+                end
+            end
+        end
     end
 
     table.insert(ChaosEffectsManager.activeEffects, newEffect)
@@ -160,6 +211,13 @@ function ChaosEffectsManager.OnTick(deltaMs)
             end
 
             effect.ticksActiveTime = effect.ticksActiveTime + deltaMs
+
+            -- Reveal a concealed fake/hidden effect once its conceal window passes.
+            if effect.uiHidden and effect.uiRevealDelayMs
+                and effect.ticksActiveTime >= effect.uiRevealDelayMs then
+                effect.uiHidden = false
+            end
+
             if effect.ticksActiveTime >= effect.maxTicks then
                 effect:OnEnd()
                 shouldRemove = true
@@ -170,6 +228,32 @@ function ChaosEffectsManager.OnTick(deltaMs)
             table.remove(ChaosEffectsManager.activeEffects, i)
         end
     end
+
+    -- Tick down fake (decoy) visual-only rows; they carry no effect logic.
+    for i = #ChaosEffectsManager.fakeVisualEffects, 1, -1 do
+        local fv = ChaosEffectsManager.fakeVisualEffects[i]
+        if not fv then
+            table.remove(ChaosEffectsManager.fakeVisualEffects, i)
+        else
+            fv.timeMs = fv.timeMs - deltaMs
+            if fv.timeMs <= 0 then
+                table.remove(ChaosEffectsManager.fakeVisualEffects, i)
+            end
+        end
+    end
+end
+
+--- Adds a UI-only decoy row that shows `displayName` for `timeMs` milliseconds.
+--- Used by fake vote effects to display a plausible (no-duration) effect name
+--- while the real effect runs concealed.
+---@param displayName string
+---@param timeMs number
+function ChaosEffectsManager.AddFakeVisualEffect(displayName, timeMs)
+    if not displayName or displayName == "" then return end
+    table.insert(ChaosEffectsManager.fakeVisualEffects, {
+        displayName = displayName,
+        timeMs = timeMs,
+    })
 end
 
 ---@param effectIds table<integer, string>
@@ -220,4 +304,5 @@ function ChaosEffectsManager.StopAllEffects()
             table.remove(ChaosEffectsManager.activeEffects, i)
         end
     end
+    ChaosEffectsManager.fakeVisualEffects = {}
 end

@@ -184,6 +184,8 @@ local function writeRecentEffectsToDisk()
 end
 
 local function loadRecentEffectsFromDisk()
+    if ChaosConfig.persist_recent_effects == false then return end
+
     local maxBuffer = getRecentEffectsMax()
     if maxBuffer <= 0 then return end
 
@@ -319,6 +321,21 @@ function ChaosEffectsRegistry.GetRandomEffects(amount, pickType, addToBlock)
     end
 
     return result
+end
+
+--- Picks a random enabled effect id with no duration, excluding `excludeId`.
+--- Does not touch the blocklist; used purely for fake vote display names.
+---@param excludeId string | nil
+---@return string | nil
+function ChaosEffectsRegistry.GetRandomNoDurationEffectId(excludeId)
+    local pool = {}
+    for id, effect in pairs(ChaosEffectsRegistry.effects) do
+        if effect.enabled and effect.withDuration == false and effect.chance > 0 and id ~= excludeId then
+            pool[#pool + 1] = id
+        end
+    end
+    if #pool == 0 then return nil end
+    return pool[ChaosUtils.RandArrayIndex(pool)]
 end
 
 ---@param effectJsonData ChaosEffectJsonData

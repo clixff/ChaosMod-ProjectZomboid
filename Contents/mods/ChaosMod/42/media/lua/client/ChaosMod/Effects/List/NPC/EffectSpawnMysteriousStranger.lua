@@ -36,7 +36,7 @@ function EffectSpawnMysteriousStranger:OnStart()
     npc.DamageMultiplier = 10.0
     npc.enemyDistanceFindRadius = 20.0
     npc.canBePanicked = false
-    npc:AddTag("mysterious_stranger")
+    npc:AddTag("no_betray")
     self.npc = npc
 
     npc:SetWeapon("Base.Revolver_Long")

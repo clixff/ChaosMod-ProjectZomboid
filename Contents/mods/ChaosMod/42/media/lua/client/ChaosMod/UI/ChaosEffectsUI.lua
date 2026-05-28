@@ -24,9 +24,18 @@ ChaosEffectsUI.hideEffectNames = false
 local MIN_WINDOW_W = 280
 
 ---@param effect ChaosEffectBase
+---@return boolean
+local function shouldHideEffectName(effect)
+    if effect.showNameAlways then
+        return false
+    end
+    return ChaosEffectsUI.hideEffectNames or ChaosConfig.hide_effect_names == true
+end
+
+---@param effect ChaosEffectBase
 ---@return string
 local function buildEffectString(effect)
-    if ChaosEffectsUI.hideEffectNames and not effect.showNameAlways then
+    if shouldHideEffectName(effect) then
         return "???"
     end
     local effectString
@@ -34,6 +43,9 @@ local function buildEffectString(effect)
         effectString = ChaosLocalization.GetString("effects", effect.fakeEffectNameId)
     else
         effectString = tostring(effect.effectName)
+    end
+    if effect.uiRevealPrefix and effect.uiRevealPrefix ~= "" then
+        effectString = effect.uiRevealPrefix .. effectString
     end
     if effect.withDuration then
         local msToEnd = effect.maxTicks - effect.ticksActiveTime
@@ -119,8 +131,32 @@ function ChaosEffectsUI:createChildren()
     self:addChild(self.btnAnchor)
 end
 
+--- Builds the list of rows to render: visible (non-concealed) real effects plus
+--- fake decoy rows. Concealed (uiHidden) effects are omitted.
+---@return { text: string, effect: ChaosEffectBase | nil }[]
+function ChaosEffectsUI:buildRenderRows()
+    local rows = {}
+    local activeEffects = ChaosEffectsManager.activeEffects
+    for i = 1, #activeEffects do
+        local effect = activeEffects[i]
+        if effect and not effect.uiHidden then
+            rows[#rows + 1] = { text = buildEffectString(effect), effect = effect }
+        end
+    end
+    local fakeVisuals = ChaosEffectsManager.fakeVisualEffects
+    if fakeVisuals then
+        for i = 1, #fakeVisuals do
+            local fv = fakeVisuals[i]
+            if fv then
+                rows[#rows + 1] = { text = tostring(fv.displayName), effect = nil }
+            end
+        end
+    end
+    return rows
+end
+
 function ChaosEffectsUI:getEffectsAreaH()
-    local N = #ChaosEffectsManager.activeEffects
+    local N = #self:buildRenderRows()
     if N == 0 then
         return self.effectRowH
     end
@@ -130,11 +166,9 @@ end
 function ChaosEffectsUI:computeWindowW()
     local minW = ChaosUIManager.GetScaledWidth(MIN_WINDOW_W)
     local maxTextW = 0
-    local activeEffects = ChaosEffectsManager.activeEffects
-    for i = 1, #activeEffects do
-        local effect = activeEffects[i]
-        local effectString = buildEffectString(effect)
-        local tw = getTextManager():MeasureStringX(UIFont.NewLarge, effectString)
+    local rows = self:buildRenderRows()
+    for i = 1, #rows do
+        local tw = getTextManager():MeasureStringX(UIFont.NewLarge, rows[i].text)
         if tw > maxTextW then maxTextW = tw end
     end
     local needed = maxTextW + self.textPadH * 2 + self.margin * 2
@@ -236,18 +270,17 @@ function ChaosEffectsUI:prerender()
     end
 
     -- Effect rows
-    local activeEffects = ChaosEffectsManager.activeEffects
+    local rows = self:buildRenderRows()
     local fontHeight = getTextManager():getFontHeight(UIFont.NewLarge)
     local rectW = self.windowW - self.margin * 2
-    for i = 1, #activeEffects do
-        local effect = activeEffects[i]
+    for i = 1, #rows do
+        local effect = rows[i].effect
+        local effectString = rows[i].text
         local rowY = titleH + (i - 1) * (self.effectRowH + self.effectGap)
-
-        local effectString = buildEffectString(effect)
 
         self:drawRect(self.margin, rowY, rectW, self.effectRowH, 0.7, 0.1, 0.1, 0.1)
 
-        if effect.withDuration and effect.maxTicks > 0 and (not ChaosEffectsUI.hideEffectNames or effect.showNameAlways) then
+        if effect and effect.withDuration and effect.maxTicks > 0 and not shouldHideEffectName(effect) then
             local progress = 1 - (effect.ticksActiveTime / effect.maxTicks)
             local fgWidth = math.floor(rectW * progress)
             if fgWidth > 0 then

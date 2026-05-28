@@ -4,9 +4,11 @@
     "effects_interval": 45,
     "effects_duration_multiplier": 1.0,
     "recent_effects_block_buffer": 60,
+    "persist_recent_effects": true,
     "vote_start_time": 10,
     "hide_progress_bar": false,
     "use_voting_progress_bar_color": false,
+    "hide_effect_names": false,
     "ui": {
         "progress_bar_color": "9f211f",
         "progress_bar_opacity": 0.9,
@@ -22,6 +24,8 @@
     },
     "ui_sounds_enabled": true,
     "ignore_effect_chances": false,
+    "npc_voicelines_enabled": true,
+    "npc_gifts_enabled": true,
     "streamer_mode": {
         "streamer_mode_enabled": true,
         "voting_enabled": false,
@@ -134,6 +138,12 @@
         "hide_votes": false,
         "youtube_chat_connection_type": "long_polling",
         "random_effect_in_vote": true,
+        "voting_fake_effects_enabled": true,
+        "voting_fake_effects_chance": 5.0,
+        "voting_hidden_effects_enabled": true,
+        "voting_hidden_effects_chance": 5.0,
+        "reveal_hidden_effect_after_delay": true,
+        "reveal_fake_effect_after_delay": true,
         "currencies": {
             "main": "",
             "list": {}

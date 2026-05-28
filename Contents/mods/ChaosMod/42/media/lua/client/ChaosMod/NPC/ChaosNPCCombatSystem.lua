@@ -462,7 +462,7 @@ function ChaosNPC:OnAttackEnemyHit()
         local bodyDamage = enemy:getBodyDamage()
         enemy:setAttackedBy(zombie)
 
-
+        chanceToKnockDown = chanceToKnockDown / 2.0
         if ChaosUtils.RandFloat(0, 100) < chanceToKnockDown and not enemy:isKnockedDown() then
             enemy:setKnockedDown(true)
         else

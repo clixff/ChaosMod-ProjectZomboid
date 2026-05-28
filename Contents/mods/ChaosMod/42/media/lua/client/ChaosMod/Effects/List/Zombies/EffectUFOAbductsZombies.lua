@@ -92,6 +92,7 @@ function EffectUFOAbductsZombies:OnTick(deltaMs)
     for zombie, startZ in pairs(self.abductedZombies) do
         if zombie and zombie:isAlive() then
             local liftedZ = ChaosUtils.Lerp(startZ, TARGET_Z, t)
+            -- print("[EffectUFOAbductsZombies] Z: " .. tostring(zombie:getZ()) .. " -> " .. tostring(liftedZ))
             zombie:setbFalling(false)
             zombie:setFallTime(0)
             zombie:setLastFallSpeed(0)

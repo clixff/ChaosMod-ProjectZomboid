@@ -1,5 +1,6 @@
 ---@class EffectStealShoesFromEveryZombie : ChaosEffectBase
-EffectStealShoesFromEveryZombie = ChaosEffectBase:derive("EffectStealShoesFromEveryZombie", "steal_shoes_from_every_zombie")
+EffectStealShoesFromEveryZombie = ChaosEffectBase:derive("EffectStealShoesFromEveryZombie",
+    "steal_shoes_from_every_zombie")
 
 ---@param visuals ItemVisuals
 ---@param removeIndex integer

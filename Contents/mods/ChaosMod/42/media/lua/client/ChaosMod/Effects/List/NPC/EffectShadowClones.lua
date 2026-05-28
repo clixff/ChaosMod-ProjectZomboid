@@ -36,11 +36,11 @@ function EffectShadowClones:OnStart()
                 npc.npcGroup = ChaosNPCGroupID.COMPANIONS
                 npc.DamageMultiplier = DAMAGE_MULTIPLIER
                 npc.canBePanicked = false
+                npc.canGiftItems = false
+                npc:AddTag("no_betray")
 
                 npc.maxHealth = 5.0
                 zombie:setHealth(npc.maxHealth)
-
-                npc:AddTag("shadow_clone")
 
                 table.insert(self.npcs, npc)
             end

@@ -157,10 +157,10 @@ function EffectSwordAura:OnStart()
                 playerSquare,
                 1.0, 0.2, 0.2,
                 true,
-                ORBIT_RADIUS + 1.0
+                ORBIT_RADIUS * math.sqrt(2.0)
             )
             if self.marker then
-                self.marker:setScaleCircleTexture(true)
+                self.marker:setScaleCircleTexture(false)
             end
         end
     end

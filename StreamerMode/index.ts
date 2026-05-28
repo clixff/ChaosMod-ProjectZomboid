@@ -574,8 +574,19 @@ async function main(): Promise<void> {
         votingManager.stop();
         const winnerEffectId = votingManager.lastWinnerEffectId;
         if (winnerEffectId) {
+          const winnerEntry: {
+            id: string;
+            type: string;
+            fake_option_type?: number;
+          } = { id: winnerEffectId, type: "vote" };
+          const winnerTag = votingManager.lastWinnerOptionTag;
+          if (winnerTag === "fake") {
+            winnerEntry.fake_option_type = 1;
+          } else if (winnerTag === "hidden") {
+            winnerEntry.fake_option_type = 2;
+          }
           bridge.emit("activate_effects", {
-            effects: [{ id: winnerEffectId, type: "vote" }],
+            effects: [winnerEntry],
           });
           activityLog.add({
             type: "vote",
@@ -1067,7 +1078,13 @@ async function main(): Promise<void> {
             const secretId = votingManager.secretRandomEffectId;
             const hidden = isRandom && votingManager.isActive;
             const resolvedId = revealSecret && secretId ? secretId : opt.id;
-            const effectName = getString("effects", resolvedId);
+            const baseEffectName = getString("effects", resolvedId);
+            let effectName = baseEffectName;
+            if (!hidden && opt.tag === "fake") {
+              effectName = `[Fake] ${baseEffectName}`;
+            } else if (!hidden && opt.tag === "hidden") {
+              effectName = `[Hidden] ${baseEffectName}`;
+            }
             const effectEntry = hidden
               ? null
               : effects.find((e) => e.id === resolvedId);

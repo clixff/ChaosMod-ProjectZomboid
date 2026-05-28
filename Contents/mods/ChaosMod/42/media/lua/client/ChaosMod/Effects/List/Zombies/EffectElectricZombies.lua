@@ -10,19 +10,19 @@ local function ApplyElectricHighlight(character)
             ---@type IsoGameCharacter
             local c = data.character
             if c then
-                c:setOutlineHighlight(0, true)
-                c:setOutlineHighlightCol(0, 0.3, 1.0, 1.0, 1.0)
+                ChaosUtils.SetCharacterOutlineHighlightEnabled(0, c, 0.3, 1.0, 1.0, 1.0)
             end
         end,
         function(data)
             local c = data.character
             if c then
-                c:setOutlineHighlight(0, false)
+                ChaosUtils.SetCharacterOutlineHighlightDisabled(c)
             end
         end,
         function(data)
             local c = data.character
             if c then
+                ChaosUtils.SetCharacterOutlineHighlightDisabled(c)
                 c:setOutlineHighlight(0, false)
             end
         end

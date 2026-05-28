@@ -2,10 +2,12 @@
 ---@field npcList ArrayList<ChaosNPC>
 ---@field cleanupAccumMs integer
 ---@field NPCIgnorePlayerEffectsActive string[]
+---@field lastGiftItemTimeMs integer
 ChaosNPCUtils = ChaosNPCUtils or {
     npcList = ArrayList:new(),
     cleanupAccumMs = 0,
     NPCIgnorePlayerEffectsActive = {},
+    lastGiftItemTimeMs = 0,
 }
 
 ---@param effectId string
@@ -41,6 +43,11 @@ local ZOMBIE_NPC_BITE_CANCEL_WINDOW_MS = ZOMBIE_NPC_BITE_DAMAGE_DELAY_MS * ZOMBI
 local ZOMBIE_NPC_HITREACTION_RECOVERY_MS = 1500
 
 local DEBUG_ZOMBIES_NPC_UTILS_LOGS = false
+
+---@return boolean
+local function ChaosNPCDebugLogsEnabled()
+    return CHAOS_NPC_DEBUG_LOGS == true
+end
 
 ---@param deltaMs integer
 function ChaosNPCUtils.OnTick(deltaMs)
@@ -308,30 +315,36 @@ local function FinishZombieBiteNPCAttack(data)
     end
 
     if data.cancelled then
-        print(string.format("[ChaosNPCUtils] Bite attack cancelled attacker=%s target=%s elapsed=%d",
-            tostring(attacker and attacker:getID() or nil),
-            tostring(targetZombie and targetZombie:getID() or nil),
-            ChaosMod.lastTimeTickMs - (data.startTime or ChaosMod.lastTimeTickMs)
-        ))
+        if ChaosNPCDebugLogsEnabled() then
+            print(string.format("[ChaosNPCUtils] Bite attack cancelled attacker=%s target=%s elapsed=%d",
+                tostring(attacker and attacker:getID() or nil),
+                tostring(targetZombie and targetZombie:getID() or nil),
+                ChaosMod.lastTimeTickMs - (data.startTime or ChaosMod.lastTimeTickMs)
+            ))
+        end
         return true
     end
 
     if not attacker or not targetZombie or not targetZombie:isAlive() then
-        print(string.format("[ChaosNPCUtils] Bite attack expired attacker=%s target=%s reason=invalid_or_dead",
-            tostring(attacker and attacker:getID() or nil),
-            tostring(targetZombie and targetZombie:getID() or nil)
-        ))
+        if ChaosNPCDebugLogsEnabled() then
+            print(string.format("[ChaosNPCUtils] Bite attack expired attacker=%s target=%s reason=invalid_or_dead",
+                tostring(attacker and attacker:getID() or nil),
+                tostring(targetZombie and targetZombie:getID() or nil)
+            ))
+        end
         return true
     end
 
     local dist = ChaosUtils.distTo(attacker:getX(), attacker:getY(), targetZombie:getX(), targetZombie:getY())
     if dist >= 1.15 or math.abs(attacker:getZ() - targetZombie:getZ()) >= 0.3 then
-        print(string.format("[ChaosNPCUtils] Bite attack missed attacker=%s target=%s dist=%.2f elapsed=%d",
-            tostring(attacker:getID()),
-            tostring(targetZombie:getID()),
-            dist,
-            ChaosMod.lastTimeTickMs - (data.startTime or ChaosMod.lastTimeTickMs)
-        ))
+        if ChaosNPCDebugLogsEnabled() then
+            print(string.format("[ChaosNPCUtils] Bite attack missed attacker=%s target=%s dist=%.2f elapsed=%d",
+                tostring(attacker:getID()),
+                tostring(targetZombie:getID()),
+                dist,
+                ChaosMod.lastTimeTickMs - (data.startTime or ChaosMod.lastTimeTickMs)
+            ))
+        end
         return true
     end
 
@@ -348,20 +361,22 @@ local function FinishZombieBiteNPCAttack(data)
         targetZombie:setHealth(math.max(0.0, oldHealth - biteDamage))
     end
 
-    print(string.format(
-        "[ChaosNPCUtils] Bite attack hit npc=%s attacker=%s damage=%.2f health=%.2f oldHealth=%.2f state=%s current=%s bump=%s hit=%s stagger=%s elapsed=%d",
-        tostring(targetZombie:getID()),
-        tostring(attacker:getID()),
-        biteDamage,
-        targetZombie:getHealth(),
-        oldHealth,
-        tostring(targetZombie:getActionStateName()),
-        tostring(targetZombie:getCurrentStateName()),
-        tostring(targetZombie:getBumpType()),
-        tostring(targetZombie:getHitReaction()),
-        tostring(targetZombie:isStaggerBack()),
-        ChaosMod.lastTimeTickMs - (data.startTime or ChaosMod.lastTimeTickMs)
-    ))
+    if ChaosNPCDebugLogsEnabled() then
+        print(string.format(
+            "[ChaosNPCUtils] Bite attack hit npc=%s attacker=%s damage=%.2f health=%.2f oldHealth=%.2f state=%s current=%s bump=%s hit=%s stagger=%s elapsed=%d",
+            tostring(targetZombie:getID()),
+            tostring(attacker:getID()),
+            biteDamage,
+            targetZombie:getHealth(),
+            oldHealth,
+            tostring(targetZombie:getActionStateName()),
+            tostring(targetZombie:getCurrentStateName()),
+            tostring(targetZombie:getBumpType()),
+            tostring(targetZombie:getHitReaction()),
+            tostring(targetZombie:isStaggerBack()),
+            ChaosMod.lastTimeTickMs - (data.startTime or ChaosMod.lastTimeTickMs)
+        ))
+    end
 
     targetZombie:addBlood(BloodBodyPartType.Torso_Upper,
         true, true, false)
@@ -574,13 +589,15 @@ function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
                 -- zombie:changeState(AttackState.instance())
                 -- zombie:setVariable("AttackType", "bite")
                 StartZombieBiteNPCSpecialAction(zombie, nearestNPC)
-                print(string.format(
-                    "[ChaosNPCUtils] Starting bite attack attacker=%s target=%s damageDelay=%d cancelWindow=%d",
-                    tostring(zombie:getID()),
-                    tostring(zombieNPC:getID()),
-                    ZOMBIE_NPC_BITE_DAMAGE_DELAY_MS,
-                    ZOMBIE_NPC_BITE_CANCEL_WINDOW_MS
-                ))
+                if ChaosNPCDebugLogsEnabled() then
+                    print(string.format(
+                        "[ChaosNPCUtils] Starting bite attack attacker=%s target=%s damageDelay=%d cancelWindow=%d",
+                        tostring(zombie:getID()),
+                        tostring(zombieNPC:getID()),
+                        ZOMBIE_NPC_BITE_DAMAGE_DELAY_MS,
+                        ZOMBIE_NPC_BITE_CANCEL_WINDOW_MS
+                    ))
+                end
             else
                 LogZombieNPCDebug(zombie,
                     string.format("close_ready_but_no_bite target=%s dist=%.2f newBump=%s pendingBite=%s",

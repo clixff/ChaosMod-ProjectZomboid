@@ -88,10 +88,11 @@ function EffectEnergyShield:OnStart()
                 playerSquare,
                 0.68, 0.90, 1.0,
                 true,
-                ORBIT_RADIUS + 2.0
+                1.0
             )
             if self.marker then
-                self.marker:setScaleCircleTexture(true)
+                self.marker:setScaleCircleTexture(false)
+                self.marker:setSize(ORBIT_RADIUS * math.sqrt(2.0))
             end
         end
     end

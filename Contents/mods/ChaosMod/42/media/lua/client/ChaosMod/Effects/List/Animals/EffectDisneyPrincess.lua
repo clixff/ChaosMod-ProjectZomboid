@@ -33,23 +33,6 @@ local function removeAnimalFollower(animal)
     end
 end
 
----@param animal IsoAnimal
-local function killAnimal(animal)
-    if not animal or animal:isDead() then return end
-
-    if animal.setHealth then
-        animal:setHealth(0)
-    end
-
-    if animal.DoDeath then
-        ---@diagnostic disable-next-line: param-type-mismatch
-        animal:DoDeath(nil, nil)
-    else
-        animal:removeFromWorld()
-        animal:removeFromSquare()
-    end
-end
-
 function EffectDisneyPrincess:OnStart()
     ChaosEffectBase:OnStart()
 
@@ -87,9 +70,14 @@ function EffectDisneyPrincess:OnEnd()
         local animal = self.animals[i]
         if animal then
             removeAnimalFollower(animal)
-            killAnimal(animal)
+            SpecialAnimal.AddAnimalToRemove(animal)
         end
     end
 
     self.animals = {}
+
+    local player = getPlayer()
+    if player then
+        ChaosPlayer.SayLine(player, "Press G to remove animals", 1.0, 0.45, 0.75)
+    end
 end

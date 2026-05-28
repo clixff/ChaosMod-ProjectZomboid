@@ -28,6 +28,10 @@ function EffectHealRandomWound:OnStart()
     part:RestoreToFullHealth()
     bodyDamage:calculateOverallHealth()
 
-    ChaosPlayer.SayLineByColor(player, string.format("Healed %s", bodyDamage:getBodyPartName(part:getType())),
-        ChaosPlayerChatColors.green)
+    local partName = ChaosPlayer.HealRandomWound(player)
+
+    if partName then
+        ChaosPlayer.SayLineByColor(player, string.format("Healed %s", partName),
+            ChaosPlayerChatColors.green)
+    end
 end

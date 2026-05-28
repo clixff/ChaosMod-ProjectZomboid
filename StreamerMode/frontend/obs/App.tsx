@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 
 interface VoteOption {
   effect_id: string;
@@ -87,10 +87,88 @@ function formatOptionVotes(value: number): string {
   return `${compact.toFixed(decimals).replace(/\.0$/, "")}m`;
 }
 
-function getNameFontSize(name: string): string {
-  if (name.length > 38) return "11px";
-  if (name.length > 30) return "13px";
-  return "15px";
+// Renders a vote option name. When the text fits it stays static at 16px.
+// When it's too wide it shrinks to 14px and scrolls back and forth (ping-pong
+// marquee) to reveal the full name. Every scrolling option uses the same fixed
+// cycle duration (defined in CSS) so all options move in sync regardless of
+// length — the trade-off is that longer names travel a bit faster.
+function OptionName({ text }: { text: string }) {
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [scrolling, setScrolling] = useState(false);
+  const [shift, setShift] = useState(0);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const textEl = textRef.current;
+    if (!container || !textEl) return;
+
+    // Measure imperatively so the decision is independent of the current
+    // scroll state: force 16px to test the fit, then force 14px to read the
+    // real travel distance (the narrower text overflows by less). The inline
+    // font size is restored afterwards so the className governs the rendered
+    // size again.
+    const measure = () => {
+      const cw = container.clientWidth;
+      const prevFont = textEl.style.fontSize;
+
+      textEl.style.fontSize = "16px";
+      const fitsAt16 = textEl.scrollWidth - cw <= 1;
+      if (fitsAt16) {
+        textEl.style.fontSize = prevFont;
+        setScrolling(false);
+        setShift(0);
+        return;
+      }
+
+      textEl.style.fontSize = "14px";
+      const distance = textEl.scrollWidth - cw;
+      textEl.style.fontSize = prevFont;
+      setScrolling(true);
+      setShift(distance > 1 ? distance : 0);
+    };
+
+    // ResizeObserver delivers an initial callback when observe() is called,
+    // which seeds the first measurement (so we never call setState
+    // synchronously in the effect body). It also re-measures when the votes
+    // count grows and shrinks the name's available width.
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+
+    // Montserrat loads asynchronously; re-measure once it's ready so the
+    // overflow check uses real glyph widths instead of the fallback font's.
+    let cancelled = false;
+    if (document.fonts?.ready) {
+      void document.fonts.ready.then(() => {
+        if (!cancelled) measure();
+      });
+    }
+
+    return () => {
+      cancelled = true;
+      ro.disconnect();
+    };
+  }, [text]);
+
+  // Cast: CSSProperties doesn't type custom "--" properties in an object
+  // literal, but they're valid inline-style values consumed by the keyframes.
+  const scrollStyle = { "--marquee-shift": `-${shift}px` } as CSSProperties;
+
+  return (
+    <span className="option-name" ref={containerRef}>
+      <span
+        ref={textRef}
+        className={
+          scrolling
+            ? "option-name-text option-name-text--scroll"
+            : "option-name-text"
+        }
+        style={scrolling ? scrollStyle : undefined}
+      >
+        {text}
+      </span>
+    </span>
+  );
 }
 
 export function App() {
@@ -311,12 +389,7 @@ export function App() {
                 />
                 <div className="option-content">
                   <span className="option-index">{opt.index}</span>
-                  <span
-                    className="option-name"
-                    style={{ fontSize: getNameFontSize(displayedName) }}
-                  >
-                    {displayedName}
-                  </span>
+                  <OptionName text={displayedName} />
                   {opt.votes !== undefined && (
                     <span className="option-votes">{formatOptionVotes(opt.votes)}</span>
                   )}

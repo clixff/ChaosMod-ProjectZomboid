@@ -31,7 +31,8 @@ function EffectGroveStreetGang:OnStart()
                 local npc = ChaosNPC:new(zombie, self.effectNickname)
                 npc:initializeHuman()
                 npc.npcGroup = ChaosNPCGroupID.COMPANIONS
-
+                npc.canGiftItems = false
+                npc:AddTag("no_betray")
 
                 npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
 
@@ -55,12 +56,9 @@ function EffectGroveStreetGang:OnStart()
                 --- Remove clothes
                 local visuals = zombie:getItemVisuals()
 
-                for i = visuals:size() - 1, 0, -1 do
-                    local visual = visuals:get(i)
-                    if visual then
-                        visuals:clear()
-                        zombie:clearWornItems()
-                    end
+                if visuals and visuals:size() > 0 then
+                    visuals:clear()
+                    zombie:clearWornItems()
                 end
 
                 if _ == 1 then

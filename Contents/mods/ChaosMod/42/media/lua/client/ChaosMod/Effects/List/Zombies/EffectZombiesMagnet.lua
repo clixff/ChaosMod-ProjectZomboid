@@ -86,7 +86,7 @@ function EffectZombiesMagnet:OnStart()
     -- )
 
     if self.marker then
-        self.marker:setScaleCircleTexture(true)
+        self.marker:setScaleCircleTexture(false)
     end
 end
 

@@ -521,3 +521,53 @@ function ChaosPlayer.SayLineByColor(player, text, color)
 
     ChaosPlayer.SayLine(player, text, color.r, color.g, color.b)
 end
+
+---@param part BodyPart
+---@return boolean
+local function hasVisibleInjury(part)
+    return part
+        and (
+            part:scratched()
+            or part:isCut()
+            or part:deepWounded()
+            or part:bitten()
+            or part:bleeding()
+            or part:haveGlass()
+            or part:haveBullet()
+            or part:getBurnTime() > 0
+            or part:stitched()
+        )
+end
+
+---@param player IsoPlayer
+---@return string | nil partName name of the body part that was healed, or nil if nothing was healed
+function ChaosPlayer.HealRandomWound(player)
+    if not player then return nil end
+
+    local bodyDamage = player:getBodyDamage()
+    if not bodyDamage then return nil end
+
+    local bodyParts = bodyDamage:getBodyParts()
+    if not bodyParts then return nil end
+
+    local candidates = {}
+
+    for i = 0, bodyParts:size() - 1 do
+        local part = bodyParts:get(i)
+        if hasVisibleInjury(part) then
+            candidates[#candidates + 1] = part
+        end
+    end
+
+    if #candidates == 0 then return nil end
+
+    local part = candidates[ChaosUtils.RandArrayIndex(candidates)]
+    if not part then return nil end
+
+    local partName = bodyDamage:getBodyPartName(part:getType())
+
+    part:RestoreToFullHealth()
+    bodyDamage:calculateOverallHealth()
+
+    return partName
+end

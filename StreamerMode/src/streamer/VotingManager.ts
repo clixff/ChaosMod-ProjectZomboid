@@ -4,9 +4,13 @@ import type { ModConfig } from "../config.ts";
 
 export const RANDOM_EFFECT_ID = "random_effect";
 
+/** Display/activation tag rolled per visible vote option. */
+export type VoteOptionTag = "fake" | "hidden" | null;
+
 export interface VoteOption {
   id: string;
   voters: Set<string>;
+  tag: VoteOptionTag;
 }
 
 export class VotingManager {
@@ -15,6 +19,7 @@ export class VotingManager {
   private lastOptions: VoteOption[] = [];
   private lastWinner: string | null = null;
   private lastWinnerEffect: string | null = null;
+  private lastWinnerTag: VoteOptionTag = null;
   private secretRandomEffect: string | null = null;
 
   constructor(
@@ -42,6 +47,10 @@ export class VotingManager {
     return this.lastWinnerEffect;
   }
 
+  get lastWinnerOptionTag(): VoteOptionTag {
+    return this.lastWinnerTag;
+  }
+
   get secretRandomEffectId(): string | null {
     return this.secretRandomEffect;
   }
@@ -50,20 +59,58 @@ export class VotingManager {
     if (!this.config) return;
     this.lastWinner = null;
     this.lastWinnerEffect = null;
+    this.lastWinnerTag = null;
     this.lastOptions = [];
     this.secretRandomEffect = secretEffectId;
     const knownIds = new Set(this.effects.map((e) => e.id));
     const filteredIds = visibleEffectIds.filter((id) => knownIds.has(id));
     const includeRandom =
       this.config.streamer_mode.random_effect_in_vote !== false;
-    this.options = filteredIds.map((id) => ({ id, voters: new Set<string>() }));
+    // Fake/Hidden tags only apply to visible (non-hidden) effect options, never
+    // the hidden Random/Secret option.
+    const sm = this.config.streamer_mode;
+    const fakeEnabled = sm.voting_fake_effects_enabled === true;
+    const fakeChance = sm.voting_fake_effects_chance;
+    const hiddenEnabled = sm.voting_hidden_effects_enabled === true;
+    const hiddenChance = sm.voting_hidden_effects_chance;
+    this.options = filteredIds.map((id) => ({
+      id,
+      voters: new Set<string>(),
+      tag: this.rollOptionTag(
+        fakeEnabled,
+        fakeChance,
+        hiddenEnabled,
+        hiddenChance,
+      ),
+    }));
     if (includeRandom) {
-      this.options.push({ id: RANDOM_EFFECT_ID, voters: new Set<string>() });
+      this.options.push({
+        id: RANDOM_EFFECT_ID,
+        voters: new Set<string>(),
+        tag: null,
+      });
     }
     this.active = true;
     logger.debug(
       `Voting started (options: ${this.options.map((o) => o.id).join(", ")}, secret: ${secretEffectId ?? "none"})`,
     );
+  }
+
+  // Roll the per-option tag. Fake is rolled first; only if it loses do we roll
+  // Hidden. Tags are mutually exclusive.
+  private rollOptionTag(
+    fakeEnabled: boolean,
+    fakeChance: number,
+    hiddenEnabled: boolean,
+    hiddenChance: number,
+  ): VoteOptionTag {
+    if (fakeEnabled && Math.random() * 100 < fakeChance) {
+      return "fake";
+    }
+    if (hiddenEnabled && Math.random() * 100 < hiddenChance) {
+      return "hidden";
+    }
+    return null;
   }
 
   stop(): void {
@@ -72,6 +119,7 @@ export class VotingManager {
     this.lastOptions = this.options.map((option) => ({
       id: option.id,
       voters: new Set(option.voters),
+      tag: option.tag,
     }));
     this.selectWinner();
     this.options = [];
@@ -114,6 +162,9 @@ export class VotingManager {
 
     logger.debug(`Voting winner: ${winnerId}`);
     this.lastWinner = winnerId;
+
+    const winningOption = this.options.find((o) => o.id === winnerId);
+    this.lastWinnerTag = winningOption?.tag ?? null;
 
     if (winnerId === RANDOM_EFFECT_ID) {
       this.lastWinnerEffect = this.secretRandomEffect;

@@ -19,7 +19,7 @@ local CLOSE_DELAY_MS = 3000
 ---@return string
 local function pickItemIdForRoll(index)
     if index == 2 or index == 4 then
-        return GetRandomLootboxItem()
+        return GetRandomLootboxItem(3)
     end
     return ChaosItems.GetRandomItemId()
 end

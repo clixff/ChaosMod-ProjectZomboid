@@ -313,6 +313,14 @@ function ChaosNPC:update(deltaMs)
         end
     end
 
+    if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil and
+        not isPanicking and not self:HasTag("effect_move_to_square") and
+        self.npcGroup == ChaosNPCGroupID.PEDESTRIAN then
+        if not self.moving and timestampMs >= (self.pedestrianPauseEndMs or 0) then
+            self:UpdateWanderTarget()
+        end
+    end
+
     local isFriendly = self:IsFriendlyToPlayer()
     local needsHealing = isFriendly and self:NeedsHealing()
     local shouldFindBandage = needsHealing and self.enemy == nil and self.actionType == nil and
@@ -345,7 +353,9 @@ function ChaosNPC:update(deltaMs)
 
     if isFriendly and self.canGiftItems and self.enemy == nil and not self.isAttacking and not isPanicking then
         local timeSinceGiftMs = timestampMs - (self.lastGiftItemTimeMs or 0)
-        if timeSinceGiftMs >= CHAOS_NPC_GIFT_ITEM_COOLDOWN_MS then
+        local timeSinceGlobalGiftMs = timestampMs - (ChaosNPCUtils.lastGiftItemTimeMs or 0)
+        if timeSinceGiftMs >= CHAOS_NPC_GIFT_ITEM_COOLDOWN_MS and
+            timeSinceGlobalGiftMs >= CHAOS_NPC_GIFT_ITEM_COOLDOWN_MS then
             local followTarget = self:GetFollowTarget()
             if followTarget and instanceof(followTarget, "IsoPlayer") and
                 zombie:getZ() == followTarget:getZ() then
@@ -467,6 +477,11 @@ function ChaosNPC:update(deltaMs)
                 self:StopMoving(true, "effect_move_to_square_finished")
             elseif not self.moveTargetCharacter and self:HasTag("item_robber") then
                 self:StopMoving(true, "wander_reached")
+            elseif not self.moveTargetCharacter and self.npcGroup == ChaosNPCGroupID.PEDESTRIAN then
+                self:StopMoving(true, "pedestrian_wander_reached")
+                self.pedestrianPauseEndMs = timestampMs +
+                    ChaosUtils.RandIntegerRange(CHAOS_NPC_PEDESTRIAN_PAUSE_MIN_MS,
+                        CHAOS_NPC_PEDESTRIAN_PAUSE_MAX_MS + 1)
             end
             self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
         elseif moveResult == BehaviorResult.Working then

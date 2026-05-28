@@ -159,7 +159,7 @@ function EffectMedicalSuppliesDrop:OnStart()
     if markers then
         local marker = markers:addGridSquareMarker(square, 0.2, 1.0, 0.2, true, 4)
         if marker then
-            marker:setScaleCircleTexture(true)
+            marker:setScaleCircleTexture(false)
             ChaosSpecialAction.AddNewAction(
                 { marker = marker },
                 MARKER_DURATION_MS,

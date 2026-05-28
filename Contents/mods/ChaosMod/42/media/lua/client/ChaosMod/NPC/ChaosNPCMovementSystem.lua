@@ -10,7 +10,7 @@ function ChaosNPC:MoveToCharacter(character)
 
     local actionState = zombie:getActionStateName()
     local allowActionState = actionState == "walktoward" or actionState == "idle" or
-        actionState == "pathfinding" or actionState == "run"
+        actionState == "pathfinding" or actionState == "run" or "sitting"
 
     if not allowActionState then
         self:DebugLogThrottled("move_to_character_blocked_state " .. tostring(actionState))
@@ -103,7 +103,7 @@ function ChaosNPC:MoveToLocation(square)
 
     local actionState = zombie:getActionStateName()
     local allowActionState = actionState == "walktoward" or actionState == "idle" or
-        actionState == "pathfinding" or actionState == "run"
+        actionState == "pathfinding" or actionState == "run" or "sitting"
     if not allowActionState then
         self:DebugLogThrottled("move_to_location_blocked_state " .. tostring(actionState))
         self:StopMoving(true, "not_allowed_action_state")

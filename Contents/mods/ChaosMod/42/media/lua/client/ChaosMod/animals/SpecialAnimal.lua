@@ -12,6 +12,33 @@ SpecialAnimal.__index = SpecialAnimal
 SpecialAnimal.modDataNameKey = "ChaosModAnimalNickname"
 SpecialAnimal.modDataColorKey = "ChaosModAnimalNicknameColor"
 
+---Animals queued to be removed from the world when the player presses the removal key.
+---@type table<integer, IsoAnimal>
+SpecialAnimal.animalsToRemove = SpecialAnimal.animalsToRemove or {}
+
+---Queue an animal to be removed from the world on the next removal keypress.
+---@param animal IsoAnimal
+function SpecialAnimal.AddAnimalToRemove(animal)
+    if not animal then return end
+    table.insert(SpecialAnimal.animalsToRemove, animal)
+end
+
+---Removes every queued animal from the world (not killing them) and clears the queue.
+---@param key integer
+function SpecialAnimal.OnKeyPressed(key)
+    if key ~= Keyboard.KEY_G then return end
+
+    for i = #SpecialAnimal.animalsToRemove, 1, -1 do
+        local animal = SpecialAnimal.animalsToRemove[i]
+        if animal then
+            animal:removeFromWorld()
+            animal:removeFromSquare()
+        end
+    end
+
+    SpecialAnimal.animalsToRemove = {}
+end
+
 local DOOR_CHECK_INTERVAL_MS = 1000
 local DOOR_CHECK_RADIUS = 1
 

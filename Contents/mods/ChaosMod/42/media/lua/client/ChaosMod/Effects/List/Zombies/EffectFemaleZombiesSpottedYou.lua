@@ -15,11 +15,8 @@ function EffectFemaleZombiesSpottedYou:OnStart()
     local pz = square:getZ()
 
     ChaosZombie.ForEachZombieInRange(px, py, 50, function(zombie)
-        if zombie and zombie:isAlive() and zombie:isFemale() then
-            -- ChaosZombie.MoveToPlayerSpotted(zombie, player)
-            zombie:pathToSound(px, py, pz)
-
-            zombie:setLastHeardSound(px, py, pz)
+        if zombie and zombie:isFemale() then
+            ChaosZombie.MoveToSound(zombie, px, py, pz)
         end
     end, true, nil)
 end

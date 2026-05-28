@@ -321,7 +321,23 @@ function ChaosMod.RegisterBridgeHandlers()
                 elseif e.type == ChaosEffectActivationType.VOTE then
                     activationType = ChaosEffectActivationType.VOTE
                 end
-                ChaosEffectsManager.StartEffect(e.id, nickname, activationType)
+                -- Vote winner may be tagged as fake (1) or hidden (2) by StreamerMode.
+                local fakeType = nil
+                if e.fake_option_type == 1 then
+                    fakeType = 1
+                elseif e.fake_option_type == 2 then
+                    fakeType = 2
+                end
+                local startedEffect = ChaosEffectsManager.StartEffect(e.id, nickname, activationType, fakeType)
+                -- Fake effects show a decoy (no-duration) effect name while the real one runs concealed.
+                if startedEffect and fakeType == 1 then
+                    local fakeId = ChaosEffectsRegistry.GetRandomNoDurationEffectId(e.id)
+                    if fakeId then
+                        ChaosEffectsManager.AddFakeVisualEffect(
+                            ChaosLocalization.GetString("effects", fakeId),
+                            ChaosEffectsManager.FAKE_DECOY_MS)
+                    end
+                end
                 if activationType == ChaosEffectActivationType.VOTE then
                     ChaosEffectsRegistry.AddToBlocklist(e.id)
                 end
@@ -370,6 +386,14 @@ function ChaosMod.OnZombieDead(zombie)
     ChaosZombie.OnZombieDead(zombie)
 end
 
+---@param key integer
+function ChaosMod.OnKeyPressed(key)
+    if ChaosMod.enabled == false then
+        return
+    end
+    SpecialAnimal.OnKeyPressed(key)
+end
+
 ---@param character IsoGameCharacter
 function ChaosMod.OnEnterVehicle(character)
     if not character then return end
@@ -383,10 +407,11 @@ Events.OnInitWorld.Add(ChaosMod.OnInitWorld)
 Events.OnWeaponHitCharacter.Add(ChaosMod.OnWeaponHitCharacter)
 Events.OnGameStart.Add(ChaosMod.OnGameStart)
 Events.OnZombieUpdate.Add(ChaosMod.OnZombieUpdate)
-Events.OnTickEvenPaused.Add(ChaosMod.OnTick)
-Events.OnTickEvenPaused.Add(ChaosMod.OnSpecialAnimalsTick)
+Events.OnTick.Add(ChaosMod.OnTick)
+Events.OnTick.Add(ChaosMod.OnSpecialAnimalsTick)
 Events.OnZombieDead.Add(ChaosMod.OnZombieDead)
 Events.OnEnterVehicle.Add(ChaosMod.OnEnterVehicle)
 Events.OnPlayerDeath.Add(ChaosMod.OnPlayerDeath)
+Events.OnKeyPressed.Add(ChaosMod.OnKeyPressed)
 
 return ChaosMod

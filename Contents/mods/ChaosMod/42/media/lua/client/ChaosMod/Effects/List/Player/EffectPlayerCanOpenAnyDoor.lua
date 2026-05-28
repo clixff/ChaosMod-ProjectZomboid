@@ -3,6 +3,7 @@
 ---@field originalOnOpenCloseDoor unknown
 EffectPlayerCanOpenAnyDoor = ChaosEffectBase:derive("EffectPlayerCanOpenAnyDoor", "player_can_open_any_door")
 
+---@param door IsoDoor|IsoThumpable
 local function unlockDoor(door)
     if not door then return end
     if door.setIsLocked then

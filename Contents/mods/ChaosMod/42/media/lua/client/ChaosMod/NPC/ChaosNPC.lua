@@ -77,6 +77,7 @@ require "ChaosMod/NPC/ChaosNPCFirearms"
 ---@field _lastFirearmDiagMs integer
 ---@field enemyDistanceFindRadius number
 ---@field disableAIEffects table<string, boolean>
+---@field pedestrianPauseEndMs integer
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -158,6 +159,7 @@ function ChaosNPC:new(zombie, nickname)
     o.firearmStateEndMs = 0
     o.enemyDistanceFindRadius = 5.0
     o.disableAIEffects = {}
+    o.pedestrianPauseEndMs = 0
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o
@@ -233,6 +235,7 @@ end
 
 ---@param message string
 function ChaosNPC:SayDebug(message)
+    if not CHAOS_NPC_DEBUG_LOGS then return end
     if not self.zombie then return end
     local zombie = self.zombie
     if not zombie:isAlive() then return end
@@ -243,6 +246,7 @@ end
 ---@param message string
 ---@param say? boolean
 function ChaosNPC:DebugLog(message, say)
+    if not CHAOS_NPC_DEBUG_LOGS then return end
     if not self.zombie then return end
 
     local zombie = self.zombie
@@ -274,6 +278,7 @@ end
 ---@param message string
 ---@param intervalMs? integer
 function ChaosNPC:DebugLogThrottled(message, intervalMs)
+    if not CHAOS_NPC_DEBUG_LOGS then return end
     intervalMs = intervalMs or 1000
     local now = ChaosMod and ChaosMod.lastTimeTickMs or getTimestampMs()
     if now - (self.lastNpcDebugLogMs or 0) < intervalMs then return end

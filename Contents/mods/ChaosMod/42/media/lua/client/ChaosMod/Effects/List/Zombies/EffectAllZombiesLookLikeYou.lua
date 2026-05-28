@@ -15,7 +15,7 @@ function EffectAllZombiesLookLikeYou:OnStart()
 
     ChaosZombie.ForEachZombieInRange(x, y, radius, function(zombie)
         if zombie:isDead() then return end
-        ChaosZombie.CopyPlayerAppearanceToNormalZombie(player, zombie)
+        ChaosZombie.CopyAppearanceToNormalZombie(player, zombie)
         updatedCount = updatedCount + 1
     end, true, z)
 

@@ -75,6 +75,12 @@ export interface StreamerModeConfig {
   hide_votes: boolean;
   youtube_chat_connection_type: "long_polling" | "message_streaming";
   random_effect_in_vote: boolean;
+  voting_fake_effects_enabled: boolean;
+  voting_fake_effects_chance: number;
+  voting_hidden_effects_enabled: boolean;
+  voting_hidden_effects_chance: number;
+  reveal_hidden_effect_after_delay: boolean;
+  reveal_fake_effect_after_delay: boolean;
   currencies: CurrenciesConfig;
 }
 
@@ -84,12 +90,16 @@ export interface ModConfig {
   effects_interval: number;
   effects_duration_multiplier: number;
   recent_effects_block_buffer: number;
+  persist_recent_effects: boolean;
   vote_start_time: number;
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
+  hide_effect_names: boolean;
   ui: UIConfig;
   ui_sounds_enabled: boolean;
   ignore_effect_chances: boolean;
+  npc_voicelines_enabled: boolean;
+  npc_gifts_enabled: boolean;
   streamer_mode: StreamerModeConfig;
 }
 
@@ -192,6 +202,12 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   hide_votes: false,
   youtube_chat_connection_type: "long_polling",
   random_effect_in_vote: true,
+  voting_fake_effects_enabled: true,
+  voting_fake_effects_chance: 5.0,
+  voting_hidden_effects_enabled: true,
+  voting_hidden_effects_chance: 5.0,
+  reveal_hidden_effect_after_delay: true,
+  reveal_fake_effect_after_delay: true,
   currencies: { main: "", list: {} },
 };
 
@@ -201,12 +217,16 @@ const DEFAULT_CONFIG: ModConfig = {
   effects_interval: 45,
   effects_duration_multiplier: 1.0,
   recent_effects_block_buffer: 90,
+  persist_recent_effects: true,
   vote_start_time: 15,
   hide_progress_bar: false,
   use_voting_progress_bar_color: false,
+  hide_effect_names: false,
   ui: DEFAULT_UI,
   ui_sounds_enabled: true,
   ignore_effect_chances: false,
+  npc_voicelines_enabled: true,
+  npc_gifts_enabled: true,
   streamer_mode: DEFAULT_STREAMER_MODE,
 };
 
@@ -390,6 +410,30 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
       raw["random_effect_in_vote"],
       d.random_effect_in_vote,
     ),
+    voting_fake_effects_enabled: bool(
+      raw["voting_fake_effects_enabled"],
+      d.voting_fake_effects_enabled,
+    ),
+    voting_fake_effects_chance: num(
+      raw["voting_fake_effects_chance"],
+      d.voting_fake_effects_chance,
+    ),
+    voting_hidden_effects_enabled: bool(
+      raw["voting_hidden_effects_enabled"],
+      d.voting_hidden_effects_enabled,
+    ),
+    voting_hidden_effects_chance: num(
+      raw["voting_hidden_effects_chance"],
+      d.voting_hidden_effects_chance,
+    ),
+    reveal_hidden_effect_after_delay: bool(
+      raw["reveal_hidden_effect_after_delay"],
+      d.reveal_hidden_effect_after_delay,
+    ),
+    reveal_fake_effect_after_delay: bool(
+      raw["reveal_fake_effect_after_delay"],
+      d.reveal_fake_effect_after_delay,
+    ),
     currencies: parseCurrencies(obj(raw["currencies"])),
   };
 }
@@ -521,18 +565,28 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
       raw["recent_effects_block_buffer"],
       d.recent_effects_block_buffer,
     ),
+    persist_recent_effects: bool(
+      raw["persist_recent_effects"],
+      d.persist_recent_effects,
+    ),
     vote_start_time: num(raw["vote_start_time"], d.vote_start_time),
     hide_progress_bar: bool(raw["hide_progress_bar"], d.hide_progress_bar),
     use_voting_progress_bar_color: bool(
       raw["use_voting_progress_bar_color"],
       d.use_voting_progress_bar_color,
     ),
+    hide_effect_names: bool(raw["hide_effect_names"], d.hide_effect_names),
     ui: parseUI(obj(raw["ui"])),
     ui_sounds_enabled: bool(raw["ui_sounds_enabled"], d.ui_sounds_enabled),
     ignore_effect_chances: bool(
       raw["ignore_effect_chances"],
       d.ignore_effect_chances,
     ),
+    npc_voicelines_enabled: bool(
+      raw["npc_voicelines_enabled"],
+      d.npc_voicelines_enabled,
+    ),
+    npc_gifts_enabled: bool(raw["npc_gifts_enabled"], d.npc_gifts_enabled),
     streamer_mode: parseStreamerMode(obj(raw["streamer_mode"])),
   };
 }

@@ -173,12 +173,28 @@ function ChaosSettingsConfigPanel:rebuild()
     end
     y = y + hintH + rowGap
 
+    addLabelled("persist_recent_effects")
+    self.controls.persist_recent_effects = W.MakeCheckbox(self, controlX, y, "", cfg.persist_recent_effects ~= false,
+        function(checked)
+            cfg.persist_recent_effects = checked
+        end)
+    table.insert(children, self.controls.persist_recent_effects)
+    y = y + rowH + rowGap
+
     addLabelled("hide_progress_bar")
     self.controls.hide_progress_bar = W.MakeCheckbox(self, controlX, y, "", cfg.hide_progress_bar == true,
         function(checked)
             cfg.hide_progress_bar = checked
         end)
     table.insert(children, self.controls.hide_progress_bar)
+    y = y + rowH + rowGap
+
+    addLabelled("hide_effect_names")
+    self.controls.hide_effect_names = W.MakeCheckbox(self, controlX, y, "", cfg.hide_effect_names == true,
+        function(checked)
+            cfg.hide_effect_names = checked
+        end)
+    table.insert(children, self.controls.hide_effect_names)
     y = y + rowH + rowGap
 
     addLabelled("ui_sounds_enabled")
@@ -195,6 +211,22 @@ function ChaosSettingsConfigPanel:rebuild()
             cfg.ignore_effect_chances = checked
         end)
     table.insert(children, self.controls.ignore_effect_chances)
+    y = y + rowH + rowGap
+
+    addLabelled("npc_voicelines_enabled")
+    self.controls.npc_voicelines_enabled = W.MakeCheckbox(self, controlX, y, "", cfg.npc_voicelines_enabled ~= false,
+        function(checked)
+            cfg.npc_voicelines_enabled = checked
+        end)
+    table.insert(children, self.controls.npc_voicelines_enabled)
+    y = y + rowH + rowGap
+
+    addLabelled("npc_gifts_enabled")
+    self.controls.npc_gifts_enabled = W.MakeCheckbox(self, controlX, y, "", cfg.npc_gifts_enabled ~= false,
+        function(checked)
+            cfg.npc_gifts_enabled = checked
+        end)
+    table.insert(children, self.controls.npc_gifts_enabled)
     y = y + rowH + rowGap
 
     -- ---------- Streamer Mode ----------
@@ -317,6 +349,64 @@ function ChaosSettingsConfigPanel:rebuild()
             sm.random_effect_in_vote = c
         end)
     table.insert(children, self.controls.random_effect_in_vote)
+    y = y + rowH + rowGap
+
+    addLabelled("voting_fake_effects_enabled")
+    self.controls.voting_fake_effects_enabled = W.MakeCheckbox(self, controlX, y, "",
+        sm.voting_fake_effects_enabled == true, function(c)
+            sm.voting_fake_effects_enabled = c
+        end)
+    table.insert(children, self.controls.voting_fake_effects_enabled)
+    y = y + rowH + rowGap
+
+    local fakeHintLabels, fakeHintH = W.MakeHint(self, controlX, y,
+        "Fake options are shown with [Fake].\nWhen voted for, the fake effect is activated, but the streamer sees a different effect name.")
+    for _, lbl in ipairs(fakeHintLabels) do
+        table.insert(children, lbl)
+    end
+    y = y + fakeHintH + rowGap
+
+    addLabelled("voting_fake_effects_chance")
+    self.controls.voting_fake_effects_chance = W.MakeNumberInput(self, controlX, y, controlW,
+        sm.voting_fake_effects_chance or 5.0, { float = true, maxLen = 6 })
+    table.insert(children, self.controls.voting_fake_effects_chance)
+    y = y + rowH + rowGap
+
+    addLabelled("voting_hidden_effects_enabled")
+    self.controls.voting_hidden_effects_enabled = W.MakeCheckbox(self, controlX, y, "",
+        sm.voting_hidden_effects_enabled == true, function(c)
+            sm.voting_hidden_effects_enabled = c
+        end)
+    table.insert(children, self.controls.voting_hidden_effects_enabled)
+    y = y + rowH + rowGap
+
+    local hiddenHintLabels, hiddenHintH = W.MakeHint(self, controlX, y,
+        "Each vote option has a chance to become [Hidden].\nIf it wins, the effect is activated, but its name is hidden from the streamer for some time.")
+    for _, lbl in ipairs(hiddenHintLabels) do
+        table.insert(children, lbl)
+    end
+    y = y + hiddenHintH + rowGap
+
+    addLabelled("voting_hidden_effects_chance")
+    self.controls.voting_hidden_effects_chance = W.MakeNumberInput(self, controlX, y, controlW,
+        sm.voting_hidden_effects_chance or 5.0, { float = true, maxLen = 6 })
+    table.insert(children, self.controls.voting_hidden_effects_chance)
+    y = y + rowH + rowGap
+
+    addLabelled("reveal_hidden_effect_after_delay")
+    self.controls.reveal_hidden_effect_after_delay = W.MakeCheckbox(self, controlX, y, "",
+        sm.reveal_hidden_effect_after_delay ~= false, function(c)
+            sm.reveal_hidden_effect_after_delay = c
+        end)
+    table.insert(children, self.controls.reveal_hidden_effect_after_delay)
+    y = y + rowH + rowGap
+
+    addLabelled("reveal_fake_effect_after_delay")
+    self.controls.reveal_fake_effect_after_delay = W.MakeCheckbox(self, controlX, y, "",
+        sm.reveal_fake_effect_after_delay ~= false, function(c)
+            sm.reveal_fake_effect_after_delay = c
+        end)
+    table.insert(children, self.controls.reveal_fake_effect_after_delay)
     y = y + rowH + rowGap
 
     -- ---------- Donate Groups ----------
@@ -465,6 +555,14 @@ function ChaosSettingsConfigPanel:CommitWorkingState()
     if self.controls.zombie_nicknames_buffer then
         sm.zombie_nicknames_buffer = W.GetIntFromBox(self.controls.zombie_nicknames_buffer,
             sm.zombie_nicknames_buffer or 150)
+    end
+    if self.controls.voting_fake_effects_chance then
+        local v = W.GetFloatFromBox(self.controls.voting_fake_effects_chance, sm.voting_fake_effects_chance or 5.0)
+        sm.voting_fake_effects_chance = W.Clamp(v, 0, 100)
+    end
+    if self.controls.voting_hidden_effects_chance then
+        local v = W.GetFloatFromBox(self.controls.voting_hidden_effects_chance, sm.voting_hidden_effects_chance or 5.0)
+        sm.voting_hidden_effects_chance = W.Clamp(v, 0, 100)
     end
     if self.controls.progress_bar_color then
         ui.progress_bar_color = self.controls.progress_bar_color:getInternalText() or ui.progress_bar_color

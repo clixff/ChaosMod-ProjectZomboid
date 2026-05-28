@@ -57,15 +57,8 @@ local function DoctorHealEnd(data)
     local dist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), player:getX(), player:getY())
     if dist > HEAL_DISTANCE then return false end
 
-    local candidates = CollectWoundedBodyParts(player)
-    if #candidates == 0 then return false end
-
-    local part = candidates[ChaosUtils.RandArrayIndex(candidates)]
-    if not part then return false end
-
-    part:RestoreToFullHealth()
-    local bodyDamage = player:getBodyDamage()
-    if bodyDamage then bodyDamage:calculateOverallHealth() end
+    local partName = ChaosPlayer.HealRandomWound(player)
+    if not partName then return false end
 
     data.healsDone = data.healsDone + 1
     data.sinceLastHealMs = 0

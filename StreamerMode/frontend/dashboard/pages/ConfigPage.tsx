@@ -222,6 +222,15 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setField("recent_effects_block_buffer", v)}
           />
         </FieldRow>
+        <FieldRow
+          label="Persist recent effects"
+          hint="When enabled, the recent effects block buffer is loaded from previous sessions."
+        >
+          <Checkbox
+            checked={config.persist_recent_effects}
+            onChange={(v) => setField("persist_recent_effects", v)}
+          />
+        </FieldRow>
         <FieldRow label="Vote start time (seconds)">
           <NumberInput
             value={config.vote_start_time}
@@ -241,10 +250,37 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setField("ignore_effect_chances", v)}
           />
         </FieldRow>
+        <FieldRow
+          label="Voicelines for NPCs"
+          hint="When off, NPCs and themed zombies stop playing their voicelines."
+        >
+          <Checkbox
+            checked={config.npc_voicelines_enabled}
+            onChange={(v) => setField("npc_voicelines_enabled", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Gifts from NPCs"
+          hint="When off, friendly NPCs will not gift items to the player."
+        >
+          <Checkbox
+            checked={config.npc_gifts_enabled}
+            onChange={(v) => setField("npc_gifts_enabled", v)}
+          />
+        </FieldRow>
         <FieldRow label="Hide progress bar">
           <Checkbox
             checked={config.hide_progress_bar}
             onChange={(v) => setField("hide_progress_bar", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Hide effect names"
+          hint="When on, all effect names are rendered as ??? for the player."
+        >
+          <Checkbox
+            checked={config.hide_effect_names}
+            onChange={(v) => setField("hide_effect_names", v)}
           />
         </FieldRow>
         <FieldRow label="Use voting progress bar color">
@@ -325,6 +361,60 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
           <Checkbox
             checked={sm.random_effect_in_vote}
             onChange={(v) => setStreamer("random_effect_in_vote", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Voting fake effects enabled"
+          hint="Fake options are shown with [Fake]. When voted for, the fake effect is activated, but the streamer sees a different effect name."
+        >
+          <Checkbox
+            checked={sm.voting_fake_effects_enabled}
+            onChange={(v) => setStreamer("voting_fake_effects_enabled", v)}
+          />
+        </FieldRow>
+        <FieldRow label="Voting fake effects chance">
+          <NumberInput
+            value={sm.voting_fake_effects_chance}
+            min={0}
+            max={100}
+            step={0.5}
+            onChange={(v) => setStreamer("voting_fake_effects_chance", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Voting hidden effects enabled"
+          hint="Each vote option has a chance to become [Hidden]. If it wins, the effect is activated, but its name is hidden from the streamer for some time."
+        >
+          <Checkbox
+            checked={sm.voting_hidden_effects_enabled}
+            onChange={(v) => setStreamer("voting_hidden_effects_enabled", v)}
+          />
+        </FieldRow>
+        <FieldRow label="Voting hidden effects chance">
+          <NumberInput
+            value={sm.voting_hidden_effects_chance}
+            min={0}
+            max={100}
+            step={0.5}
+            onChange={(v) => setStreamer("voting_hidden_effects_chance", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Reveal hidden effect after delay"
+          hint="When on, a hidden effect's name is revealed in-game after the conceal delay. When off, it stays hidden the whole time."
+        >
+          <Checkbox
+            checked={sm.reveal_hidden_effect_after_delay}
+            onChange={(v) => setStreamer("reveal_hidden_effect_after_delay", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Reveal fake effect after delay"
+          hint="When on, a fake effect's real name is revealed in-game after the conceal delay. When off, it is never revealed."
+        >
+          <Checkbox
+            checked={sm.reveal_fake_effect_after_delay}
+            onChange={(v) => setStreamer("reveal_fake_effect_after_delay", v)}
           />
         </FieldRow>
         <FieldRow label="Use zombie nicknames">

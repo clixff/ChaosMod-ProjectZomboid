@@ -69,6 +69,8 @@ function ChaosUIManager.onDonateEffectActivated(username, effectId)
     local effectData = ChaosEffectsRegistry.effects[effectId]
     if not effectData then return end
     local displayName = effectData.name
+    local maskedByConfig = ChaosConfig.hide_effect_names == true
+    local showNameAlways = false
     if ChaosEffectsManager and ChaosEffectsManager.activeEffects then
         for i = #ChaosEffectsManager.activeEffects, 1, -1 do
             local effect = ChaosEffectsManager.activeEffects[i]
@@ -76,9 +78,13 @@ function ChaosUIManager.onDonateEffectActivated(username, effectId)
                 if effect.fakeEffectNameId and effect.fakeEffectNameId ~= "" then
                     displayName = ChaosLocalization.GetString("effects", effect.fakeEffectNameId)
                 end
+                showNameAlways = effect.showNameAlways == true
                 break
             end
         end
+    end
+    if maskedByConfig and not showNameAlways then
+        displayName = "???"
     end
     local fmt = ChaosLocalization.GetString("meta", "username_activated_effect")
     local msg = string.format(fmt, username, displayName)

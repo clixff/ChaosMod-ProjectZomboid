@@ -1,6 +1,6 @@
 EffectExplodeNearbyCars = ChaosEffectBase:derive("EffectExplodeNearbyCars", "explode_nearby_cars")
 
-local VEHICLE_RADIUS = 30
+local VEHICLE_RADIUS = 45
 local EXPLOSION_RADIUS = 5
 
 function EffectExplodeNearbyCars:OnStart()
@@ -29,6 +29,7 @@ function EffectExplodeNearbyCars:OnStart()
     table.sort(sortedVehicles, function(a, b) return a.dist < b.dist end)
 
     for i = 1, #sortedVehicles do
+        ---@type BaseVehicle
         local vehicle = sortedVehicles[i].vehicle
         ---@type VehiclePart
         local part = vehicle:getPartById("Engine")

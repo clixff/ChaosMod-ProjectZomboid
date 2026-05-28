@@ -3,7 +3,7 @@
 ---@field onPlayerUpdate fun(player: IsoPlayer) | nil
 EffectPlayerFalls = ChaosEffectBase:derive("EffectPlayerFalls", "player_falls")
 
-local FALL_COOLDOWN_MS = 10000
+local FALL_COOLDOWN_MS = 8000
 
 local function triggerFall(player)
     player:clearVariable("BumpFallType")

@@ -1,6 +1,8 @@
 ---@class EffectZombiesWalkAway : ChaosEffectBase
 EffectZombiesWalkAway = ChaosEffectBase:derive("EffectZombiesWalkAway", "zombies_walk_away")
 
+local USELESS_DURATION_MS = 10000
+
 function EffectZombiesWalkAway:OnStart()
     ChaosEffectBase:OnStart()
     local player = getPlayer()
@@ -12,7 +14,8 @@ function EffectZombiesWalkAway:OnStart()
     local px = square:getX()
     local py = square:getY()
 
-    local counter = 0
+    ---@type table<integer, {zombie: IsoZombie, pos: { x, y, z } }>
+    local objects = {}
 
     ChaosZombie.ForEachZombieInRange(px, py, 30, function(zombie)
         if not zombie or not zombie:isAlive() then return end
@@ -38,8 +41,48 @@ function EffectZombiesWalkAway:OnStart()
         zombie:setTargetSeenTime(0)
 
         ChaosZombie.MoveToLocation(zombie, tx, ty, zz, true, true, true, true)
-        counter = counter + 1
+
+        local iZ = math.floor(zz)
+
+        zombie:setUseless(true)
+
+
+        zombie:pathToSound(tx, ty, 0)
+        zombie:setLastHeardSound(tx, ty, 0)
+
+        table.insert(objects, {
+            zombie = zombie,
+            pos = { x = tx, y = ty, z = iZ }
+        })
     end, true, nil)
 
-    print("[EffectZombiesWalkAway] Redirected " .. tostring(counter) .. " zombies away from player")
+    ChaosSpecialAction.AddNewAction({ objects = objects }, USELESS_DURATION_MS,
+        function(_deltaMs, data)
+            for _, obj in ipairs(data.objects) do
+                ---@type IsoZombie
+                local zombie = obj.zombie
+                if zombie and zombie:isAlive() then
+                    zombie:setUseless(true)
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    zombie:setTarget(nil)
+                    zombie:setTargetSeenTime(0)
+                end
+            end
+        end,
+        function(data)
+            for _, obj in ipairs(data.objects) do
+                local zombie = obj.zombie
+                if zombie then
+                    zombie:setUseless(false)
+                end
+            end
+        end,
+        function(data)
+            for _, obj in ipairs(data.objects) do
+                local zombie = obj.zombie
+                if zombie then
+                    zombie:setUseless(false)
+                end
+            end
+        end)
 end

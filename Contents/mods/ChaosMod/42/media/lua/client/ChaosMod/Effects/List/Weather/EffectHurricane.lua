@@ -8,6 +8,25 @@ local CHARACTER_SPEED  = 15.0
 local VEHICLE_STRENGTH = 50000
 local SEARCH_RADIUS    = 40
 
+---@param c IsoGameCharacter
+local function lockFallPhysics(c)
+    c:setbClimbing(true)
+    c:setbFalling(false)
+    c:setFallTime(0)
+    c:setLastFallSpeed(0)
+    c:setLastZ(c:getZ())
+end
+
+---@param c IsoGameCharacter
+local function unlockFallPhysics(c)
+    c:setbClimbing(false)
+    c:setbFalling(false)
+    c:setFallTime(0)
+    c:setLastFallSpeed(0)
+    c:setLastZ(c:getZ())
+    c:setCurrentSquareFromPosition()
+end
+
 ---@param sq1 IsoGridSquare
 ---@param sq2 IsoGridSquare
 ---@return boolean
@@ -83,7 +102,13 @@ function EffectHurricane:OnStart()
         ChaosUtils.SetClimateFloatOverride(cm, ClimateManager.FLOAT_PRECIPITATION_INTENSITY, true, 1.0)
     end
 
-    ChaosVehicle.ExitVehicle(getPlayer())
+    ChaosUtils.EFFECT_HURRICANE_ENABLED = true
+
+    local player = getPlayer()
+    ChaosVehicle.ExitVehicle(player)
+    if player then
+        lockFallPhysics(player)
+    end
 end
 
 ---@param deltaMs integer
@@ -97,6 +122,8 @@ function EffectHurricane:OnTick(deltaMs)
 
     local player = getPlayer()
     if not player then return end
+
+    lockFallPhysics(player)
 
     local square = player:getSquare()
     if not square then return end
@@ -131,6 +158,13 @@ end
 
 function EffectHurricane:OnEnd()
     ChaosEffectBase:OnEnd()
+
+    ChaosUtils.EFFECT_HURRICANE_ENABLED = false
+
+    local player = getPlayer()
+    if player then
+        unlockFallPhysics(player)
+    end
 
     local cm = ClimateManager.getInstance()
     if not cm then return end
