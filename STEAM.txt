@@ -23,10 +23,10 @@ This mod triggers a random effect every 45 seconds. There are currently [b]450+ 
 [*] 135+ new effects!
 [*] Meta Effects system that trigger every 15 minutes
 [*] And many other improvements
+[/list]
 
 [url=https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest]Full changelog[/url]
 
-[/list]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_03.png[/img]
 
@@ -152,6 +152,7 @@ It is designed for single-player only.
 [*] NPCs update: smarter, stronger, and with firearms
 [*] 135+ new effects!
 [*] And many other improvements
+[/list]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/future_versions.png[/img]
 
