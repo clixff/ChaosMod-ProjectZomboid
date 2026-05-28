@@ -1,3 +1,7 @@
+// MUST be first import — see file header. Sets globalThis.Long so that
+// protobufjs (loaded transitively by @grpc/proto-loader) can find the Long
+// class in `bun build --compile` output.
+import "./src/streamer/youtube/protobufBootstrap.ts";
 import colors from "colors";
 import open from "open";
 import { existsSync, statSync, writeFileSync } from "fs";
@@ -26,22 +30,40 @@ import {
   getAvailableLanguages,
 } from "./src/commands/lang.ts";
 import { loadEffects, saveEffects } from "./src/effects.ts";
+import { buildHubExportPayload } from "./src/hubExport.ts";
 import { syncEffectsForModVersion } from "./src/versionFile.ts";
 import { startServer } from "./src/server.ts";
-import { createProvider, type StreamerUser } from "./src/streamer/index.ts";
+import {
+  createChatProviders,
+  type NormalizedChatMessage,
+} from "./src/streamer/index.ts";
 import { initLocalization, getString } from "./src/localization.ts";
-import { writeEffectsXlsx } from "./src/exportXlsx.ts";
-import { TwitchChat, type ChatEvent } from "./src/streamer/TwitchChat.ts";
+import { buildEffectsXlsxBuffer, writeEffectsXlsx } from "./src/exportXlsx.ts";
 import { NicknamesManager } from "./src/streamer/NicknamesManager.ts";
 import { VotingManager } from "./src/streamer/VotingManager.ts";
+import { removeEmojis } from "./src/utils/text.ts";
 import {
   startDebugChatMessages,
   startDebugNicknames,
 } from "./src/debugNicknames.ts";
 import { startDebugVotes } from "./src/debugVotes.ts";
+import { startDebugSubs } from "./src/debugSubs.ts";
 import { Bridge } from "./src/bridge/Bridge.ts";
 import { DonationAlertsProvider } from "./src/donationalerts/DonationAlertsProvider.ts";
 import { DonationManager } from "./src/donations/DonationManager.ts";
+import { fetchExchangeRates } from "./src/utils/currencies.ts";
+import { handleBitsCheer } from "./src/donations/BitsHandler.ts";
+import { SubsHandler } from "./src/donations/SubsHandler.ts";
+import {
+  TwitchRewardsManager,
+  type EffectLookup,
+  type RewardRow,
+} from "./src/streamer/twitch/rewards/TwitchRewardsManager.ts";
+import { TwitchRewardsError } from "./src/streamer/twitch/rewards/TwitchRewardsClient.ts";
+import type {
+  ChatNotificationEvent,
+  RedemptionEvent,
+} from "./src/streamer/TwitchChat.ts";
 import { registerDonateCommand } from "./src/commands/donate.ts";
 import type { EffectEntry } from "./src/effects.ts";
 import { ActivityLog } from "./src/activityLog.ts";
@@ -92,7 +114,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.1.1";
+const VERSION = "1.2.0";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -166,6 +188,7 @@ const KNOWN_ARGS_EXACT = new Set([
   "--debug-chat-messages",
   "--debug-nicknames",
   "--debug-votes",
+  "--debug-subs",
 ]);
 const KNOWN_ARGS_PREFIXES = ["--port=", "--host="];
 let fatalExitInProgress = false;
@@ -418,7 +441,9 @@ async function main(): Promise<void> {
   const useLocalhost = config?.streamer_mode.use_localhost_ip ?? true;
   const host = hostOverride ?? (useLocalhost ? "127.0.0.1" : "0.0.0.0");
 
-  const provider = createProvider(config);
+  const { twitch: twitchProvider, youtube: youtubeProvider } =
+    createChatProviders();
+  const chatProviders = [twitchProvider, youtubeProvider];
 
   const nicknamesManager = luaFolder
     ? new NicknamesManager(
@@ -453,6 +478,76 @@ async function main(): Promise<void> {
   const activityLog = new ActivityLog();
 
   let versionStatus: VersionStatus = buildVersionStatus(VERSION, null);
+
+  const bridge = luaFolder ? new Bridge(luaFolder) : null;
+  let modEnabled = false;
+  let iterationIndex = 0;
+  // Tracks meta effect ids reported active by Lua via meta_effect_start/_end.
+  // Cleared on mod_change_status:false. Used to compute desired winner count
+  // for combo_time and to gate other meta-aware logic.
+  const activeMetas = new Set<string>();
+
+  function getComboTimeEffectsCount(): number {
+    if (!activeMetas.has("combo_time")) return 1;
+    if (!config) return 1;
+    const entry = config.meta_effects.list.find((e) => e.id === "combo_time");
+    if (!entry) return 1;
+    const raw = entry.variables["effects_count"];
+    const n = typeof raw === "number" ? Math.floor(raw) : 1;
+    return n >= 1 ? n : 1;
+  }
+
+  // Replaces activeMetas wholesale from a snapshot the mod includes on
+  // interval_start / vote_start. Used as a self-correcting safety net on top
+  // of meta_effect_start / meta_effect_end edge events.
+  function syncActiveMetasFromPayload(payload: Record<string, unknown>): void {
+    const raw = payload["meta_effects"];
+    if (!Array.isArray(raw)) return;
+    activeMetas.clear();
+    for (const id of raw) {
+      if (typeof id === "string" && id !== "") activeMetas.add(id);
+    }
+  }
+
+  type HandshakePayload = {
+    streamer_mode_version: string;
+    has_new_update: boolean;
+    new_update_version: string;
+  };
+  let lastSentHandshake: HandshakePayload | null = null;
+
+  function buildHandshakePayload(): HandshakePayload {
+    const hasNew = versionStatus.update_available && !!versionStatus.latest;
+    return {
+      streamer_mode_version: VERSION,
+      has_new_update: hasNew,
+      new_update_version: hasNew ? (versionStatus.latest ?? "") : "",
+    };
+  }
+
+  function handshakeEquals(
+    a: HandshakePayload | null,
+    b: HandshakePayload,
+  ): boolean {
+    if (!a) return false;
+    return (
+      a.streamer_mode_version === b.streamer_mode_version &&
+      a.has_new_update === b.has_new_update &&
+      a.new_update_version === b.new_update_version
+    );
+  }
+
+  function emitHandshakeIfChanged(): void {
+    if (!bridge || !modEnabled) return;
+    const next = buildHandshakePayload();
+    if (handshakeEquals(lastSentHandshake, next)) return;
+    lastSentHandshake = next;
+    bridge.emit("streamer_handshake", next);
+    logger.debug(
+      `[Bridge] streamer_handshake: app=${next.streamer_mode_version} update=${next.has_new_update} new=${next.new_update_version || "-"}`,
+    );
+  }
+
   void fetchLatestVersion().then((latest) => {
     versionStatus = buildVersionStatus(VERSION, latest);
     if (versionStatus.update_available && latest) {
@@ -460,45 +555,98 @@ async function main(): Promise<void> {
         `${colors.yellow(`New version v${latest} is available.`)} Download: ${colors.cyan(RELEASES_URL)}`,
       );
     }
+    emitHandshakeIfChanged();
   });
 
-  const bridge = luaFolder ? new Bridge(luaFolder) : null;
-  let modEnabled = false;
-  let iterationIndex = 0;
+  const subsHandler = new SubsHandler();
+  const pendingSubActivations: Array<{ nickname: string; threshold: number }> =
+    [];
 
   if (bridge) {
     bridge.on("mod_change_status", (payload) => {
       const enabled = payload.enabled === true;
       modEnabled = enabled;
       logger.debug(`[Bridge] mod_change_status: enabled=${enabled}`);
-      if (!enabled) {
+      // Any change to the mod's run state invalidates the active-meta tracking;
+      // it gets repopulated by subsequent meta_effect_start events.
+      activeMetas.clear();
+      if (enabled) {
+        lastSentHandshake = null;
+        emitHandshakeIfChanged();
+      } else {
         votingManager.stop();
+        lastSentHandshake = null;
         bridge.rotateOutbound();
+      }
+      if (
+        rewardsManager &&
+        (config?.streamer_mode.donation_systems.twitch_points.enabled ?? false)
+      ) {
+        void rewardsManager.setVisible(enabled);
       }
     });
 
+    bridge.on("open_github", () => {
+      logger.debug("[Bridge] open_github");
+      void open(RELEASES_URL).catch((err) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        logger.debug(`[Bridge] open_github: failed to open browser: ${msg}`);
+      });
+    });
+
     bridge.on("interval_start", (payload) => {
+      syncActiveMetasFromPayload(payload);
       const iter =
         typeof payload.iteration === "number" ? payload.iteration : 0;
       iterationIndex = iter;
       logger.debug(`[Bridge] interval_start: iteration=${iter}`);
       if (votingManager.isActive) {
-        votingManager.stop();
-        const winnerEffectId = votingManager.lastWinnerEffectId;
-        if (winnerEffectId) {
-          bridge.emit("activate_effects", {
-            effects: [{ id: winnerEffectId, type: "vote" }],
-          });
-          activityLog.add({
-            type: "vote",
-            effect_id: winnerEffectId,
-            effect_name: getString("effects", winnerEffectId),
-          });
+        const desiredCount = getComboTimeEffectsCount();
+        votingManager.stop(desiredCount);
+        const winners = votingManager.lastWinnersBatch;
+        if (winners.length > 0) {
+          const winnerEntries = winners
+            .filter((w) => !!w.effectId)
+            .map((w) => {
+              const entry: {
+                id: string;
+                type: string;
+                fake_option_type?: number;
+              } = { id: w.effectId, type: "vote" };
+              if (w.tag === "fake") entry.fake_option_type = 1;
+              else if (w.tag === "hidden") entry.fake_option_type = 2;
+              return entry;
+            });
+          if (winnerEntries.length > 0) {
+            bridge.emit("activate_effects", { effects: winnerEntries });
+            for (const w of winnerEntries) {
+              activityLog.add({
+                type: "vote",
+                effect_id: w.id,
+                effect_name: getString("effects", w.id),
+              });
+            }
+          }
         }
       }
     });
 
+    bridge.on("meta_effect_start", (payload) => {
+      const id = typeof payload["id"] === "string" ? payload["id"] : "";
+      if (!id) return;
+      activeMetas.add(id);
+      logger.debug(`[Bridge] meta_effect_start: ${id}`);
+    });
+
+    bridge.on("meta_effect_end", (payload) => {
+      const id = typeof payload["id"] === "string" ? payload["id"] : "";
+      if (!id) return;
+      activeMetas.delete(id);
+      logger.debug(`[Bridge] meta_effect_end: ${id}`);
+    });
+
     bridge.on("vote_start", (payload) => {
+      syncActiveMetasFromPayload(payload);
       logger.debug("[Bridge] vote_start");
       if (!config?.streamer_mode.voting_enabled) return;
       const rawEffects = payload["effects"];
@@ -506,7 +654,8 @@ async function main(): Promise<void> {
         ? rawEffects.filter((id): id is string => typeof id === "string")
         : [];
       const rawSecret = payload["secret_effect"];
-      const secretEffectId = typeof rawSecret === "string" && rawSecret !== "" ? rawSecret : null;
+      const secretEffectId =
+        typeof rawSecret === "string" && rawSecret !== "" ? rawSecret : null;
       votingManager.start(visibleEffectIds, secretEffectId);
     });
 
@@ -515,17 +664,66 @@ async function main(): Promise<void> {
       reloadRuntimeConfig();
     });
 
+    bridge.on("random_effect_activated", (payload) => {
+      const effectId =
+        typeof payload["effect_id"] === "string" ? payload["effect_id"] : "";
+      if (!effectId) return;
+      const pending = pendingSubActivations.shift();
+      activityLog.add({
+        type: "sub",
+        effect_id: effectId,
+        effect_name: getString("effects", effectId),
+        nickname: pending?.nickname ?? "",
+        threshold: pending?.threshold ?? 0,
+      });
+    });
+
     bridge.start();
   }
 
-  const daProvider = new DonationAlertsProvider();
+  await DonationAlertsProvider.cleanupLegacySecrets();
+
+  const daProvider = new DonationAlertsProvider(() =>
+    config ? config.streamer_mode.donation_systems.donationalerts : null,
+  );
   daProvider.onConnect = () => {
     activityLog.add({ type: "donationalerts_connected" });
   };
   daProvider.onDisconnect = () => {
     activityLog.add({ type: "donationalerts_disconnected" });
   };
-  const donationManager = new DonationManager(port);
+  const donationManager = new DonationManager(port, () =>
+    config ? config.streamer_mode.currencies : { main: "", list: {} },
+  );
+
+  // On first DA login (currencies fully empty), default main=RUB and load rates.
+  const autoSetupCurrenciesOnDALogin = async (): Promise<void> => {
+    if (!config || !luaFolder) return;
+    const currencies = config.streamer_mode.currencies;
+    if (
+      currencies.main.trim().length > 0 ||
+      Object.keys(currencies.list).length > 0
+    ) {
+      return;
+    }
+    try {
+      const result = await fetchExchangeRates("RUB");
+      config.streamer_mode.currencies = {
+        main: "RUB",
+        list: result.rates,
+      };
+      saveConfig(luaFolder, config);
+      bridge?.emit("reload_config");
+      logger.info(
+        `[DonationAlerts] Auto-configured currencies: main=RUB with ${Object.keys(result.rates).length} rates loaded.`,
+      );
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.warn(
+        `[DonationAlerts] Failed to auto-load exchange rates: ${msg}`,
+      );
+    }
+  };
   donationManager.onActivationFailed = (info) => {
     const effectName = getString("effects", info.effect_id);
     if (info.type === "price_too_low") {
@@ -549,124 +747,290 @@ async function main(): Promise<void> {
   };
   donationManager.addProvider(daProvider);
 
-  // Auto-login donation providers on startup
-  const daUser = await daProvider.start(port);
-  if (daUser) {
-    logger.info(
-      `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`,
-    );
-  } else {
-    const daCreds = await daProvider.loadCredentials();
-    if (daCreds) {
-      logger.info(
-        `${daProvider.coloredName} Not logged in. Type ${colors.cyan("donate login donationalerts")} to authenticate.`,
-      );
+  // Auto-login donation providers on startup. Runs in the background so a
+  // slow or unreachable DonationAlerts API can't block the rest of startup.
+  void (async () => {
+    try {
+      const daUser = await daProvider.start(port);
+      if (daUser) {
+        logger.info(
+          `[DonationProvider] ${daProvider.coloredName} Logged in as ${colors.cyan(daUser.name)}`,
+        );
+        await autoSetupCurrenciesOnDALogin();
+      } else {
+        const daAppId = daProvider.getAppId();
+        const daSecrets = await daProvider.loadSecrets();
+        if (daAppId && daSecrets) {
+          logger.info(
+            `${daProvider.coloredName} Not logged in. Type ${colors.cyan("donate login donationalerts")} to authenticate.`,
+          );
+        }
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`[DonationAlerts] Background startup failed: ${msg}`);
     }
+  })();
+
+  // Twitch Channel Points rewards manager. Active only while a Lua folder is
+  // available; bootstraps from twitch_rewards.json and reconciles against the
+  // user's manageable rewards on Twitch.
+  const rewardsManager = luaFolder ? new TwitchRewardsManager(luaFolder) : null;
+
+  function parseRedemptionNumber(input: string): number | null {
+    const match = input.match(/\d+/);
+    if (!match) return null;
+    const value = Number.parseInt(match[0], 10);
+    return Number.isInteger(value) && value > 0 ? value : null;
   }
+
+  function buildEffectLookup(effect: EffectEntry, index: number): EffectLookup {
+    return {
+      id: effect.id,
+      numericId: index + 1,
+      enabled: effect.enabled,
+      enabled_donate: effect.enabled_donate,
+      price_group: effect.price_group ?? "",
+    };
+  }
+
+  if (rewardsManager) {
+    rewardsManager.resolver = {
+      resolve: (event, reward) => {
+        const num = parseRedemptionNumber(event.userInput);
+        if (num === null) return null;
+        const effect = effects[num - 1];
+        if (!effect) return null;
+        if (!effect.enabled || !effect.enabled_donate) return null;
+        const group = effect.price_group ?? "";
+        if (!group || !reward.groups.includes(group)) return null;
+        return buildEffectLookup(effect, num - 1);
+      },
+    };
+    rewardsManager.onActivate = (effect, nickname) => {
+      if (!bridge) return;
+      bridge.emit("activate_effects", {
+        effects: [{ id: effect.id, type: "donate", nickname: nickname ?? "" }],
+      });
+      const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
+      const groupEntry = effect.price_group
+        ? priceGroups.find((entry) => entry.group === effect.price_group)
+        : undefined;
+      activityLog.add({
+        type: "donate",
+        effect_id: effect.id,
+        effect_name: getString("effects", effect.id),
+        nickname: nickname ?? "",
+        price: groupEntry ? groupEntry.price : null,
+        price_group: effect.price_group ?? "",
+      });
+    };
+  }
+
+  twitchProvider.onSessionChange = (token, user) => {
+    if (!rewardsManager) return;
+    rewardsManager.setAuth(user?.id ?? null, token);
+    if (token && user) {
+      void rewardsManager.bootstrap();
+    }
+  };
+
+  twitchProvider.setRedemptionScopeReader(
+    () => config?.streamer_mode.donation_systems.twitch_points.enabled ?? false,
+  );
+
+  twitchProvider.onRedemption = (ev: RedemptionEvent) => {
+    if (!rewardsManager) return;
+    void rewardsManager.handleRedemption({
+      redemptionId: ev.id,
+      rewardId: ev.reward.id,
+      userInput: ev.user_input,
+      userName: ev.user_name,
+    });
+  };
+
+  function syncSubsHandlerFromConfig(): void {
+    if (!config) return;
+    const subs = config.streamer_mode.donation_systems.twitch_subs;
+    subsHandler.syncConfig(subs.enabled, subs.threshold);
+  }
+
+  function handleSubNotification(ev: ChatNotificationEvent): void {
+    if (!config) return;
+    syncSubsHandlerFromConfig();
+    const result = subsHandler.handle(ev, config);
+    if (result.type !== "activate") return;
+    if (!bridge) return;
+    pendingSubActivations.push({
+      nickname: result.nickname,
+      threshold: result.threshold,
+    });
+    bridge.emit("activate_random_effect", { nickname: result.nickname });
+  }
+
+  twitchProvider.onNotification = (ev) => {
+    try {
+      handleSubNotification(ev);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`[Subs] Failed to handle notification: ${msg}`);
+    }
+  };
 
   if (args.includes("--debug-votes")) {
     startDebugVotes(votingManager);
   }
 
-  function handleChatMessage(chat: ChatEvent): void {
+  if (args.includes("--debug-subs")) {
+    startDebugSubs((ev) => handleSubNotification(ev));
+  }
+
+  function handleBitsForChat(msg: NormalizedChatMessage): void {
+    if (!config) return;
+    const bits = msg.cheer?.bits ?? 0;
+    if (bits <= 0) return;
+    const nickname = msg.displayName || msg.loginName || "";
+    const result = handleBitsCheer({
+      message: msg.text,
+      bits,
+      nickname,
+      config,
+      effects,
+    });
+
+    switch (result.type) {
+      case "ignored":
+        return;
+      case "no_tag":
+      case "unknown_effect":
+        activityLog.add({
+          type: "bits_failed_no_tag",
+          nickname: result.nickname,
+          bits: result.bits,
+        });
+        return;
+      case "donations_disabled":
+        activityLog.add({
+          type: "bits_failed_disabled",
+          effect_id: result.effect_id,
+          effect_name: getString("effects", result.effect_id),
+          nickname: result.nickname,
+          bits: result.bits,
+        });
+        return;
+      case "price_too_low":
+        activityLog.add({
+          type: "bits_failed_price",
+          effect_id: result.effect_id,
+          effect_name: getString("effects", result.effect_id),
+          nickname: result.nickname,
+          bits: result.bits,
+          required_bits: result.required_bits,
+        });
+        return;
+      case "activate":
+        if (bridge) {
+          bridge.emit("activate_effects", {
+            effects: [
+              {
+                id: result.effect_id,
+                type: "donate",
+                nickname: result.nickname,
+              },
+            ],
+          });
+        }
+        activityLog.add({
+          type: "bits",
+          effect_id: result.effect_id,
+          effect_name: getString("effects", result.effect_id),
+          nickname: result.nickname,
+          bits: result.bits,
+          required_bits: result.required_bits,
+          price_group: result.price_group,
+        });
+        return;
+    }
+  }
+
+  function handleChatMessage(msg: NormalizedChatMessage): void {
     if (!config?.streamer_mode.streamer_mode_enabled) return;
 
-    const text = chat.message.text.trim();
+    const bits = msg.cheer?.bits ?? 0;
+    const isCheer = bits > 0;
+
+    const text = msg.text;
     let voteNum: number | null = null;
 
-    const direct = Number(text);
-    if (Number.isInteger(direct) && text !== "") {
-      voteNum = direct;
-    }
+    if (!isCheer) {
+      const direct = Number(text);
+      if (Number.isInteger(direct) && text !== "") {
+        voteNum = direct;
+      }
 
-    if (voteNum === null && config.streamer_mode.allow_vote_command) {
-      const parts = text.split(/\s+/);
-      if (parts[0]?.toLowerCase() === "!vote" && parts.length === 2) {
-        const n = Number(parts[1]);
-        if (Number.isInteger(n)) voteNum = n;
+      if (voteNum === null && config.streamer_mode.allow_vote_command) {
+        const parts = text.split(/\s+/);
+        if (parts[0]?.toLowerCase() === "!vote" && parts.length === 2) {
+          const n = Number(parts[1]);
+          if (Number.isInteger(n)) voteNum = n;
+        }
       }
     }
 
     if (config.streamer_mode.use_zombie_nicknames && nicknamesManager) {
-      const sanitizedMessage =
-        config.streamer_mode.render_chat_messages && voteNum === null
-          ? text.replace(/\\n/g, "").replace(/\r?\n/g, "")
-          : undefined;
+      const cleanedDisplayName =
+        removeEmojis(msg.displayName) || msg.displayName;
+      let sanitizedMessage: string | undefined;
+      if (config.streamer_mode.render_chat_messages && voteNum === null) {
+        const stripped = removeEmojis(
+          text.replace(/\\n/g, "").replace(/\r?\n/g, " "),
+        );
+        sanitizedMessage = stripped.length > 0 ? stripped : undefined;
+      }
 
       nicknamesManager.add(
-        chat.chatter_user_login,
-        chat.chatter_user_name,
-        chat.color,
+        msg.loginName,
+        cleanedDisplayName,
+        msg.colorHex,
         sanitizedMessage,
-        chat.timestamp_ms,
+        msg.timestampMs,
       );
     }
 
-    if (config.streamer_mode.voting_enabled) {
+    if (!isCheer && config.streamer_mode.voting_enabled) {
       if (voteNum !== null) {
         const n = config.streamer_mode.voting_options_number;
         if (voteNum >= n + 1 && voteNum <= 2 * n) voteNum -= n;
         if (voteNum >= 1 && voteNum <= n) {
-          votingManager.addVote(chat.chatter_user_id, voteNum);
+          votingManager.addVote(msg.userId, voteNum);
         }
       }
     }
+
+    if (isCheer) {
+      handleBitsForChat(msg);
+    }
   }
 
-  let chat: TwitchChat | null = null;
-  let twitchUser: StreamerUser | null = null;
-  let chatConnected = false;
-
-  function connectChat(token: string, user: StreamerUser): void {
-    if (chat) chat.disconnect();
-    twitchUser = user;
-    chat = new TwitchChat({
-      accessToken: token,
-      broadcasterUserId: user.id,
-      readerUserId: user.id,
-    });
-    chat.onMessage = handleChatMessage;
-    chat.onConnect = () => {
-      chatConnected = true;
-      activityLog.add({ type: "chat_connected" });
-    };
-    chat.onDisconnect = () => {
-      chatConnected = false;
-      activityLog.add({ type: "chat_disconnected" });
-    };
-    chat.connect();
-  }
-
-  // Try loading existing token on startup
-  let isLoggedIn = false;
-  if (provider) {
-    const existingToken = await provider.loadToken();
-    if (existingToken) {
-      const user = await provider.validateToken(existingToken);
-      if (user) {
-        logger.info(
-          `${provider.coloredName} Logged in as ${colors.cyan(user.display_name)}`,
-        );
-        isLoggedIn = true;
-        connectChat(existingToken, user);
-      } else {
-        logger.debug(`Stored ${provider.name} token is invalid or expired`);
+  for (const provider of chatProviders) {
+    provider.onMessage = handleChatMessage;
+    provider.onChatConnect = () => {
+      if (provider.key === "twitch") {
+        activityLog.add({ type: "chat_connected" });
+      } else if (provider.key === "youtube") {
+        activityLog.add({ type: "youtube_chat_connected" });
       }
-    }
-    if (!isLoggedIn) {
-      logger.info(
-        `${provider.coloredName} Not logged in. Type ${colors.cyan("login")} to get the login URL.`,
-      );
-    }
+    };
+    provider.onChatDisconnect = () => {
+      if (provider.key === "twitch") {
+        activityLog.add({ type: "chat_disconnected" });
+      } else if (provider.key === "youtube") {
+        activityLog.add({ type: "youtube_chat_disconnected" });
+      }
+    };
   }
 
-  function onLogin(user: StreamerUser, token: string): void {
-    if (provider) {
-      logger.info(
-        `${provider.coloredName} Logged in as ${colors.cyan(user.display_name)}`,
-      );
-      connectChat(token, user);
-    }
+  twitchProvider.onLogin = () => {
     if (config && luaFolder) {
       config.streamer_mode.streamer_mode_enabled = true;
       config.streamer_mode.voting_enabled = true;
@@ -674,7 +1038,40 @@ async function main(): Promise<void> {
       bridge?.emit("reload_config");
       logger.info("Streamer mode and voting enabled.");
     }
-  }
+  };
+
+  // Auto-login Twitch on startup. Background so token validation hitting the
+  // Twitch API can't block the rest of startup if the network is slow.
+  void (async () => {
+    try {
+      await twitchProvider.initFromStorage();
+      if (!twitchProvider.isAccountConnected()) {
+        logger.info(
+          `${twitchProvider.coloredName} Not logged in. Type ${colors.cyan("login")} to get the login URL.`,
+        );
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`[Twitch] Background startup failed: ${msg}`);
+    }
+  })();
+
+  youtubeProvider.setConnectionTypeReader(
+    () => config?.streamer_mode.youtube_chat_connection_type ?? "long_polling",
+  );
+  void (async () => {
+    try {
+      await youtubeProvider.initFromStorage();
+      if (!youtubeProvider.isAccountConnected()) {
+        logger.debug(
+          `${youtubeProvider.coloredName} Not logged in. Use the dashboard YouTube card to connect.`,
+        );
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(`[YouTube] Background startup failed: ${msg}`);
+    }
+  })();
 
   function reloadRuntimeConfig(): boolean {
     if (!config || !modFolder || !luaFolder) {
@@ -702,6 +1099,7 @@ async function main(): Promise<void> {
     effectCount: effects.length,
     onShutdown: () => {
       bridge?.stop();
+      for (const p of chatProviders) p.shutdown();
     },
   });
 
@@ -709,8 +1107,7 @@ async function main(): Promise<void> {
     return {
       host: serverHost,
       port,
-      provider,
-      onLogin,
+      twitch: twitchProvider,
       getModStatus: () => {
         const optionsCount = config?.streamer_mode.voting_options_number ?? 4;
         const offset = iterationIndex % 2 !== 0 ? optionsCount : 0;
@@ -728,10 +1125,24 @@ async function main(): Promise<void> {
             const isRandom = opt.id === "random_effect";
             const revealSecret = isRandom && !votingManager.isActive;
             const secretId = votingManager.secretRandomEffectId;
-            const effectName =
-              revealSecret && secretId
-                ? getString("effects", secretId)
-                : getString("effects", opt.id);
+            const hidden = isRandom && votingManager.isActive;
+            const resolvedId = revealSecret && secretId ? secretId : opt.id;
+            const baseEffectName = getString("effects", resolvedId);
+            let effectName = baseEffectName;
+            if (!hidden && opt.tag === "fake") {
+              effectName = `[Fake] ${baseEffectName}`;
+            } else if (!hidden && opt.tag === "hidden") {
+              effectName = `[Hidden] ${baseEffectName}`;
+            }
+            const effectEntry = hidden
+              ? null
+              : effects.find((e) => e.id === resolvedId);
+            const duration =
+              effectEntry &&
+              effectEntry.withDuration &&
+              typeof effectEntry.duration === "number"
+                ? effectEntry.duration
+                : undefined;
             return {
               effect_id: opt.id,
               index: i + 1 + offset,
@@ -739,10 +1150,20 @@ async function main(): Promise<void> {
               votes: config?.streamer_mode.hide_votes
                 ? undefined
                 : opt.voters.size,
-              hidden: isRandom && votingManager.isActive,
+              hidden,
+              duration,
             };
           }),
           donateEnabled: config?.streamer_mode.enable_donate ?? false,
+          twitch_subs: (() => {
+            const subs = config?.streamer_mode.donation_systems.twitch_subs;
+            return {
+              enabled: subs?.enabled === true,
+              show_in_obs: subs?.show_in_obs !== false,
+              current: subsHandler.getCurrent(),
+              threshold: Math.max(1, Math.floor(subs?.threshold ?? 1)),
+            };
+          })(),
         };
       },
       onDonationAlertsCode: async (code: string) => {
@@ -757,6 +1178,7 @@ async function main(): Promise<void> {
             bridge?.emit("reload_config");
             logger.info("Donate mode enabled.");
           }
+          await autoSetupCurrenciesOnDALogin();
         }
         return user ? { name: user.name } : null;
       },
@@ -821,6 +1243,37 @@ async function main(): Promise<void> {
           return { success: false, error: "Patch must be an object" };
         }
         const previousUseLocalhost = config.streamer_mode.use_localhost_ip;
+        // streamer_mode.currencies must be replaced wholesale rather than
+        // deep-merged so removed entries in `list` are actually removed.
+        const patchObj = patch as Record<string, unknown>;
+        const sm = patchObj["streamer_mode"];
+        if (isPlainObj(sm) && "currencies" in sm) {
+          const c = sm["currencies"];
+          if (isPlainObj(c)) {
+            const mainRaw = c["main"];
+            const listRaw = c["list"];
+            const main =
+              typeof mainRaw === "string" ? mainRaw.trim().toUpperCase() : "";
+            const list: Record<string, number> = {};
+            if (isPlainObj(listRaw)) {
+              for (const [code, value] of Object.entries(listRaw)) {
+                const upper = code.trim().toUpperCase();
+                if (!/^[A-Z]{3}$/.test(upper)) continue;
+                if (
+                  typeof value !== "number" ||
+                  !Number.isFinite(value) ||
+                  value <= 0
+                ) {
+                  continue;
+                }
+                if (upper === main) continue;
+                list[upper] = value;
+              }
+            }
+            config.streamer_mode.currencies = { main, list };
+            delete sm["currencies"];
+          }
+        }
         deepMergeInto(
           config as unknown as Record<string, unknown>,
           patch as Record<string, unknown>,
@@ -886,18 +1339,19 @@ async function main(): Promise<void> {
           : null;
         const localUrl = `http://127.0.0.1:${port}/obs`;
         const lanUrl = lan ? `http://${lan}:${port}/obs` : null;
+        const youtubeStatus = youtubeProvider.getStatusSnapshot();
         return {
           port,
           twitch: {
-            configured: provider !== null,
-            connected: chat !== null && twitchUser !== null,
-            name: twitchUser?.display_name ?? null,
+            configured: true,
+            connected: twitchProvider.isAccountConnected(),
+            name: twitchProvider.getAccountName(),
           },
           donationalerts: {
-            configured: true,
             connected: daProvider.isConnected,
             name: daProvider.currentUser?.name ?? null,
           },
+          youtube: youtubeStatus,
           obs: {
             use_localhost_ip: useLocalhost,
             local_url: localUrl,
@@ -910,17 +1364,17 @@ async function main(): Promise<void> {
             active: votingManager.isActive,
           },
           twitch_chat: {
-            connected: chatConnected,
+            connected: twitchProvider.isChatConnected(),
+          },
+          twitch_subs: {
+            current: subsHandler.getCurrent(),
           },
           recent_activity: activityLog.list(),
           version: versionStatus,
         };
       },
       twitchLogin: async () => {
-        if (!provider) {
-          return { success: false, error: "No streamer provider configured" };
-        }
-        const loginUrl = `http://localhost:${port}/login/${provider.key}`;
+        const loginUrl = `http://localhost:${port}/login/twitch`;
         try {
           await open(loginUrl);
         } catch (err) {
@@ -930,32 +1384,142 @@ async function main(): Promise<void> {
         return { success: true, url: loginUrl };
       },
       twitchLogout: async () => {
-        if (!provider) {
-          return { success: false, error: "No streamer provider configured" };
-        }
-        if (chat) {
-          chat.disconnect();
-          chat = null;
-        }
-        twitchUser = null;
-        chatConnected = false;
-        const deleted = await provider.deleteToken();
+        const deleted = await twitchProvider.logout();
         if (!deleted) {
           return { success: false, error: "Not logged in" };
         }
-        logger.info(`${provider.coloredName} Logged out.`);
         return { success: true };
       },
-      donationAlertsLogin: async () => {
-        const creds = await daProvider.loadCredentials();
-        if (!creds) {
+      youtubeLogout: async () => {
+        await youtubeProvider.logout();
+        return { success: true };
+      },
+      youtubeSetStreamUrl: async (rawUrl: string) => {
+        const r = await youtubeProvider.setStreamUrl(rawUrl);
+        if (!r.success) {
+          return { success: false, error: r.error };
+        }
+        return { success: true };
+      },
+      youtubeSetApiKey: async (rawKey: string) => {
+        const r = await youtubeProvider.setApiKey(rawKey);
+        if (!r.success) {
+          return { success: false, error: r.error };
+        }
+        return { success: true };
+      },
+      youtubeReconnect: async () => {
+        await youtubeProvider.restartChat();
+        return { success: true };
+      },
+      getTwitchPointsStatus: () => {
+        const enabled =
+          config?.streamer_mode.donation_systems.twitch_points.enabled ?? false;
+        const hasScope = twitchProvider.hasRedemptionScope();
+        return {
+          enabled,
+          twitch_connected: twitchProvider.isAccountConnected(),
+          has_scope: hasScope,
+          has_rewards: rewardsManager?.hasRewards ?? false,
+          rewards: rewardsManager?.list() ?? [],
+          available_groups: (
+            config?.streamer_mode.donate_price_groups ?? []
+          ).map((g) => g.group),
+        };
+      },
+      updateTwitchPointsConfig: async (input: { enabled: boolean }) => {
+        if (!config || !luaFolder) {
+          return { success: false, error: "Config not available" };
+        }
+        const prev =
+          config.streamer_mode.donation_systems.twitch_points.enabled;
+        config.streamer_mode.donation_systems.twitch_points.enabled =
+          input.enabled;
+        saveConfig(luaFolder, config);
+        bridge?.emit("reload_config");
+        if (prev && !input.enabled && rewardsManager) {
+          try {
+            await rewardsManager.deleteAll();
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            logger.warn(`[TwitchPoints] deleteAll on disable failed: ${msg}`);
+          }
+        }
+        return { success: true };
+      },
+      createTwitchPoints: async (rows: RewardRow[]) => {
+        if (!rewardsManager) {
+          return { success: false, error: "Lua folder not available" };
+        }
+        if (!twitchProvider.isAccountConnected()) {
+          return { success: false, error: "Not logged in to Twitch" };
+        }
+        if (!twitchProvider.hasRedemptionScope()) {
           return {
             success: false,
             error:
-              "DonationAlerts credentials not configured. Use the CLI: donate on donationalerts <app_id> <client_secret> <currency>",
+              "Missing channel:manage:redemptions scope. Log in to Twitch.",
           };
         }
-        const loginUrl = daProvider.getLoginUrl(port, creds.appId);
+        rewardsManager.setAuth(
+          twitchProvider.getBroadcasterId(),
+          twitchProvider.getCurrentToken(),
+        );
+        try {
+          await rewardsManager.createAll(rows);
+          if (!modEnabled) {
+            await rewardsManager.setVisible(false);
+          }
+          return { success: true };
+        } catch (err) {
+          if (err instanceof TwitchRewardsError) {
+            return {
+              success: false,
+              error: `${err.status} ${err.twitchMessage}`,
+              status: err.status,
+            };
+          }
+          const msg = err instanceof Error ? err.message : String(err);
+          return { success: false, error: msg };
+        }
+      },
+      deleteTwitchPoints: async () => {
+        if (!rewardsManager) {
+          return { success: false, error: "Lua folder not available" };
+        }
+        if (!twitchProvider.isAccountConnected()) {
+          return { success: false, error: "Not logged in to Twitch" };
+        }
+        rewardsManager.setAuth(
+          twitchProvider.getBroadcasterId(),
+          twitchProvider.getCurrentToken(),
+        );
+        try {
+          await rewardsManager.deleteAll();
+          return { success: true };
+        } catch (err) {
+          if (err instanceof TwitchRewardsError) {
+            return {
+              success: false,
+              error: `${err.status} ${err.twitchMessage}`,
+              status: err.status,
+            };
+          }
+          const msg = err instanceof Error ? err.message : String(err);
+          return { success: false, error: msg };
+        }
+      },
+      donationAlertsLogin: async () => {
+        const appId = daProvider.getAppId();
+        const secrets = await daProvider.loadSecrets();
+        if (!appId || !secrets) {
+          return {
+            success: false,
+            error:
+              "DonationAlerts is not set up. Open the dashboard DonationAlerts card to enter credentials.",
+          };
+        }
+        const loginUrl = daProvider.getLoginUrl(port, appId);
         try {
           await open(loginUrl);
         } catch (err) {
@@ -966,32 +1530,47 @@ async function main(): Promise<void> {
       },
       donationAlertsLogout: async () => {
         daProvider.disconnect();
-        await daProvider.deleteTokens();
+        await daProvider.deleteSecrets();
+        if (config && luaFolder) {
+          if (config.streamer_mode.donation_systems.donationalerts.enabled) {
+            config.streamer_mode.donation_systems.donationalerts.enabled = false;
+            saveConfig(luaFolder, config);
+            bridge?.emit("reload_config");
+          }
+        }
         logger.info(`${daProvider.coloredName} Logged out.`);
         return { success: true };
       },
       donationAlertsSetup: async (input: {
         appId: string;
         clientSecret: string;
-        currency: string;
       }) => {
-        await daProvider.saveCredentials(
-          input.appId,
-          input.clientSecret,
-          input.currency,
-        );
+        await daProvider.saveSecrets({
+          clientSecret: input.clientSecret,
+          accessToken: "",
+          refreshToken: "",
+        });
         if (config && luaFolder) {
-          if (
-            !config.streamer_mode.donate_providers.includes("donationalerts")
-          ) {
-            config.streamer_mode.donate_providers.push("donationalerts");
+          let changed = false;
+          const da = config.streamer_mode.donation_systems.donationalerts;
+          if (da.app_id !== input.appId) {
+            da.app_id = input.appId;
+            changed = true;
+          }
+          if (!da.enabled) {
+            da.enabled = true;
+            changed = true;
+          }
+          if (!config.streamer_mode.enable_donate) {
+            config.streamer_mode.enable_donate = true;
+            changed = true;
+          }
+          if (changed) {
             saveConfig(luaFolder, config);
             bridge?.emit("reload_config");
           }
         }
-        logger.info(
-          `[DonationAlerts] App credentials saved with currency ${input.currency}. Opening login...`,
-        );
+        logger.info(`[DonationAlerts] App credentials saved. Opening login...`);
         const loginUrl = daProvider.getLoginUrl(port, input.appId);
         try {
           await open(loginUrl);
@@ -1014,19 +1593,57 @@ async function main(): Promise<void> {
                 luaFolder,
                 effects,
                 config?.streamer_mode.donate_price_groups ?? [],
-                Boolean(
-                  config?.streamer_mode.enable_donate && daProvider.isConnected,
-                ),
+                getXlsxExportOptions(),
               )
             : writeEffectsCsv(luaFolder);
         revealInExplorer(outputPath);
         logger.info(`Exported to ${colors.cyan(outputPath)}`);
         return { success: true, path: outputPath };
       },
+      downloadEffects: async (kind: string) => {
+        if (kind !== "csv" && kind !== "xlsx") {
+          return {
+            success: false as const,
+            error: `Unsupported export type: ${kind}`,
+          };
+        }
+        if (kind === "xlsx") {
+          const buffer = await buildEffectsXlsxBuffer(
+            effects,
+            config?.streamer_mode.donate_price_groups ?? [],
+            getXlsxExportOptions(),
+          );
+          return {
+            success: true as const,
+            bytes: buffer,
+            filename: "chaos_mod_effects.xlsx",
+            contentType:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          };
+        }
+        const csv = buildEffectsCsvString();
+        return {
+          success: true as const,
+          bytes: new TextEncoder().encode(csv).buffer as ArrayBuffer,
+          filename: "chaos_mod_effects.csv",
+          contentType: "text/csv; charset=utf-8",
+        };
+      },
+      getHubExportPayload: () => {
+        if (!config) return null;
+        const rewards = rewardsManager?.list() ?? [];
+        return buildHubExportPayload({
+          version: VERSION,
+          modFolder,
+          config,
+          effects,
+          rewards: rewards.map((r) => ({ name: r.name, groups: r.groups })),
+        });
+      },
     };
   }
 
-  function writeEffectsCsv(luaDir: string): string {
+  function buildEffectsCsvString(): string {
     const priceGroups = config?.streamer_mode.donate_price_groups ?? [];
     const rows: string[] = [
       "id,name,effect_id,enabled,chance,duration,price_group,price",
@@ -1049,9 +1666,25 @@ async function main(): Promise<void> {
         ].join(","),
       );
     }
+    return rows.join("\n");
+  }
+
+  function writeEffectsCsv(luaDir: string): string {
     const outputPath = join(luaDir, "export.csv");
-    writeFileSync(outputPath, rows.join("\n"), "utf-8");
+    writeFileSync(outputPath, buildEffectsCsvString(), "utf-8");
     return outputPath;
+  }
+
+  function getXlsxExportOptions() {
+    return {
+      donationalertsEnabled:
+        config?.streamer_mode.donation_systems.donationalerts.enabled ?? false,
+      twitchBitsEnabled:
+        config?.streamer_mode.donation_systems.twitch_bits.enabled ?? false,
+      bitsMultiplier:
+        config?.streamer_mode.donation_systems.twitch_bits.price_multiplier ??
+        100,
+    };
   }
 
   let activeServer = startServer(buildServerCtx(host));
@@ -1094,15 +1727,11 @@ async function main(): Promise<void> {
     [],
     [],
     async () => {
-      if (!provider) {
-        logger.warn("No streamer provider configured.");
-        return;
-      }
-      const loginUrl = `http://localhost:${port}/login/${provider.key}`;
+      const loginUrl = `http://localhost:${port}/login/twitch`;
       logger.info(`Opening login URL: ${colors.cyan(loginUrl)}`);
       await open(loginUrl);
     },
-    "Open the login URL for the current streaming provider",
+    "Open the Twitch login URL",
   );
 
   app.registerCommand(
@@ -1110,23 +1739,12 @@ async function main(): Promise<void> {
     [],
     [],
     async () => {
-      if (!provider) {
-        logger.warn("No streamer provider configured.");
-        return;
-      }
-      if (chat) {
-        chat.disconnect();
-        chat = null;
-      }
-      twitchUser = null;
-      const deleted = await provider.deleteToken();
-      if (deleted) {
-        logger.info(`${provider.coloredName} Logged out.`);
-      } else {
+      const deleted = await twitchProvider.logout();
+      if (!deleted) {
         logger.warn("Not logged in.");
       }
     },
-    "Log out from the current streaming provider",
+    "Log out from Twitch",
   );
 
   app.registerCommand(
@@ -1237,9 +1855,7 @@ async function main(): Promise<void> {
               luaFolder,
               effects,
               config?.streamer_mode.donate_price_groups ?? [],
-              Boolean(
-                config?.streamer_mode.enable_donate && daProvider.isConnected,
-              ),
+              getXlsxExportOptions(),
             )
           : writeEffectsCsv(luaFolder);
       logger.info(`Exported to ${colors.cyan(outputPath)}`);

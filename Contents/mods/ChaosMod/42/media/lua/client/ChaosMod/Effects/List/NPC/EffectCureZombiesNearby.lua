@@ -1,6 +1,6 @@
 EffectCureZombiesNearby = ChaosEffectBase:derive("EffectCureZombiesNearby", "cure_zombies_nearby")
 
-local RADIUS = 12
+local RADIUS = 30
 
 function EffectCureZombiesNearby:OnStart()
     ChaosEffectBase:OnStart()
@@ -19,7 +19,8 @@ function EffectCureZombiesNearby:OnStart()
         if zombie:isDead() then return end
         if zombie:isReanimatedPlayer() then return end
 
-        local npc = ChaosNPC:new(zombie)
+        local nickname = (curedCount == 0) and self.effectNickname or nil
+        local npc = ChaosNPC:new(zombie, nickname)
         npc:initializeHuman()
         npc.npcGroup = ChaosNPCGroupID.PEDESTRIAN
 

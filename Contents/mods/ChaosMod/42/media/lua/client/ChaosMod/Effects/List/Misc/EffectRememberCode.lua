@@ -31,8 +31,6 @@ function EffectRememberCode.applyWrongAnswer()
         ChaosUtils.TriggerExplosionAt(square)
     end
 
-    ChaosUtils.RemoveRandomItem(player)
-
     local stats = player:getStats()
     if stats and stats:get(CharacterStat.ENDURANCE) > 0.5 then
         stats:set(CharacterStat.ENDURANCE, 0.5)
@@ -47,16 +45,32 @@ function EffectRememberCode.applyCorrectAnswer()
     print("[EffectRememberCode] Correct answer")
     local player = getPlayer()
     if not player then return end
-    ChaosPlayer.SayLine(player, ChaosLocalization.GetString("misc", "correct_answer"), 0.0, 1.0, 0.0)
+
+    local inventory = player:getInventory()
+    if inventory then
+        local itemId = GetRandomLootboxItem()
+        if itemId then
+            local item = inventory:AddItem(itemId)
+            if item then
+                ChaosItems.SetFullAmmoIfWeapon(item)
+
+                ChaosPlayer.SayLineNewItem(player, item)
+            end
+        end
+    end
+
+    if player.playGainExperienceLevelSound then
+        player:playGainExperienceLevelSound()
+    end
 end
 
 function EffectRememberCode:OnEnd()
-    setGameSpeed(1)
-
     if self.rememberCodeWindow and not self.rememberCodeWindow.resolved then
         self.rememberCodeWindow.resolved = true
         self.rememberCodeWindow:setVisible(false)
         self.rememberCodeWindow:removeFromUIManager()
     end
     self.rememberCodeWindow = nil
+
+    setGameSpeed(1)
 end

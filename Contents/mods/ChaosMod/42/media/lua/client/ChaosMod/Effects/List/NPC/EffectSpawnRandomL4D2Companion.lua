@@ -13,6 +13,10 @@ local function MakeTint(r, g, b)
     }
 end
 
+---@type table<integer, string>
+local weapons = { "Base.Axe", "Base.BaseballBat", "Base.BaseballBat_Nails", "Base.Plank_Nails" }
+local special_weapon = "Base.Shotgun"
+
 ---@param zombie IsoZombie
 ---@param effectName string
 ---@param fullType string
@@ -154,9 +158,25 @@ function EffectSpawnRandomL4D2Companion:OnStart()
     local zombie = newZombies and newZombies:getFirst() or nil
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
+
+    local weapon = ""
+
+
+    if ChaosUtils.RandFloat(0.0, 100.0) < 25.0 then
+        weapon = special_weapon
+    else
+        local weaponIndex = ChaosUtils.RandArrayIndex(weapons)
+        weapon = weapons[weaponIndex]
+    end
+
+
+    if weapon and weapon ~= "" then
+        npc:SetWeapon(weapon)
+    end
 
     ChaosZombie.HumanizeZombie(zombie)
     ApplyVariantVisuals(zombie, variant)

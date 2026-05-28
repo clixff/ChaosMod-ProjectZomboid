@@ -12,7 +12,7 @@ local function collectItems(container, out)
     if not items then return end
     for i = 0, items:size() - 1 do
         local item = items:get(i)
-        if item then
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             if item:IsInventoryContainer() then
                 ---@type InventoryContainer
                 local inner = item
@@ -39,6 +39,7 @@ function EffectHideRandomItems:OnStart()
     if #items == 0 then return end
 
     local itemsToHide = math.min(ITEMS_TO_HIDE, #items)
+    local hiddenCount = 0
 
     for _ = 1, itemsToHide do
         local itemIndex = ChaosUtils.RandArrayIndex(items)
@@ -64,6 +65,11 @@ function EffectHideRandomItems:OnStart()
             ChaosPlayer.SayLineByColor(player, str, ChaosPlayerChatColors.removedItem)
 
             table.remove(items, itemIndex)
+            hiddenCount = hiddenCount + 1
         end
+    end
+
+    if hiddenCount > 0 then
+        ChaosPlayer.ScheduleItemsHiddenHint(player)
     end
 end

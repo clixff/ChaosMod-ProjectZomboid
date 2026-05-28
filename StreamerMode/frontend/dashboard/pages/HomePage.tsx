@@ -1,15 +1,19 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
   CircleQuestionMark,
   Copy,
   DollarSign,
+  ExternalLink,
   FileDown,
+  Globe,
   Info,
   Link as LinkIcon,
   LogIn,
   LogOut,
   Pencil,
+  Power,
+  PowerOff,
   Settings,
   Star,
   TriangleAlert,
@@ -19,10 +23,18 @@ import donationAlertsLogo from "../assets/donationalerts_logo.webp";
 import obsLogo from "../assets/obs_logo.webp";
 import googleSheetsLogo from "../assets/google_sheets_logo.webp";
 import steamLogo from "../assets/steam_logo.webp";
+import youtubeLogo from "../assets/youtube_logo.webp";
 
 const STEAM_WORKSHOP_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142";
+
+const HUB_BASE_URL = "https://chaos-zomboid.com";
+const HUB_EXPORT_URL = `${HUB_BASE_URL}/effects?export=true`;
+const HUB_ALT_BASE_URL = "https://chaos-zomboid.vercel.app";
+const HUB_EXPORT_URL_ALT = `${HUB_ALT_BASE_URL}/effects?export=true`;
 import { Modal } from "../components/Modal.tsx";
+import { CurrenciesModal } from "../components/CurrenciesModal.tsx";
+import { YouTubeSetupGuide } from "../components/YouTubeSetupGuide.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
 import { Select } from "../components/Select.tsx";
 import { TextInput, NumberInput } from "../components/Input.tsx";
@@ -34,13 +46,23 @@ import {
   twitchLogout,
   donationAlertsLogout,
   donationAlertsSetup,
-  exportEffects,
+  downloadEffectsUrl,
   updateConfig,
   getConfig,
   getLanguages,
+  getHubExportPayload,
+  youtubeLogout,
+  youtubeReconnect,
+  youtubeSetStreamUrl,
+  youtubeSetApiKey,
+  getTwitchPointsStatus,
   type HomeStatus,
   type ModConfig,
+  type TwitchPointsStatus,
 } from "../api.ts";
+import { TwitchPointsSettingsModal } from "../components/TwitchPointsSettingsModal.tsx";
+import { TwitchSubsSettingsModal } from "../components/TwitchSubsSettingsModal.tsx";
+import type { CurrenciesConfig, DonationSystemTwitchSubs } from "../api.ts";
 
 interface HomePageProps {
   onNotify: (message: string, isError?: boolean) => void;
@@ -87,18 +109,37 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   const [loading, setLoading] = useState(true);
   const [obsModal, setObsModal] = useState(false);
   const [exportModal, setExportModal] = useState(false);
-  const [exportResultPath, setExportResultPath] = useState<string | null>(null);
-  const [exportResultKind, setExportResultKind] = useState<"csv" | "xlsx">(
-    "xlsx",
+  const [hubExportModal, setHubExportModal] = useState(false);
+  const [exportDoneKind, setExportDoneKind] = useState<"csv" | "xlsx" | null>(
+    null,
   );
   const [exportType, setExportType] = useState("xlsx");
   const [busy, setBusy] = useState(false);
   const [daModal, setDaModal] = useState(false);
   const [daAppId, setDaAppId] = useState("");
   const [daSecret, setDaSecret] = useState("");
-  const [daCurrency, setDaCurrency] = useState("RUB");
   const [config, setConfig] = useState<ModConfig | null>(null);
   const [languages, setLanguages] = useState<string[]>([]);
+  const [bitsOptionsModal, setBitsOptionsModal] = useState(false);
+  const [youtubeUrlDraft, setYoutubeUrlDraft] = useState<string | null>(null);
+  const [youtubeConnectModal, setYoutubeConnectModal] = useState(false);
+  const [youtubeApiKeyDraft, setYoutubeApiKeyDraft] = useState("");
+  const [youtubeChatTypeModal, setYoutubeChatTypeModal] = useState(false);
+  const [twitchPointsModal, setTwitchPointsModal] = useState(false);
+  const [twitchPointsStatus, setTwitchPointsStatus] =
+    useState<TwitchPointsStatus | null>(null);
+  const [twitchSubsModal, setTwitchSubsModal] = useState(false);
+  const [currenciesModal, setCurrenciesModal] = useState(false);
+
+  const refreshTwitchPoints = useCallback(async () => {
+    try {
+      const s = await getTwitchPointsStatus();
+      setTwitchPointsStatus(s);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      onNotify(`Failed to load Twitch Points: ${msg}`, true);
+    }
+  }, [onNotify]);
 
   const refresh = useCallback(async () => {
     try {
@@ -122,6 +163,16 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
   }, [refresh]);
 
   useEffect(() => {
+    void (async () => {
+      await refreshTwitchPoints();
+    })();
+    const t = setInterval(() => {
+      void refreshTwitchPoints();
+    }, 5000);
+    return () => clearInterval(t);
+  }, [refreshTwitchPoints]);
+
+  useEffect(() => {
     let cancelled = false;
     void (async () => {
       try {
@@ -139,6 +190,22 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
       cancelled = true;
     };
   }, [onNotify]);
+
+  const prevDaConnectedRef = useRef(false);
+  useEffect(() => {
+    const connected = status?.donationalerts.connected ?? false;
+    if (connected && !prevDaConnectedRef.current) {
+      void (async () => {
+        try {
+          const cfg = await getConfig();
+          setConfig(cfg);
+        } catch {
+          /* ignore */
+        }
+      })();
+    }
+    prevDaConnectedRef.current = connected;
+  }, [status?.donationalerts.connected]);
 
   const saveConfigPatch = async (patch: Record<string, unknown>) => {
     try {
@@ -181,6 +248,29 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
     } finally {
       setBusy(false);
     }
+  };
+
+  const commitYoutubeUrl = () => {
+    if (youtubeUrlDraft === null) return;
+    const next = youtubeUrlDraft;
+    void wrap(async () => {
+      await youtubeSetStreamUrl(next);
+      setYoutubeUrlDraft(null);
+      onNotify(
+        next.trim()
+          ? "YouTube stream URL saved."
+          : "YouTube stream URL cleared.",
+      );
+    });
+  };
+
+  const clearYoutubeUrl = () => {
+    setYoutubeUrlDraft("");
+    void wrap(async () => {
+      await youtubeSetStreamUrl("");
+      setYoutubeUrlDraft(null);
+      onNotify("YouTube stream URL cleared.");
+    });
   };
 
   if (loading) return <div className="loading">Loading…</div>;
@@ -305,6 +395,18 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
               labelOn="Connected"
               labelOff="Not connected"
             />
+            <StatusRow
+              label="YouTube Account"
+              on={status.youtube.account_connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
+            <StatusRow
+              label="YouTube Chat"
+              on={status.youtube.chat_connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
           </div>
         </Section>
       </div>
@@ -354,6 +456,102 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
         <div className="card">
           <div className="card-head">
             <h3 className="card-title">
+              <img src={youtubeLogo} alt="" className="card-title-logo" />
+              YouTube
+            </h3>
+            <StatusBadge
+              on={status.youtube.account_connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
+          </div>
+          <div className="card-row">
+            <span className="card-row-label">Account</span>
+            <span className="card-row-value">
+              {status.youtube.channel_name ?? "—"}
+            </span>
+          </div>
+          <div className="card-row">
+            <span className="card-row-label">Chat</span>
+            <StatusBadge
+              on={status.youtube.chat_connected}
+              labelOn="Connected"
+              labelOff="Not connected"
+            />
+          </div>
+          {status.youtube.account_connected && status.youtube.stream_title && (
+            <>
+              <div className="card-row">
+                <span className="card-row-value">
+                  {status.youtube.stream_title}
+                </span>
+              </div>
+              <div className="card-row">
+                <span className="card-row-value" style={{ opacity: 0.65 }}>
+                  {status.youtube.chat_message_count} chat messages
+                </span>
+              </div>
+            </>
+          )}
+          {status.youtube.account_connected && (
+            <div className="card-row card-row-inline">
+              <span className="card-row-label">Stream URL</span>
+              <TextInput
+                value={youtubeUrlDraft ?? status.youtube.stream_url ?? ""}
+                placeholder="https://www.youtube.com/watch?v=..."
+                onChange={(v) => setYoutubeUrlDraft(v)}
+                onBlur={() => commitYoutubeUrl()}
+                onSubmit={() => commitYoutubeUrl()}
+                onClear={clearYoutubeUrl}
+              />
+            </div>
+          )}
+          {status.youtube.last_error && (
+            <div className="card-row">
+              <span className="card-row-value" style={{ color: "#f5b301" }}>
+                {status.youtube.last_error}
+              </span>
+            </div>
+          )}
+          <div className="card-actions">
+            {status.youtube.account_connected ? (
+              <button
+                className="btn"
+                disabled={busy}
+                onClick={() =>
+                  void wrap(() => youtubeLogout(), "Disconnected from YouTube.")
+                }
+              >
+                <LogOut size={14} aria-hidden="true" />
+                Disconnect
+              </button>
+            ) : (
+              <button
+                className="btn btn--primary"
+                disabled={busy}
+                onClick={() => {
+                  setYoutubeApiKeyDraft("");
+                  setYoutubeConnectModal(true);
+                }}
+              >
+                <LogIn size={14} aria-hidden="true" />
+                Login
+              </button>
+            )}
+            <button
+              className="btn"
+              disabled={busy}
+              onClick={() => setYoutubeChatTypeModal(true)}
+            >
+              <Settings size={14} aria-hidden="true" />
+              Chat Options
+            </button>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-head">
+            <h3 className="card-title">
               <span className="card-title-icon">
                 <DollarSign size={18} aria-hidden="true" />
               </span>
@@ -362,6 +560,334 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           </div>
           <div className="card-row-label" style={{ fontSize: 12 }}>
             Supported services
+          </div>
+          <div className="provider-row">
+            <div className="provider-row-main">
+              <span className="provider-row-name">
+                <img src={twitchLogo} alt="" className="provider-row-logo" />
+                Twitch Bits
+              </span>
+              {(() => {
+                const twitchAuthorized =
+                  status.twitch.configured && status.twitch.name !== null;
+                const bitsEnabled =
+                  config?.streamer_mode.donation_systems.twitch_bits.enabled ??
+                  false;
+                if (!twitchAuthorized) {
+                  return (
+                    <span className="badge badge--off">
+                      <span className="badge-dot" />
+                      Not Authorized
+                    </span>
+                  );
+                }
+                return (
+                  <StatusBadge
+                    on={bitsEnabled}
+                    labelOn="Enabled"
+                    labelOff="Disabled"
+                  />
+                );
+              })()}
+            </div>
+            {config && (
+              <div className="provider-row-sub">
+                <span className="card-row-label">1.0 effect cost</span>
+                <span className="card-row-value">
+                  {Math.ceil(
+                    1.0 *
+                      config.streamer_mode.donation_systems.twitch_bits
+                        .price_multiplier,
+                  )}{" "}
+                  bits
+                </span>
+              </div>
+            )}
+            {(() => {
+              const twitchAuthorized =
+                status.twitch.configured && status.twitch.name !== null;
+              if (!twitchAuthorized) return null;
+              const bitsEnabled =
+                config?.streamer_mode.donation_systems.twitch_bits.enabled ??
+                false;
+              return (
+                <div className="card-actions">
+                  {bitsEnabled ? (
+                    <button
+                      className="btn"
+                      disabled={busy}
+                      onClick={() =>
+                        void wrap(async () => {
+                          await updateConfig({
+                            streamer_mode: {
+                              donation_systems: {
+                                twitch_bits: { enabled: false },
+                              },
+                            },
+                          });
+                          setConfig((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  streamer_mode: {
+                                    ...prev.streamer_mode,
+                                    donation_systems: {
+                                      ...prev.streamer_mode.donation_systems,
+                                      twitch_bits: {
+                                        ...prev.streamer_mode.donation_systems
+                                          .twitch_bits,
+                                        enabled: false,
+                                      },
+                                    },
+                                  },
+                                }
+                              : prev,
+                          );
+                          onNotify("Twitch Bits disabled.");
+                        })
+                      }
+                    >
+                      <PowerOff size={14} aria-hidden="true" />
+                      Disable
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn--primary"
+                      disabled={busy}
+                      onClick={() =>
+                        void wrap(async () => {
+                          await updateConfig({
+                            streamer_mode: {
+                              enable_donate: true,
+                              donation_systems: {
+                                twitch_bits: { enabled: true },
+                              },
+                            },
+                          });
+                          setConfig((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  streamer_mode: {
+                                    ...prev.streamer_mode,
+                                    enable_donate: true,
+                                    donation_systems: {
+                                      ...prev.streamer_mode.donation_systems,
+                                      twitch_bits: {
+                                        ...prev.streamer_mode.donation_systems
+                                          .twitch_bits,
+                                        enabled: true,
+                                      },
+                                    },
+                                  },
+                                }
+                              : prev,
+                          );
+                          onNotify("Twitch Bits enabled.");
+                        })
+                      }
+                    >
+                      <Power size={14} aria-hidden="true" />
+                      Enable
+                    </button>
+                  )}
+                  <button
+                    className="btn"
+                    disabled={busy}
+                    onClick={() => setBitsOptionsModal(true)}
+                  >
+                    <Settings size={14} aria-hidden="true" />
+                    Options
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+          <div className="provider-row">
+            <div className="provider-row-main">
+              <span className="provider-row-name">
+                <img src={twitchLogo} alt="" className="provider-row-logo" />
+                Twitch Points
+              </span>
+              {(() => {
+                const twitchAuthorized =
+                  status.twitch.configured && status.twitch.name !== null;
+                if (!twitchAuthorized) {
+                  return (
+                    <span className="badge badge--off">
+                      <span className="badge-dot" />
+                      Not Authorized
+                    </span>
+                  );
+                }
+                return (
+                  <StatusBadge
+                    on={twitchPointsStatus?.enabled ?? false}
+                    labelOn="Enabled"
+                    labelOff="Disabled"
+                  />
+                );
+              })()}
+            </div>
+            {twitchPointsStatus && (
+              <div className="provider-row-sub">
+                <span className="card-row-label">Rewards on Twitch</span>
+                <span className="card-row-value">
+                  {twitchPointsStatus.has_rewards
+                    ? `${twitchPointsStatus.rewards.length} active`
+                    : "None"}
+                </span>
+              </div>
+            )}
+            <div className="card-actions">
+              <button
+                className="btn"
+                disabled={busy || !twitchPointsStatus}
+                onClick={() => setTwitchPointsModal(true)}
+              >
+                <Settings size={14} aria-hidden="true" />
+                Options
+              </button>
+            </div>
+          </div>
+          <div className="provider-row">
+            <div className="provider-row-main">
+              <span className="provider-row-name">
+                <img src={twitchLogo} alt="" className="provider-row-logo" />
+                Twitch Subs
+              </span>
+              {(() => {
+                const twitchAuthorized =
+                  status.twitch.configured && status.twitch.name !== null;
+                const subsEnabled =
+                  config?.streamer_mode.donation_systems.twitch_subs.enabled ??
+                  false;
+                if (!twitchAuthorized) {
+                  return (
+                    <span className="badge badge--off">
+                      <span className="badge-dot" />
+                      Not Authorized
+                    </span>
+                  );
+                }
+                return (
+                  <StatusBadge
+                    on={subsEnabled}
+                    labelOn="Enabled"
+                    labelOff="Disabled"
+                  />
+                );
+              })()}
+            </div>
+            {config && (
+              <div className="provider-row-sub">
+                <span className="card-row-label">Subs</span>
+                <span className="card-row-value">
+                  {`${status.twitch_subs?.current ?? 0}/${
+                    config.streamer_mode.donation_systems.twitch_subs.threshold
+                  }`}
+                </span>
+              </div>
+            )}
+            {(() => {
+              const twitchAuthorized =
+                status.twitch.configured && status.twitch.name !== null;
+              if (!twitchAuthorized) return null;
+              const subsEnabled =
+                config?.streamer_mode.donation_systems.twitch_subs.enabled ??
+                false;
+              return (
+                <div className="card-actions">
+                  {subsEnabled ? (
+                    <button
+                      className="btn"
+                      disabled={busy}
+                      onClick={() =>
+                        void wrap(async () => {
+                          await updateConfig({
+                            streamer_mode: {
+                              donation_systems: {
+                                twitch_subs: { enabled: false },
+                              },
+                            },
+                          });
+                          setConfig((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  streamer_mode: {
+                                    ...prev.streamer_mode,
+                                    donation_systems: {
+                                      ...prev.streamer_mode.donation_systems,
+                                      twitch_subs: {
+                                        ...prev.streamer_mode.donation_systems
+                                          .twitch_subs,
+                                        enabled: false,
+                                      },
+                                    },
+                                  },
+                                }
+                              : prev,
+                          );
+                          onNotify("Twitch Subs disabled.");
+                        })
+                      }
+                    >
+                      <PowerOff size={14} aria-hidden="true" />
+                      Disable
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn--primary"
+                      disabled={busy}
+                      onClick={() =>
+                        void wrap(async () => {
+                          await updateConfig({
+                            streamer_mode: {
+                              enable_donate: true,
+                              donation_systems: {
+                                twitch_subs: { enabled: true },
+                              },
+                            },
+                          });
+                          setConfig((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  streamer_mode: {
+                                    ...prev.streamer_mode,
+                                    enable_donate: true,
+                                    donation_systems: {
+                                      ...prev.streamer_mode.donation_systems,
+                                      twitch_subs: {
+                                        ...prev.streamer_mode.donation_systems
+                                          .twitch_subs,
+                                        enabled: true,
+                                      },
+                                    },
+                                  },
+                                }
+                              : prev,
+                          );
+                          onNotify("Twitch Subs enabled.");
+                        })
+                      }
+                    >
+                      <Power size={14} aria-hidden="true" />
+                      Enable
+                    </button>
+                  )}
+                  <button
+                    className="btn"
+                    disabled={busy}
+                    onClick={() => setTwitchSubsModal(true)}
+                  >
+                    <Settings size={14} aria-hidden="true" />
+                    Options
+                  </button>
+                </div>
+              );
+            })()}
           </div>
           <div className="provider-row">
             <div className="provider-row-main">
@@ -381,6 +907,37 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                 {status.donationalerts.name ?? "—"}
               </span>
             </div>
+            {status.donationalerts.connected &&
+              config &&
+              (config.streamer_mode.currencies.main.trim().length === 0 ||
+                Object.keys(config.streamer_mode.currencies.list).length ===
+                  0) && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    padding: "8px 10px",
+                    border: "1px solid rgba(245, 179, 1, 0.4)",
+                    borderRadius: 6,
+                    background: "rgba(245, 179, 1, 0.08)",
+                    color: "#f5b301",
+                    lineHeight: 1.5,
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 8,
+                    fontSize: 13,
+                  }}
+                >
+                  <TriangleAlert
+                    size={16}
+                    aria-hidden="true"
+                    style={{ marginTop: 2, flexShrink: 0 }}
+                  />
+                  <div>
+                    You're using <code>DonationAlerts</code> service, but did
+                    not set currencies exchange rate.
+                  </div>
+                </div>
+              )}
             <div className="card-actions">
               {status.donationalerts.connected ? (
                 <button
@@ -401,9 +958,10 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                   className="btn btn--primary"
                   disabled={busy}
                   onClick={() => {
-                    setDaAppId("");
+                    const da =
+                      config?.streamer_mode.donation_systems.donationalerts;
+                    setDaAppId(da?.app_id ?? "");
                     setDaSecret("");
-                    setDaCurrency("RUB");
                     setDaModal(true);
                   }}
                 >
@@ -411,6 +969,14 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
                   Login
                 </button>
               )}
+              <button
+                className="btn"
+                disabled={busy || !config}
+                onClick={() => setCurrenciesModal(true)}
+              >
+                <Pencil size={14} aria-hidden="true" />
+                Edit Currencies
+              </button>
             </div>
           </div>
           <div className="card-actions">
@@ -420,6 +986,14 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             >
               <Pencil size={14} aria-hidden="true" />
               Edit Price Groups
+            </button>
+            <button
+              className="btn"
+              disabled={!config}
+              onClick={() => setCurrenciesModal(true)}
+            >
+              <Pencil size={14} aria-hidden="true" />
+              Edit Currencies
             </button>
           </div>
         </div>
@@ -468,11 +1042,40 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           </div>
         </div>
 
+        {config && (
+          <div className="card">
+            <div className="card-head">
+              <h3 className="card-title">
+                <span className="card-title-icon">
+                  <Globe size={18} aria-hidden="true" />
+                </span>
+                Export To Hub{" "}
+              </h3>
+            </div>
+            <p className="card-row-label" style={{ fontSize: 13 }}>
+              Share your prices, rewards, and effect tweaks with viewers via a
+              public Hub URL.
+            </p>
+            <div className="card-actions">
+              <button
+                className="btn btn--primary"
+                onClick={() => setHubExportModal(true)}
+              >
+                <ExternalLink size={14} aria-hidden="true" />
+                Export
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="card">
           <div className="card-head">
             <h3 className="card-title">
               <img src={googleSheetsLogo} alt="" className="card-title-logo" />
               Export effects to Google Sheets
+              <span style={{ color: "var(--text-muted)", marginLeft: 6 }}>
+                (Legacy)
+              </span>
             </h3>
           </div>
           <div className="card-row card-row-inline">
@@ -490,15 +1093,17 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
             <button
               className="btn btn--primary"
               disabled={busy}
-              onClick={() =>
-                void wrap(async () => {
-                  const kind: "csv" | "xlsx" =
-                    exportType === "csv" ? "csv" : "xlsx";
-                  const r = await exportEffects(kind);
-                  setExportResultKind(kind);
-                  setExportResultPath(r.path);
-                })
-              }
+              onClick={() => {
+                const kind: "csv" | "xlsx" =
+                  exportType === "csv" ? "csv" : "xlsx";
+                const a = document.createElement("a");
+                a.href = downloadEffectsUrl(kind);
+                a.rel = "noopener";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setExportDoneKind(kind);
+              }}
             >
               <FileDown size={14} aria-hidden="true" />
               Export
@@ -565,7 +1170,9 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           title="Google Sheets import"
           onClose={() => setExportModal(false)}
         >
-          <GoogleSheetsInstructions kind={exportType === "csv" ? "csv" : "xlsx"} />
+          <GoogleSheetsInstructions
+            kind={exportType === "csv" ? "csv" : "xlsx"}
+          />
           <div
             style={{
               display: "flex",
@@ -596,17 +1203,14 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
           busy={busy}
           appId={daAppId}
           secret={daSecret}
-          currency={daCurrency}
           onAppId={setDaAppId}
           onSecret={setDaSecret}
-          onCurrency={setDaCurrency}
           onClose={() => setDaModal(false)}
           onSubmit={() =>
             void wrap(async () => {
               await donationAlertsSetup({
                 appId: daAppId.trim(),
                 clientSecret: daSecret,
-                currency: daCurrency.trim().toUpperCase(),
               });
               setDaModal(false);
               onNotify(
@@ -617,34 +1221,174 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
         />
       )}
 
-      {exportResultPath !== null && (
-        <Modal
-          title="Export complete"
-          onClose={() => setExportResultPath(null)}
-        >
-          <p>The effects file was written to:</p>
-          <div
-            className="card-link"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <span style={{ flex: 1, wordBreak: "break-all" }}>
-              {exportResultPath}
-            </span>
-            <CopyButton
-              value={exportResultPath}
-              onCopied={() => onNotify("Path copied to clipboard.")}
-              onError={(msg) => onNotify(msg, true)}
-            />
-          </div>
-          <p style={{ marginTop: 12 }}>
-            Explorer should open with the file selected. Use it directly or
-            import it into Google Sheets:
+      {youtubeConnectModal && (
+        <YouTubeConnectModal
+          busy={busy}
+          apiKey={youtubeApiKeyDraft}
+          onApiKey={setYoutubeApiKeyDraft}
+          onClose={() => setYoutubeConnectModal(false)}
+          onSubmit={() => {
+            const key = youtubeApiKeyDraft.trim();
+            if (!key) return;
+            void wrap(async () => {
+              await youtubeSetApiKey(key);
+              setYoutubeConnectModal(false);
+              setYoutubeApiKeyDraft("");
+              onNotify("YouTube API key saved.");
+            });
+          }}
+        />
+      )}
+
+      {youtubeChatTypeModal && config && (
+        <YouTubeChatTypeModal
+          busy={busy}
+          currentType={config.streamer_mode.youtube_chat_connection_type}
+          onClose={() => setYoutubeChatTypeModal(false)}
+          onSave={(next) => {
+            setYoutubeChatTypeModal(false);
+            setConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    streamer_mode: {
+                      ...prev.streamer_mode,
+                      youtube_chat_connection_type: next,
+                    },
+                  }
+                : prev,
+            );
+            void wrap(async () => {
+              await updateConfig({
+                streamer_mode: { youtube_chat_connection_type: next },
+              });
+              await youtubeReconnect();
+              onNotify("YouTube chat connection type saved.");
+            });
+          }}
+        />
+      )}
+
+      {twitchPointsModal && twitchPointsStatus && (
+        <TwitchPointsSettingsModal
+          status={twitchPointsStatus}
+          onClose={() => setTwitchPointsModal(false)}
+          onNotify={onNotify}
+          onRefresh={refreshTwitchPoints}
+        />
+      )}
+
+      {twitchSubsModal && config && (
+        <TwitchSubsSettingsModal
+          value={config.streamer_mode.donation_systems.twitch_subs}
+          onChange={(next: DonationSystemTwitchSubs) => {
+            setConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    streamer_mode: {
+                      ...prev.streamer_mode,
+                      donation_systems: {
+                        ...prev.streamer_mode.donation_systems,
+                        twitch_subs: next,
+                      },
+                    },
+                  }
+                : prev,
+            );
+            void saveConfigPatch({
+              streamer_mode: {
+                donation_systems: { twitch_subs: next },
+              },
+            });
+          }}
+          onClose={() => setTwitchSubsModal(false)}
+        />
+      )}
+
+      {hubExportModal && (
+        <HubExportModal
+          url={HUB_EXPORT_URL}
+          altUrl={HUB_EXPORT_URL_ALT}
+          onClose={() => setHubExportModal(false)}
+          onCopied={(what) => onNotify(`${what} copied to clipboard.`)}
+          onError={(msg) => onNotify(msg, true)}
+        />
+      )}
+
+      {currenciesModal && config && (
+        <CurrenciesModal
+          currencies={config.streamer_mode.currencies}
+          priceGroups={config.streamer_mode.donate_price_groups}
+          daFallbackCurrency={
+            config.streamer_mode.donation_systems.donationalerts.currency
+          }
+          onClose={() => setCurrenciesModal(false)}
+          onNotify={onNotify}
+          onSave={(next: CurrenciesConfig) => {
+            setConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    streamer_mode: {
+                      ...prev.streamer_mode,
+                      currencies: next,
+                    },
+                  }
+                : prev,
+            );
+            void saveConfigPatch({
+              streamer_mode: { currencies: next },
+            });
+            setCurrenciesModal(false);
+            onNotify("Currencies saved.");
+          }}
+        />
+      )}
+
+      {bitsOptionsModal && config && (
+        <TwitchBitsOptionsModal
+          multiplier={
+            config.streamer_mode.donation_systems.twitch_bits.price_multiplier
+          }
+          priceGroups={config.streamer_mode.donate_price_groups}
+          onChangeMultiplier={(v) => {
+            setConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    streamer_mode: {
+                      ...prev.streamer_mode,
+                      donation_systems: {
+                        ...prev.streamer_mode.donation_systems,
+                        twitch_bits: {
+                          ...prev.streamer_mode.donation_systems.twitch_bits,
+                          price_multiplier: v,
+                        },
+                      },
+                    },
+                  }
+                : prev,
+            );
+            void saveConfigPatch({
+              streamer_mode: {
+                donation_systems: {
+                  twitch_bits: { price_multiplier: v },
+                },
+              },
+            });
+          }}
+          onClose={() => setBitsOptionsModal(false)}
+        />
+      )}
+
+      {exportDoneKind !== null && (
+        <Modal title="Export complete" onClose={() => setExportDoneKind(null)}>
+          <p>
+            The effects file is being downloaded by your browser. Use it
+            directly or import it into Google Sheets:
           </p>
-          <GoogleSheetsInstructions kind={exportResultKind} />
+          <GoogleSheetsInstructions kind={exportDoneKind} />
           <div
             style={{
               display: "flex",
@@ -653,10 +1397,7 @@ export function HomePage({ onNotify, onNavigate }: HomePageProps) {
               marginTop: 16,
             }}
           >
-            <button
-              className="btn"
-              onClick={() => setExportResultPath(null)}
-            >
+            <button className="btn" onClick={() => setExportDoneKind(null)}>
               Close
             </button>
             <a
@@ -717,6 +1458,152 @@ function GoogleSheetsInstructions({ kind }: GoogleSheetsInstructionsProps) {
   );
 }
 
+interface HubExportModalProps {
+  url: string;
+  altUrl: string;
+  onClose: () => void;
+  onCopied: (what: string) => void;
+  onError: (message: string) => void;
+}
+
+function HubExportModal({
+  url,
+  altUrl,
+  onClose,
+  onCopied,
+  onError,
+}: HubExportModalProps) {
+  const [json, setJson] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const payload = await getHubExportPayload();
+        if (!cancelled) {
+          setJson(JSON.stringify(payload));
+          setLoading(false);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          const msg = e instanceof Error ? e.message : String(e);
+          setError(msg);
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <Modal title="Export to Hub" onClose={onClose} wide>
+      <ol style={{ marginTop: 0 }}>
+        <li>
+          Open the Hub link below and follow the &quot;Create config&quot; flow.
+        </li>
+        <li>
+          Paste the JSON below into the modal that opens on the Hub, pick a
+          public name, then click <b>Create</b>.
+        </li>
+        <li>Share the resulting Hub URL with your viewers.</li>
+      </ol>
+
+      <div className="form-grid">
+        <label className="form-field">
+          <span className="form-label">Hub URL</span>
+          <div className="card-link card-link--with-copy">
+            <span className="card-link-text">{url}</span>
+            <CopyButton
+              value={url}
+              onCopied={() => onCopied("Hub URL")}
+              onError={onError}
+            />
+          </div>
+        </label>
+
+        <label className="form-field">
+          <span className="form-label">Alternative Hub URL</span>
+          <div className="card-link card-link--with-copy">
+            <span className="card-link-text">{altUrl}</span>
+            <CopyButton
+              value={altUrl}
+              onCopied={() => onCopied("Alternative Hub URL")}
+              onError={onError}
+            />
+          </div>
+        </label>
+
+        <label className="form-field">
+          <span className="form-label">Config JSON</span>
+          {loading ? (
+            <div style={{ opacity: 0.7, fontSize: 13 }}>
+              Building export payload…
+            </div>
+          ) : error ? (
+            <div style={{ color: "#f5b301", fontSize: 13 }}>
+              Failed to build payload: {error}
+            </div>
+          ) : (
+            <div style={{ position: "relative" }}>
+              <textarea
+                readOnly
+                value={json ?? ""}
+                rows={10}
+                style={{
+                  width: "100%",
+                  resize: "vertical",
+                  fontFamily: "Roboto Mono, monospace",
+                  fontSize: 12,
+                  padding: "10px 44px 10px 10px",
+                  background: "#0a0a0a",
+                  border: "1px solid #2a2a2a",
+                  borderRadius: 6,
+                  color: "#ededed",
+                  lineHeight: 1.4,
+                }}
+                onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+              />
+              <div style={{ position: "absolute", top: 6, right: 6 }}>
+                <CopyButton
+                  value={json ?? ""}
+                  onCopied={() => onCopied("Config JSON")}
+                  onError={onError}
+                />
+              </div>
+            </div>
+          )}
+        </label>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 18,
+        }}
+      >
+        <a
+          className="btn btn--primary"
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ExternalLink size={14} aria-hidden="true" />
+          Open Hub
+        </a>
+        <button className="btn" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
 interface CopyButtonProps {
   value: string;
   onCopied: () => void;
@@ -751,15 +1638,93 @@ function CopyButton({ value, onCopied, onError }: CopyButtonProps) {
   );
 }
 
+interface TwitchBitsOptionsModalProps {
+  multiplier: number;
+  priceGroups: { group: string; price: number }[];
+  onChangeMultiplier: (v: number) => void;
+  onClose: () => void;
+}
+
+function TwitchBitsOptionsModal({
+  multiplier,
+  priceGroups,
+  onChangeMultiplier,
+  onClose,
+}: TwitchBitsOptionsModalProps) {
+  const safeMultiplier =
+    Number.isFinite(multiplier) && multiplier > 0 ? multiplier : 100;
+
+  const groupedHint = useMemo(() => {
+    const byBits = new Map<number, string[]>();
+    for (const pg of priceGroups) {
+      const bits = Math.ceil(pg.price * safeMultiplier);
+      const list = byBits.get(bits) ?? [];
+      list.push(pg.group);
+      byBits.set(bits, list);
+    }
+    const rows = Array.from(byBits.entries())
+      .map(([bits, groups]) => ({ bits, groups }))
+      .sort((a, b) => a.bits - b.bits);
+    return rows;
+  }, [priceGroups, safeMultiplier]);
+
+  return (
+    <Modal title="Twitch Bits Options" onClose={onClose}>
+      <div className="form-grid">
+        <label className="form-field">
+          <span className="form-label">Twitch Bits Multiplier</span>
+          <NumberInput
+            value={multiplier}
+            min={1}
+            step={1}
+            onChange={(v) => onChangeMultiplier(v)}
+          />
+        </label>
+      </div>
+      <p style={{ marginTop: 16, marginBottom: 8, fontWeight: 600 }}>
+        Effect Groups:
+      </p>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          fontFamily: "Roboto Mono, monospace",
+          fontSize: 13,
+        }}
+      >
+        {groupedHint.length === 0 ? (
+          <span style={{ opacity: 0.7 }}>No price groups configured.</span>
+        ) : (
+          groupedHint.map((row) => (
+            <div key={row.bits}>
+              {row.groups.join(", ")} — {row.bits} Bits
+            </div>
+          ))
+        )}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginTop: 18,
+        }}
+      >
+        <button className="btn" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
 interface DonationAlertsLoginModalProps {
   port: number;
   busy: boolean;
   appId: string;
   secret: string;
-  currency: string;
   onAppId: (v: string) => void;
   onSecret: (v: string) => void;
-  onCurrency: (v: string) => void;
   onClose: () => void;
   onSubmit: () => void;
 }
@@ -769,19 +1734,14 @@ function DonationAlertsLoginModal({
   busy,
   appId,
   secret,
-  currency,
   onAppId,
   onSecret,
-  onCurrency,
   onClose,
   onSubmit,
 }: DonationAlertsLoginModalProps) {
   const redirectUri = `http://localhost:${port}/provider/donationalerts/success/`;
   const trimmedAppId = appId.trim();
-  const trimmedCurrency = currency.trim().toUpperCase();
-  const currencyValid = /^[A-Z]{3}$/.test(trimmedCurrency);
-  const canSubmit =
-    !busy && trimmedAppId.length > 0 && secret.length > 0 && currencyValid;
+  const canSubmit = !busy && trimmedAppId.length > 0 && secret.length > 0;
 
   return (
     <Modal title="Connect DonationAlerts" onClose={onClose}>
@@ -812,10 +1772,6 @@ function DonationAlertsLoginModal({
           fields below.
         </li>
         <li>
-          Choose the donation <b>Currency</b> code (3 letters, e.g.{" "}
-          <code>RUB</code>, <code>USD</code>, <code>EUR</code>).
-        </li>
-        <li>
           Click <b>Login</b> — credentials are saved and a DonationAlerts
           authorization page opens in your browser.
         </li>
@@ -835,13 +1791,95 @@ function DonationAlertsLoginModal({
             placeholder="••••••••"
           />
         </label>
+      </div>
+
+      <div
+        style={{
+          marginTop: 16,
+          padding: "8px 10px",
+          border: "1px solid rgba(245, 179, 1, 0.4)",
+          borderRadius: 6,
+          background: "rgba(245, 179, 1, 0.08)",
+          color: "#f5b301",
+          lineHeight: 1.5,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 8,
+        }}
+      >
+        <Info
+          size={16}
+          aria-hidden="true"
+          style={{ marginTop: 2, flexShrink: 0 }}
+        />
+        <div>
+          Note: Once you log in, you will need to specify currencies using the
+          &quot;Edit Currencies&quot; button.
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 18,
+        }}
+      >
+        <button className="btn" onClick={onClose} disabled={busy}>
+          Cancel
+        </button>
+        <button
+          className="btn btn--primary"
+          disabled={!canSubmit}
+          onClick={onSubmit}
+        >
+          <LogIn size={14} aria-hidden="true" />
+          Login
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+interface YouTubeConnectModalProps {
+  busy: boolean;
+  apiKey: string;
+  onApiKey: (v: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+}
+
+function YouTubeConnectModal({
+  busy,
+  apiKey,
+  onApiKey,
+  onClose,
+  onSubmit,
+}: YouTubeConnectModalProps) {
+  const canSubmit = !busy && apiKey.trim().length > 0;
+  const [guideOpen, setGuideOpen] = useState(false);
+  return (
+    <Modal title="Connect YouTube" onClose={onClose} wide={guideOpen}>
+      <p style={{ marginTop: 0, marginBottom: 12 }}>
+        Paste a YouTube Data API v3 key from your own Google Cloud project.
+        ChaosMod does not need access to your Google account.
+      </p>
+
+      <YouTubeSetupGuide open={guideOpen} onOpenChange={setGuideOpen} />
+
+      <div className="form-grid">
         <label className="form-field">
-          <span className="form-label">Currency</span>
+          <span className="form-label">YouTube Data API key</span>
           <TextInput
-            value={currency}
-            onChange={(v) => onCurrency(v.toUpperCase().slice(0, 3))}
-            size="mid"
-            placeholder="RUB"
+            value={apiKey}
+            onChange={onApiKey}
+            type="password"
+            placeholder="AIza..."
+            noAutofill
+            onSubmit={() => {
+              if (canSubmit) onSubmit();
+            }}
           />
         </label>
       </div>
@@ -863,7 +1901,82 @@ function DonationAlertsLoginModal({
           onClick={onSubmit}
         >
           <LogIn size={14} aria-hidden="true" />
-          Login
+          Save
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+interface YouTubeChatTypeModalProps {
+  busy: boolean;
+  currentType: "long_polling" | "message_streaming";
+  onClose: () => void;
+  onSave: (next: "long_polling" | "message_streaming") => void;
+}
+
+function YouTubeChatTypeModal({
+  busy,
+  currentType,
+  onClose,
+  onSave,
+}: YouTubeChatTypeModalProps) {
+  const [draft, setDraft] = useState<"long_polling" | "message_streaming">(
+    currentType,
+  );
+  return (
+    <Modal title="YouTube Chat Settings" onClose={onClose}>
+      <div className="form-grid">
+        <label className="form-field">
+          <span className="form-label">Chat Connection Type</span>
+          <Select
+            value={draft}
+            options={[
+              { value: "long_polling", label: "Polling (5s, lower quota)" },
+              {
+                value: "message_streaming",
+                label: "Streaming (faster, higher quota)",
+              },
+            ]}
+            onChange={(v) =>
+              setDraft(
+                v === "message_streaming"
+                  ? "message_streaming"
+                  : "long_polling",
+              )
+            }
+          />
+        </label>
+      </div>
+      <div style={{ marginTop: 14, fontSize: 13, lineHeight: 1.5 }}>
+        <p style={{ margin: "0 0 8px 0" }}>
+          <b>Polling (default).</b> Fetches new chat messages every 5 seconds.
+          Comfortably fits a ~10-hour daily stream within the free YouTube Data
+          API quota.
+        </p>
+        <p style={{ margin: 0 }}>
+          <b>Streaming.</b> Delivers messages with much shorter latency, but
+          burns through the daily API quota quickly — you can hit the limit well
+          before a long stream finishes.
+        </p>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 18,
+        }}
+      >
+        <button className="btn" onClick={onClose} disabled={busy}>
+          Cancel
+        </button>
+        <button
+          className="btn btn--primary"
+          disabled={busy}
+          onClick={() => onSave(draft)}
+        >
+          Save
         </button>
       </div>
     </Modal>

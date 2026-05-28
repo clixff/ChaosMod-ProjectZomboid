@@ -1,11 +1,11 @@
 ---@class EffectPlayerFalls : ChaosEffectBase
----@field fallIntervalMs integer
+---@field lastFallTimeMs integer | nil
+---@field onPlayerUpdate fun(player: IsoPlayer) | nil
 EffectPlayerFalls = ChaosEffectBase:derive("EffectPlayerFalls", "player_falls")
 
-local FALL_INTERVAL_MS = 10000
+local FALL_COOLDOWN_MS = 8000
 
 local function triggerFall(player)
-    ChaosVehicle.ExitVehicle(player)
     player:clearVariable("BumpFallType")
     player:setBumpStaggered(true)
     player:setBumpType("stagger")
@@ -13,25 +13,36 @@ local function triggerFall(player)
     player:setBumpFallType("pushedBehind")
 end
 
-function EffectPlayerFalls:OnStart()
-    ChaosEffectBase:OnStart()
-    self.fallIntervalMs = FALL_INTERVAL_MS
-    local player = getPlayer()
-    if not player then return end
+---@param player IsoPlayer
+function EffectPlayerFalls:HandlePlayerUpdate(player)
+    if not player or player:isDead() then return end
+    if not player:isPlayerMoving() then return end
+
+    local now = getTimestampMs()
+    if self.lastFallTimeMs and now - self.lastFallTimeMs < FALL_COOLDOWN_MS then
+        return
+    end
+
+    self.lastFallTimeMs = now
     triggerFall(player)
 end
 
----@param deltaMs integer
-function EffectPlayerFalls:OnTick(deltaMs)
-    self.fallIntervalMs = self.fallIntervalMs + deltaMs
-    if self.fallIntervalMs < FALL_INTERVAL_MS then return end
-    self.fallIntervalMs = self.fallIntervalMs - FALL_INTERVAL_MS
+function EffectPlayerFalls:OnStart()
+    ChaosEffectBase:OnStart()
 
-    local player = getPlayer()
-    if not player then return end
-    triggerFall(player)
+    self.lastFallTimeMs = nil
+
+    self.onPlayerUpdate = function(player)
+        self:HandlePlayerUpdate(player)
+    end
+
+    Events.OnPlayerUpdate.Add(self.onPlayerUpdate)
 end
 
 function EffectPlayerFalls:OnEnd()
     ChaosEffectBase:OnEnd()
+    if self.onPlayerUpdate then
+        Events.OnPlayerUpdate.Remove(self.onPlayerUpdate)
+        self.onPlayerUpdate = nil
+    end
 end

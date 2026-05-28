@@ -21,16 +21,17 @@ function EffectDarkSoulsBonfire:OnStart()
             targetSquare = sq
             return true
         end
-    end, 1, 10, true, true, true, z, z)
+    end, 2, 10, true, true, true, z, z)
 
     if not targetSquare then return end
-    if not ChaosProps.SpawnCampfire(targetSquare) then return end
+    if not ChaosProps.SpawnCampfire(targetSquare, true) then return end
 
     ChaosPlayer.SayLineByColor(player, "Bonfire Lit", BONFIRE_COLOR)
     ChaosUtils.PlayUISound("bonfire_lit")
 
     local item = instanceItem("Base.Sword")
     if item then
+        item:setCondition(1)
         local placedItem = targetSquare:AddWorldInventoryItem(item, 0.5, 0.5, 0.5, false)
         if placedItem then
             placedItem:setWorldXRotation(0)

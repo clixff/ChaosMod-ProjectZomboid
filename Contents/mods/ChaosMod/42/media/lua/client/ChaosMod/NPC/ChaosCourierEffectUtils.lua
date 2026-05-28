@@ -16,6 +16,7 @@
 ---@field courierExitSquare? IsoGridSquare
 ---@field courierItemCount? integer
 ---@field courierItemProvider? fun(): string?
+---@field effectNickname? string
 
 ---@class ChaosCourierEffectUtils
 ---@field STATE_MOVE_TO_PLAYER ChaosCourierEffectState
@@ -54,7 +55,7 @@ function ChaosCourierEffectUtils.Start(effect, options)
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, effect.effectNickname)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.COURIER
     npc:AddTag("effect_move_to_square")
@@ -95,6 +96,7 @@ local function giveItems(effect, player)
             local item = inventory:AddItem(itemId)
             if item then
                 ChaosPlayer.SayLineNewItem(player, item)
+                ChaosItems.SetFullAmmoIfWeapon(item)
             end
         end
     end

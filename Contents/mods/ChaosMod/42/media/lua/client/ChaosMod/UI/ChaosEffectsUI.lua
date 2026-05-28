@@ -23,13 +23,46 @@ ChaosEffectsUI.hideEffectNames = false
 
 local MIN_WINDOW_W = 280
 
+-- Meta progress-bar animated gradient anchors (~2s period).
+-- Start: orange. End: default red progress-bar color (hex 9f211f).
+local META_GRADIENT_PERIOD_MS = 2000
+local META_GRADIENT_START = { r = 1.0, g = 0.45, b = 0.05 }
+local META_GRADIENT_END = { r = 159 / 255, g = 33 / 255, b = 31 / 255 }
+
+--- Returns the current frame's lerped meta-gradient color. Phase is driven off
+--- getTimestampMs so the global HUD bar and every meta effect row pulse in
+--- lockstep.
+---@return table -- {r, g, b} color table
+function ChaosEffectsUI.GetMetaGradientColor()
+    local phase = (getTimestampMs() % META_GRADIENT_PERIOD_MS) / META_GRADIENT_PERIOD_MS
+    local t = 0.5 - 0.5 * math.cos(2 * math.pi * phase)
+    return ChaosUtils.LerpColor(META_GRADIENT_START, META_GRADIENT_END, t)
+end
+
+---@param effect ChaosEffectBase
+---@return boolean
+local function shouldHideEffectName(effect)
+    if effect.showNameAlways then
+        return false
+    end
+    return ChaosEffectsUI.hideEffectNames or ChaosConfig.hide_effect_names == true
+end
+
 ---@param effect ChaosEffectBase
 ---@return string
 local function buildEffectString(effect)
-    if ChaosEffectsUI.hideEffectNames and not effect.showNameAlways then
+    if shouldHideEffectName(effect) then
         return "???"
     end
-    local effectString = tostring(effect.effectName)
+    local effectString
+    if effect.fakeEffectNameId and effect.fakeEffectNameId ~= "" then
+        effectString = ChaosLocalization.GetString("effects", effect.fakeEffectNameId)
+    else
+        effectString = tostring(effect.effectName)
+    end
+    if effect.uiRevealPrefix and effect.uiRevealPrefix ~= "" then
+        effectString = effect.uiRevealPrefix .. effectString
+    end
     if effect.withDuration then
         local msToEnd = effect.maxTicks - effect.ticksActiveTime
         if effect.effectNickname and effect.effectNickname ~= "" then
@@ -114,8 +147,51 @@ function ChaosEffectsUI:createChildren()
     self:addChild(self.btnAnchor)
 end
 
+--- Builds a row for a meta effect. Meta rows are always visible and use the
+--- hardcoded "[META] {name} (Ns)" format regardless of hide_effect_names.
+---@param meta ChaosMetaEffectBase
+---@return string
+local function buildMetaEffectString(meta)
+    local msToEnd = meta.maxTicks - meta.ticksActiveTime
+    if msToEnd < 0 then msToEnd = 0 end
+    return string.format("[META] %s (%.1fs)", tostring(meta.effectName), msToEnd / 1000)
+end
+
+--- Builds the list of rows to render: meta effects (always shown, prepended),
+--- visible (non-concealed) real effects, plus fake decoy rows. Concealed
+--- (uiHidden) regular effects are omitted.
+---@return { text: string, effect: ChaosEffectBase | nil, meta: ChaosMetaEffectBase | nil }[]
+function ChaosEffectsUI:buildRenderRows()
+    local rows = {}
+    if ChaosMetaEffectsManager and ChaosMetaEffectsManager.activeEffects then
+        for i = 1, #ChaosMetaEffectsManager.activeEffects do
+            local meta = ChaosMetaEffectsManager.activeEffects[i]
+            if meta then
+                rows[#rows + 1] = { text = buildMetaEffectString(meta), effect = nil, meta = meta }
+            end
+        end
+    end
+    local activeEffects = ChaosEffectsManager.activeEffects
+    for i = 1, #activeEffects do
+        local effect = activeEffects[i]
+        if effect and not effect.uiHidden then
+            rows[#rows + 1] = { text = buildEffectString(effect), effect = effect, meta = nil }
+        end
+    end
+    local fakeVisuals = ChaosEffectsManager.fakeVisualEffects
+    if fakeVisuals then
+        for i = 1, #fakeVisuals do
+            local fv = fakeVisuals[i]
+            if fv then
+                rows[#rows + 1] = { text = tostring(fv.displayName), effect = nil, meta = nil }
+            end
+        end
+    end
+    return rows
+end
+
 function ChaosEffectsUI:getEffectsAreaH()
-    local N = #ChaosEffectsManager.activeEffects
+    local N = #self:buildRenderRows()
     if N == 0 then
         return self.effectRowH
     end
@@ -125,11 +201,9 @@ end
 function ChaosEffectsUI:computeWindowW()
     local minW = ChaosUIManager.GetScaledWidth(MIN_WINDOW_W)
     local maxTextW = 0
-    local activeEffects = ChaosEffectsManager.activeEffects
-    for i = 1, #activeEffects do
-        local effect = activeEffects[i]
-        local effectString = buildEffectString(effect)
-        local tw = getTextManager():MeasureStringX(UIFont.NewLarge, effectString)
+    local rows = self:buildRenderRows()
+    for i = 1, #rows do
+        local tw = getTextManager():MeasureStringX(UIFont.NewLarge, rows[i].text)
         if tw > maxTextW then maxTextW = tw end
     end
     local needed = maxTextW + self.textPadH * 2 + self.margin * 2
@@ -231,18 +305,26 @@ function ChaosEffectsUI:prerender()
     end
 
     -- Effect rows
-    local activeEffects = ChaosEffectsManager.activeEffects
+    local rows = self:buildRenderRows()
     local fontHeight = getTextManager():getFontHeight(UIFont.NewLarge)
     local rectW = self.windowW - self.margin * 2
-    for i = 1, #activeEffects do
-        local effect = activeEffects[i]
+    local metaColor = ChaosEffectsUI.GetMetaGradientColor()
+    for i = 1, #rows do
+        local effect = rows[i].effect
+        local meta = rows[i].meta
+        local effectString = rows[i].text
         local rowY = titleH + (i - 1) * (self.effectRowH + self.effectGap)
-
-        local effectString = buildEffectString(effect)
 
         self:drawRect(self.margin, rowY, rectW, self.effectRowH, 0.7, 0.1, 0.1, 0.1)
 
-        if effect.withDuration and effect.maxTicks > 0 and (not ChaosEffectsUI.hideEffectNames or effect.showNameAlways) then
+        if meta and meta.maxTicks > 0 then
+            local progress = 1 - (meta.ticksActiveTime / meta.maxTicks)
+            if progress < 0 then progress = 0 end
+            local fgWidth = math.floor(rectW * progress)
+            if fgWidth > 0 then
+                self:drawRect(self.margin, rowY, fgWidth, self.effectRowH, 1, metaColor.r, metaColor.g, metaColor.b)
+            end
+        elseif effect and effect.withDuration and effect.maxTicks > 0 and not shouldHideEffectName(effect) then
             local progress = 1 - (effect.ticksActiveTime / effect.maxTicks)
             local fgWidth = math.floor(rectW * progress)
             if fgWidth > 0 then

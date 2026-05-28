@@ -32,15 +32,18 @@ function ChaosNPC:initializeHuman(shouldHumanize)
     self.spawnTimeMs = ChaosMod.lastTimeTickMs
     zombie:setVariable("Chaos2HandsWeapon", false)
     zombie:setVariable("ChaosSneak", false)
+    zombie:setVariable("ChaosFirearmType", "none")
 
     self:DisableZombieVoice()
+
+    self:SetHealthGroup(self.healthGroup or CHAOS_NPC_HEALTH_GROUP.DEFAULT)
 
     ChaosNPCUtils.npcList:add(self)
 end
 
 ---@param worldObj IsoWorldInventoryObject
 ---@return boolean
-function ChaosNPC:IsGroundMeleeWeaponWorldObject(worldObj)
+function ChaosNPC:IsGroundUsableWeaponWorldObject(worldObj)
     if not worldObj then return false end
 
     local item = worldObj:getItem()
@@ -49,13 +52,15 @@ function ChaosNPC:IsGroundMeleeWeaponWorldObject(worldObj)
     end
 
     ---@cast item HandWeapon
-    return item:isMelee()
+    if item:isMelee() then return true end
+
+    return ChaosNPCFirearms.Classify(item) ~= "none"
 end
 
 ---@param worldObj IsoWorldInventoryObject
 ---@return boolean
-function ChaosNPC:CanUseGroundMeleeWeaponWorldObject(worldObj)
-    if not self:IsGroundMeleeWeaponWorldObject(worldObj) then
+function ChaosNPC:CanUseGroundUsableWeaponWorldObject(worldObj)
+    if not self:IsGroundUsableWeaponWorldObject(worldObj) then
         return false
     end
 
@@ -132,12 +137,140 @@ function ChaosNPC:ReleaseGroundWeaponClaim(worldObj)
 end
 
 function ChaosNPC:ClearAction()
-    if self.actionType == "pickup_ground_weapon" and self.actionWorldObjectTarget then
+    if self.actionWorldObjectTarget and
+        (self.actionType == "pickup_ground_weapon" or self.actionType == "pickup_bandage") then
         self:ReleaseGroundWeaponClaim(self.actionWorldObjectTarget)
     end
 
     self.actionType = nil
     self.actionWorldObjectTarget = nil
+end
+
+---@return boolean
+function ChaosNPC:IsFriendlyToPlayer()
+    return self.npcGroup == ChaosNPCGroupID.COMPANIONS or
+        self.npcGroup == ChaosNPCGroupID.FOLLOWERS
+end
+
+---@param player IsoPlayer
+function ChaosNPC:TryGiftRandomItem(player)
+    if not self.zombie or not player then return end
+    if ChaosConfig.npc_gifts_enabled == false then return end
+
+    local inventory = player:getInventory()
+    if not inventory then return end
+
+    local zombie = self.zombie
+
+    for _ = 1, 5 do
+        local itemType = ChaosItems.GetRandomItemId()
+        if itemType and itemType ~= "" then
+            local newItem = inventory:AddItem(itemType)
+            if newItem then
+                ChaosPlayer.SayLineNewItem(player, newItem)
+
+                local displayName = newItem:getDisplayName() or itemType
+                local line = string.format(ChaosLocalization.GetString("misc", "npc_gifted_item"), displayName)
+                ChaosZombie.AddNewChatLine(zombie, line, ChaosPlayerChatColors.green)
+
+                local nowMs = ChaosMod.lastTimeTickMs or getTimestampMs()
+                self.lastGiftItemTimeMs = nowMs
+                ChaosNPCUtils.lastGiftItemTimeMs = nowMs
+                return
+            end
+        end
+    end
+end
+
+---@return boolean
+function ChaosNPC:NeedsHealing()
+    if not self.zombie then return false end
+    return self.zombie:getHealth() < self.maxHealth
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:IsGroundBandageWorldObject(worldObj)
+    if not worldObj then return false end
+
+    local item = worldObj:getItem()
+    if not item then return false end
+
+    return CHAOS_NPC_BANDAGE_HEAL_AMOUNTS[item:getFullType()] ~= nil
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:CanUseGroundBandageWorldObject(worldObj)
+    if not self:IsGroundBandageWorldObject(worldObj) then
+        return false
+    end
+
+    local owner = self:GetGroundWeaponClaimOwner(worldObj)
+    local token = self:GetGroundWeaponClaimToken()
+    return owner == nil or owner == token
+end
+
+---@param worldObj IsoWorldInventoryObject
+function ChaosNPC:StartPickupBandageAction(worldObj)
+    if not self.zombie or not worldObj then return end
+    if self.enemy then return end
+    if self.actionType ~= nil then return end
+    if not self:TryClaimGroundWeapon(worldObj) then return end
+
+    local square = worldObj:getSquare()
+    if not square then
+        self:ReleaseGroundWeaponClaim(worldObj)
+        return
+    end
+
+    self.actionType = "pickup_bandage"
+    self.actionWorldObjectTarget = worldObj
+    self:MoveToLocation(square)
+end
+
+---@param worldObj IsoWorldInventoryObject
+---@return boolean
+function ChaosNPC:pickGroundBandage(worldObj)
+    if not self.zombie or not worldObj then return false end
+
+    local claimOwner = self:GetGroundWeaponClaimOwner(worldObj)
+    if claimOwner ~= self:GetGroundWeaponClaimToken() then
+        return false
+    end
+
+    local item = worldObj:getItem()
+    if not item then return false end
+
+    local healAmount = CHAOS_NPC_BANDAGE_HEAL_AMOUNTS[item:getFullType()]
+    if not healAmount then return false end
+
+    local md = item:getModData()
+    if md then
+        md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] = nil
+    end
+
+    InventoryItem.RemoveFromContainer(item)
+
+    local zombie = self.zombie
+    local newHealth = zombie:getHealth() + healAmount
+    if newHealth > self.maxHealth then
+        newHealth = self.maxHealth
+    end
+    zombie:setHealth(newHealth)
+
+    local percent = 0
+    if self.maxHealth > 0 then
+        percent = math.floor(newHealth / self.maxHealth * 100)
+    end
+    local line = string.format(ChaosLocalization.GetString("misc", "npc_bandaged_wounds"), percent)
+    ChaosZombie.AddNewChatLine(zombie, line, CHAOS_NPC_BANDAGE_CHAT_COLOR)
+
+
+    local soundName = zombie:isFemale() and "chaos_npc_wounds_bandaged_female" or "chaos_npc_wounds_bandaged_male"
+    ChaosZombie.PlaySoundLine(zombie, soundName, "bandage_wounds", 10000)
+
+    return true
 end
 
 ---@param worldObj IsoWorldInventoryObject
@@ -190,6 +323,10 @@ function ChaosNPC:pickGroundItemToPrimary(worldObj)
         md[CHAOS_NPC_GROUND_WEAPON_CLAIM_KEY] = nil
     end
 
+    self.chanceToDropWeaponOnDeath = 1.0
+
+    ChaosNPCFirearms.OnSetFirearm(self, item)
+
     return item
 end
 
@@ -225,6 +362,8 @@ function ChaosNPC:setNPCAsZombie()
     zombie:setUseless(false)
     zombie:Wander()
 
+    ChaosNPCFirearms.ClearFirearm(self)
+
     self.weaponItemCached = nil
     self.enemy = nil
     self.moveTargetCharacter = nil
@@ -251,8 +390,13 @@ function ChaosNPC:setNPCAsZombie()
     self.zombie = nil
 end
 
-function ChaosNPC:Destroy()
+---@param dropWeapon? boolean
+function ChaosNPC:Destroy(dropWeapon)
     if not self.zombie then return end
+
+    if dropWeapon then
+        self:TryDropWeaponOnDeath()
+    end
 
     local md = self.zombie:getModData()
     if md then
@@ -261,6 +405,8 @@ function ChaosNPC:Destroy()
     end
 
     if not self.zombie then return end
+
+    ChaosNPCFirearms.ClearFirearm(self)
 
     self.zombie:removeFromWorld()
     self.zombie:removeFromSquare()
@@ -279,19 +425,57 @@ function ChaosNPC:Destroy()
     end
 end
 
+function ChaosNPC:TryDropWeaponOnDeath()
+    if not self.zombie then return end
+
+    local weapon = self.weaponItemCached
+    if not weapon then return end
+    if weapon:getFullType() == "Base.BareHands" then return end
+
+    local chance = self.chanceToDropWeaponOnDeath or 0.0
+    if chance <= 0.0 or ChaosUtils.RandFloat(0.0, 1.0) > chance then
+        return
+    end
+
+    local square = self.zombie:getSquare()
+    if not square then return end
+
+    local inventory = self.zombie:getInventory()
+    if inventory and inventory:contains(weapon) then
+        inventory:Remove(weapon)
+    end
+
+    ---@diagnostic disable-next-line: param-type-mismatch
+    self.zombie:setPrimaryHandItem(nil)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    self.zombie:setSecondaryHandItem(nil)
+
+    square:AddWorldInventoryItem(weapon, 0.5, 0.5, 0)
+end
+
 function ChaosNPC:OnZombieDead()
     if self.zombie then
+        self:TryDropWeaponOnDeath()
+
         local md = self.zombie:getModData()
         if md then
             md[CHAOS_NPC_MOD_DATA_KEY] = nil
             md[CHAOS_NPC_MOD_DATA_KEY_2] = nil
+        end
+
+        ChaosNPCFirearms.ClearFirearm(self)
+
+        if self:HasTag("jesus") then
+            self.zombie:removeFromWorld()
+            self.zombie:removeFromSquare()
         end
     end
 
     local isFollowGroup = self.npcGroup == ChaosNPCGroupID.COMPANIONS or
         self.npcGroup == ChaosNPCGroupID.FOLLOWERS
     if isFollowGroup and self.zombie then
-        self.zombie:playSound("deathcrash")
+        ChaosUtils.PlayUISound("deathcrash", false, 1.0)
+
         local player = getPlayer()
         if player then
             local name = ChaosNicknames.ensureZombieNicknameAndColor(self.zombie)
@@ -349,6 +533,8 @@ function ChaosNPC:SetWeapon(weaponFullType)
         oldWeapon:removeFromWorld()
     end
 
+    ChaosNPCFirearms.ClearFirearm(self)
+
     local newWeapon = instanceItem(weaponFullType)
     if newWeapon then
         self.weaponItemCached = newWeapon
@@ -360,5 +546,23 @@ function ChaosNPC:SetWeapon(weaponFullType)
             ---@diagnostic disable-next-line: param-type-mismatch
             self.zombie:setSecondaryHandItem(nil)
         end
+
+        ChaosNPCFirearms.OnSetFirearm(self, newWeapon)
     end
+end
+
+---@param group integer
+function ChaosNPC:SetHealthGroup(group)
+    if not self.zombie then return end
+
+    if self.healthGroup == CHAOS_NPC_HEALTH_GROUP.STRONG then
+        local health = ChaosUtils.RandFloat(3.5, 5.0)
+        self.zombie:setHealth(health)
+    elseif self.healthGroup == CHAOS_NPC_HEALTH_GROUP.WEAK then
+        self.zombie:setHealth(ChaosUtils.RandFloat(0.5, 1.2))
+    else
+        self.zombie:setHealth(ChaosUtils.RandFloat(1.5, 3.0))
+    end
+
+    self.maxHealth = self.zombie:getHealth()
 end

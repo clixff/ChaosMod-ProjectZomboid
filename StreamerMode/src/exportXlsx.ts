@@ -16,7 +16,7 @@ interface ColumnSpec {
   pixelWidth: number;
 }
 
-const COLUMNS: ColumnSpec[] = [
+const BASE_COLUMNS: ColumnSpec[] = [
   {
     key: "id",
     headerKey: null,
@@ -54,19 +54,28 @@ const COLUMNS: ColumnSpec[] = [
     headerColor: "FF8E7CC3",
     pixelWidth: 120,
   },
-  {
-    key: "price",
-    headerKey: "col_price",
-    headerColor: "FF93C47D",
-    pixelWidth: 100,
-  },
-  {
-    key: "description",
-    headerKey: "col_description",
-    headerColor: "FF6C757D",
-    pixelWidth: 300,
-  },
 ];
+
+const PRICE_COLUMN: ColumnSpec = {
+  key: "price",
+  headerKey: "col_price",
+  headerColor: "FF93C47D",
+  pixelWidth: 100,
+};
+
+const TWITCH_BITS_COLUMN: ColumnSpec = {
+  key: "twitch_bits",
+  headerKey: "col_twitch_bits",
+  headerColor: "FF9B59B6",
+  pixelWidth: 120,
+};
+
+const DESCRIPTION_COLUMN: ColumnSpec = {
+  key: "description",
+  headerKey: "col_description",
+  headerColor: "FF6C757D",
+  pixelWidth: 300,
+};
 
 // exceljs column width unit ≈ width of a "0" digit in Calibri 11 (~7px).
 function pxToColumnWidth(px: number): number {
@@ -163,29 +172,43 @@ function setCell(
   };
 }
 
-export async function writeEffectsXlsx(
-  luaDir: string,
+export interface WriteEffectsXlsxOptions {
+  donationalertsEnabled: boolean;
+  twitchBitsEnabled: boolean;
+  bitsMultiplier: number;
+}
+
+async function buildEffectsWorkbook(
   effects: EffectEntry[],
   priceGroups: PriceGroup[],
-  donateActive: boolean,
-): Promise<string> {
+  options: WriteEffectsXlsxOptions,
+): Promise<ExcelJS.Workbook> {
+  const { donationalertsEnabled, twitchBitsEnabled, bitsMultiplier } = options;
+
+  const columns: ColumnSpec[] = [...BASE_COLUMNS];
+  if (donationalertsEnabled) columns.push(PRICE_COLUMN);
+  if (twitchBitsEnabled) columns.push(TWITCH_BITS_COLUMN);
+  columns.push(DESCRIPTION_COLUMN);
+
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Effects", {
     views: [{ state: "frozen", ySplit: 2 }],
   });
 
   // Column widths
-  sheet.columns = COLUMNS.map((c) => ({
+  sheet.columns = columns.map((c) => ({
     key: c.key,
     width: pxToColumnWidth(c.pixelWidth),
   }));
 
   // Row 1: title
-  sheet.mergeCells(1, 1, 1, COLUMNS.length);
+  sheet.mergeCells(1, 1, 1, columns.length);
   const titleCell = sheet.getCell(1, 1);
   const titleText = getString("export", "title");
-  const donateHint = donateActive ? getString("export", "donate_hint") : "";
-  if (donateActive) {
+  const hints: string[] = [];
+  if (donationalertsEnabled) hints.push(getString("export", "donate_hint"));
+  if (twitchBitsEnabled) hints.push(getString("export", "donate_hint_bits"));
+  if (hints.length > 0) {
     titleCell.value = {
       richText: [
         {
@@ -197,15 +220,15 @@ export async function writeEffectsXlsx(
           },
           text: titleText,
         },
-        {
+        ...hints.map((hint) => ({
           font: {
             name: "Roboto",
             size: 11,
             bold: false,
             color: { argb: "FFFFFFFF" },
           },
-          text: `\n${donateHint}`,
-        },
+          text: `\n${hint}`,
+        })),
       ],
     };
     titleCell.alignment = {
@@ -224,7 +247,11 @@ export async function writeEffectsXlsx(
       bottom: { style: "thin", color: { argb: "FFD0D0D0" } },
       right: { style: "thin", color: { argb: "FFD0D0D0" } },
     };
-    sheet.getRow(1).height = pxToRowHeightPt(110);
+    const baseHeight = 70;
+    const perHintHeight = 40;
+    sheet.getRow(1).height = pxToRowHeightPt(
+      baseHeight + perHintHeight * hints.length,
+    );
   } else {
     setCell(titleCell, titleText, {
       bg: "FFC75C5C",
@@ -242,7 +269,7 @@ export async function writeEffectsXlsx(
 
   // Row 2: header
   const headerRow = sheet.getRow(2);
-  COLUMNS.forEach((col, idx) => {
+  columns.forEach((col, idx) => {
     const cell = headerRow.getCell(idx + 1);
     const headerText =
       col.headerKey != null
@@ -260,13 +287,16 @@ export async function writeEffectsXlsx(
   const priceByGroup = new Map<string, number>();
   for (const pg of priceGroups) priceByGroup.set(pg.group, pg.price);
 
+  const colIndex = new Map<string, number>();
+  columns.forEach((col, idx) => colIndex.set(col.key, idx + 1));
+
   effects.forEach((e, index) => {
     const rowNumber = index + 3;
     const row = sheet.getRow(rowNumber);
     row.height = pxToRowHeightPt(40);
 
     // ID
-    setCell(row.getCell(1), index + 1, {
+    setCell(row.getCell(colIndex.get("id") ?? 1), index + 1, {
       bg: "FFE35A58",
       fontColor: "FFFFFFFF",
       bold: true,
@@ -276,7 +306,7 @@ export async function writeEffectsXlsx(
     // Name
     const name = getString("effects", e.id);
     const nameBg = index % 2 === 0 ? "FFFFFFFF" : "FFEFEFEF";
-    setCell(row.getCell(2), name, {
+    setCell(row.getCell(colIndex.get("name") ?? 2), name, {
       bg: nameBg,
       fontColor: "FF000000",
       wrap: true,
@@ -300,7 +330,7 @@ export async function writeEffectsXlsx(
       enabledText = getString("export", "status_donations_only");
       enabledBg = "FFE69138"; // orange
     }
-    setCell(row.getCell(3), enabledText, {
+    setCell(row.getCell(colIndex.get("enabled") ?? 3), enabledText, {
       bg: enabledBg,
       fontColor: "FFFFFFFF",
       bold: true,
@@ -308,57 +338,82 @@ export async function writeEffectsXlsx(
 
     // Duration
     const hasDuration = e.withDuration && e.duration != null;
+    const durationCell = row.getCell(colIndex.get("duration") ?? 4);
     if (hasDuration) {
-      setCell(row.getCell(4), e.duration ?? 0, {
+      setCell(durationCell, e.duration ?? 0, {
         bg: "FF4A90E2",
         fontColor: "FFFFFFFF",
         wrap: true,
       });
     } else {
-      setCell(row.getCell(4), null, { bg: "FFFFFFFF" });
+      setCell(durationCell, null, { bg: "FFFFFFFF" });
     }
 
     // Chance
+    const chanceCell = row.getCell(colIndex.get("chance") ?? 5);
     if (enabled) {
-      setCell(row.getCell(5), e.chance, {
+      setCell(chanceCell, e.chance, {
         bg: "FFFFFFFF",
         fontColor: "FF000000",
       });
     } else {
-      setCell(row.getCell(5), null, { bg: "FFFFFFFF" });
+      setCell(chanceCell, null, { bg: "FFFFFFFF" });
     }
 
     // Price group
+    const priceGroupCell = row.getCell(colIndex.get("price_group") ?? 6);
     if (e.price_group) {
       const tier = extractGroupTier(e.price_group);
       const bg = tier != null ? priceGroupColor(tier) : "FFCCCCCC";
-      setCell(row.getCell(6), formatPriceGroupLabel(e.price_group), {
+      setCell(priceGroupCell, formatPriceGroupLabel(e.price_group), {
         bg,
         fontColor: "FFFFFFFF",
         bold: true,
         fontName: "Roboto Serif",
       });
     } else {
-      setCell(row.getCell(6), null, {
+      setCell(priceGroupCell, null, {
         bg: "FFFFFFFF",
         fontName: "Roboto Serif",
       });
     }
 
-    // Price
-    if (donate && e.price_group && priceByGroup.has(e.price_group)) {
-      setCell(row.getCell(7), priceByGroup.get(e.price_group) ?? 0, {
-        bg: "FFF6B26B",
-        fontColor: "FFFFFFFF",
-        bold: true,
-      });
-    } else {
-      setCell(row.getCell(7), null, { bg: "FFFFFFFF" });
+    // Price (DonationAlerts)
+    const priceColIdx = colIndex.get("price");
+    if (priceColIdx != null) {
+      const priceCell = row.getCell(priceColIdx);
+      if (donate && e.price_group && priceByGroup.has(e.price_group)) {
+        setCell(priceCell, priceByGroup.get(e.price_group) ?? 0, {
+          bg: "FFF6B26B",
+          fontColor: "FFFFFFFF",
+          bold: true,
+        });
+      } else {
+        setCell(priceCell, null, { bg: "FFFFFFFF" });
+      }
+    }
+
+    // Twitch Bits
+    const bitsColIdx = colIndex.get("twitch_bits");
+    if (bitsColIdx != null) {
+      const bitsCell = row.getCell(bitsColIdx);
+      if (donate && e.price_group && priceByGroup.has(e.price_group)) {
+        const price = priceByGroup.get(e.price_group) ?? 0;
+        const bits = Math.ceil(price * bitsMultiplier);
+        setCell(bitsCell, bits, {
+          bg: "FF9B59B6",
+          fontColor: "FFFFFFFF",
+          bold: true,
+        });
+      } else {
+        setCell(bitsCell, null, { bg: "FFFFFFFF" });
+      }
     }
 
     // Description
     const desc = getStringOrNull("descriptions", e.id);
-    setCell(row.getCell(8), desc ?? null, {
+    const descCell = row.getCell(colIndex.get("description") ?? columns.length);
+    setCell(descCell, desc ?? null, {
       bg: "FFFFFFFF",
       fontColor: "FF000000",
       fontSize: 10,
@@ -366,7 +421,26 @@ export async function writeEffectsXlsx(
     });
   });
 
+  return workbook;
+}
+
+export async function writeEffectsXlsx(
+  luaDir: string,
+  effects: EffectEntry[],
+  priceGroups: PriceGroup[],
+  options: WriteEffectsXlsxOptions,
+): Promise<string> {
+  const workbook = await buildEffectsWorkbook(effects, priceGroups, options);
   const outputPath = join(luaDir, "export.xlsx");
   await workbook.xlsx.writeFile(outputPath);
   return outputPath;
+}
+
+export async function buildEffectsXlsxBuffer(
+  effects: EffectEntry[],
+  priceGroups: PriceGroup[],
+  options: WriteEffectsXlsxOptions,
+): Promise<ArrayBuffer> {
+  const workbook = await buildEffectsWorkbook(effects, priceGroups, options);
+  return (await workbook.xlsx.writeBuffer()) as ArrayBuffer;
 }

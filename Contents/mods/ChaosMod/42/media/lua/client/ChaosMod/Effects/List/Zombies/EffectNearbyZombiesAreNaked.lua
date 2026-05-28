@@ -17,9 +17,10 @@ function EffectNearbyZombiesAreNaked:OnStart()
     ChaosZombie.ForEachZombieInRange(x1, y1, 30, function(zombie)
         if not zombie or not zombie:isAlive() then return end
 
-        zombie:setReanimatedPlayer(true)
-        zombie:getHumanVisual():getBodyVisuals():clear()
+        --- Remove default clothes
+        zombie:getItemVisuals():clear()
         zombie:clearWornItems()
+
         zombie:resetModelNextFrame()
 
         strippedZombies = strippedZombies + 1

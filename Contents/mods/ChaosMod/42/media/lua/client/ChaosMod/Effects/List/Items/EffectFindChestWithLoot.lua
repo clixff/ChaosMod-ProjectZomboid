@@ -8,7 +8,7 @@ EffectFindChestWithLoot = ChaosEffectBase:derive("EffectFindChestWithLoot", "fin
 
 local MIN_RADIUS = 8
 local MAX_RADIUS = 20
-local ITEM_COUNT = 3
+local ITEM_COUNT = 5
 local GIFTBOX_ITEM_ID = "Base.Present_ExtraLarge"
 
 
@@ -99,7 +99,10 @@ function EffectFindChestWithLoot:OnStart()
     for _ = 1, ITEM_COUNT do
         local itemId = GetRandomLootboxItem()
         if itemId then
-            container:AddItem(itemId)
+            local item = container:AddItem(itemId)
+            if item then
+                ChaosItems.SetFullAmmoIfWeapon(item)
+            end
         end
     end
 

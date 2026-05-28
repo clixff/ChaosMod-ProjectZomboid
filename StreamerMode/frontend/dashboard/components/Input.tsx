@@ -1,4 +1,5 @@
-import type { ChangeEvent, CSSProperties } from "react";
+import type { ChangeEvent, CSSProperties, KeyboardEvent } from "react";
+import { X } from "lucide-react";
 
 interface TextInputProps {
   value: string;
@@ -7,6 +8,10 @@ interface TextInputProps {
   size?: "small" | "mid" | "full";
   type?: "text" | "color" | "password";
   style?: CSSProperties;
+  onBlur?: () => void;
+  onSubmit?: () => void;
+  onClear?: () => void;
+  noAutofill?: boolean;
 }
 
 export function TextInput({
@@ -16,13 +21,35 @@ export function TextInput({
   size = "full",
   type = "text",
   style,
+  onBlur,
+  onSubmit,
+  onClear,
+  noAutofill,
 }: TextInputProps) {
   const cls =
     size === "small" ? "input input--small" : size === "mid" ? "input input--mid" : "input";
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
-  return (
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && onSubmit) {
+      e.preventDefault();
+      onSubmit();
+    }
+  };
+  const noAutofillProps = noAutofill
+    ? {
+        autoComplete: "off",
+        spellCheck: false,
+        autoCorrect: "off",
+        autoCapitalize: "off",
+        "data-lpignore": "true",
+        "data-1p-ignore": "true",
+        "data-bwignore": "true",
+        "data-form-type": "other",
+      }
+    : {};
+  const input = (
     <input
       className={cls}
       type={type}
@@ -30,7 +57,28 @@ export function TextInput({
       onChange={handleChange}
       placeholder={placeholder}
       style={style}
+      onBlur={onBlur}
+      onKeyDown={handleKeyDown}
+      {...noAutofillProps}
     />
+  );
+  if (!onClear) return input;
+  return (
+    <span className="input-wrap">
+      {input}
+      {value.length > 0 && (
+        <button
+          type="button"
+          className="input-clear"
+          aria-label="Clear"
+          title="Clear"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={onClear}
+        >
+          <X size={14} aria-hidden="true" />
+        </button>
+      )}
+    </span>
   );
 }
 

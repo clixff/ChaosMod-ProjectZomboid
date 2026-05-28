@@ -23,7 +23,7 @@ function EffectKillNearbyZombies:OnStart()
         weapon = instanceItem("Base.BareHands")
     end
 
-    ChaosZombie.ForEachZombieInRange(x1, y1, 35, function(zombie)
+    ChaosZombie.ForEachZombieInRange(x1, y1, 50, function(zombie)
         if zombie and zombie:isAlive() then
             zombie:setHealth(0)
             ---@diagnostic disable-next-line: param-type-mismatch

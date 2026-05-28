@@ -38,6 +38,8 @@ function ChaosMod.StartMod()
     ChaosUIManager:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
+    -- Load meta effects registry from ChaosConfig.meta_effects.list
+    ChaosMetaEffectsRegistry.Initialize()
     -- Clear position history so it starts fresh from this session
     ChaosUtils.playerPositionHistory = {}
     ChaosUtils.positionSampleMs = 0
@@ -52,10 +54,10 @@ function ChaosMod.StartMod()
     ChaosMod.enabled = true;
     -- Set last time tick milliseconds to current time for next tick function call
     ChaosMod.lastTimeTickMs = getTimestampMs()
-    -- Start global effects countdown timer if effects are enabled
-    if ChaosConfig.IsEffectsEnabled() then
-        ChaosEffectsManager.StartGlobalTimer()
-    end
+    -- Always initialize the global effects countdown timer; OnTick gates firing on IsEffectsEnabled()
+    ChaosEffectsManager.StartGlobalTimer()
+    -- Reset meta-effects interval timer for this StartMod cycle
+    ChaosMetaEffectsManager.Start()
     print("[ChaosMod] Mod started")
     local modVersion = "0"
     -- Update internal mod version string
@@ -68,6 +70,7 @@ function ChaosMod.StartMod()
     ChaosUIManager:SetMainText(newMainString)
     -- Update UI elements status based on mod enabled flag
     ChaosUIManager.hud:OnModStatusChanged(true)
+    ChaosUIManager.hud:ShowIntro(modVersion, ChaosEffectsRegistry.effectsEnabledCount)
     ChaosUIManager:ShowEffectsUI()
     -- Load zombie nicknames from disk first time if enabled
     if ChaosConfig.IsZombieNicknamesEnabled() then
@@ -77,15 +80,21 @@ function ChaosMod.StartMod()
     if ChaosConfig.streamer_mode and ChaosConfig.streamer_mode.streamer_mode_enabled == true then
         ChaosEffectsManager.iterationIndex = 0
         ChaosBridge.Init()
-        ChaosBridge.Emit("mod_change_status", { enabled = true })
+        ChaosBridge.Emit("mod_change_status", { enabled = true, version = modVersion })
         ChaosBridge.Emit("interval_start", { iteration = 0 })
     end
 
     ChaosUIManager.hud:AddMessage("Chaos Mod started")
     ChaosUtils.PlayUISound("UIPauseMenuEnter")
+
+    local player = getPlayer()
+    if player then
+        getPlayer():setVariable("ChaosModSuperSonic", false)
+    end
 end
 
 function ChaosMod.StopMod()
+    ChaosMetaEffectsManager.StopAllMetaEffects()
     ChaosEffectsManager.StopAllEffects()
     ChaosSpecialAction.StopAll()
     ChaosEffectsManager.ClearGlobalTimer()
@@ -99,28 +108,14 @@ function ChaosMod.StopMod()
     ChaosUIManager:HideEffectsUI()
     ChaosEffectsManager.iterationIndex = 0
     ChaosMod.specialAnimalsFollowers = {}
+    ChaosNPCUtils.NPCIgnorePlayerEffectsActive = {}
     if ChaosBridge.enabled then
-        ChaosBridge.Emit("mod_change_status", { enabled = false })
+        local modVersion = "0"
+        if ChaosMod.modData then
+            modVersion = ChaosMod.modData:getModVersion() or "0"
+        end
+        ChaosBridge.Emit("mod_change_status", { enabled = false, version = modVersion })
         ChaosBridge.Shutdown()
-    end
-end
-
----@param key integer
-function ChaosMod.OnKeyPressed(key)
-    if key == 53 then
-        local player = getPlayer()
-        if player then
-            print("Drop item in hand")
-            player:dropHandItems()
-        end
-    elseif key == 51 then
-        local player = getPlayer()
-        if player then
-            player:getInventory()
-            print("Dress in random outfit")
-            ChaosPlayer.DropAllItemsOnGround(player, false)
-            player:dressInRandomOutfit()
-        end
     end
 end
 
@@ -173,6 +168,8 @@ function ChaosMod.OnInitWorld()
     ChaosUtils.playerPreviousPositionsSampleMs = 0
     ChaosUtils.playerPreviousPositions = {}
 
+    ChaosUtils.ResetCrashDamageOverride()
+
     LoadSpawnPointFromModData()
 end
 
@@ -196,6 +193,8 @@ function ChaosMod.OnGameStart()
     ChaosUIManager:OnLanguageLoaded()
     -- Load effects.json file from disk
     ChaosEffectsRegistry.Initialize()
+    -- Load meta effects from ChaosConfig.meta_effects.list
+    ChaosMetaEffectsRegistry.Initialize()
 
     ChaosMod.RegisterBridgeHandlers()
 
@@ -205,6 +204,11 @@ function ChaosMod.OnGameStart()
     if Fishing and Fishing.Handler and Fishing.Handler.onEquipPrimary then
         Events.OnEquipPrimary.Remove(Fishing.Handler.onEquipPrimary)
         Events.OnEquipPrimary.Add(ChaosMod.CustomFishingEquipEvent)
+    end
+
+    local player = getPlayer()
+    if player then
+        getPlayer():setVariable("ChaosModSuperSonic", false)
     end
 end
 
@@ -256,8 +260,21 @@ function ChaosMod.OnTick()
     -- Calculate delta time in milliseconds since last tick
     local deltaMs = msNow - ChaosMod.lastTimeTickMs
     ChaosMod.lastTimeTickMs = msNow
+
+    if isGamePaused() or getGameSpeed() == 0 then
+        return
+    end
+
+    if deltaMs > 250 then
+        deltaMs = 250
+    end
+
     -- Tick all active effects
     ChaosEffectsManager.OnTick(deltaMs)
+    -- Tick meta effects (active effects + interval timer)
+    ChaosMetaEffectsManager.OnTick(deltaMs)
+    -- Flush pending recent-effects blocklist writes when the throttle window has elapsed
+    ChaosEffectsRegistry.TickRecentEffectsSave()
     -- Tick zombie nicknames if enabled
     if ChaosMod.enabled and ChaosConfig.IsZombieNicknamesEnabled() then
         ChaosNicknames.OnTick(deltaMs)
@@ -271,6 +288,15 @@ function ChaosMod.OnTick()
         ChaosUtils.sleepHandleTick()
         ChaosNPCUtils.OnTick(deltaMs)
         ChaosBridge.Tick(deltaMs)
+        ChaosUtils.UpdateCrashDamageOverride()
+    end
+end
+
+---@param player IsoPlayer
+function ChaosMod.OnPlayerDeath(player)
+    if ChaosMod.enabled and player then
+        ChaosUtils.SetCrashDamageDisabled(false)
+        ChaosUtils.SaveDeathPosition(player:getX(), player:getY(), player:getZ())
     end
 end
 
@@ -279,9 +305,16 @@ function ChaosMod.RegisterBridgeHandlers()
         print("[ChaosMod] Reloading config and effects via bridge")
         ChaosConfig.LoadConfigFromDisk()
         ChaosEffectsRegistry.Initialize()
+        ChaosMetaEffectsRegistry.Initialize()
         ChaosLocalization.ReloadLanguages()
         if ChaosUIManager and ChaosUIManager.OnLanguageLoaded then
             ChaosUIManager:OnLanguageLoaded()
+        end
+    end)
+
+    ChaosBridge.On("streamer_handshake", function(payload)
+        if ChaosBridgeHandshake and ChaosBridgeHandshake.OnHandshake then
+            ChaosBridgeHandshake.OnHandshake(payload)
         end
     end)
 
@@ -298,7 +331,23 @@ function ChaosMod.RegisterBridgeHandlers()
                 elseif e.type == ChaosEffectActivationType.VOTE then
                     activationType = ChaosEffectActivationType.VOTE
                 end
-                ChaosEffectsManager.StartEffect(e.id, nickname, activationType)
+                -- Vote winner may be tagged as fake (1) or hidden (2) by StreamerMode.
+                local fakeType = nil
+                if e.fake_option_type == 1 then
+                    fakeType = 1
+                elseif e.fake_option_type == 2 then
+                    fakeType = 2
+                end
+                local startedEffect = ChaosEffectsManager.StartEffect(e.id, nickname, activationType, fakeType)
+                -- Fake effects show a decoy (no-duration) effect name while the real one runs concealed.
+                if startedEffect and fakeType == 1 then
+                    local fakeId = ChaosEffectsRegistry.GetRandomNoDurationEffectId(e.id)
+                    if fakeId then
+                        ChaosEffectsManager.AddFakeVisualEffect(
+                            ChaosLocalization.GetString("effects", fakeId),
+                            ChaosEffectsManager.FAKE_DECOY_MS)
+                    end
+                end
                 if activationType == ChaosEffectActivationType.VOTE then
                     ChaosEffectsRegistry.AddToBlocklist(e.id)
                 end
@@ -308,6 +357,22 @@ function ChaosMod.RegisterBridgeHandlers()
                 end
             end
         end
+    end)
+
+    ChaosBridge.On("activate_random_effect", function(payload)
+        if type(payload) ~= "table" then return end
+        local nickname = type(payload.nickname) == "string" and payload.nickname ~= "" and payload.nickname or nil
+        local effectIds = ChaosEffectsRegistry.GetRandomEffects(1, "default", true)
+        local effectId = effectIds and effectIds[1]
+        if not effectId then
+            print("[ChaosMod] activate_random_effect: no eligible effect to pick")
+            return
+        end
+        ChaosEffectsManager.StartEffect(effectId, nickname, ChaosEffectActivationType.DONATE)
+        if ChaosUIManager and ChaosUIManager.onDonateEffectActivated then
+            ChaosUIManager.onDonateEffectActivated(nickname or "Anonymous", effectId)
+        end
+        ChaosBridge.Emit("random_effect_activated", { effect_id = effectId, nickname = nickname or "" })
     end)
 end
 
@@ -331,6 +396,14 @@ function ChaosMod.OnZombieDead(zombie)
     ChaosZombie.OnZombieDead(zombie)
 end
 
+---@param key integer
+function ChaosMod.OnKeyPressed(key)
+    if ChaosMod.enabled == false then
+        return
+    end
+    SpecialAnimal.OnKeyPressed(key)
+end
+
 ---@param character IsoGameCharacter
 function ChaosMod.OnEnterVehicle(character)
     if not character then return end
@@ -340,7 +413,6 @@ function ChaosMod.OnEnterVehicle(character)
     ChaosUtils.lastUsedVehicle = vehicle
 end
 
-Events.OnKeyPressed.Add(ChaosMod.OnKeyPressed)
 Events.OnInitWorld.Add(ChaosMod.OnInitWorld)
 Events.OnWeaponHitCharacter.Add(ChaosMod.OnWeaponHitCharacter)
 Events.OnGameStart.Add(ChaosMod.OnGameStart)
@@ -349,5 +421,7 @@ Events.OnTick.Add(ChaosMod.OnTick)
 Events.OnTick.Add(ChaosMod.OnSpecialAnimalsTick)
 Events.OnZombieDead.Add(ChaosMod.OnZombieDead)
 Events.OnEnterVehicle.Add(ChaosMod.OnEnterVehicle)
+Events.OnPlayerDeath.Add(ChaosMod.OnPlayerDeath)
+Events.OnKeyPressed.Add(ChaosMod.OnKeyPressed)
 
 return ChaosMod

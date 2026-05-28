@@ -11,6 +11,7 @@
 ]]
 
 require "ChaosMod/NPC/ChaosNPCConstants"
+require "ChaosMod/NPC/ChaosNPCFirearms"
 
 ---@class ChaosNPC
 ---@field pathfindUpdateMs integer
@@ -35,6 +36,8 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field lastTimeUpdateMs integer
 ---@field findEnemyTimeoutMs integer
 ---@field lastZombieThatAttackedNPC? IsoZombie
+---@field lastZombieBiteTimeMs? integer
+---@field lastNpcDebugLogMs integer
 ---@field spawnTimeMs integer
 ---@field debugLastTimePathfindMs integer
 ---@field attackLastTimeMs integer
@@ -52,6 +55,29 @@ require "ChaosMod/NPC/ChaosNPCConstants"
 ---@field stalkerTeleportCooldownMs? integer
 ---@field stalkerInteractionCount integer
 ---@field effectMoveTargetLocation? IsoGridSquare
+---@field healthGroup? integer
+---@field maxHealth number
+---@field chanceToDropWeaponOnDeath number
+---@field lastNeedHealLineMs integer
+---@field lastGiftItemTimeMs integer
+---@field canGiftItems boolean
+---@field panicCheckTimeoutMs integer
+---@field panicStartTimeMs integer
+---@field panicTargetSquare? IsoGridSquare
+---@field panicCooldownEndMs integer
+---@field panicLastSeenHealth number
+---@field canBePanicked boolean
+---@field firearmType? string
+---@field maxAmmo integer
+---@field currentAmmo integer
+---@field firearmAccuracyZombies number
+---@field firearmAccuracyPlayers number
+---@field firearmStateType? string
+---@field firearmStateEndMs integer
+---@field _lastFirearmDiagMs integer
+---@field enemyDistanceFindRadius number
+---@field disableAIEffects table<string, boolean>
+---@field pedestrianPauseEndMs integer
 ChaosNPC = ChaosNPC or {}
 ChaosNPC.__index = ChaosNPC
 ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId or 0
@@ -63,11 +89,16 @@ require "ChaosMod/NPC/ChaosNPCCollisionSystem"
 require "ChaosMod/NPC/ChaosNPCBehaviorSystem"
 require "ChaosMod/NPC/ChaosNPCAISystem"
 
-function ChaosNPC:new(zombie)
+---@param zombie IsoZombie
+---@param nickname string|nil
+function ChaosNPC:new(zombie, nickname)
     ---@type ChaosNPC
     local o = setmetatable({}, self)
     o.pathfindUpdateMs = 0
     o.zombie = zombie
+    if nickname and type(nickname) == "string" and nickname ~= "" then
+        ChaosZombie.SetSpecificNickname(zombie, nickname)
+    end
     o.moveTargetCharacter = nil
     o.moveTargetLocation = nil
     o.lastCachedTargetMoveLocation = nil
@@ -88,6 +119,8 @@ function ChaosNPC:new(zombie)
     o.lastTimeUpdateMs = 0
     o.findEnemyTimeoutMs = 0
     o.lastZombieThatAttackedNPC = nil
+    o.lastZombieBiteTimeMs = nil
+    o.lastNpcDebugLogMs = 0
     o.spawnTimeMs = getTimestampMs()
     o.debugLastTimePathfindMs = 0
     o.attackLastTimeMs = 0
@@ -105,6 +138,28 @@ function ChaosNPC:new(zombie)
     o.stalkerTeleportCooldownMs = 0
     o.stalkerInteractionCount = 0
     o.effectMoveTargetLocation = nil
+    o.healthGroup = CHAOS_NPC_HEALTH_GROUP.DEFAULT
+    o.maxHealth = 1.0
+    o.chanceToDropWeaponOnDeath = 0.4
+    o.lastNeedHealLineMs = 0
+    o.lastGiftItemTimeMs = getTimestampMs()
+    o.canGiftItems = true
+    o.panicCheckTimeoutMs = 0
+    o.panicStartTimeMs = 0
+    o.panicTargetSquare = nil
+    o.panicCooldownEndMs = 0
+    o.panicLastSeenHealth = -1
+    o.canBePanicked = true
+    o.firearmType = nil
+    o.maxAmmo = 0
+    o.currentAmmo = 0
+    o.firearmAccuracyZombies = 1.0
+    o.firearmAccuracyPlayers = 0.25
+    o.firearmStateType = nil
+    o.firearmStateEndMs = 0
+    o.enemyDistanceFindRadius = 5.0
+    o.disableAIEffects = {}
+    o.pedestrianPauseEndMs = 0
     ChaosNPC._nextGroundWeaponClaimId = ChaosNPC._nextGroundWeaponClaimId + 1
     o.actionWorldObjectClaimToken = "npc_ground_weapon_claim_" .. tostring(ChaosNPC._nextGroundWeaponClaimId)
     return o
@@ -114,9 +169,40 @@ end
 ---@param target? IsoGameCharacter
 function ChaosNPC.SetTargetInner(npc, target)
     if not npc then return end
-    if not target then return end
 
+    ---@diagnostic disable-next-line: param-type-mismatch
     npc:setTarget(target)
+end
+
+---@param effectId string
+function ChaosNPC:AddDisableAiEffect(effectId)
+    if not effectId or effectId == "" then return end
+    if not self.disableAIEffects then self.disableAIEffects = {} end
+    self.disableAIEffects[effectId] = true
+end
+
+---@param effectId string
+function ChaosNPC:RemoveDisableAiEffect(effectId)
+    if not effectId then return end
+    if not self.disableAIEffects then return end
+    self.disableAIEffects[effectId] = nil
+end
+
+---@param effectId string
+---@return boolean
+function ChaosNPC:HasDisableAiEffect(effectId)
+    if not effectId then return false end
+    if not self.disableAIEffects then return false end
+    return self.disableAIEffects[effectId] == true
+end
+
+---@return boolean
+function ChaosNPC:HasAnyDisableAiEffect()
+    if not self.disableAIEffects then return false end
+    for _ in pairs(self.disableAIEffects) do
+        return true
+    end
+    return false
 end
 
 ---@param tag string
@@ -149,11 +235,76 @@ end
 
 ---@param message string
 function ChaosNPC:SayDebug(message)
+    if not CHAOS_NPC_DEBUG_LOGS then return end
     if not self.zombie then return end
     local zombie = self.zombie
     if not zombie:isAlive() then return end
 
     zombie:SayDebug(2, message)
+end
+
+---@param message string
+---@param say? boolean
+function ChaosNPC:DebugLog(message, say)
+    if not CHAOS_NPC_DEBUG_LOGS then return end
+    if not self.zombie then return end
+
+    local zombie = self.zombie
+    local enemyId = "nil"
+    if self.enemy then
+        enemyId = tostring(self.enemy:getID())
+    end
+
+    print(string.format(
+        "[ChaosNPC][%s] %s | state=%s current=%s bump=%s hit=%s stagger=%s moving=%s attacking=%s enemy=%s health=%.2f",
+        tostring(zombie:getID()),
+        tostring(message),
+        tostring(zombie:getActionStateName()),
+        tostring(zombie:getCurrentStateName()),
+        tostring(zombie:getBumpType()),
+        tostring(zombie:getHitReaction()),
+        tostring(zombie:isStaggerBack()),
+        tostring(self.moving),
+        tostring(self.isAttacking),
+        enemyId,
+        zombie:getHealth()
+    ))
+
+    if say then
+        self:SayDebug(tostring(message))
+    end
+end
+
+---@param message string
+---@param intervalMs? integer
+function ChaosNPC:DebugLogThrottled(message, intervalMs)
+    if not CHAOS_NPC_DEBUG_LOGS then return end
+    intervalMs = intervalMs or 1000
+    local now = ChaosMod and ChaosMod.lastTimeTickMs or getTimestampMs()
+    if now - (self.lastNpcDebugLogMs or 0) < intervalMs then return end
+    self.lastNpcDebugLogMs = now
+    self:DebugLog(message, false)
+end
+
+---@param reason string
+function ChaosNPC:CancelAttackState(reason)
+    if self.isAttacking then
+        self:DebugLog("cancel_attack: " .. tostring(reason), false)
+    end
+
+    self.isAttacking = false
+    self.attackAnimTimeMs = 0
+    self.attackAnimWindowMs = 0
+    self.attackAnimName = nil
+    self.attackHitPassed = false
+    self.attackObjectTarget = nil
+    self.attackObjectType = nil
+
+    if self.firearmStateType then
+        self.firearmStateType = nil
+        self.firearmStateEndMs = 0
+        ChaosNPCFirearms.ForceExitBumpedState(self)
+    end
 end
 
 return ChaosNPC

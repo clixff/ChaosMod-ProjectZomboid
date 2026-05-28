@@ -23,8 +23,9 @@ function EffectCloneZombies:OnStart()
             local clone = clones:getFirst()
             if clone then
                 ChaosZombie.CopyCharacterVisualsAndClothes(zombie, clone)
+                -- ChaosZombie.CopyCharacterVisualsAndClothes(zombie, clone)
                 cloneCount = cloneCount + 1
-                clone:setReanimatedPlayer(true)
+                -- clone:setReanimatedPlayer(true)
             end
         end
     end, true, z)

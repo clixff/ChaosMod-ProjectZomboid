@@ -23,7 +23,7 @@ function EffectSpawnGrieferMiner:OnStart()
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
@@ -80,4 +80,5 @@ function EffectSpawnGrieferMiner:OnStart()
     addDeathDrop("Base.Diamond", 5)
     addDeathDrop("Base.IronIngot", 3)
     addDeathDrop("Base.GoldBar", 2)
+    npc:EnterPlayerVehicle(player)
 end

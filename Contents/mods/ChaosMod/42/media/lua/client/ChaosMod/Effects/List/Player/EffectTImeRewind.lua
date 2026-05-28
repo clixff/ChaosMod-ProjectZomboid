@@ -4,7 +4,7 @@
 ---@field totalMs number
 EffectTimeRewind = ChaosEffectBase:derive("EffectTimeRewind", "time_rewind")
 
-local HISTORY_COPY_MAX = 120
+local HISTORY_COPY_MAX = 90
 
 function EffectTimeRewind:OnStart()
     ChaosEffectBase:OnStart()

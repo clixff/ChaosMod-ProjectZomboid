@@ -79,4 +79,14 @@ function ChaosLocalization.ReloadLanguages()
     if ChaosEffectsManager and ChaosEffectsManager.RefreshActiveEffectNames then
         ChaosEffectsManager.RefreshActiveEffectNames()
     end
+    if ChaosMetaEffectsRegistry and ChaosMetaEffectsRegistry.RefreshNames then
+        ChaosMetaEffectsRegistry.RefreshNames()
+    end
+    if ChaosMetaEffectsManager and ChaosMetaEffectsManager.activeEffects then
+        for _, effect in ipairs(ChaosMetaEffectsManager.activeEffects) do
+            if effect and effect.effectId then
+                effect.effectName = ChaosLocalization.GetString("effects", effect.effectId)
+            end
+        end
+    end
 end

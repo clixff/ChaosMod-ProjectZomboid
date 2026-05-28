@@ -28,8 +28,25 @@ local function ExplodeSpiffos(data)
         end
     end
 
+    local nearestIdx = 0
+    local player = getPlayer()
+    if player then
+        local px, py = player:getX(), player:getY()
+        local nearestDist = math.huge
+        for i = 1, #spawnedSquares do
+            local sq = spawnedSquares[i]
+            if sq then
+                local d = ChaosUtils.distTo(px, py, sq:getX(), sq:getY())
+                if d < nearestDist then
+                    nearestDist = d
+                    nearestIdx = i
+                end
+            end
+        end
+    end
+
     for i = 1, #spawnedSquares do
-        ChaosUtils.TriggerExplosionAt(spawnedSquares[i], EXPLOSION_RADIUS)
+        ChaosUtils.TriggerExplosionAt(spawnedSquares[i], EXPLOSION_RADIUS, true, i ~= nearestIdx)
     end
     print("[EffectSpawnExplosiveSpiffos] " .. tostring(#spawnedSquares) .. " spiffos exploded")
 end

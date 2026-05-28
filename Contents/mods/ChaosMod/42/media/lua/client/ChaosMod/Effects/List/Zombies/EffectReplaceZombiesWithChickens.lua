@@ -12,7 +12,7 @@ function EffectReplaceZombiesWithChickens:OnStart()
     local x1 = square:getX()
     local y1 = square:getY()
 
-    ChaosZombie.ForEachZombieInRange(x1, y1, 25, function(zombie)
+    ChaosZombie.ForEachZombieInRange(x1, y1, 45, function(zombie)
         if zombie and zombie:isAlive() then
             local x2 = math.floor(zombie:getX())
             local y2 = math.floor(zombie:getY())

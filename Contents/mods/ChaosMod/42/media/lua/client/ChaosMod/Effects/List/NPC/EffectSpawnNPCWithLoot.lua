@@ -37,7 +37,7 @@ function EffectSpawnNPCWithLoot:OnStart()
     local player = getPlayer()
     if not player then return end
 
-    local spawnSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, 0, 5, 10, 50, true, false, false)
+    local spawnSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 0, 3, 50, true, true, true)
     if not spawnSquare then return end
 
     local newZombies = ChaosZombie.SpawnZombieAt(
@@ -51,17 +51,18 @@ function EffectSpawnNPCWithLoot:OnStart()
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.ROBBER
     npc:AddTag("effect_move_to_square")
     self.npc = npc
 
-    for _ = 1, 3 do
+    for _ = 1, 6 do
         local itemId = GetRandomLootboxItem()
         if itemId then
             local item = instanceItem(itemId)
             if item then
+                ChaosItems.SetFullAmmoIfWeapon(item)
                 zombie:addItemToSpawnAtDeath(item)
             end
         end

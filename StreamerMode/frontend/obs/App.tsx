@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 
 interface VoteOption {
   effect_id: string;
@@ -6,15 +6,25 @@ interface VoteOption {
   effect_name: string;
   votes: number | undefined;
   hidden?: boolean;
+  duration?: number;
+}
+
+interface TwitchSubsStatus {
+  enabled: boolean;
+  show_in_obs: boolean;
+  current: number;
+  threshold: number;
 }
 
 interface ModStatus {
   voting_enabled: boolean;
+  donateEnabled?: boolean;
   total_votes: number;
   total_votes_label: string;
   vote_background_color: string;
   last_winner: string | null;
   vote_options: VoteOption[];
+  twitch_subs?: TwitchSubsStatus;
 }
 
 type DisplayMode = "hidden" | "entering" | "voting" | "results" | "hiding";
@@ -26,6 +36,9 @@ interface DisplayState {
   totalVotesLabel: string;
   bgColor: string;
   lastWinner: string | null;
+  subs: TwitchSubsStatus | null;
+  donateEnabled: boolean;
+  votingEnabled: boolean;
 }
 
 const BAR_WIDTH = 400;
@@ -74,10 +87,88 @@ function formatOptionVotes(value: number): string {
   return `${compact.toFixed(decimals).replace(/\.0$/, "")}m`;
 }
 
-function getNameFontSize(name: string): string {
-  if (name.length > 38) return "11px";
-  if (name.length > 30) return "13px";
-  return "15px";
+// Renders a vote option name. When the text fits it stays static at 16px.
+// When it's too wide it shrinks to 14px and scrolls back and forth (ping-pong
+// marquee) to reveal the full name. Every scrolling option uses the same fixed
+// cycle duration (defined in CSS) so all options move in sync regardless of
+// length — the trade-off is that longer names travel a bit faster.
+function OptionName({ text }: { text: string }) {
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [scrolling, setScrolling] = useState(false);
+  const [shift, setShift] = useState(0);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const textEl = textRef.current;
+    if (!container || !textEl) return;
+
+    // Measure imperatively so the decision is independent of the current
+    // scroll state: force 16px to test the fit, then force 14px to read the
+    // real travel distance (the narrower text overflows by less). The inline
+    // font size is restored afterwards so the className governs the rendered
+    // size again.
+    const measure = () => {
+      const cw = container.clientWidth;
+      const prevFont = textEl.style.fontSize;
+
+      textEl.style.fontSize = "16px";
+      const fitsAt16 = textEl.scrollWidth - cw <= 1;
+      if (fitsAt16) {
+        textEl.style.fontSize = prevFont;
+        setScrolling(false);
+        setShift(0);
+        return;
+      }
+
+      textEl.style.fontSize = "14px";
+      const distance = textEl.scrollWidth - cw;
+      textEl.style.fontSize = prevFont;
+      setScrolling(true);
+      setShift(distance > 1 ? distance : 0);
+    };
+
+    // ResizeObserver delivers an initial callback when observe() is called,
+    // which seeds the first measurement (so we never call setState
+    // synchronously in the effect body). It also re-measures when the votes
+    // count grows and shrinks the name's available width.
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+
+    // Montserrat loads asynchronously; re-measure once it's ready so the
+    // overflow check uses real glyph widths instead of the fallback font's.
+    let cancelled = false;
+    if (document.fonts?.ready) {
+      void document.fonts.ready.then(() => {
+        if (!cancelled) measure();
+      });
+    }
+
+    return () => {
+      cancelled = true;
+      ro.disconnect();
+    };
+  }, [text]);
+
+  // Cast: CSSProperties doesn't type custom "--" properties in an object
+  // literal, but they're valid inline-style values consumed by the keyframes.
+  const scrollStyle = { "--marquee-shift": `-${shift}px` } as CSSProperties;
+
+  return (
+    <span className="option-name" ref={containerRef}>
+      <span
+        ref={textRef}
+        className={
+          scrolling
+            ? "option-name-text option-name-text--scroll"
+            : "option-name-text"
+        }
+        style={scrolling ? scrollStyle : undefined}
+      >
+        {text}
+      </span>
+    </span>
+  );
 }
 
 export function App() {
@@ -88,6 +179,9 @@ export function App() {
     totalVotesLabel: "Total votes: %d",
     bgColor: "#9f211f",
     lastWinner: null,
+    subs: null,
+    donateEnabled: false,
+    votingEnabled: false,
   });
   const [hasSeenVoteOptions, setHasSeenVoteOptions] = useState(false);
 
@@ -109,6 +203,10 @@ export function App() {
           setHasSeenVoteOptions(true);
         }
 
+        const subs = data.twitch_subs ?? null;
+        const donateEnabled = data.donateEnabled === true;
+        const votingEnabled = data.voting_enabled === true;
+
         if (data.voting_enabled && data.vote_options.length > 0) {
           if (hideTimerRef.current !== null) {
             clearTimeout(hideTimerRef.current);
@@ -126,6 +224,9 @@ export function App() {
             totalVotesLabel: data.total_votes_label ?? "Total votes: %d",
             bgColor: data.vote_background_color,
             lastWinner: data.last_winner,
+            subs,
+            donateEnabled,
+            votingEnabled,
           });
         } else if (!data.voting_enabled && data.vote_options.length > 0) {
           const current = displayStateRef.current;
@@ -141,6 +242,9 @@ export function App() {
               totalVotesLabel: data.total_votes_label ?? "Total votes: %d",
               bgColor: data.vote_background_color,
               lastWinner: data.last_winner,
+              subs,
+              donateEnabled,
+              votingEnabled,
             }));
             hideTimerRef.current = setTimeout(() => {
               setDisplayState((prev) => ({ ...prev, mode: "hiding" }));
@@ -154,8 +258,25 @@ export function App() {
               totalVotesLabel: data.total_votes_label ?? "Total votes: %d",
               bgColor: data.vote_background_color,
               lastWinner: data.last_winner,
+              subs,
+              donateEnabled,
+              votingEnabled,
+            }));
+          } else {
+            setDisplayState((prev) => ({
+              ...prev,
+              subs,
+              donateEnabled,
+              votingEnabled,
             }));
           }
+        } else {
+          setDisplayState((prev) => ({
+            ...prev,
+            subs,
+            donateEnabled,
+            votingEnabled,
+          }));
         }
       } catch {
         // ignore network errors
@@ -171,18 +292,52 @@ export function App() {
     };
   }, []);
 
-  const { mode, options, totalVotes, totalVotesLabel, bgColor, lastWinner } = displayState;
+  const {
+    mode,
+    options,
+    totalVotes,
+    totalVotesLabel,
+    bgColor,
+    lastWinner,
+    subs,
+    votingEnabled,
+  } = displayState;
+
+  const subsEnabled = subs?.enabled === true;
+  const subsVisible = subsEnabled && subs?.show_in_obs === true;
+  const subsLine = subsVisible && subs
+    ? `Twitch Subs: ${subs.current}/${subs.threshold}`
+    : null;
+  const idleSecondLine = subsEnabled && !votingEnabled
+    ? "Waiting for mod start"
+    : "Waiting for vote";
 
   if (!hasSeenVoteOptions && mode === "hidden" && options.length === 0) {
+    if (subsVisible && subsLine) {
+      return (
+        <main className="overlay overlay--idle">
+          <div className="idle-line">{subsLine}</div>
+        </main>
+      );
+    }
     return (
       <main className="overlay overlay--idle">
         <div className="idle-line">Chaos Mod OBS is working</div>
-        <div className="idle-line">Waiting for vote</div>
+        <div className="idle-line">{idleSecondLine}</div>
       </main>
     );
   }
 
-  if (mode === "hidden" || options.length === 0) return null;
+  if (mode === "hidden" || options.length === 0) {
+    if (subsVisible && subsLine) {
+      return (
+        <main className="overlay overlay--idle">
+          <div className="idle-line">{subsLine}</div>
+        </main>
+      );
+    }
+    return null;
+  }
 
   const isResults = mode === "results" || mode === "hiding";
 
@@ -203,7 +358,12 @@ export function App() {
 
   return (
     <main className={overlayClass} onAnimationEnd={handleAnimationEnd}>
-      <div className="total-votes">{totalVotesLabel.replace("%d", formatTotalVotes(totalVotes))}</div>
+      <div className="total-votes-row">
+        <div className="total-votes">{totalVotesLabel.replace("%d", formatTotalVotes(totalVotes))}</div>
+        {subsVisible && subsLine && (
+          <div className="twitch-subs-inline">{subsLine}</div>
+        )}
+      </div>
       <div className="options">
         {options.map((opt) => {
           const barWidth = getBarWidth(opt.votes, options);
@@ -213,6 +373,11 @@ export function App() {
                 ? 1
                 : 0.5
               : 1;
+          const showDuration =
+            !opt.hidden && typeof opt.duration === "number";
+          const displayedName = showDuration
+            ? `${opt.effect_name} (${opt.duration}s)`
+            : opt.effect_name;
 
           return (
             <div key={opt.effect_id} className="option" style={{ opacity }}>
@@ -224,12 +389,7 @@ export function App() {
                 />
                 <div className="option-content">
                   <span className="option-index">{opt.index}</span>
-                  <span
-                    className="option-name"
-                    style={{ fontSize: getNameFontSize(opt.effect_name) }}
-                  >
-                    {opt.effect_name}
-                  </span>
+                  <OptionName text={displayedName} />
                   {opt.votes !== undefined && (
                     <span className="option-votes">{formatOptionVotes(opt.votes)}</span>
                   )}

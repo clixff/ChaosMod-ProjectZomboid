@@ -25,4 +25,10 @@ function EffectMedievalTimes:OnStart()
     end, true, z)
 
     print("[EffectMedievalTimes] Added helmets to " .. tostring(updatedCount) .. " zombies")
+
+    if updatedCount > 0 then
+        ChaosPlayer.SayLineByColor(player,
+            string.format(ChaosLocalization.GetString("misc", "modified_zombies"), updatedCount),
+            ChaosPlayerChatColors.green)
+    end
 end

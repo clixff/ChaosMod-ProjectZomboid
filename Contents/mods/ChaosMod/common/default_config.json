@@ -4,9 +4,13 @@
     "effects_interval": 45,
     "effects_duration_multiplier": 1.0,
     "recent_effects_block_buffer": 60,
+    "persist_recent_effects": true,
     "vote_start_time": 10,
     "hide_progress_bar": false,
     "use_voting_progress_bar_color": false,
+    "hide_effect_names": false,
+    "explosions_damage_items": true,
+    "explosions_destroy_random_item": true,
     "ui": {
         "progress_bar_color": "9f211f",
         "progress_bar_opacity": 0.9,
@@ -22,12 +26,13 @@
     },
     "ui_sounds_enabled": true,
     "ignore_effect_chances": false,
+    "npc_voicelines_enabled": true,
+    "npc_gifts_enabled": true,
     "streamer_mode": {
         "streamer_mode_enabled": true,
         "voting_enabled": false,
         "voting_mode": 0,
         "voting_options_number": 4,
-        "type": "twitch",
         "use_localhost_ip": true,
         "use_zombie_nicknames": true,
         "use_animals_nicknames": true,
@@ -35,7 +40,28 @@
         "say_killed_zombie_name": true,
         "zombie_nicknames_buffer": 150,
         "enable_donate": false,
-        "donate_providers": [],
+        "donation_systems": {
+            "donationalerts": {
+                "enabled": false,
+                "app_id": "",
+                "currency": ""
+            },
+            "twitch_bits": {
+                "enabled": false,
+                "price_multiplier": 100.0
+            },
+            "twitch_points": {
+                "enabled": false
+            },
+            "twitch_subs": {
+                "enabled": false,
+                "threshold": 1,
+                "allow_gift_subs": true,
+                "allow_resubscriptions": true,
+                "sub_tier_multipliers": true,
+                "show_in_obs": true
+            }
+        },
         "donate_price_groups": [
             {
                 "group": "positive_1",
@@ -111,6 +137,45 @@
             }
         ],
         "allow_vote_command": true,
-        "hide_votes": false
+        "hide_votes": false,
+        "youtube_chat_connection_type": "long_polling",
+        "random_effect_in_vote": true,
+        "voting_fake_effects_enabled": true,
+        "voting_fake_effects_chance": 3.0,
+        "voting_hidden_effects_enabled": true,
+        "voting_hidden_effects_chance": 3.0,
+        "reveal_hidden_effect_after_delay": true,
+        "reveal_fake_effect_after_delay": true,
+        "currencies": {
+            "main": "",
+            "list": {}
+        }
+    },
+    "meta_effects": {
+        "enabled": true,
+        "interval_sec": 900,
+        "list": [
+            {
+                "id": "total_chaos",
+                "enabled": true,
+                "voting_only": false,
+                "duration": 180,
+                "chance": 1.0,
+                "variables": {
+                    "min_time": 15,
+                    "time_multipier": 0.5
+                }
+            },
+            {
+                "id": "combo_time",
+                "enabled": true,
+                "voting_only": false,
+                "chance": 1.0,
+                "duration": 100,
+                "variables": {
+                    "effects_count": 2
+                }
+            }
+        ]
     }
 }

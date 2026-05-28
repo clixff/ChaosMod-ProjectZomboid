@@ -5,12 +5,10 @@
 ---@field worldGunItem InventoryItem?
 ---@field worldGunObj IsoWorldInventoryObject?
 ---@field lastShotMs integer
----@field lastRetargetMs integer
 ---@field lastWanderMs integer
+---@field hitPlayerCount integer
 EffectPigTurret = ChaosEffectBase:derive("EffectPigTurret", "pig_turret")
 
----@type integer
-local RETARGET_INTERVAL_MS = 4000
 ---@type integer
 local WANDER_INTERVAL_MS = 1000
 ---@type integer
@@ -45,10 +43,16 @@ local PLAYER_MISS_CHANCE = 0.8
 ---@param dist number
 ---@return number
 local function getPlayerHitChanceForDist(dist)
-    if dist <= 1.0 then return 0.45 end
+    local maxChance = 0.45
+    local minChance = 0.1
+
+    local minDist = 1.0
+    local maxDist = 15.0
+
+    if dist <= 1.0 then return maxChance end
     if dist <= 10.0 then
         local t = (dist - 1.0) / (10.0 - 1.0)
-        return 0.45 + (0.1 - 0.45) * t
+        return maxChance + (0.1 - maxChance) * t
     end
     if dist <= 15.0 then
         local t = (dist - 10.0) / (15.0 - 10.0)
@@ -116,6 +120,8 @@ function PigWeaponAttach.ensureItem(data, square)
 
     local item = instanceItem(WEAPON_ITEM_ID)
     if not item then return false end
+
+    item:setConditionNoSound(0)
 
     local placedItem = square:AddWorldInventoryItem(item, 0.5, 0.5, Z_OFFSET, false)
     if not placedItem then return false end
@@ -311,7 +317,7 @@ local function playShotEffects(pigSquare, target)
     if weapon.setJammed then weapon:setJammed(false) end
     if weapon.setContainsClip then weapon:setContainsClip(true) end
     if weapon.setRoundChambered then weapon:setRoundChambered(true) end
-    weapon:setCurrentAmmoCount(30)
+    weapon:setCurrentAmmoCount(0)
     if target and weapon.setAttackTargetSquare then
         weapon:setAttackTargetSquare(target:getSquare())
     end
@@ -361,6 +367,8 @@ local function applyShotDamage(target, weapon, attacker)
 
     if instanceof(target, "IsoPlayer") then
         damage = damage * 0.5
+    else
+        damage = damage * 2.0
     end
 
     target:Hit(weapon, attacker, damage, false, 1.0, false)
@@ -397,13 +405,18 @@ local function firePigTurret(self)
     if weapon.setJammed then weapon:setJammed(false) end
     if weapon.setContainsClip then weapon:setContainsClip(true) end
     if weapon.setRoundChambered then weapon:setRoundChambered(true) end
-    weapon:setCurrentAmmoCount(30)
+    weapon:setCurrentAmmoCount(0)
     if weapon.setAttackTargetSquare then
         weapon:setAttackTargetSquare(target:getSquare())
     end
 
     local missChance
     if instanceof(target, "IsoPlayer") then
+        if self.hitPlayerCount >= 2 then
+            return
+        end
+
+
         local dist = ChaosUtils.distTo(pigSquare:getX(), pigSquare:getY(), target:getX(), target:getY())
         missChance = 1.0 - getPlayerHitChanceForDist(dist)
     else
@@ -412,6 +425,8 @@ local function firePigTurret(self)
     if ChaosUtils.RandFloat(0, 1) <= missChance then
         return
     end
+
+
 
     local attacker = createFakeAttacker(pigSquare, target)
     applyShotDamage(target, weapon, attacker)
@@ -443,55 +458,10 @@ function EffectPigTurret:OnStart()
     self.pig:changeStress(80)
     self.pig:updateStress()
     self.lastShotMs = 0
-    self.lastRetargetMs = 0
     self.lastWanderMs = 0
+    self.hitPlayerCount = 0
 
     PigWeaponAttach.update(self.pig, self)
-end
-
----@param pigSquare IsoGridSquare
----@return IsoZombie?
-local function findRetargetZombie(pigSquare)
-    local zombies = ChaosZombie.GetNearestZombies(
-        pigSquare:getX(),
-        pigSquare:getY(),
-        MAX_ATTACK_DIST,
-        true,
-        pigSquare:getZ()
-    )
-
-    local nearestZombie = nil
-    local nearestDist = math.huge
-
-    for i = 0, zombies:size() - 1 do
-        local zombie = zombies:get(i)
-        if zombie and zombie:isAlive() then
-            local zSquare = zombie:getSquare()
-            if zSquare and zSquare:getZ() == pigSquare:getZ() then
-                local dist = ChaosUtils.distTo(pigSquare:getX(), pigSquare:getY(), zombie:getX(), zombie:getY())
-                if dist < nearestDist then
-                    nearestDist = dist
-                    nearestZombie = zombie
-                end
-            end
-        end
-    end
-
-    return nearestZombie
-end
-
----@param self EffectPigTurret
-local function updateRetarget(self)
-    if not self.specialAnimal or not self.pig then return end
-
-    local now = getTimestampMs()
-    if now - (self.lastRetargetMs or 0) < RETARGET_INTERVAL_MS then return end
-    self.lastRetargetMs = now
-
-    local pigSquare = self.pig:getCurrentSquare()
-    if not pigSquare then return end
-
-    self.specialAnimal.followCharacter = findRetargetZombie(pigSquare)
 end
 
 ---@param pig IsoAnimal
@@ -500,9 +470,12 @@ local function pathPigToRandomNearbyLocation(pig, pigSquare)
     local cell = getCell()
     if not cell then return end
 
-    local pigZ = pigSquare:getZ()
-    local baseX = pigSquare:getX()
-    local baseY = pigSquare:getY()
+    local player = getPlayer()
+    if not player then return end
+
+    local pigZ = player:getZ()
+    local baseX = player:getX()
+    local baseY = player:getY()
 
     for _ = 1, WANDER_MAX_TRIES do
         local dx = ChaosUtils.RandIntegerRange(-WANDER_RADIUS, WANDER_RADIUS + 1)
@@ -512,6 +485,7 @@ local function pathPigToRandomNearbyLocation(pig, pigSquare)
             local ty = baseY + dy
             local sq = cell:getGridSquare(tx, ty, pigZ)
             if sq and sq:getFloor() and not sq:isSolid() and not sq:isSolidTrans() then
+                ---@diagnostic disable-next-line: param-type-mismatch
                 pig:pathToLocation(tx, ty, pigZ)
                 return
             end
@@ -522,10 +496,7 @@ end
 ---@param self EffectPigTurret
 local function updateWander(self)
     local pig = self.pig
-    if not pig or not self.specialAnimal then return end
-
-    local follow = self.specialAnimal.followCharacter
-    if follow and follow:isAlive() then return end
+    if not pig then return end
 
     local now = getTimestampMs()
     if now - (self.lastWanderMs or 0) < WANDER_INTERVAL_MS then return end
@@ -541,7 +512,6 @@ end
 function EffectPigTurret:OnTick(deltaMs)
     if not self.pig or self.pig:isDead() then return end
 
-    updateRetarget(self)
     updateWander(self)
 
     -- local debugPlayer = getPlayer()

@@ -21,12 +21,47 @@ export interface DonatePriceGroup {
   price: number;
 }
 
+export interface DonationSystemDonationAlerts {
+  enabled: boolean;
+  app_id: string;
+  currency: string;
+}
+
+export interface DonationSystemTwitchBits {
+  enabled: boolean;
+  price_multiplier: number;
+}
+
+export interface DonationSystemTwitchPoints {
+  enabled: boolean;
+}
+
+export interface DonationSystemTwitchSubs {
+  enabled: boolean;
+  threshold: number;
+  allow_gift_subs: boolean;
+  allow_resubscriptions: boolean;
+  sub_tier_multipliers: boolean;
+  show_in_obs: boolean;
+}
+
+export interface DonationSystemsConfig {
+  donationalerts: DonationSystemDonationAlerts;
+  twitch_bits: DonationSystemTwitchBits;
+  twitch_points: DonationSystemTwitchPoints;
+  twitch_subs: DonationSystemTwitchSubs;
+}
+
+export interface CurrenciesConfig {
+  main: string;
+  list: Record<string, number>;
+}
+
 export interface StreamerModeConfig {
   streamer_mode_enabled: boolean;
   voting_enabled: boolean;
   voting_mode: number;
   voting_options_number: number;
-  type: string;
   use_localhost_ip: boolean;
   use_zombie_nicknames: boolean;
   use_animals_nicknames: boolean;
@@ -34,10 +69,34 @@ export interface StreamerModeConfig {
   say_killed_zombie_name: boolean;
   zombie_nicknames_buffer: number;
   enable_donate: boolean;
-  donate_providers: string[];
+  donation_systems: DonationSystemsConfig;
   donate_price_groups: DonatePriceGroup[];
   allow_vote_command: boolean;
   hide_votes: boolean;
+  youtube_chat_connection_type: "long_polling" | "message_streaming";
+  random_effect_in_vote: boolean;
+  voting_fake_effects_enabled: boolean;
+  voting_fake_effects_chance: number;
+  voting_hidden_effects_enabled: boolean;
+  voting_hidden_effects_chance: number;
+  reveal_hidden_effect_after_delay: boolean;
+  reveal_fake_effect_after_delay: boolean;
+  currencies: CurrenciesConfig;
+}
+
+export interface MetaEffectEntry {
+  id: string;
+  enabled: boolean;
+  voting_only: boolean;
+  duration: number;
+  chance: number;
+  variables: Record<string, unknown>;
+}
+
+export interface MetaEffectsConfig {
+  enabled: boolean;
+  interval_sec: number;
+  list: MetaEffectEntry[];
 }
 
 export interface ModConfig {
@@ -46,12 +105,19 @@ export interface ModConfig {
   effects_interval: number;
   effects_duration_multiplier: number;
   recent_effects_block_buffer: number;
+  persist_recent_effects: boolean;
   vote_start_time: number;
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
+  hide_effect_names: boolean;
+  explosions_damage_items: boolean;
+  explosions_destroy_random_item: boolean;
   ui: UIConfig;
   ui_sounds_enabled: boolean;
   ignore_effect_chances: boolean;
+  npc_voicelines_enabled: boolean;
+  npc_gifts_enabled: boolean;
+  meta_effects: MetaEffectsConfig;
   streamer_mode: StreamerModeConfig;
 }
 
@@ -69,11 +135,6 @@ function bool(val: unknown, def: boolean): boolean {
 }
 function num(val: unknown, def: number): number {
   return typeof val === "number" ? val : def;
-}
-function strArr(val: unknown, def: string[]): string[] {
-  return Array.isArray(val)
-    ? val.filter((v): v is string => typeof v === "string")
-    : def;
 }
 function priceGroupArr(
   val: unknown,
@@ -127,12 +188,25 @@ const DEFAULT_DONATE_PRICE_GROUPS: DonatePriceGroup[] = [
   { group: "neutral_6", price: 10 },
 ];
 
+const DEFAULT_DONATION_SYSTEMS: DonationSystemsConfig = {
+  donationalerts: { enabled: false, app_id: "", currency: "" },
+  twitch_bits: { enabled: false, price_multiplier: 100.0 },
+  twitch_points: { enabled: false },
+  twitch_subs: {
+    enabled: false,
+    threshold: 1,
+    allow_gift_subs: true,
+    allow_resubscriptions: true,
+    sub_tier_multipliers: true,
+    show_in_obs: true,
+  },
+};
+
 const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   streamer_mode_enabled: true,
   voting_enabled: false,
   voting_mode: 0,
   voting_options_number: 4,
-  type: "twitch",
   use_localhost_ip: true,
   use_zombie_nicknames: true,
   use_animals_nicknames: true,
@@ -140,10 +214,25 @@ const DEFAULT_STREAMER_MODE: StreamerModeConfig = {
   say_killed_zombie_name: true,
   zombie_nicknames_buffer: 150,
   enable_donate: false,
-  donate_providers: [],
+  donation_systems: DEFAULT_DONATION_SYSTEMS,
   donate_price_groups: DEFAULT_DONATE_PRICE_GROUPS,
   allow_vote_command: true,
   hide_votes: false,
+  youtube_chat_connection_type: "long_polling",
+  random_effect_in_vote: true,
+  voting_fake_effects_enabled: true,
+  voting_fake_effects_chance: 5.0,
+  voting_hidden_effects_enabled: true,
+  voting_hidden_effects_chance: 5.0,
+  reveal_hidden_effect_after_delay: true,
+  reveal_fake_effect_after_delay: true,
+  currencies: { main: "", list: {} },
+};
+
+const DEFAULT_META_EFFECTS: MetaEffectsConfig = {
+  enabled: true,
+  interval_sec: 900,
+  list: [],
 };
 
 const DEFAULT_CONFIG: ModConfig = {
@@ -152,14 +241,56 @@ const DEFAULT_CONFIG: ModConfig = {
   effects_interval: 45,
   effects_duration_multiplier: 1.0,
   recent_effects_block_buffer: 90,
+  persist_recent_effects: true,
   vote_start_time: 15,
   hide_progress_bar: false,
   use_voting_progress_bar_color: false,
+  hide_effect_names: false,
+  explosions_damage_items: true,
+  explosions_destroy_random_item: true,
   ui: DEFAULT_UI,
   ui_sounds_enabled: true,
   ignore_effect_chances: false,
+  npc_voicelines_enabled: true,
+  npc_gifts_enabled: true,
+  meta_effects: DEFAULT_META_EFFECTS,
   streamer_mode: DEFAULT_STREAMER_MODE,
 };
+
+function parseMetaEffects(raw: Record<string, unknown>): MetaEffectsConfig {
+  const d = DEFAULT_META_EFFECTS;
+  const list: MetaEffectEntry[] = [];
+  const rawList = raw["list"];
+  if (Array.isArray(rawList)) {
+    for (const item of rawList) {
+      if (item === null || typeof item !== "object" || Array.isArray(item)) {
+        continue;
+      }
+      const r = item as Record<string, unknown>;
+      if (typeof r["id"] !== "string" || r["id"] === "") continue;
+      const variables =
+        r["variables"] !== null &&
+        typeof r["variables"] === "object" &&
+        !Array.isArray(r["variables"])
+          ? (r["variables"] as Record<string, unknown>)
+          : {};
+      list.push({
+        id: r["id"],
+        enabled: typeof r["enabled"] === "boolean" ? r["enabled"] : false,
+        voting_only:
+          typeof r["voting_only"] === "boolean" ? r["voting_only"] : false,
+        duration: typeof r["duration"] === "number" ? r["duration"] : 0,
+        chance: typeof r["chance"] === "number" ? r["chance"] : 0,
+        variables,
+      });
+    }
+  }
+  return {
+    enabled: bool(raw["enabled"], d.enabled),
+    interval_sec: num(raw["interval_sec"], d.interval_sec),
+    list,
+  };
+}
 
 function cloneConfig(config: ModConfig): ModConfig {
   return JSON.parse(JSON.stringify(config)) as ModConfig;
@@ -227,6 +358,67 @@ function parseUI(raw: Record<string, unknown>): UIConfig {
   };
 }
 
+function parseDonationSystems(
+  raw: Record<string, unknown>,
+): DonationSystemsConfig {
+  const d = DEFAULT_DONATION_SYSTEMS;
+  const da = obj(raw["donationalerts"]);
+  const bits = obj(raw["twitch_bits"]);
+  const points = obj(raw["twitch_points"]);
+  const subs = obj(raw["twitch_subs"]);
+  const multiplier = num(
+    bits["price_multiplier"],
+    d.twitch_bits.price_multiplier,
+  );
+  const subsThresholdRaw = num(subs["threshold"], d.twitch_subs.threshold);
+  const subsThreshold = Math.max(1, Math.floor(subsThresholdRaw));
+  return {
+    donationalerts: {
+      enabled: bool(da["enabled"], d.donationalerts.enabled),
+      app_id: str(da["app_id"], d.donationalerts.app_id),
+      currency: str(da["currency"], d.donationalerts.currency),
+    },
+    twitch_bits: {
+      enabled: bool(bits["enabled"], d.twitch_bits.enabled),
+      price_multiplier:
+        multiplier > 0 ? multiplier : d.twitch_bits.price_multiplier,
+    },
+    twitch_points: {
+      enabled: bool(points["enabled"], d.twitch_points.enabled),
+    },
+    twitch_subs: {
+      enabled: bool(subs["enabled"], d.twitch_subs.enabled),
+      threshold: subsThreshold,
+      allow_gift_subs: bool(subs["allow_gift_subs"], d.twitch_subs.allow_gift_subs),
+      allow_resubscriptions: bool(
+        subs["allow_resubscriptions"],
+        d.twitch_subs.allow_resubscriptions,
+      ),
+      sub_tier_multipliers: bool(
+        subs["sub_tier_multipliers"],
+        d.twitch_subs.sub_tier_multipliers,
+      ),
+      show_in_obs: bool(subs["show_in_obs"], d.twitch_subs.show_in_obs),
+    },
+  };
+}
+
+function parseCurrencies(raw: Record<string, unknown>): CurrenciesConfig {
+  const main = str(raw["main"], "").trim().toUpperCase();
+  const rawList = obj(raw["list"]);
+  const list: Record<string, number> = {};
+  for (const [code, value] of Object.entries(rawList)) {
+    const upper = code.trim().toUpperCase();
+    if (!/^[A-Z]{3}$/.test(upper)) continue;
+    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+      continue;
+    }
+    if (upper === main) continue;
+    list[upper] = value;
+  }
+  return { main, list };
+}
+
 function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
   const d = DEFAULT_STREAMER_MODE;
   return {
@@ -243,7 +435,6 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
         Math.floor(num(raw["voting_options_number"], d.voting_options_number)),
       ),
     ),
-    type: str(raw["type"], d.type),
     use_localhost_ip: bool(raw["use_localhost_ip"], d.use_localhost_ip),
     use_zombie_nicknames: bool(
       raw["use_zombie_nicknames"],
@@ -266,13 +457,46 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
       d.zombie_nicknames_buffer,
     ),
     enable_donate: bool(raw["enable_donate"], d.enable_donate),
-    donate_providers: strArr(raw["donate_providers"], d.donate_providers),
+    donation_systems: parseDonationSystems(obj(raw["donation_systems"])),
     donate_price_groups: priceGroupArr(
       raw["donate_price_groups"],
       d.donate_price_groups,
     ),
     allow_vote_command: bool(raw["allow_vote_command"], d.allow_vote_command),
     hide_votes: bool(raw["hide_votes"], d.hide_votes),
+    youtube_chat_connection_type:
+      raw["youtube_chat_connection_type"] === "message_streaming"
+        ? "message_streaming"
+        : "long_polling",
+    random_effect_in_vote: bool(
+      raw["random_effect_in_vote"],
+      d.random_effect_in_vote,
+    ),
+    voting_fake_effects_enabled: bool(
+      raw["voting_fake_effects_enabled"],
+      d.voting_fake_effects_enabled,
+    ),
+    voting_fake_effects_chance: num(
+      raw["voting_fake_effects_chance"],
+      d.voting_fake_effects_chance,
+    ),
+    voting_hidden_effects_enabled: bool(
+      raw["voting_hidden_effects_enabled"],
+      d.voting_hidden_effects_enabled,
+    ),
+    voting_hidden_effects_chance: num(
+      raw["voting_hidden_effects_chance"],
+      d.voting_hidden_effects_chance,
+    ),
+    reveal_hidden_effect_after_delay: bool(
+      raw["reveal_hidden_effect_after_delay"],
+      d.reveal_hidden_effect_after_delay,
+    ),
+    reveal_fake_effect_after_delay: bool(
+      raw["reveal_fake_effect_after_delay"],
+      d.reveal_fake_effect_after_delay,
+    ),
+    currencies: parseCurrencies(obj(raw["currencies"])),
   };
 }
 
@@ -330,6 +554,13 @@ export function saveConfig(luaFolder: string, config: ModConfig): void {
     let existingRaw: Record<string, unknown> = {};
     if (existsSync(configPath)) {
       existingRaw = obj(JSON.parse(readFileSync(configPath, "utf-8")));
+    }
+    // streamer_mode.currencies is a user-managed list of currency rates;
+    // removing an entry must propagate to disk. Drop the existing block so the
+    // merge takes the new in-memory value verbatim instead of merging maps.
+    const existingSm = existingRaw["streamer_mode"];
+    if (isPlainObject(existingSm) && "currencies" in existingSm) {
+      delete existingSm["currencies"];
     }
     const merged = mergeDefaultsPreservingUnknowns(existingRaw, config);
     writeFileSync(configPath, JSON.stringify(merged, null, 4), "utf-8");
@@ -396,11 +627,24 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
       raw["recent_effects_block_buffer"],
       d.recent_effects_block_buffer,
     ),
+    persist_recent_effects: bool(
+      raw["persist_recent_effects"],
+      d.persist_recent_effects,
+    ),
     vote_start_time: num(raw["vote_start_time"], d.vote_start_time),
     hide_progress_bar: bool(raw["hide_progress_bar"], d.hide_progress_bar),
     use_voting_progress_bar_color: bool(
       raw["use_voting_progress_bar_color"],
       d.use_voting_progress_bar_color,
+    ),
+    hide_effect_names: bool(raw["hide_effect_names"], d.hide_effect_names),
+    explosions_damage_items: bool(
+      raw["explosions_damage_items"],
+      d.explosions_damage_items,
+    ),
+    explosions_destroy_random_item: bool(
+      raw["explosions_destroy_random_item"],
+      d.explosions_destroy_random_item,
     ),
     ui: parseUI(obj(raw["ui"])),
     ui_sounds_enabled: bool(raw["ui_sounds_enabled"], d.ui_sounds_enabled),
@@ -408,6 +652,12 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
       raw["ignore_effect_chances"],
       d.ignore_effect_chances,
     ),
+    npc_voicelines_enabled: bool(
+      raw["npc_voicelines_enabled"],
+      d.npc_voicelines_enabled,
+    ),
+    npc_gifts_enabled: bool(raw["npc_gifts_enabled"], d.npc_gifts_enabled),
+    meta_effects: parseMetaEffects(obj(raw["meta_effects"])),
     streamer_mode: parseStreamerMode(obj(raw["streamer_mode"])),
   };
 }

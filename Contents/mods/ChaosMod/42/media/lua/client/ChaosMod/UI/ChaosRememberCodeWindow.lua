@@ -40,7 +40,7 @@ function ChaosRememberCodeWindow:new(effect, code)
     o.code = code
     o.startTimeMs = getTimestampMs()
     o.durationMs = math.floor(effect.duration * 1000)
-    o.revealDurationMs = 2900
+    o.revealDurationMs = 1500
     o.resolved = false
     o.isCodeHidden = false
 

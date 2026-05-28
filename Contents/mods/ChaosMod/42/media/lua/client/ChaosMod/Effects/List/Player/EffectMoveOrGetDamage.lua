@@ -9,7 +9,7 @@ EffectMoveOrGetDamage = ChaosEffectBase:derive("EffectMoveOrGetDamage", "move_or
 
 local CHECK_INTERVAL_MS = 1000
 local MOVE_THRESHOLD = 1.0
-local DAMAGE_COOLDOWN_MS = 5000
+local DAMAGE_COOLDOWN_MS = 7500
 
 function EffectMoveOrGetDamage:OnStart()
     ChaosEffectBase:OnStart()
@@ -17,7 +17,7 @@ function EffectMoveOrGetDamage:OnStart()
     self.cooldownMs = DAMAGE_COOLDOWN_MS
     self.accumulatedDist = 0
 
-    ChaosPlayer.SayLineByColor(getPlayer(), "Move or get damage", ChaosPlayerChatColors.red)
+    ChaosPlayer.SayLineByColor(getPlayer(), "Move Or Take Damage", ChaosPlayerChatColors.red)
 
     local player = getPlayer()
     if player then

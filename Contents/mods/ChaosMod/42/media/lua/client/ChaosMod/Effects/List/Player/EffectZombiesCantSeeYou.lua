@@ -2,14 +2,22 @@
 ---@field affectedZombies table<IsoZombie, boolean>
 EffectZombiesCantSeeYou = ChaosEffectBase:derive("EffectZombiesCantSeeYou", "zombies_cant_see_you")
 
+---@param character IsoGameCharacter
+local function handlePlayerUpdate(character)
+    if not character then return end
+    character:setTargetAlpha(0.5)
+end
+
 function EffectZombiesCantSeeYou:OnStart()
     ChaosEffectBase:OnStart()
     self.affectedZombies = {}
+    Events.OnPlayerUpdate.Add(handlePlayerUpdate)
 end
 
 function EffectZombiesCantSeeYou:OnTick(deltaMs)
     local player = getPlayer()
     if not player then return end
+
 
     local px, py, pz = player:getX(), player:getY(), player:getZ()
     ChaosZombie.ForEachZombieInRange(px, py, 30, function(zombie)
@@ -27,6 +35,7 @@ end
 
 function EffectZombiesCantSeeYou:OnEnd()
     ChaosEffectBase:OnEnd()
+    Events.OnPlayerUpdate.Remove(handlePlayerUpdate)
     if self.affectedZombies then
         for zombie, _ in pairs(self.affectedZombies) do
             if zombie then

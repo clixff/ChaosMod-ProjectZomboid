@@ -1,15 +1,21 @@
-import { logger } from "../utils/logger.ts";
-import type { ModConfig } from "../config.ts";
 import { TwitchProvider } from "./TwitchProvider.ts";
+import { TwitchChatProvider } from "./TwitchChatProvider.ts";
+import { YouTubeChatProvider } from "./youtube/YouTubeChatProvider.ts";
 
 export type { StreamerUser } from "./TwitchProvider.ts";
-export { TwitchProvider };
+export type {
+  ChatProvider,
+  ChatProviderKey,
+  NormalizedChatMessage,
+} from "./ChatProvider.ts";
+export { TwitchProvider, TwitchChatProvider, YouTubeChatProvider };
 
-export type AnyProvider = TwitchProvider;
-
-export function createProvider(config: ModConfig | null): AnyProvider | null {
-  const type = config?.streamer_mode?.type ?? "twitch";
-  if (type === "twitch") return new TwitchProvider();
-  logger.warn(`Unknown streamer provider type: "${type}"`);
-  return null;
+export function createChatProviders(): {
+  twitch: TwitchChatProvider;
+  youtube: YouTubeChatProvider;
+} {
+  return {
+    twitch: new TwitchChatProvider(),
+    youtube: new YouTubeChatProvider(),
+  };
 }

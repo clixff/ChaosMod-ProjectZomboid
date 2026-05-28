@@ -6,9 +6,16 @@
 ---@field lastIsSleeping boolean -- Whether the player was sleeping last tick
 ---@field sleepWorldLocation {x: number, y: number, z: number} | nil -- World position where player last fell asleep
 ---@field playerSpawnPoint {x: number, y: number, z: number} | nil -- World position where player first spawned this save
----@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 2 recorded player world positions, oldest first
----@field playerPreviousPositionsSampleMs integer
+---@field playerPreviousPositions table<integer, {x: number, y: number, z: number}> -- Last 20 recorded player world positions, oldest first
+---@field playerPreviousPositionsTimer ChaosManualTimer | nil
+---@field ScannedBasementLatest {x: number, y: number, z: number} | nil -- Most recently scanned nearby basement square (Z=-1), updated alongside playerPreviousPositions
 ---@field DEBUG_SQUARE_RING_SEARCH boolean -- When true, SquareRingSearchTile_2D prints a per-ring non-null tile count at Z=0
+---@field crashDamage { originalValue: boolean|nil, disabled: boolean } -- Tracks the sandbox PlayerDamageFromCrash override state
+---@field EFFECT_FLYING_CARS_ENABLED boolean -- When true, forces crash damage off regardless of NPC count
+---@field EFFECT_EARTHQUAKE_ENABLED boolean -- When true, forces crash damage off (earthquake violently shakes cars)
+---@field EFFECT_HURRICANE_ENABLED boolean -- When true, forces crash damage off (hurricane flings cars across the ground)
+---@field EFFECT_BLACK_HOLE_ENABLED boolean -- When true, forces crash damage off (black hole pulls cars toward a center)
+---@field EFFECT_DOOMSDAY_ENABLED boolean -- When true, forces crash damage off (doomsday flings cars across the ground)
 ChaosUtils = ChaosUtils or {
     DEBUG_SQUARE_RING_SEARCH = false,
     lastUsedVehicle = nil,
@@ -19,7 +26,14 @@ ChaosUtils = ChaosUtils or {
     sleepWorldLocation = nil,
     playerSpawnPoint = nil,
     playerPreviousPositions = {},
-    playerPreviousPositionsSampleMs = 0
+    playerPreviousPositionsTimer = nil,
+    ScannedBasementLatest = nil,
+    crashDamage = { originalValue = nil, disabled = false },
+    EFFECT_FLYING_CARS_ENABLED = false,
+    EFFECT_EARTHQUAKE_ENABLED = false,
+    EFFECT_HURRICANE_ENABLED = false,
+    EFFECT_BLACK_HOLE_ENABLED = false,
+    EFFECT_DOOMSDAY_ENABLED = false
 }
 
 local SLEEP_MOD_DATA_KEY = "ChaosMod_SleepData"
@@ -69,10 +83,34 @@ function ChaosUtils.sleepHandleTick()
     end
 end
 
+local LAST_DEATH_FILE = "ChaosMod/last_death.txt"
+
+--- Writes the player's death position (floored) to last_death.txt as "x y z".
+---@param x number
+---@param y number
+---@param z number
+function ChaosUtils.SaveDeathPosition(x, y, z)
+    local text = string.format("%d %d %d", math.floor(x), math.floor(y), math.floor(z))
+    ChaosFileReader.WriteTextToCache(LAST_DEATH_FILE, text)
+end
+
+--- Reads the last recorded death position from last_death.txt.
+---@return number? x
+---@return number? y
+---@return number? z
+function ChaosUtils.GetLatestDeathPosition()
+    local content = ChaosFileReader.ReadFileFromCacheAllLines(LAST_DEATH_FILE)
+    if not content then return nil end
+    local xs, ys, zs = content:match("(%-?%d+)%s+(%-?%d+)%s+(%-?%d+)")
+    if not (xs and ys and zs) then return nil end
+    return tonumber(xs), tonumber(ys), tonumber(zs)
+end
+
 local POSITION_SAMPLE_INTERVAL_MS = 1000
 local POSITION_HISTORY_MAX = 120
 local PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS = 60000
-local PREVIOUS_LOCATION_MAX = 2
+local PREVIOUS_LOCATION_MAX = 20
+local PREVIOUS_LOCATION_BASEMENT_SCAN_RADIUS = 100
 
 --- Records the local player's position once per second (call only when ChaosMod is enabled).
 ---@param deltaMs integer
@@ -96,13 +134,44 @@ function ChaosUtils.TrackPlayerPosition(deltaMs)
     end
 end
 
---- Records the player's location every 60 seconds, keeping only the last 2 entries (oldest first).
+--- Scans for the nearest valid Z=-1 basement square within radius of the player and caches it.
+---@param player IsoPlayer
+local function scanNearestBasement(player)
+    local square = player:getSquare()
+    if not square then return end
+
+    local px, py = square:getX(), square:getY()
+    ---@type IsoGridSquare | nil
+    local found = nil
+
+    ChaosUtils.SquareRingSearchTile_2D(px, py, function(sq)
+        if sq and sq:getWall() == nil then
+            found = sq
+            return true
+        end
+    end, 0, PREVIOUS_LOCATION_BASEMENT_SCAN_RADIUS, true, true, true, -1, -1)
+
+    if found then
+        ChaosUtils.ScannedBasementLatest = {
+            x = found:getX(),
+            y = found:getY(),
+            z = found:getZ()
+        }
+    end
+end
+
+--- Records the player's location every 60 seconds, keeping only the last 20 entries (oldest first).
+--- Also scans for and caches the nearest valid basement square (Z=-1) on each sample.
 ---@param deltaMs integer
 function ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
-    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs + deltaMs
-    if ChaosUtils.playerPreviousPositionsSampleMs < PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS then return end
-    ChaosUtils.playerPreviousPositionsSampleMs = ChaosUtils.playerPreviousPositionsSampleMs -
-        PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS
+    if not ChaosUtils.playerPreviousPositionsTimer then
+        ChaosUtils.playerPreviousPositionsTimer = ChaosManualTimer.new(PREVIOUS_LOCATION_SAMPLE_INTERVAL_MS)
+    end
+
+    local timer = ChaosUtils.playerPreviousPositionsTimer
+    timer:add(deltaMs)
+    if not timer:isEnded() then return end
+    timer:reset()
 
     local player = getPlayer()
     if not player then return end
@@ -117,6 +186,8 @@ function ChaosUtils.TrackPlayerPreviousPositions(deltaMs)
     while #ChaosUtils.playerPreviousPositions > PREVIOUS_LOCATION_MAX do
         table.remove(ChaosUtils.playerPreviousPositions, 1)
     end
+
+    scanNearestBasement(player)
 end
 
 ---@param obj IsoObject
@@ -132,26 +203,57 @@ function ChaosUtils.RemovePropExplosion(obj)
         return
     end
 
+    if instanceof(obj, "IsoDoor") or instanceof(obj, "IsoThumpable") then
+        ---@type IsoDoor | IsoThumpable
+        local door = obj
+
+        if door.isDoor and not door:isDoor() then
+            return
+        end
+
+        door:destroy()
+    end
+
     local containerCount = obj:getContainerCount()
-    if not containerCount or containerCount == 0 then return end
     local sq = obj:getSquare()
     if not sq then return end
-    for i = 0, containerCount - 1 do
-        local container = obj:getContainerByIndex(i)
-        if container then
-            local items = container:getItems()
-            ---@type InventoryItem[]
-            local snapshot = {}
-            for j = 0, items:size() - 1 do
-                table.insert(snapshot, items:get(j))
-            end
-            for _, item in ipairs(snapshot) do
-                local ox = ChaosUtils.RandFloat(0.15, 0.85)
-                local oy = ChaosUtils.RandFloat(0.15, 0.85)
-                sq:AddWorldInventoryItem(item, ox, oy, 0.0)
+    if containerCount and containerCount > 0 then
+        for i = 0, containerCount - 1 do
+            local container = obj:getContainerByIndex(i)
+            if container then
+                local items = container:getItems()
+                ---@type InventoryItem[]
+                local snapshot = {}
+                for j = 0, items:size() - 1 do
+                    table.insert(snapshot, items:get(j))
+                end
+                for _, item in ipairs(snapshot) do
+                    local ox = ChaosUtils.RandFloat(0.15, 0.85)
+                    local oy = ChaosUtils.RandFloat(0.15, 0.85)
+                    sq:AddWorldInventoryItem(item, ox, oy, 0.0)
+                end
             end
         end
     end
+
+    local isContainer = containerCount > 0
+    local isFurniture = ChaosProps.GetFurnitureType(obj) ~= nil
+
+    if isContainer == false and isFurniture == false then
+        return
+    end
+
+    local x = math.floor(obj:getX())
+    local y = math.floor(obj:getY())
+    local z = math.floor(obj:getZ())
+
+    getPlayer():playSound("BreakObject")
+    addSound(getPlayer(), x, y, z, 10, 10)
+
+    print("removing prop with expl")
+
+    sq:AddWorldInventoryItem("Base.UnusableWood", ChaosUtils.RandFloat(0.1, 0.9), ChaosUtils.RandFloat(0.1, 0.9), 0)
+    sq:transmitRemoveItemFromSquare(obj)
 
     local square = obj:getSquare()
     if square then
@@ -164,9 +266,22 @@ end
 ---@param square IsoGridSquare
 ---@param explosionRange integer | nil defaults to 5
 ---@param shouldRemoveProps boolean | nil defaults to true
-function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps)
+---@param disableSounds boolean | nil defaults to false; when true the explosion plays no bang sound
+---@return boolean playerWasInRadius true if the player was within the explosion radius
+function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps, disableSounds)
     explosionRange = explosionRange or 5
     if shouldRemoveProps == nil then shouldRemoveProps = true end
+    if disableSounds == nil then disableSounds = false end
+
+    local prePlayer = getPlayer()
+    if prePlayer and prePlayer:getVehicle() then
+        local sqX, sqY, sqZ = square:getX(), square:getY(), square:getZ()
+        if math.floor(prePlayer:getZ()) == sqZ
+            and ChaosUtils.isInRange(sqX, sqY, prePlayer:getX(), prePlayer:getY(), explosionRange)
+        then
+            ChaosVehicle.ExitVehicle(prePlayer)
+        end
+    end
 
     if shouldRemoveProps then
         local x, y, z = square:getX(), square:getY(), square:getZ()
@@ -191,7 +306,11 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
     trap:setSmokeRange(5)
     trap:setNoiseRange(20)
     trap:setInstantExplosion(false)
-    trap:setExplosionSound("BigExplosion")
+    if disableSounds then
+        trap:setExplosionSound("")
+    else
+        trap:setExplosionSound("BigExplosion")
+    end
 
     ---@diagnostic disable-next-line: deprecated
     trap:triggerExplosion()
@@ -199,6 +318,8 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
     local expX = square:getX()
     local expY = square:getY()
     local expZ = square:getZ()
+
+    local playerWasInRadius = false
 
     local player = getPlayer()
     if player then
@@ -209,7 +330,14 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
         local playerZ = player:getZ()
         local isSameZ = expZ == playerZ
         if square and isSameZ and ChaosUtils.isInRange(expX, expY, playerX, playerY, explosionRange) then
+            playerWasInRadius = true
             player:setKnockedDown(true)
+            if ChaosConfig.explosions_destroy_random_item ~= false then
+                ChaosUtils.RemoveRandomItem(player, true)
+            end
+            if ChaosConfig.explosions_damage_items ~= false then
+                ChaosUtils.DamageAllItems(player, 0.35)
+            end
         end
     end
 
@@ -219,6 +347,30 @@ function ChaosUtils.TriggerExplosionAt(square, explosionRange, shouldRemoveProps
             zombie:knockDown(isBehindZombie)
         end
     end, false, expZ)
+
+    local nearbyVehicles = ChaosVehicle.GetVehiclesNearby(square, explosionRange + 2)
+    for i = 0, nearbyVehicles:size() - 1 do
+        local nearbyVehicle = nearbyVehicles:get(i)
+        if nearbyVehicle and expZ == 0 then
+            ChaosVehicle.DamageVehicleFromExplosion(nearbyVehicle)
+            ChaosVehicle.AddVehicleImpulseAtExplosion(nearbyVehicle, expX, expY, expZ)
+        end
+    end
+
+    local cell = getCell()
+    if cell then
+        local light = IsoLightSource.new(
+            expX,
+            expY,
+            math.floor(expZ),
+            1.0, 0.5, 0.0,
+            14,
+            12
+        )
+        cell:addLamppost(light)
+    end
+
+    return playerWasInRadius
 end
 
 ---@type table<integer, PerkFactory.Perk>
@@ -326,18 +478,42 @@ end
 
 ---@param soundname string
 ---@param skipCheck boolean | nil
-function ChaosUtils.PlayUISound(soundname, skipCheck)
+---@param volume number | nil
+---@param skipPlayerVolumeSettings boolean?
+function ChaosUtils.PlayUISound(soundname, skipCheck, volume, skipPlayerVolumeSettings)
     skipCheck = skipCheck or false
     if not skipCheck and not ChaosConfig.IsUISoundsEnabled() then
         return nil
     end
 
-    local soundManager = getSoundManager()
-    if not soundManager then
-        print("[ChaosUtils] Sound manager not found")
+    volume = volume or 1.0
+
+    local player = getPlayer()
+    if not player then return nil end
+
+    local sq = player:getSquare()
+    if not sq then return nil end
+
+    local x = sq:getX()
+    local y = sq:getY()
+    local z = sq:getZ()
+
+    local emitter = getWorld():getFreeEmitter(x + 0.5, y + 0.5, z)
+    local handle = emitter:playSoundImpl(soundname, sq)
+
+    if not handle or handle == 0 then
         return nil
     end
-    return soundManager:playUISound(soundname)
+
+    local settingsVolume = getCore():getRealOptionSoundVolume()
+
+    if skipPlayerVolumeSettings then
+        settingsVolume = 1.0
+    end
+
+    emitter:setVolume(handle, volume * settingsVolume)
+
+    return handle
 end
 
 ---@param targetHours integer
@@ -426,6 +602,31 @@ function ChaosUtils.GetRandomSquareAroundPosition(x, y, z, minRadius, maxRadius,
     end
 
     return nil
+end
+
+--- Finds the highest valid square in a vertical stack at (x, y) starting from Z=0.
+--- Walks upward through Z levels while each square exists (and optionally `:isSolidFloor()` is true),
+--- and returns the last valid square before the stack breaks. Returns nil if Z=0 is not valid.
+---@param x integer
+---@param y integer
+---@param checkSolidFloor boolean? defaults to true; when true each square must pass `:isSolidFloor()` to count
+---@return IsoGridSquare | nil
+function ChaosUtils.FindHighestZSquare(x, y, checkSolidFloor)
+    local cell = getCell()
+    if not cell then return nil end
+
+    if checkSolidFloor == nil then checkSolidFloor = true end
+
+    local lastValidSquare = nil
+    for z = 0, 31 do
+        local square = cell:getGridSquare(x, y, z)
+        if not square or (checkSolidFloor and not square:isSolidFloor()) then
+            return lastValidSquare
+        end
+        lastValidSquare = square
+    end
+
+    return lastValidSquare
 end
 
 ---@param value unknown
@@ -862,7 +1063,8 @@ local function _collectItemsFromContainer(container, out)
 end
 
 ---@param player IsoPlayer
-function ChaosUtils.RemoveRandomItem(player)
+---@param asDestroyed boolean? if true, shows "Item Destroyed" red say line instead of the default removed-item line
+function ChaosUtils.RemoveRandomItem(player, asDestroyed)
     if not player then return end
     local inventory = player:getInventory()
     if not inventory then return end
@@ -887,7 +1089,36 @@ function ChaosUtils.RemoveRandomItem(player)
         container:Remove(randomItem.item)
     end
 
-    ChaosPlayer.SayLineRemovedItem(player, randomItem.item)
+    if asDestroyed then
+        ChaosPlayer.SayLineDestroyedItem(player, randomItem.item)
+    else
+        ChaosPlayer.SayLineRemovedItem(player, randomItem.item)
+    end
+end
+
+---@param player IsoPlayer
+---@param lossFactor number fraction of max condition lost per item (e.g. 0.35 for 35%)
+function ChaosUtils.DamageAllItems(player, lossFactor)
+    if not player then return end
+    if not lossFactor or lossFactor <= 0 then return end
+    local inventory = player:getInventory()
+    if not inventory then return end
+
+    ---@type table<integer, { item: InventoryItem }>
+    local allItems = {}
+    _collectItemsFromContainer(inventory, allItems)
+
+    for i = 1, #allItems do
+        local item = allItems[i].item
+        if item and item.getConditionMax and item.getCondition and item.setCondition then
+            local maxCondition = item:getConditionMax()
+            if maxCondition and maxCondition > 0 then
+                local loss = maxCondition * lossFactor
+                local newCondition = math.floor(item:getCondition() - loss + 0.5)
+                item:setCondition(math.max(0, newCondition))
+            end
+        end
+    end
 end
 
 ---@param square IsoGridSquare
@@ -974,6 +1205,38 @@ function ChaosUtils.RandArrayIndex(array)
     return math.floor(ZombRand(#array)) + 1
 end
 
+---Normalizes any angle (in degrees) into the [0, 360) range.
+---@param angle number
+---@return number
+function ChaosUtils.Normalize360(angle)
+    angle = angle % 360
+    if angle < 0 then
+        angle = angle + 360
+    end
+    return angle
+end
+
+---@class ChaosRGB
+---@field r number Red channel in 0..1.
+---@field g number Green channel in 0..1.
+---@field b number Blue channel in 0..1.
+
+---Builds an RGB color table. When `normalize` is true, the input channels are
+---treated as 0..255 and divided by 255 to fit the 0..1 range.
+---@param r number
+---@param g number
+---@param b number
+---@param normalize boolean?
+---@return ChaosRGB
+function ChaosUtils.MakeRGB(r, g, b, normalize)
+    if normalize then
+        r = r / 255
+        g = g / 255
+        b = b / 255
+    end
+    return { r = r, g = g, b = b }
+end
+
 ---@param worldObject IsoWorldInventoryObject
 ---@param removeInventoryItem boolean | nil
 ---@return InventoryItem | nil
@@ -1058,4 +1321,194 @@ function ChaosUtils.IsSquareBehindZombie(square, character)
 
     -- Behind zombie = opposite its forward direction
     return dot < -0.6
+end
+
+--- Parses a semantic version string into its numeric components.
+--- Mirrors StreamerMode/src/versionCheck.ts:parseSemver: extracts the first three
+--- numeric groups (`MAJOR.MINOR.PATCH`) and ignores any suffix (e.g. `-beta.3`).
+---@param input string
+---@return integer? major
+---@return integer? minor
+---@return integer? patch
+function ChaosUtils.ParseSemver(input)
+    if type(input) ~= "string" then return nil, nil, nil end
+    local trimmed = input:match("^%s*(.-)%s*$") or input
+    local a, b, c = string.match(trimmed, "^(%d+)%.(%d+)%.(%d+)")
+    if not a or not b or not c then return nil, nil, nil end
+    local na = math.floor(tonumber(a) or 0)
+    local nb = math.floor(tonumber(b) or 0)
+    local nc = math.floor(tonumber(c) or 0)
+    return na, nb, nc
+end
+
+--- Compares two semver strings.
+--- Mirrors StreamerMode/src/versionCheck.ts:compareVersions.
+--- Returns 0 when either side cannot be parsed.
+---@param a string
+---@param b string
+---@return integer -- -1 if a<b, 0 if a==b or unparseable, 1 if a>b
+function ChaosUtils.CompareVersions(a, b)
+    local aMaj, aMin, aPat = ChaosUtils.ParseSemver(a)
+    local bMaj, bMin, bPat = ChaosUtils.ParseSemver(b)
+    if not aMaj or not bMaj then return 0 end
+    local pa = { aMaj, aMin, aPat }
+    local pb = { bMaj, bMin, bPat }
+    for i = 1, 3 do
+        if pa[i] < pb[i] then return -1 end
+        if pa[i] > pb[i] then return 1 end
+    end
+    return 0
+end
+
+local function getCrashDamageOption()
+    local opts = SandboxOptions.instance or SandboxOptions.getInstance()
+    if not opts then return nil end
+
+    ---@diagnostic disable-next-line: undefined-field
+    if opts.playerDamageFromCrash then
+        ---@diagnostic disable-next-line: undefined-field
+        return opts.playerDamageFromCrash
+    end
+
+    return opts:getOptionByName("PlayerDamageFromCrash")
+end
+
+--- Disables or restores the PlayerDamageFromCrash sandbox option.
+--- Captures the original value lazily on the first disable call.
+--- No-op when the requested state already matches the cached state.
+---@param disabled boolean
+function ChaosUtils.SetCrashDamageDisabled(disabled)
+    if ChaosUtils.crashDamage.disabled == disabled then return end
+
+    local opt = getCrashDamageOption()
+    if not opt then return end
+
+    if disabled then
+        ChaosUtils.crashDamage.originalValue = opt:getValue()
+        opt:setValue(false)
+        ChaosUtils.crashDamage.disabled = true
+    else
+        local restore = ChaosUtils.crashDamage.originalValue
+        if restore == nil then restore = true end
+        opt:setValue(restore)
+        ChaosUtils.crashDamage.originalValue = nil
+        ChaosUtils.crashDamage.disabled = false
+    end
+end
+
+--- Counts ChaosNPCs currently sitting in any vehicle.
+---@return integer
+function ChaosUtils.CountNPCsInVehicles()
+    local list = ChaosNPCUtils and ChaosNPCUtils.npcList
+    if not list then return 0 end
+    local n = 0
+    for i = 0, list:size() - 1 do
+        local npc = list:get(i)
+        if npc and npc.zombie and npc.zombie:getVehicle() then
+            n = n + 1
+        end
+    end
+    return n
+end
+
+--- Re-evaluates whether the PlayerDamageFromCrash override should be active.
+--- Disables crash damage if any NPC is in a vehicle, or if any of
+--- EFFECT_FLYING_CARS_ENABLED / EFFECT_EARTHQUAKE_ENABLED / EFFECT_HURRICANE_ENABLED /
+--- EFFECT_BLACK_HOLE_ENABLED is set.
+function ChaosUtils.UpdateCrashDamageOverride()
+    local shouldDisable = ChaosUtils.EFFECT_FLYING_CARS_ENABLED
+        or ChaosUtils.EFFECT_EARTHQUAKE_ENABLED
+        or ChaosUtils.EFFECT_HURRICANE_ENABLED
+        or ChaosUtils.EFFECT_BLACK_HOLE_ENABLED
+        or ChaosUtils.EFFECT_DOOMSDAY_ENABLED
+        or ChaosUtils.CountNPCsInVehicles() > 0
+    ChaosUtils.SetCrashDamageDisabled(shouldDisable)
+end
+
+--- Resets crash-damage override state at the start of a new world session.
+function ChaosUtils.ResetCrashDamageOverride()
+    ChaosUtils.EFFECT_FLYING_CARS_ENABLED = false
+    ChaosUtils.EFFECT_EARTHQUAKE_ENABLED = false
+    ChaosUtils.EFFECT_HURRICANE_ENABLED = false
+    ChaosUtils.EFFECT_BLACK_HOLE_ENABLED = false
+    ChaosUtils.EFFECT_DOOMSDAY_ENABLED = false
+    ChaosUtils.crashDamage.originalValue = nil
+    ChaosUtils.crashDamage.disabled = false
+end
+
+---@param x number
+---@param y number
+---@param z integer
+---@param doSound boolean
+---@param doThunder boolean
+---@param spawnFire boolean
+---@param spawnFireNearby boolean
+---@param doZombieDamage boolean
+---@param doRumble boolean?
+function ChaosUtils.SpawnLightningStrikeAt(x, y, z, doSound, doThunder, spawnFire, spawnFireNearby, doZombieDamage,
+                                           doRumble)
+    local cell = getCell()
+    if not cell then return end
+    local sq = cell:getGridSquare(x, y, z)
+    if not sq then return end
+
+    local iX = math.floor(x)
+    local iY = math.floor(y)
+
+    if spawnFire then
+        IsoFireManager.StartFire(cell, sq, true, 100, 3000)
+        if spawnFireNearby then
+            ChaosUtils.SquareRingSearchTile_2D(iX, iY, function(square)
+                if square and ChaosUtils.RandFloat(0, 100) < 50 then
+                    IsoFireManager.StartFire(cell, square, true, 100, 3000)
+                end
+            end, 1, 2, false, false, true, z, z)
+        end
+    end
+
+    if doZombieDamage then
+        ChaosZombie.ForEachZombieInRange(x + 0.5, y + 0.5, 1.5, function(zombie)
+            local zx = math.floor(zombie:getX())
+            local zy = math.floor(zombie:getY())
+            if zx == x and zy == y then
+                zombie:SetOnFire()
+                ChaosZombie.DamageZombie(zombie, 0.6)
+            end
+        end, false, z)
+    end
+
+    if doRumble == nil then
+        doRumble = false
+    end
+
+    if doThunder then
+        getClimateManager():getThunderStorm():triggerThunderEvent(
+            iX, iY,
+            doSound, -- doStrike: plays "Thunder"
+            true,    -- doLightning: visual flash
+            doRumble -- doRumble
+        )
+    end
+
+    --- sound for zombies AI
+    ---@diagnostic disable-next-line: param-type-mismatch
+    addSound(nil, x, y, 0, 180, 180)
+end
+
+---@param playerIndex integer
+---@param character IsoGameCharacter
+---@param r number
+---@param g number
+---@param b number
+---@param a number
+function ChaosUtils.SetCharacterOutlineHighlightEnabled(playerIndex, character, r, g, b, a)
+    if not character then return end
+
+    character:setOutlineHighlight(playerIndex, true)
+    character:setOutlineHighlightCol(playerIndex, r, g, b, a)
+end
+
+function ChaosUtils.SetCharacterOutlineHighlightDisabled(character)
+    if not character then return end
+    character:setOutlineHighlight(0, false)
 end

@@ -7,18 +7,25 @@
 ---@field voting_enabled boolean -- If voting is enabled
 ---@field voting_mode number
 ---@field voting_options_number number
----@field type string -- Streamer mode type (twitch or ...)
 ---@field use_localhost_ip boolean
 ---@field say_killed_zombie_name boolean
 ---@field zombie_nicknames_buffer number
 ---@field use_zombie_nicknames boolean
 ---@field enable_donate boolean
----@field donate_providers table<integer, string>
+---@field donation_systems table -- opaque, owned by StreamerMode app; Lua only round-trips it through save
 ---@field donate_price_groups DonatePriceGroup[]
 ---@field allow_vote_command boolean
 ---@field hide_votes boolean
 ---@field render_chat_messages boolean
 ---@field use_animals_nicknames boolean
+---@field random_effect_in_vote boolean -- if true, one of the vote options is a hidden "Random" effect
+---@field voting_fake_effects_enabled boolean -- if true, some vote options are fake effects
+---@field voting_fake_effects_chance number -- chance (percent) for a vote option to be a fake effect
+---@field voting_hidden_effects_enabled boolean -- if true, some vote options are hidden effects
+---@field voting_hidden_effects_chance number -- chance (percent) for a vote option to be a hidden effect
+---@field reveal_hidden_effect_after_delay boolean -- if true, hidden vote effects are revealed in the UI after their conceal delay
+---@field reveal_fake_effect_after_delay boolean -- if true, fake vote effects are revealed in the UI after their conceal delay
+---@field currencies table -- opaque, owned by StreamerMode app; Lua only round-trips it through save
 
 ---@class ChaosConfigUI
 ---@field progress_bar_color string
@@ -40,18 +47,38 @@
 ---@field vote_background_color string
 ---@field vote_background_rgb {r: number, g: number, b: number}
 
+---@class ChaosMetaEffectJsonEntry
+---@field id string
+---@field enabled boolean
+---@field voting_only boolean
+---@field duration number
+---@field chance number
+---@field variables table
+
+---@class ChaosMetaEffectsConfig
+---@field enabled boolean
+---@field interval_sec number
+---@field list ChaosMetaEffectJsonEntry[]
+
 ---@class ChaosConfig
 ---@field lang string -- Language code (e.g. "en", "fr")
 ---@field effects_interval_enabled boolean -- Disabling this will not start any effect, but streamer mode will work
 ---@field effects_interval number
 ---@field effects_duration_multiplier number -- multiplier applied to every effect's duration
 ---@field recent_effects_block_buffer number -- size of the recently-used effects blocklist
+---@field persist_recent_effects boolean -- if true, the recent-effects blocklist is loaded from disk on startup
 ---@field vote_start_time number
 ---@field hide_progress_bar boolean
 ---@field use_voting_progress_bar_color boolean
+---@field hide_effect_names boolean -- If true, all effect names are rendered as "???" for the player
+---@field explosions_damage_items boolean -- If true, explosions damage every item in the player's inventory
+---@field explosions_destroy_random_item boolean -- If true, explosions destroy one random item from the player's inventory
 ---@field ui ChaosConfigUI
 ---@field ui_sounds_enabled boolean
 ---@field ignore_effect_chances boolean -- If true, all effects have equal chance 1 during selection
+---@field npc_voicelines_enabled boolean -- If false, NPC/zombie voicelines (ChaosZombie.PlaySoundLine) are suppressed
+---@field npc_gifts_enabled boolean -- If false, friendly NPCs will not gift items to the player
+---@field meta_effects ChaosMetaEffectsConfig
 ---@field streamer_mode ChaosConfigStreamerMode
 ChaosConfig = ChaosConfig or {
     lang = "en",
@@ -59,9 +86,13 @@ ChaosConfig = ChaosConfig or {
     effects_interval = 45,
     effects_duration_multiplier = 1.0,
     recent_effects_block_buffer = 90,
+    persist_recent_effects = true,
     vote_start_time = 15,
     hide_progress_bar = false,
     use_voting_progress_bar_color = false,
+    hide_effect_names = false,
+    explosions_damage_items = true,
+    explosions_destroy_random_item = true,
     ui = {
         progress_bar_color         = "9f211f",
         progress_bar_opacity       = 0.9,
@@ -84,18 +115,27 @@ ChaosConfig = ChaosConfig or {
     },
     ui_sounds_enabled = true,
     ignore_effect_chances = false,
+    npc_voicelines_enabled = true,
+    npc_gifts_enabled = true,
+    meta_effects = {
+        enabled = true,
+        interval_sec = 900,
+        list = {},
+    },
     streamer_mode = {
         streamer_mode_enabled = false,
         voting_enabled = false,
         voting_mode = 0,
         voting_options_number = 4,
-        type = "twitch",
         use_localhost_ip = true,
         say_killed_zombie_name = true,
         zombie_nicknames_buffer = 150,
         use_zombie_nicknames = true,
         enable_donate = false,
-        donate_providers = {},
+        donation_systems = {
+            donationalerts = { enabled = false, app_id = "", currency = "" },
+            twitch_bits = { enabled = false, price_multiplier = 100.0 },
+        },
         donate_price_groups = {
             { group = "positive_1", price = 1 },
             { group = "positive_2", price = 2.5 },
@@ -121,6 +161,14 @@ ChaosConfig = ChaosConfig or {
         hide_votes = false,
         render_chat_messages = true,
         use_animals_nicknames = true,
+        random_effect_in_vote = true,
+        voting_fake_effects_enabled = true,
+        voting_fake_effects_chance = 5.0,
+        voting_hidden_effects_enabled = true,
+        voting_hidden_effects_chance = 5.0,
+        reveal_hidden_effect_after_delay = true,
+        reveal_fake_effect_after_delay = true,
+        currencies = { main = "", list = {} },
     }
 }
 
@@ -177,6 +225,49 @@ end
 
 ChaosConfig._mergeMissingKeys = mergeMissingKeys
 
+--- If the stored mod version in VERSION.txt differs from the current mod version,
+--- overwrite the user's `meta_effects.list` with the defaults so newly-shipped
+--- meta effects propagate to existing installs. The same VERSION.txt is later
+--- updated by `ChaosEffectsRegistry.SyncEffectsForModVersion`.
+---@param configData table | nil
+---@param defaultConfig table | nil
+---@return boolean changed
+local function syncMetaEffectsForModVersion(configData, defaultConfig)
+    if not configData or not defaultConfig then return false end
+    if type(defaultConfig.meta_effects) ~= "table" then return false end
+
+    local currentVersion = ""
+    if ChaosMod and ChaosMod.modData then
+        currentVersion = ChaosMod.modData:getModVersion() or ""
+    end
+    local storedRaw = ChaosFileReader.ReadFileFromCacheAllLines("ChaosMod/VERSION.txt")
+    local storedVersion = ""
+    if storedRaw then
+        storedVersion = storedRaw:match("^%s*(.-)%s*$") or ""
+    end
+    if storedVersion == currentVersion then return false end
+
+    if type(configData.meta_effects) ~= "table" then
+        configData.meta_effects = {}
+    end
+    -- Deep-copy the default list so later mutations don't bleed into the cached default.
+    local defaultList = defaultConfig.meta_effects.list
+    local newList = {}
+    if type(defaultList) == "table" then
+        for _, item in ipairs(defaultList) do
+            if type(item) == "table" then
+                local copy = {}
+                for k, v in pairs(item) do copy[k] = v end
+                table.insert(newList, copy)
+            end
+        end
+    end
+    configData.meta_effects.list = newList
+    print(string.format("[ChaosConfig] Mod version changed ('%s' -> '%s'); replacing meta_effects.list with defaults",
+        storedVersion, currentVersion))
+    return true
+end
+
 function ChaosConfig.LoadConfigFromDisk()
     ---@type table | nil
     local defaultConfig = ChaosFileReader.ReadJsonFile("default_config.json")
@@ -193,9 +284,10 @@ function ChaosConfig.LoadConfigFromDisk()
             configData = defaultConfig
         end
     elseif defaultConfig then
+        local metaChanged = syncMetaEffectsForModVersion(configData, defaultConfig)
         local _, changed = mergeMissingKeys(configData, defaultConfig)
-        if changed then
-            print("[ChaosConfig] Added missing keys from default_config.json; saving config.json")
+        if changed or metaChanged then
+            print("[ChaosConfig] Updating config.json on disk")
             ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", configData)
         end
     end
@@ -228,6 +320,10 @@ function ChaosConfig.LoadConfigFromDisk()
         ChaosConfig.recent_effects_block_buffer = math.floor(configData.recent_effects_block_buffer)
     end
 
+    if type(configData.persist_recent_effects) == "boolean" then
+        ChaosConfig.persist_recent_effects = configData.persist_recent_effects
+    end
+
     if type(configData.vote_start_time) == "number" then
         ChaosConfig.vote_start_time = configData.vote_start_time
     end
@@ -238,6 +334,18 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.use_voting_progress_bar_color) == "boolean" then
         ChaosConfig.use_voting_progress_bar_color = configData.use_voting_progress_bar_color
+    end
+
+    if type(configData.hide_effect_names) == "boolean" then
+        ChaosConfig.hide_effect_names = configData.hide_effect_names
+    end
+
+    if type(configData.explosions_damage_items) == "boolean" then
+        ChaosConfig.explosions_damage_items = configData.explosions_damage_items
+    end
+
+    if type(configData.explosions_destroy_random_item) == "boolean" then
+        ChaosConfig.explosions_destroy_random_item = configData.explosions_destroy_random_item
     end
 
     if configData.ui then
@@ -313,6 +421,41 @@ function ChaosConfig.LoadConfigFromDisk()
         ChaosConfig.ignore_effect_chances = configData.ignore_effect_chances
     end
 
+    if type(configData.npc_voicelines_enabled) == "boolean" then
+        ChaosConfig.npc_voicelines_enabled = configData.npc_voicelines_enabled
+    end
+
+    if type(configData.npc_gifts_enabled) == "boolean" then
+        ChaosConfig.npc_gifts_enabled = configData.npc_gifts_enabled
+    end
+
+    if type(configData.meta_effects) == "table" then
+        local mm = configData.meta_effects
+        local dst = ChaosConfig.meta_effects
+        if type(mm.enabled) == "boolean" then
+            dst.enabled = mm.enabled
+        end
+        if type(mm.interval_sec) == "number" and mm.interval_sec > 0 then
+            dst.interval_sec = mm.interval_sec
+        end
+        if type(mm.list) == "table" then
+            local parsed = {}
+            for _, item in ipairs(mm.list) do
+                if type(item) == "table" and type(item.id) == "string" and item.id ~= "" then
+                    table.insert(parsed, {
+                        id = item.id,
+                        enabled = item.enabled == true,
+                        voting_only = item.voting_only == true,
+                        duration = tonumber(item.duration) or 0,
+                        chance = tonumber(item.chance) or 0,
+                        variables = type(item.variables) == "table" and item.variables or {},
+                    })
+                end
+            end
+            dst.list = parsed
+        end
+    end
+
     if configData.streamer_mode then
         -- If streamer mode enabled
         if type(configData.streamer_mode.streamer_mode_enabled) == "boolean" then
@@ -322,11 +465,6 @@ function ChaosConfig.LoadConfigFromDisk()
         -- If voting is enabled
         if type(configData.streamer_mode.voting_enabled) == "boolean" then
             ChaosConfig.streamer_mode.voting_enabled = configData.streamer_mode.voting_enabled
-        end
-
-        -- Streamer mode type (twitch or ...)
-        if type(configData.streamer_mode.type) == "string" then
-            ChaosConfig.streamer_mode.type = configData.streamer_mode.type
         end
 
         -- Voting mode
@@ -362,9 +500,9 @@ function ChaosConfig.LoadConfigFromDisk()
         if type(configData.streamer_mode.enable_donate) == "boolean" then
             ChaosConfig.streamer_mode.enable_donate = configData.streamer_mode.enable_donate
         end
-        -- Donate providers list
-        if type(configData.streamer_mode.donate_providers) == "table" then
-            ChaosConfig.streamer_mode.donate_providers = configData.streamer_mode.donate_providers
+        -- Donation systems (opaque blob owned by StreamerMode app)
+        if type(configData.streamer_mode.donation_systems) == "table" then
+            ChaosConfig.streamer_mode.donation_systems = configData.streamer_mode.donation_systems
         end
         -- If chat vote command (!vote) is allowed
         if type(configData.streamer_mode.allow_vote_command) == "boolean" then
@@ -382,6 +520,34 @@ function ChaosConfig.LoadConfigFromDisk()
         if type(configData.streamer_mode.use_animals_nicknames) == "boolean" then
             ChaosConfig.streamer_mode.use_animals_nicknames = configData.streamer_mode.use_animals_nicknames
         end
+        -- If one of the vote options is a hidden "Random" effect
+        if type(configData.streamer_mode.random_effect_in_vote) == "boolean" then
+            ChaosConfig.streamer_mode.random_effect_in_vote = configData.streamer_mode.random_effect_in_vote
+        end
+        -- If some vote options are fake effects
+        if type(configData.streamer_mode.voting_fake_effects_enabled) == "boolean" then
+            ChaosConfig.streamer_mode.voting_fake_effects_enabled = configData.streamer_mode.voting_fake_effects_enabled
+        end
+        -- Chance (percent) for a vote option to be a fake effect
+        if type(configData.streamer_mode.voting_fake_effects_chance) == "number" then
+            ChaosConfig.streamer_mode.voting_fake_effects_chance = configData.streamer_mode.voting_fake_effects_chance
+        end
+        -- If some vote options are hidden effects
+        if type(configData.streamer_mode.voting_hidden_effects_enabled) == "boolean" then
+            ChaosConfig.streamer_mode.voting_hidden_effects_enabled = configData.streamer_mode.voting_hidden_effects_enabled
+        end
+        -- Chance (percent) for a vote option to be a hidden effect
+        if type(configData.streamer_mode.voting_hidden_effects_chance) == "number" then
+            ChaosConfig.streamer_mode.voting_hidden_effects_chance = configData.streamer_mode.voting_hidden_effects_chance
+        end
+        -- If hidden vote effects are revealed in the UI after their conceal delay
+        if type(configData.streamer_mode.reveal_hidden_effect_after_delay) == "boolean" then
+            ChaosConfig.streamer_mode.reveal_hidden_effect_after_delay = configData.streamer_mode.reveal_hidden_effect_after_delay
+        end
+        -- If fake vote effects are revealed in the UI after their conceal delay
+        if type(configData.streamer_mode.reveal_fake_effect_after_delay) == "boolean" then
+            ChaosConfig.streamer_mode.reveal_fake_effect_after_delay = configData.streamer_mode.reveal_fake_effect_after_delay
+        end
         -- Donate price groups
         if type(configData.streamer_mode.donate_price_groups) == "table" then
             local groups = {}
@@ -393,6 +559,10 @@ function ChaosConfig.LoadConfigFromDisk()
                 end
             end
             ChaosConfig.streamer_mode.donate_price_groups = groups
+        end
+        -- Currencies (StreamerMode-owned, Lua just round-trips it)
+        if type(configData.streamer_mode.currencies) == "table" then
+            ChaosConfig.streamer_mode.currencies = configData.streamer_mode.currencies
         end
     end
 
@@ -487,21 +657,19 @@ function ChaosConfig.BuildJsonSnapshot()
             end
         end
     end
-    local providers = {}
-    if type(sm.donate_providers) == "table" then
-        for _, p in ipairs(sm.donate_providers) do
-            table.insert(providers, p)
-        end
-    end
     return {
         lang = ChaosConfig.lang,
         effects_interval_enabled = ChaosConfig.effects_interval_enabled,
         effects_interval = ChaosConfig.effects_interval,
         effects_duration_multiplier = ChaosConfig.effects_duration_multiplier,
         recent_effects_block_buffer = ChaosConfig.recent_effects_block_buffer,
+        persist_recent_effects = ChaosConfig.persist_recent_effects,
         vote_start_time = ChaosConfig.vote_start_time,
         hide_progress_bar = ChaosConfig.hide_progress_bar,
         use_voting_progress_bar_color = ChaosConfig.use_voting_progress_bar_color,
+        hide_effect_names = ChaosConfig.hide_effect_names,
+        explosions_damage_items = ChaosConfig.explosions_damage_items,
+        explosions_destroy_random_item = ChaosConfig.explosions_destroy_random_item,
         ui = {
             progress_bar_color = ui.progress_bar_color,
             progress_bar_opacity = ui.progress_bar_opacity,
@@ -517,12 +685,36 @@ function ChaosConfig.BuildJsonSnapshot()
         },
         ui_sounds_enabled = ChaosConfig.ui_sounds_enabled,
         ignore_effect_chances = ChaosConfig.ignore_effect_chances,
+        npc_voicelines_enabled = ChaosConfig.npc_voicelines_enabled,
+        npc_gifts_enabled = ChaosConfig.npc_gifts_enabled,
+        meta_effects = (function()
+            local m = ChaosConfig.meta_effects or {}
+            local list = {}
+            if type(m.list) == "table" then
+                for _, item in ipairs(m.list) do
+                    if type(item) == "table" and type(item.id) == "string" then
+                        table.insert(list, {
+                            id = item.id,
+                            enabled = item.enabled == true,
+                            voting_only = item.voting_only == true,
+                            duration = tonumber(item.duration) or 0,
+                            chance = tonumber(item.chance) or 0,
+                            variables = item.variables or {},
+                        })
+                    end
+                end
+            end
+            return {
+                enabled = m.enabled == true,
+                interval_sec = tonumber(m.interval_sec) or 0,
+                list = list,
+            }
+        end)(),
         streamer_mode = {
             streamer_mode_enabled = sm.streamer_mode_enabled,
             voting_enabled = sm.voting_enabled,
             voting_mode = sm.voting_mode,
             voting_options_number = sm.voting_options_number,
-            type = sm.type,
             use_localhost_ip = sm.use_localhost_ip,
             use_zombie_nicknames = sm.use_zombie_nicknames,
             use_animals_nicknames = sm.use_animals_nicknames,
@@ -530,10 +722,18 @@ function ChaosConfig.BuildJsonSnapshot()
             say_killed_zombie_name = sm.say_killed_zombie_name,
             zombie_nicknames_buffer = sm.zombie_nicknames_buffer,
             enable_donate = sm.enable_donate,
-            donate_providers = providers,
+            donation_systems = sm.donation_systems or {},
             donate_price_groups = groups,
             allow_vote_command = sm.allow_vote_command,
             hide_votes = sm.hide_votes,
+            random_effect_in_vote = sm.random_effect_in_vote,
+            voting_fake_effects_enabled = sm.voting_fake_effects_enabled,
+            voting_fake_effects_chance = sm.voting_fake_effects_chance,
+            voting_hidden_effects_enabled = sm.voting_hidden_effects_enabled,
+            voting_hidden_effects_chance = sm.voting_hidden_effects_chance,
+            reveal_hidden_effect_after_delay = sm.reveal_hidden_effect_after_delay,
+            reveal_fake_effect_after_delay = sm.reveal_fake_effect_after_delay,
+            currencies = sm.currencies or { main = "", list = {} },
         },
     }
 end

@@ -113,9 +113,61 @@ function ChaosProps.GetFurnitureType(obj)
     return nil
 end
 
+---@param obj IsoObject
+---@return string | nil
+function ChaosProps.GetElectronicKind(obj)
+    if not obj then return nil end
+
+    if instanceof(obj, "IsoLightSwitch") then
+        local props = obj:getProperties()
+        if props and props:has("IsMoveAble") then
+            return "lamp"
+        end
+        return "light_switch"
+    end
+
+    if instanceof(obj, "IsoRadio") then
+        return "radio"
+    end
+
+    if instanceof(obj, "IsoTelevision") then
+        return "tv"
+    end
+
+    if instanceof(obj, "IsoStove") then
+        ---@cast obj IsoStove
+        local container = obj:getContainer()
+        if obj:isMicrowave() or (container and container:getType() == "microwave") then
+            return "microwave"
+        end
+        return "stove"
+    end
+
+    local container = obj:getContainer()
+    if container then
+        local ctype = container:getType()
+        if ctype == "fridge" then
+            return "fridge"
+        end
+        if ctype == "vendingsnack" or ctype == "vendingpop" then
+            return "vending_machine"
+        end
+    end
+
+    local props = obj:getProperties()
+    if props then
+        if props:has("CustomName") and props:get("CustomName") == "Computer" then
+            return "computer"
+        end
+    end
+
+    return nil
+end
+
 ---@param square IsoGridSquare
+---@param lit boolean?
 ---@return SCampfireGlobalObject?
-function ChaosProps.SpawnCampfire(square)
+function ChaosProps.SpawnCampfire(square, lit)
     if not SCampfireSystem or not SCampfireSystem.instance then
         return nil
     end
@@ -124,6 +176,10 @@ function ChaosProps.SpawnCampfire(square)
         return nil
     end
     campfire:setSpriteName("camping_01_6")
+    if lit then
+        campfire:addFuel(500)
+        campfire:lightFire()
+    end
     campfire:syncSprite()
     campfire:syncIsoObject()
     return campfire
@@ -148,4 +204,29 @@ function ChaosProps.SpawnProp(square, spriteName, north)
     square:AddSpecialObject(obj)
 
     return obj
+end
+
+---Makes obj render as if it was at visualZ, relative to baseZ.
+---Example: baseZ=0, visualZ=1.1 => renderYOffset = 105.6
+---@param obj IsoObject
+---@param visualZ number
+---@param baseZ number?
+---@param baseRenderYOffset number?
+---@return number?
+function ChaosProps.SetIsoObjectVisualZ(obj, visualZ, baseZ, baseRenderYOffset)
+    if not obj then return end
+
+    baseZ = baseZ or obj:getZ()
+    baseRenderYOffset = baseRenderYOffset or 0
+
+    local zDelta = visualZ - baseZ
+    local renderYOffset = baseRenderYOffset + (zDelta * 96)
+
+    obj:setRenderYOffset(renderYOffset)
+
+    if obj.invalidateRenderChunkLevel then
+        obj:invalidateRenderChunkLevel(256)
+    end
+
+    return renderYOffset
 end

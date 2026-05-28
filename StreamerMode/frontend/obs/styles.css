@@ -53,12 +53,28 @@ body {
   animation: overlayExit 0.35s ease forwards;
 }
 
+.total-votes-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  width: 400px;
+  margin-bottom: 10px;
+}
+
 .total-votes {
   font-size: 20px;
   font-weight: 600;
   color: white;
   text-shadow: 0 1px 4px rgba(120, 120, 120, 0.9);
-  margin-bottom: 10px;
+}
+
+.twitch-subs-inline {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 4px rgba(120, 120, 120, 0.9);
+  white-space: nowrap;
 }
 
 .idle-line {
@@ -126,12 +142,47 @@ body {
 
 .option-name {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.option-name-text {
+  display: inline-block;
+  max-width: 100%;
+  font-size: 16px;
   font-weight: 600;
   color: white;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+.option-name-text--scroll {
+  /* Shrink to 14px while scrolling to reduce how far the name has to travel. */
+  font-size: 14px;
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+  will-change: transform;
+  /* Fixed duration shared by every scrolling option so they stay in sync. */
+  animation: optionNameMarquee 16s ease-in-out infinite;
+}
+
+@keyframes optionNameMarquee {
+  0%,
+  12% {
+    transform: translateX(0);
+  }
+  50%,
+  62% {
+    transform: translateX(var(--marquee-shift, 0));
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .option-votes {

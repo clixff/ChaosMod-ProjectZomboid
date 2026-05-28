@@ -5,15 +5,17 @@ local MAX_COMPANIONS = 2
 local SEARCH_RADIUS = 40
 
 ---@param zombie IsoGameCharacter?
+---@param nickname string|nil
 ---@return boolean
-local function MakeZombieCompanion(zombie)
+local function MakeZombieCompanion(zombie, nickname)
     if not zombie or not instanceof(zombie, "IsoZombie") then
         return false
     end
 
     ---@cast zombie IsoZombie
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, nickname)
     npc:initializeHuman(false)
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS
     return true
 end
@@ -32,11 +34,11 @@ function EffectNecromancy:OnStart()
     local z = square:getZ()
     local minZ = z - 1
     local maxZ = z + 2
-    local reanimatedCount = 0
+    local companionsCount = 0
 
     ChaosUtils.SquareRingSearchTile_2D(x, y, function(sq)
-        if not sq or reanimatedCount >= MAX_COMPANIONS then
-            return reanimatedCount >= MAX_COMPANIONS
+        if not sq or companionsCount >= MAX_COMPANIONS then
+            return companionsCount >= MAX_COMPANIONS
         end
 
         local objects = sq:getStaticMovingObjects()
@@ -45,7 +47,7 @@ function EffectNecromancy:OnStart()
         end
 
         for i = 0, objects:size() - 1 do
-            if reanimatedCount >= MAX_COMPANIONS then
+            if companionsCount >= MAX_COMPANIONS then
                 return true
             end
 
@@ -55,16 +57,32 @@ function EffectNecromancy:OnStart()
                 local deadBody = obj
                 if deadBody.reanimate then
                     local zombie = deadBody:reanimate()
-                    if MakeZombieCompanion(zombie) then
-                        reanimatedCount = reanimatedCount + 1
+                    local nickname = (companionsCount == 0) and self.effectNickname or nil
+                    if MakeZombieCompanion(zombie, nickname) then
+                        companionsCount = companionsCount + 1
                     end
                 end
             end
         end
 
-        return reanimatedCount >= MAX_COMPANIONS
+        return companionsCount >= MAX_COMPANIONS
     end, 0, SEARCH_RADIUS, false, false, true, minZ, maxZ)
 
-    ChaosPlayer.SayLineByColor(player, string.format("Reanimated %d zombies as companions", reanimatedCount),
+    while companionsCount < MAX_COMPANIONS do
+        local spawnSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, nil, 2, 5, 50, true, true, false)
+        if not spawnSquare then break end
+
+        local spawnedZombies = ChaosZombie.SpawnZombieAt(spawnSquare:getX(), spawnSquare:getY(), spawnSquare:getZ(),
+            1, "Tourist", 50)
+        if not spawnedZombies or spawnedZombies:isEmpty() then break end
+
+        local zombie = spawnedZombies:getFirst()
+        zombie:dressInRandomOutfit()
+        local nickname = (companionsCount == 0) and self.effectNickname or nil
+        if not MakeZombieCompanion(zombie, nickname) then break end
+        companionsCount = companionsCount + 1
+    end
+
+    ChaosPlayer.SayLineByColor(player, string.format("Raised %d zombies as companions", companionsCount),
         ChaosPlayerChatColors.green)
 end

@@ -1,7 +1,6 @@
 ---@class EffectFlyingCars : ChaosEffectBase
 ---@field timerMs integer
 ---@field backward boolean
----@field playerWasInGodMode boolean
 ---@field playerWasInVehicle boolean
 ---@field playerDamageCooldownMs integer
 EffectFlyingCars = ChaosEffectBase:derive("EffectFlyingCars", "flying_cars")
@@ -14,14 +13,12 @@ function EffectFlyingCars:OnStart()
 
     self.timerMs = TIMEOUT_MS
     self.backward = false
-    self.playerWasInGodMode = false
     self.playerWasInVehicle = false
     self.playerDamageCooldownMs = 0
     local player = getPlayer()
     if player and player:getVehicle() then
-        self.playerWasInGodMode = player:isGodMod()
-        player:setGodMod(true, true)
         self.playerWasInVehicle = true
+        ChaosUtils.EFFECT_FLYING_CARS_ENABLED = true
     end
 end
 
@@ -132,15 +129,13 @@ function EffectFlyingCars:OnTick(deltaMs)
     if self.playerWasInVehicle then
         if player:getVehicle() == nil then
             self.playerWasInVehicle = false
-            player:setGodMod(self.playerWasInGodMode, true)
+            ChaosUtils.EFFECT_FLYING_CARS_ENABLED = false
         end
     end
 end
 
 function EffectFlyingCars:OnEnd()
     ChaosEffectBase:OnEnd()
-    local player = getPlayer()
-    if player and player:getVehicle() then
-        player:setGodMod(self.playerWasInGodMode, true)
-    end
+    ChaosUtils.EFFECT_FLYING_CARS_ENABLED = false
+    self.playerWasInVehicle = false
 end

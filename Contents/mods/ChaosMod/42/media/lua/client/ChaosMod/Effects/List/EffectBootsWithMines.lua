@@ -5,9 +5,11 @@
 ---@field lastSquareZ integer | nil
 ---@field visitedTiles table<string, boolean>
 ---@field spawnedObjects table<integer, IsoObject>
+---@field postExplosionCooldownMs integer
 EffectBootsWithMines = ChaosEffectBase:derive("EffectBootsWithMines", "boots_with_mines")
 
 local START_DELAY_MS = 1500
+local POST_EXPLOSION_COOLDOWN_MS = 5000
 
 ---@param x integer
 ---@param y integer
@@ -49,12 +51,17 @@ function EffectBootsWithMines:OnStart()
     self.lastSquareZ = nil
     self.visitedTiles = {}
     self.spawnedObjects = {}
+    self.postExplosionCooldownMs = 0
     print("[EffectBootsWithMines] OnStart " .. tostring(self.effectId))
 end
 
 function EffectBootsWithMines:OnTick(deltaMs)
     self.startDelayMs = self.startDelayMs + deltaMs
     if self.startDelayMs < START_DELAY_MS then return end
+
+    if self.postExplosionCooldownMs > 0 then
+        self.postExplosionCooldownMs = self.postExplosionCooldownMs - deltaMs
+    end
 
     local player = getPlayer()
     if not player then return end
@@ -86,6 +93,13 @@ function EffectBootsWithMines:OnTick(deltaMs)
     local prevKey = tileKey(prevX, prevY)
     local currentKey = tileKey(currentX, currentY)
 
+    if self.postExplosionCooldownMs > 0 then
+        self.lastSquareX = currentX
+        self.lastSquareY = currentY
+        self.lastSquareZ = currentZ
+        return
+    end
+
     -- Store the previous square as visited and place a (future) object there
     if not self.visitedTiles[prevKey] then
         self.visitedTiles[prevKey] = true
@@ -104,6 +118,7 @@ function EffectBootsWithMines:OnTick(deltaMs)
 
         self.visitedTiles = {}
         self:ClearSpawnedObjects()
+        self.postExplosionCooldownMs = POST_EXPLOSION_COOLDOWN_MS
     end
 
     self.lastSquareX = currentX

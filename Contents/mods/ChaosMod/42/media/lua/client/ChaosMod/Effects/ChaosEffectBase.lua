@@ -9,6 +9,10 @@
 ---@field ticksActiveTime integer -- How many ticks the effect has been active for (in milliseconds)
 ---@field maxTicks integer -- How many ticks the effect will be active for (in milliseconds)
 ---@field showNameAlways boolean?
+---@field fakeEffectNameId string?
+---@field uiHidden boolean? -- when true, the effect runs but its row is not rendered in the effects UI (fake/hidden vote effects)
+---@field uiRevealPrefix string? -- prefix prepended to the name once the effect is revealed (e.g. "[Fake] " / "[Hidden] ")
+---@field uiRevealDelayMs number? -- how long (ms) the effect stays concealed before being revealed
 ChaosEffectBase = {}
 ChaosEffectBase.__index = ChaosEffectBase
 

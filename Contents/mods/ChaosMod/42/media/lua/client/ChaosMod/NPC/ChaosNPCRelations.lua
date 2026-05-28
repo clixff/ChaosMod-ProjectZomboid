@@ -162,6 +162,9 @@ end
 ---@return boolean
 function ChaosNPCRelations.CanNPCDestroyObjects(npc)
     if not npc then return false end
+
+    if npc:IsPanicking() then return true end
+
     local group = groups[npc.npcGroup]
     return group and group.canDestroyObjects or false
 end

@@ -10,6 +10,8 @@ ChaosPlayerChatColors = ChaosPlayerChatColors or {
     removedItem = { r = 1.0, g = 0.3, b = 0.3 },
     red = { r = 1.0, g = 0.3, b = 0.3 },
     line = { r = 1.0, g = 1.0, b = 1.0 },
+    blue = { r = 0.0, g = 0.5, b = 1.0 },
+    blue2 = { r = 0.5, g = 1.0, b = 1.0 },
 }
 
 ---@param player IsoPlayer
@@ -61,17 +63,36 @@ end
 ---@param shouldCheckEmpty boolean
 ---@param allowInteriors boolean
 ---@param returnPlayerSquare boolean
+---@param forceAllowInteriorsEvenWhenPlayerNotInRoom boolean?
 ---@return IsoGridSquare | nil
 function ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius, maxTries, shouldCheckEmpty,
-                                                 allowInteriors, returnPlayerSquare)
+                                                 allowInteriors, returnPlayerSquare,
+                                                 forceAllowInteriorsEvenWhenPlayerNotInRoom)
     if not player then return nil end
     local square = player:getSquare()
     if not square then return nil end
+
+    -- When the player is outside but interiors are allowed, prefer an outdoor result
+    -- so the spawn stays in the player's line of sight. Only fall back to interiors
+    -- if no outdoor square was found. The override flag short-circuits this to avoid
+    -- infinite recursion on the fallback pass.
+    if allowInteriors == true
+        and forceAllowInteriorsEvenWhenPlayerNotInRoom ~= true
+        and player:isInARoom() == false then
+        local outdoorSquare = ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius, maxTries,
+            shouldCheckEmpty, false, false, false)
+        if outdoorSquare then return outdoorSquare end
+        return ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius, maxTries,
+            shouldCheckEmpty, true, returnPlayerSquare, true)
+    end
+
     local x = square:getX()
     local y = square:getY()
     local newZ = z ~= nil and z or square:getZ()
 
     local cell = square:getCell()
+
+    local allowInteriorThisCheck = allowInteriors
 
     maxTries = maxTries or 50
     for i = 1, maxTries do
@@ -89,7 +110,7 @@ function ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius
             if sq and sq:isSolidFloor() then
                 local interiorCheck = true
 
-                if allowInteriors == false then
+                if allowInteriorThisCheck == false then
                     if sq:isOutside() == false then
                         interiorCheck = false
                     end
@@ -116,7 +137,7 @@ function ChaosPlayer.GetRandomSquareAroundPlayer(player, z, minRadius, maxRadius
 
     if newZ ~= 0 then
         return ChaosPlayer.GetRandomSquareAroundPlayer(player, 0, minRadius, maxRadius, maxTries, shouldCheckEmpty,
-            allowInteriors, returnPlayerSquare)
+            allowInteriors, returnPlayerSquare, forceAllowInteriorsEvenWhenPlayerNotInRoom)
     end
 
     return nil
@@ -259,7 +280,7 @@ function ChaosPlayer.RecursiveInventoryLookup(inventory, useDeepLookup, skipCont
     --- backward loop
     for i = items:size() - 1, 0, -1 do
         local item = items:get(i)
-        if item then
+        if item and not ChaosUtils.IsItemBandageOnBodyPart(item) then
             local isContainer = item:IsInventoryContainer()
             local shouldCallFunc = true
             if skipContainers and isContainer then
@@ -281,7 +302,8 @@ end
 
 ---@param player IsoPlayer
 ---@param item InventoryItem
-function ChaosPlayer.EquipWeapon(player, item)
+---@param bothHands boolean?
+function ChaosPlayer.EquipWeapon(player, item, bothHands)
     if not player then return end
     if not item then return end
 
@@ -292,7 +314,16 @@ function ChaosPlayer.EquipWeapon(player, item)
         return
     end
 
+    local isBothHandItem = item:isTwoHandWeapon()
+
+    if isBothHandItem then
+        bothHands = true
+    end
+
     player:setPrimaryHandItem(item)
+    if bothHands then
+        player:setSecondaryHandItem(item)
+    end
 end
 
 ---@param player IsoPlayer
@@ -371,6 +402,35 @@ function ChaosPlayer.SayLineRemoveItem(player, item, amount)
 end
 
 ---@param player IsoPlayer
+---@param item InventoryItem
+function ChaosPlayer.SayLineDestroyedItem(player, item)
+    if not player then return end
+    if not item then return end
+
+    local itemDisplayName = item:getDisplayName()
+    if not itemDisplayName then return end
+
+    local imgCode = ChaosUtils.GetImgCodeByItemTexture(item)
+    if not imgCode then return end
+
+    local str = string.format("%s Item Destroyed: %s", imgCode, itemDisplayName)
+
+    player:addLineChatElement(
+        str,
+        ChaosPlayerChatColors.red.r, ChaosPlayerChatColors.red.g, ChaosPlayerChatColors.red.b,
+        UIFont.Dialogue,
+        30.0,
+        "default",
+        true,
+        true,
+        true,
+        false,
+        false,
+        true
+    )
+end
+
+---@param player IsoPlayer
 function ChaosPlayer.UnequipAllClothes(player)
     if not player then return end
     local worn = player:getWornItems()
@@ -391,6 +451,7 @@ function ChaosPlayer.EquipClothes(player, item)
     if not item then return end
     if item:getBodyLocation() then
         player:setWornItem(item:getBodyLocation(), item, false)
+        triggerEvent("OnClothingUpdated", player)
     end
 end
 
@@ -436,6 +497,21 @@ function ChaosPlayer.SayLine(player, text, colorR, colorG, colorB)
 end
 
 ---@param player IsoPlayer
+function ChaosPlayer.ScheduleItemsHiddenHint(player)
+    if not player then return end
+
+    ChaosSpecialAction.AddNewAction({ player = player }, 4500,
+        function(_deltaMs, _data) end,
+        function(data)
+            local p = data.player
+            if not p or p:isDead() then return end
+            local text = ChaosLocalization.GetString("misc", "items_hidden_hint")
+            ChaosPlayer.SayLine(p, text, 232 / 255, 106 / 255, 81 / 255)
+        end
+    )
+end
+
+---@param player IsoPlayer
 ---@param text string
 ---@param color table<string, number> -- table with r, g, b values
 function ChaosPlayer.SayLineByColor(player, text, color)
@@ -444,4 +520,54 @@ function ChaosPlayer.SayLineByColor(player, text, color)
     if not color then return end
 
     ChaosPlayer.SayLine(player, text, color.r, color.g, color.b)
+end
+
+---@param part BodyPart
+---@return boolean
+local function hasVisibleInjury(part)
+    return part
+        and (
+            part:scratched()
+            or part:isCut()
+            or part:deepWounded()
+            or part:bitten()
+            or part:bleeding()
+            or part:haveGlass()
+            or part:haveBullet()
+            or part:getBurnTime() > 0
+            or part:stitched()
+        )
+end
+
+---@param player IsoPlayer
+---@return string | nil partName name of the body part that was healed, or nil if nothing was healed
+function ChaosPlayer.HealRandomWound(player)
+    if not player then return nil end
+
+    local bodyDamage = player:getBodyDamage()
+    if not bodyDamage then return nil end
+
+    local bodyParts = bodyDamage:getBodyParts()
+    if not bodyParts then return nil end
+
+    local candidates = {}
+
+    for i = 0, bodyParts:size() - 1 do
+        local part = bodyParts:get(i)
+        if hasVisibleInjury(part) then
+            candidates[#candidates + 1] = part
+        end
+    end
+
+    if #candidates == 0 then return nil end
+
+    local part = candidates[ChaosUtils.RandArrayIndex(candidates)]
+    if not part then return nil end
+
+    local partName = bodyDamage:getBodyPartName(part:getType())
+
+    part:RestoreToFullHealth()
+    bodyDamage:calculateOverallHealth()
+
+    return partName
 end

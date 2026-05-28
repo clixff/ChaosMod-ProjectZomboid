@@ -17,6 +17,42 @@ export interface DonatePriceGroup {
   price: number;
 }
 
+export interface DonationSystemDonationAlerts {
+  enabled: boolean;
+  app_id: string;
+  currency: string;
+}
+
+export interface DonationSystemTwitchBits {
+  enabled: boolean;
+  price_multiplier: number;
+}
+
+export interface DonationSystemTwitchPoints {
+  enabled: boolean;
+}
+
+export interface DonationSystemTwitchSubs {
+  enabled: boolean;
+  threshold: number;
+  allow_gift_subs: boolean;
+  allow_resubscriptions: boolean;
+  sub_tier_multipliers: boolean;
+  show_in_obs: boolean;
+}
+
+export interface DonationSystemsConfig {
+  donationalerts: DonationSystemDonationAlerts;
+  twitch_bits: DonationSystemTwitchBits;
+  twitch_points: DonationSystemTwitchPoints;
+  twitch_subs: DonationSystemTwitchSubs;
+}
+
+export interface CurrenciesConfig {
+  main: string;
+  list: Record<string, number>;
+}
+
 export interface StreamerModeConfig {
   streamer_mode_enabled: boolean;
   voting_enabled: boolean;
@@ -30,10 +66,34 @@ export interface StreamerModeConfig {
   say_killed_zombie_name: boolean;
   zombie_nicknames_buffer: number;
   enable_donate: boolean;
-  donate_providers: string[];
+  donation_systems: DonationSystemsConfig;
   donate_price_groups: DonatePriceGroup[];
   allow_vote_command: boolean;
   hide_votes: boolean;
+  youtube_chat_connection_type: "long_polling" | "message_streaming";
+  random_effect_in_vote: boolean;
+  voting_fake_effects_enabled: boolean;
+  voting_fake_effects_chance: number;
+  voting_hidden_effects_enabled: boolean;
+  voting_hidden_effects_chance: number;
+  reveal_hidden_effect_after_delay: boolean;
+  reveal_fake_effect_after_delay: boolean;
+  currencies: CurrenciesConfig;
+}
+
+export interface MetaEffectEntry {
+  id: string;
+  enabled: boolean;
+  voting_only: boolean;
+  duration: number;
+  chance: number;
+  variables: Record<string, unknown>;
+}
+
+export interface MetaEffectsConfig {
+  enabled: boolean;
+  interval_sec: number;
+  list: MetaEffectEntry[];
 }
 
 export interface ModConfig {
@@ -42,12 +102,19 @@ export interface ModConfig {
   effects_interval: number;
   effects_duration_multiplier: number;
   recent_effects_block_buffer: number;
+  persist_recent_effects: boolean;
   vote_start_time: number;
   hide_progress_bar: boolean;
   use_voting_progress_bar_color: boolean;
+  hide_effect_names: boolean;
+  explosions_damage_items: boolean;
+  explosions_destroy_random_item: boolean;
   ui: UIConfig;
   ui_sounds_enabled: boolean;
   ignore_effect_chances: boolean;
+  npc_voicelines_enabled: boolean;
+  npc_gifts_enabled: boolean;
+  meta_effects: MetaEffectsConfig;
   streamer_mode: StreamerModeConfig;
 }
 
@@ -73,7 +140,9 @@ export async function getConfig(): Promise<ModConfig> {
   return (await res.json()) as ModConfig;
 }
 
-export async function updateConfig(patch: Partial<ModConfig> | Record<string, unknown>): Promise<void> {
+export async function updateConfig(
+  patch: Partial<ModConfig> | Record<string, unknown>,
+): Promise<void> {
   const res = await fetch("/api/config", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -92,7 +161,13 @@ export async function getEffects(): Promise<EffectsResponse> {
 }
 
 export type ActivityEvent =
-  | { id: number; ts: number; type: "vote"; effect_id: string; effect_name: string }
+  | {
+      id: number;
+      ts: number;
+      type: "vote";
+      effect_id: string;
+      effect_name: string;
+    }
   | {
       id: number;
       ts: number;
@@ -122,15 +197,72 @@ export type ActivityEvent =
       nickname: string;
       donation_amount: number;
     }
+  | {
+      id: number;
+      ts: number;
+      type: "bits";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+      required_bits: number;
+      price_group: string;
+    }
+  | {
+      id: number;
+      ts: number;
+      type: "bits_failed_price";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+      required_bits: number;
+    }
+  | {
+      id: number;
+      ts: number;
+      type: "bits_failed_disabled";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      bits: number;
+    }
+  | {
+      id: number;
+      ts: number;
+      type: "bits_failed_no_tag";
+      nickname: string;
+      bits: number;
+    }
+  | {
+      id: number;
+      ts: number;
+      type: "sub";
+      effect_id: string;
+      effect_name: string;
+      nickname: string;
+      threshold: number;
+    }
   | { id: number; ts: number; type: "chat_connected" }
   | { id: number; ts: number; type: "chat_disconnected" }
   | { id: number; ts: number; type: "donationalerts_connected" }
-  | { id: number; ts: number; type: "donationalerts_disconnected" };
+  | { id: number; ts: number; type: "donationalerts_disconnected" }
+  | { id: number; ts: number; type: "youtube_chat_connected" }
+  | { id: number; ts: number; type: "youtube_chat_disconnected" };
 
 export interface HomeStatus {
   port: number;
   twitch: { configured: boolean; connected: boolean; name: string | null };
-  donationalerts: { configured: boolean; connected: boolean; name: string | null };
+  donationalerts: { connected: boolean; name: string | null };
+  youtube: {
+    account_connected: boolean;
+    channel_name: string | null;
+    chat_connected: boolean;
+    stream_url: string | null;
+    stream_title: string | null;
+    chat_message_count: number;
+    last_error: string | null;
+  };
   obs: {
     use_localhost_ip: boolean;
     local_url: string;
@@ -139,6 +271,7 @@ export interface HomeStatus {
   mod: { enabled: boolean };
   voting: { active: boolean };
   twitch_chat: { connected: boolean };
+  twitch_subs: { current: number };
   recent_activity: ActivityEvent[];
   version: {
     current: string;
@@ -176,10 +309,37 @@ export async function donationAlertsLogin(): Promise<void> {
 export async function donationAlertsLogout(): Promise<void> {
   await postSimple("/api/donationalerts/logout");
 }
+export async function youtubeLogout(): Promise<void> {
+  await postSimple("/api/youtube/logout");
+}
+export async function youtubeSetStreamUrl(url: string): Promise<void> {
+  const res = await fetch("/api/youtube/stream-url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `youtubeSetStreamUrl: ${res.status}`);
+  }
+}
+export async function youtubeSetApiKey(apiKey: string): Promise<void> {
+  const res = await fetch("/api/youtube/api-key", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ apiKey }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `youtubeSetApiKey: ${res.status}`);
+  }
+}
+export async function youtubeReconnect(): Promise<void> {
+  await postSimple("/api/youtube/reconnect");
+}
 export async function donationAlertsSetup(input: {
   appId: string;
   clientSecret: string;
-  currency: string;
 }): Promise<{ url: string | null }> {
   const res = await fetch("/api/donationalerts/setup", {
     method: "POST",
@@ -192,7 +352,9 @@ export async function donationAlertsSetup(input: {
   }
   return (await res.json()) as { url: string | null };
 }
-export async function exportEffects(kind: string): Promise<{ path: string | null }> {
+export async function exportEffects(
+  kind: string,
+): Promise<{ path: string | null }> {
   const res = await fetch(`/api/export?type=${encodeURIComponent(kind)}`, {
     method: "POST",
   });
@@ -203,6 +365,10 @@ export async function exportEffects(kind: string): Promise<{ path: string | null
   return (await res.json()) as { path: string | null };
 }
 
+export function downloadEffectsUrl(kind: string): string {
+  return `/api/export/download?type=${encodeURIComponent(kind)}`;
+}
+
 export async function getLanguages(): Promise<string[]> {
   const res = await fetch("/api/languages");
   if (!res.ok) throw new Error(`getLanguages: ${res.status}`);
@@ -210,7 +376,66 @@ export async function getLanguages(): Promise<string[]> {
   return data.languages;
 }
 
-export async function updateEffect(id: string, patch: Partial<EffectEntry>): Promise<void> {
+export interface TwitchPointsReward {
+  id: string;
+  name: string;
+  cost: number;
+  groups: string[];
+}
+
+export interface TwitchPointsStatus {
+  enabled: boolean;
+  twitch_connected: boolean;
+  has_scope: boolean;
+  has_rewards: boolean;
+  rewards: TwitchPointsReward[];
+  available_groups: string[];
+}
+
+export async function getTwitchPointsStatus(): Promise<TwitchPointsStatus> {
+  const res = await fetch("/api/twitch-points/status");
+  if (!res.ok) throw new Error(`getTwitchPointsStatus: ${res.status}`);
+  return (await res.json()) as TwitchPointsStatus;
+}
+
+export async function setTwitchPointsEnabled(enabled: boolean): Promise<void> {
+  const res = await fetch("/api/twitch-points/config", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ enabled }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `setTwitchPointsEnabled: ${res.status}`);
+  }
+}
+
+export async function createTwitchPointsRewards(
+  rows: Array<{ name: string; cost: number; groups: string[] }>,
+): Promise<void> {
+  const res = await fetch("/api/twitch-points/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rows }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `createTwitchPointsRewards: ${res.status}`);
+  }
+}
+
+export async function deleteTwitchPointsRewards(): Promise<void> {
+  const res = await fetch("/api/twitch-points/delete", { method: "POST" });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `deleteTwitchPointsRewards: ${res.status}`);
+  }
+}
+
+export async function updateEffect(
+  id: string,
+  patch: Partial<EffectEntry>,
+): Promise<void> {
   const res = await fetch(`/api/effects/${encodeURIComponent(id)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -220,4 +445,48 @@ export async function updateEffect(id: string, patch: Partial<EffectEntry>): Pro
     const text = await res.text();
     throw new Error(text || `updateEffect: ${res.status}`);
   }
+}
+
+export interface HubExportPayload {
+  mod_version: string;
+  rewards: boolean;
+  bits: boolean;
+  donationalerts: boolean;
+  last_effect: number;
+  data: {
+    effects: Record<string, Record<string, unknown>>;
+    prices: Record<string, number>;
+    rewards: Record<string, { groups: string[] }>;
+    currency: string;
+    bits_override: number;
+    donation_enabled: boolean;
+  };
+}
+
+export interface ExchangeRatesResult {
+  base: string;
+  rates: Record<string, number>;
+  time_last_update_utc: string;
+}
+
+export async function getCurrencyExchangeRates(
+  base: string,
+): Promise<ExchangeRatesResult> {
+  const res = await fetch(
+    `/api/currencies/exchange-rates?base=${encodeURIComponent(base)}`,
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `getCurrencyExchangeRates: ${res.status}`);
+  }
+  return (await res.json()) as ExchangeRatesResult;
+}
+
+export async function getHubExportPayload(): Promise<HubExportPayload> {
+  const res = await fetch("/api/hub-export");
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `getHubExportPayload: ${res.status}`);
+  }
+  return (await res.json()) as HubExportPayload;
 }

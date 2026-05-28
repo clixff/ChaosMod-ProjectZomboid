@@ -26,10 +26,13 @@ function EffectSpawnGrieferKnight:OnStart()
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc:initializeHuman()
 
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
     npc:SetWeapon("Base.Sword")
+
+    npc:EnterPlayerVehicle(player)
 end

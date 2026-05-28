@@ -1,18 +1,22 @@
+<p align="center">
+  <img src="assets\steam_v2\steam_preview_01.png" alt="Hermes Agent" width="100%">
+</p>
+
 # Chaos Mod
 
 A single-player chaos mod for **Project Zomboid Build 42**.
 
 The mod adds a random effect system to the game. Every 45 seconds, a new effect is activated. Effects can be helpful, harmful, or just completely random.
 
-The mod currently includes **310+ effects**, such as:
+The mod currently includes **450+ effects**, such as:
 
 - Spawn a Zombie Nearby
 - Give Random Tool
 - Enable Rain
 
-You can see the the full list of effects in [Google Sheets](https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I).
+You can see the the full list of effects in [Chaos Mod Hub](https://chaos-zomboid.com/effects) or [Google Sheets](https://docs.google.com/spreadsheets/d/11eyODgqo1gVIdKHx2ZYvHZq6GDGwLoQKZm4SDoZ262I).
 
-Chaos Mod also supports Twitch integration. Viewers can vote for the next effect, and Twitch nicknames can be displayed above zombies.
+Chaos Mod also supports Twitch and YouTube integration. Viewers can vote for the next effect, and their nicknames can be displayed above zombies.
 
 ## Installation
 
@@ -40,6 +44,7 @@ Chaos Mod also supports Twitch integration. Viewers can vote for the next effect
 
 ---
 
+> [!IMPORTANT]
 > This mod requires the **unstable** branch of Project Zomboid on Steam.  
 > It has been tested on version **42.18.0**.
 >
@@ -47,17 +52,15 @@ Chaos Mod also supports Twitch integration. Viewers can vote for the next effect
 
 ---
 
-## Twitch Support
+## Streaming Services Support
 
-Chaos Mod can be used with Twitch integration.
+Chaos Mod supports **Twitch** and **YouTube** live chat integration. Both platforms work the same way through a separate application called **StreamerApp**, which handles the connection between the streaming service and the mod.
 
-With Twitch support enabled:
+With streaming support enabled:
 
 - Viewers can vote for the next effect.
-- Twitch nicknames can appear above zombies.
+- Viewer nicknames can appear above zombies.
 - Voting options can be displayed in OBS.
-
-Twitch integration requires a separate application called **StreamerApp**, which handles the connection between Twitch and the mod.
 
 To vote, viewers send the option number in chat:
 
@@ -71,49 +74,89 @@ For example:
 2
 ```
 
-The option numbers are displayed in OBS.
+Both `<number>` and `!vote <number>` formats are supported. The option numbers are displayed in OBS.
 
-### Twitch Support Installation
+### StreamerApp Installation
 
-1. Launch the game with the mod enabled at least once.
+1. Launch the game with the mod enabled at least once. You need to load a game world and activate the mod once.
 2. Download the latest release from [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
 3. Extract **ZomboidStreamerApp.exe** to any folder.
-4. Launch **ZomboidStreamerApp.exe**.
-5. After dashboard is launched in your browser, click on the **"Login"** button in the Twitch section.
-6. Complete the login process in your browser
+4. Launch **ZomboidStreamerApp.exe** — the dashboard opens in your browser.
+5. Connect Twitch and/or YouTube in the dashboard (see sub-sections below).
+
+### Twitch
+
+In the StreamerApp dashboard, click the **Login** button in the Twitch card and complete the login process in your browser.
+
+### YouTube
+
+YouTube integration uses your own **YouTube Data API v3 key**. The mod never logs in to your Google account.
+
+In the StreamerApp dashboard, click **Connect** on the YouTube card. The Connect YouTube window includes a built-in step-by-step setup guide that walks you through creating an API key in Google Cloud Console. Once you have the key:
+
+1. Paste your API key into the field below the guide.
+2. Paste your current YouTube live video URL on the YouTube card.
+
+Notes:
+
+- YouTube does **not** support donation-triggered effects.
+- Reading YouTube live chat consumes your API key's daily quota.
 
 ### OBS Setup
 
-To display voting options in OBS, add a browser source.
-You can see instructions on how to set up the browser source in the StreamerApp dashboard.
+To display voting options in OBS, add a browser source. Instructions for setting up the browser source are available in the StreamerApp dashboard.
 
 ## Donation Effect Support
 
 Chaos Mod supports donation-triggered effects.
 
-This feature uses the same **StreamerApp** that is used for Twitch support.
+This feature uses the same **StreamerApp** that is used for streaming services support.
 
 Currently supported donation services:
 
+- **Twitch Bits**
+- **Twitch Channel Points Rewards**
+- **Twitch Subs**
 - **DonationAlerts**
 
-Viewers can activate effects by donating a specific amount of money and including an effect ID in their donation message.
+Viewers can activate effects by donating a specific amount of money, or by cheering with Bits on Twitch, and including an effect ID in the donation message.
 
-Supported tag formats:
-
-- `#numeric_id` — uses the numeric ID from `/export csv` and `/mod/effects`
-- `№<number>` — numeric ID prefixed with `№`
-- `!<number>` — numeric ID prefixed with `!`
-- `<number>` — bare numeric ID anywhere in the message
+To activate a specific effect, they only need to include the effect ID number in the message.
 
 Example donation messages:
 
 ```txt
-#50 Some message
-Hello! №41
-!137
-Hello! 22
+50
 ```
+
+or
+
+```txt
+Some message! 51
+```
+
+You can find effect IDs on [Chaos Mod Hub](https://chaos-zomboid.com/effects), or create your own config there.
+
+Note: Twitch subscriptions do not activate effects by ID. Instead, they activate a random effect every N subscriptions.
+
+### Twitch Bits Setup
+
+You can enable Twitch Bits in the StreamerApp dashboard. You must be logged in to Twitch first.
+
+Viewers cheer with bits and include an effect ID in the cheer message — the same tag formats as above are supported.
+
+The amount of bits required to activate an effect is calculated from the effect's price group price multiplied by the Twitch Bits multiplier (configured in the dashboard, default is `100`). For example, an effect with price `2` and multiplier `100` requires at least `200` bits.
+
+### Twitch Channel Points Rewards Setup
+
+You can enable Twitch Bits in the StreamerApp dashboard.
+You can create rewards for each Tier of Price group of effects.
+
+### Twitch Subs Setup
+
+You can enable Twitch Subs in the StreamerApp dashboard.
+
+Note: Twitch subscriptions do not activate effects by ID. Instead, they activate a random effect every N subscriptions.
 
 ### DonationAlerts Setup
 
@@ -121,7 +164,11 @@ You can set up DonationAlerts in the StreamerApp dashboard.
 
 ### Donation Prices Export
 
-You can export donation prices to a XLSX file on StreamerApp dashboard.
+Use "Export To Hub" in component to get unique URL for all your settings. You can share that link.
+
+#### Excel export (legacy)
+
+You can export donation prices to a XLSX file on StreamerApp dashboard. The XLSX includes a `Price` column when DonationAlerts is enabled and a `Twitch Bits` column when Twitch Bits is enabled.
 
 The exported XLSX file can be imported into Google Sheets and shared with viewers as a donation price table.
 
@@ -132,6 +179,9 @@ The `id` column in the XLSX is an integer starting from `1`. The same numeric ID
 Donation prices are configured in StreamerApp dashboard.
 
 ### Adding Other Donation Services — For Developers
+
+> [!NOTE]
+> This section is for developers.
 
 You can add support for other donation services by creating your own application that communicates with the local StreamerApp API.
 
@@ -222,7 +272,7 @@ In StreamerApp dashboard set these settings:
 - Voting enabled: false
 - Donations enabled: true
 
-### I only want to display Twitch nicknames above zombies, without random effects every 45 seconds and without voting. How can I do this?
+### I only want to display Twitch or YouTube nicknames above zombies, without random effects every 45 seconds and without voting. How can I do this?
 
 In StreamerApp dashboard set these settings:
 

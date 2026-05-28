@@ -10,13 +10,18 @@ function EffectSpawnAdoringFan:OnStart()
     if not randomSquare then return end
 
     local newZombies = ChaosZombie.SpawnZombieAt(randomSquare:getX(), randomSquare:getY(), randomSquare:getZ(), 1,
-        "Tourist", 50)
+        "Tourist", 0)
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     zombie:dressInRandomOutfit()
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.FOLLOWERS
     npc:AddTag("adoring_fan")
+
+    ChaosZombie.AddNewChatLine(zombie, ChaosLocalization.GetString("misc", "adoring_fan_greeting"),
+        { r = 0.4, g = 0.6, b = 1.0 })
+
+    ChaosZombie.PlaySoundLine(zombie, "chaos_adoring_fan_01_en", "adoring_fan", 50000)
 end

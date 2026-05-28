@@ -1,8 +1,9 @@
 import { logger } from "./utils/logger.ts";
-import type { AnyProvider, StreamerUser } from "./streamer/index.ts";
+import type { TwitchChatProvider } from "./streamer/index.ts";
 import type { ModConfig } from "./config.ts";
 import type { EffectEntry } from "./effects.ts";
 import type { ActivityEvent } from "./activityLog.ts";
+import { fetchExchangeRates } from "./utils/currencies.ts";
 import obsHtmlFile from "../frontend/obs/index.html";
 import dashboardHtmlFile from "../frontend/dashboard/index.html";
 
@@ -40,6 +41,7 @@ export interface VoteOptionStatus {
   effect_name: string;
   votes: number | undefined;
   hidden?: boolean;
+  duration?: number;
 }
 
 export interface ModStatus {
@@ -52,38 +54,99 @@ export interface ModStatus {
   last_winner: string | null;
   vote_options: VoteOptionStatus[];
   donateEnabled: boolean;
+  twitch_subs: {
+    enabled: boolean;
+    show_in_obs: boolean;
+    current: number;
+    threshold: number;
+  };
 }
 
 export interface ServerContext {
   host: string;
   port: number;
-  provider: AnyProvider | null;
-  onLogin: (user: StreamerUser, token: string) => void | Promise<void>;
+  twitch: TwitchChatProvider | null;
   getModStatus: () => ModStatus;
   getEffectsResponse: () => unknown;
-  activateEffect: (nickname: string | undefined, effectId: string) => { success: boolean; error?: string };
+  activateEffect: (
+    nickname: string | undefined,
+    effectId: string,
+  ) => { success: boolean; error?: string };
   onDonationAlertsCode?: (code: string) => Promise<{ name: string } | null>;
   getConfig?: () => ModConfig | null;
   updateConfig?: (patch: unknown) => { success: boolean; error?: string };
   getEffectsList?: () => Array<EffectEntry & { name: string }>;
-  updateEffect?: (id: string, patch: unknown) => { success: boolean; error?: string };
+  updateEffect?: (
+    id: string,
+    patch: unknown,
+  ) => { success: boolean; error?: string };
   getPriceGroups?: () => Array<{ group: string; price: number }>;
   getLanguages?: () => string[];
   getHomeStatus?: () => HomeStatus;
-  twitchLogin?: () => Promise<{ success: boolean; error?: string; url?: string }>;
+  twitchLogin?: () => Promise<{
+    success: boolean;
+    error?: string;
+    url?: string;
+  }>;
   twitchLogout?: () => Promise<{ success: boolean; error?: string }>;
-  donationAlertsLogin?: () => Promise<{ success: boolean; error?: string; url?: string }>;
+  donationAlertsLogin?: () => Promise<{
+    success: boolean;
+    error?: string;
+    url?: string;
+  }>;
   donationAlertsLogout?: () => Promise<{ success: boolean; error?: string }>;
+  getTwitchPointsStatus?: () => TwitchPointsStatus;
+  updateTwitchPointsConfig?: (
+    input: { enabled: boolean },
+  ) => Promise<{ success: boolean; error?: string }>;
+  createTwitchPoints?: (
+    rows: Array<{ name: string; cost: number; groups: string[] }>,
+  ) => Promise<{
+    success: boolean;
+    error?: string;
+    status?: number;
+  }>;
+  deleteTwitchPoints?: () => Promise<{
+    success: boolean;
+    error?: string;
+    status?: number;
+  }>;
   donationAlertsSetup?: (input: {
     appId: string;
     clientSecret: string;
-    currency: string;
   }) => Promise<{ success: boolean; error?: string; url?: string }>;
+  youtubeLogout?: () => Promise<{ success: boolean; error?: string }>;
+  youtubeSetStreamUrl?: (
+    url: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  youtubeSetApiKey?: (
+    apiKey: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  youtubeReconnect?: () => Promise<{ success: boolean; error?: string }>;
   exportEffects?: (
     kind: string,
   ) =>
     | { success: boolean; error?: string; path?: string }
     | Promise<{ success: boolean; error?: string; path?: string }>;
+  downloadEffects?: (kind: string) => Promise<
+    | { success: false; error: string }
+    | {
+        success: true;
+        bytes: ArrayBuffer;
+        filename: string;
+        contentType: string;
+      }
+  >;
+  getHubExportPayload?: () => unknown | null;
+}
+
+export interface TwitchPointsStatus {
+  enabled: boolean;
+  twitch_connected: boolean;
+  has_scope: boolean;
+  has_rewards: boolean;
+  rewards: Array<{ id: string; name: string; cost: number; groups: string[] }>;
+  available_groups: string[];
 }
 
 export interface HomeStatus {
@@ -94,9 +157,17 @@ export interface HomeStatus {
     name: string | null;
   };
   donationalerts: {
-    configured: boolean;
     connected: boolean;
     name: string | null;
+  };
+  youtube: {
+    account_connected: boolean;
+    channel_name: string | null;
+    chat_connected: boolean;
+    stream_url: string | null;
+    stream_title: string | null;
+    chat_message_count: number;
+    last_error: string | null;
   };
   obs: {
     use_localhost_ip: boolean;
@@ -112,6 +183,9 @@ export interface HomeStatus {
   twitch_chat: {
     connected: boolean;
   };
+  twitch_subs: {
+    current: number;
+  };
   recent_activity: ActivityEvent[];
   version: {
     current: string;
@@ -122,16 +196,17 @@ export interface HomeStatus {
 }
 
 export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
-  const { host, port, provider } = ctx;
+  const { host, port } = ctx;
+  const twitch = ctx.twitch;
 
   const server = Bun.serve({
     hostname: host,
     port,
     routes: {
       "/login/twitch": () => {
-        if (!provider)
+        if (!twitch)
           return new Response("No provider configured", { status: 503 });
-        return Response.redirect(provider.getLoginUrl(port), 302);
+        return Response.redirect(twitch.getLoginUrl(port), 302);
       },
 
       "/auth/result/twitch": new Response(AUTH_CALLBACK_HTML, {
@@ -147,17 +222,14 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           if (!token || !providerParam) {
             return new Response("Missing parameters", { status: 400 });
           }
-          if (!provider || providerParam !== provider.key) {
+          if (!twitch || providerParam !== "twitch") {
             return new Response("Unknown provider", { status: 400 });
           }
 
-          const user = await provider.validateToken(token);
+          const user = await twitch.validateAndSaveToken(token);
           if (!user) {
             return new Response("Invalid or expired token", { status: 401 });
           }
-
-          await provider.saveToken(token);
-          await ctx.onLogin(user, token);
           return new Response(
             `Logged in as ${user.display_name}. You can close this tab.`,
           );
@@ -172,7 +244,8 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
       "/api/config": {
         GET: () => {
           const cfg = ctx.getConfig?.();
-          if (!cfg) return new Response("Config not available", { status: 503 });
+          if (!cfg)
+            return new Response("Config not available", { status: 503 });
           return Response.json(cfg);
         },
         PUT: async (req: Request) => {
@@ -187,7 +260,9 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           }
           const result = ctx.updateConfig(body);
           if (!result.success) {
-            return new Response(result.error ?? "Update failed", { status: 400 });
+            return new Response(result.error ?? "Update failed", {
+              status: 400,
+            });
           }
           return new Response("OK");
         },
@@ -204,7 +279,8 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
 
       "/api/twitch/login": {
         POST: async () => {
-          if (!ctx.twitchLogin) return new Response("Not available", { status: 503 });
+          if (!ctx.twitchLogin)
+            return new Response("Not available", { status: 503 });
           const r = await ctx.twitchLogin();
           if (!r.success) {
             return new Response(r.error ?? "Login failed", { status: 400 });
@@ -215,7 +291,8 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
 
       "/api/twitch/logout": {
         POST: async () => {
-          if (!ctx.twitchLogout) return new Response("Not available", { status: 503 });
+          if (!ctx.twitchLogout)
+            return new Response("Not available", { status: 503 });
           const r = await ctx.twitchLogout();
           if (!r.success) {
             return new Response(r.error ?? "Logout failed", { status: 400 });
@@ -248,32 +325,25 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           } catch {
             return new Response("Invalid JSON", { status: 400 });
           }
-          if (body === null || typeof body !== "object" || Array.isArray(body)) {
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
             return new Response("Body must be an object", { status: 400 });
           }
           const b = body as Record<string, unknown>;
           const appId = typeof b["appId"] === "string" ? b["appId"].trim() : "";
           const clientSecret =
             typeof b["clientSecret"] === "string" ? b["clientSecret"] : "";
-          const currencyRaw =
-            typeof b["currency"] === "string" ? b["currency"].trim() : "";
-          if (!appId || !clientSecret || !currencyRaw) {
-            return new Response(
-              "Missing fields: appId, clientSecret, currency",
-              { status: 400 },
-            );
-          }
-          const currency = currencyRaw.toUpperCase();
-          if (!/^[A-Z]{3}$/.test(currency)) {
-            return new Response(
-              "Currency must be exactly 3 letters (e.g. RUB)",
-              { status: 400 },
-            );
+          if (!appId || !clientSecret) {
+            return new Response("Missing fields: appId, clientSecret", {
+              status: 400,
+            });
           }
           const r = await ctx.donationAlertsSetup({
             appId,
             clientSecret,
-            currency,
           });
           if (!r.success) {
             return new Response(r.error ?? "Setup failed", { status: 400 });
@@ -295,9 +365,145 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
         },
       },
 
+      "/api/twitch-points/status": {
+        GET: () => {
+          if (!ctx.getTwitchPointsStatus) {
+            return new Response("Not available", { status: 503 });
+          }
+          return Response.json(ctx.getTwitchPointsStatus());
+        },
+      },
+
+      "/api/twitch-points/config": {
+        POST: async (req: Request) => {
+          if (!ctx.updateTwitchPointsConfig) {
+            return new Response("Not available", { status: 503 });
+          }
+          let body: unknown;
+          try {
+            body = await req.json();
+          } catch {
+            return new Response("Invalid JSON", { status: 400 });
+          }
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
+            return new Response("Body must be an object", { status: 400 });
+          }
+          const enabledRaw = (body as Record<string, unknown>)["enabled"];
+          if (typeof enabledRaw !== "boolean") {
+            return new Response("'enabled' must be a boolean", { status: 400 });
+          }
+          const r = await ctx.updateTwitchPointsConfig({ enabled: enabledRaw });
+          if (!r.success) {
+            return new Response(r.error ?? "Update failed", { status: 400 });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/twitch-points/create": {
+        POST: async (req: Request) => {
+          if (!ctx.createTwitchPoints) {
+            return new Response("Not available", { status: 503 });
+          }
+          let body: unknown;
+          try {
+            body = await req.json();
+          } catch {
+            return new Response("Invalid JSON", { status: 400 });
+          }
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
+            return new Response("Body must be an object", { status: 400 });
+          }
+          const rowsRaw = (body as Record<string, unknown>)["rows"];
+          if (!Array.isArray(rowsRaw) || rowsRaw.length === 0) {
+            return new Response("Body must contain non-empty 'rows' array", {
+              status: 400,
+            });
+          }
+          const rows: Array<{ name: string; cost: number; groups: string[] }> = [];
+          const seenNames = new Set<string>();
+          for (let i = 0; i < rowsRaw.length; i++) {
+            const item = rowsRaw[i];
+            if (item === null || typeof item !== "object" || Array.isArray(item)) {
+              return new Response(`Row ${i + 1} is not an object`, {
+                status: 400,
+              });
+            }
+            const r = item as Record<string, unknown>;
+            const name = typeof r["name"] === "string" ? r["name"].trim() : "";
+            const cost =
+              typeof r["cost"] === "number" ? Math.floor(r["cost"]) : NaN;
+            const groupsRaw = r["groups"];
+            if (!name) {
+              return new Response(`Row ${i + 1} has empty name`, { status: 400 });
+            }
+            if (seenNames.has(name)) {
+              return new Response(`Duplicate row name: ${name}`, { status: 400 });
+            }
+            seenNames.add(name);
+            if (!Number.isInteger(cost) || cost < 1) {
+              return new Response(
+                `Row ${i + 1} has invalid cost (must be integer ≥ 1)`,
+                { status: 400 },
+              );
+            }
+            if (!Array.isArray(groupsRaw) || groupsRaw.length === 0) {
+              return new Response(
+                `Row ${i + 1} ("${name}") has no price groups`,
+                { status: 400 },
+              );
+            }
+            const groups: string[] = [];
+            const seenGroups = new Set<string>();
+            for (const g of groupsRaw) {
+              if (typeof g !== "string" || !g) continue;
+              if (seenGroups.has(g)) continue;
+              seenGroups.add(g);
+              groups.push(g);
+            }
+            if (groups.length === 0) {
+              return new Response(
+                `Row ${i + 1} ("${name}") has no valid price groups`,
+                { status: 400 },
+              );
+            }
+            rows.push({ name, cost, groups });
+          }
+          const result = await ctx.createTwitchPoints(rows);
+          if (!result.success) {
+            const status = result.status && result.status >= 400 ? 502 : 400;
+            return new Response(result.error ?? "Create failed", { status });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/twitch-points/delete": {
+        POST: async () => {
+          if (!ctx.deleteTwitchPoints) {
+            return new Response("Not available", { status: 503 });
+          }
+          const result = await ctx.deleteTwitchPoints();
+          if (!result.success) {
+            const status = result.status && result.status >= 400 ? 502 : 400;
+            return new Response(result.error ?? "Delete failed", { status });
+          }
+          return new Response("OK");
+        },
+      },
+
       "/api/export": {
         POST: async (req: Request) => {
-          if (!ctx.exportEffects) return new Response("Not available", { status: 503 });
+          if (!ctx.exportEffects)
+            return new Response("Not available", { status: 503 });
           const url = new URL(req.url);
           const kind = url.searchParams.get("type") ?? "csv";
           const r = await ctx.exportEffects(kind);
@@ -308,10 +514,45 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
         },
       },
 
+      "/api/export/download": {
+        GET: async (req: Request) => {
+          if (!ctx.downloadEffects) {
+            return new Response("Not available", { status: 503 });
+          }
+          const url = new URL(req.url);
+          const kind = url.searchParams.get("type") ?? "csv";
+          const r = await ctx.downloadEffects(kind);
+          if (!r.success) {
+            return new Response(r.error, { status: 400 });
+          }
+          return new Response(r.bytes, {
+            headers: {
+              "Content-Type": r.contentType,
+              "Content-Disposition": `attachment; filename="${r.filename}"`,
+              "Content-Length": String(r.bytes.byteLength),
+              "Cache-Control": "no-store",
+            },
+          });
+        },
+      },
+
       "/api/languages": {
         GET: () => {
           const langs = ctx.getLanguages?.() ?? [];
           return Response.json({ languages: langs });
+        },
+      },
+
+      "/api/hub-export": {
+        GET: () => {
+          if (!ctx.getHubExportPayload) {
+            return new Response("Not available", { status: 503 });
+          }
+          const payload = ctx.getHubExportPayload();
+          if (!payload) {
+            return new Response("Hub export unavailable", { status: 503 });
+          }
+          return Response.json(payload);
         },
       },
 
@@ -324,6 +565,30 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
             effects: ctx.getEffectsList(),
             price_groups: ctx.getPriceGroups?.() ?? [],
           });
+        },
+      },
+
+      "/api/currencies/exchange-rates": {
+        GET: async (req: Request) => {
+          const url = new URL(req.url);
+          const base = url.searchParams.get("base") ?? "";
+          const code = base.trim().toUpperCase();
+          if (!/^[A-Z]{3}$/.test(code)) {
+            return new Response(
+              `Invalid base currency code: ${base}`,
+              { status: 400 },
+            );
+          }
+          try {
+            const result = await fetchExchangeRates(code);
+            return Response.json(result);
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            logger.warn(`[currencies] Exchange rate fetch failed: ${msg}`);
+            return new Response(`Exchange rate fetch failed: ${msg}`, {
+              status: 502,
+            });
+          }
         },
       },
 
@@ -343,7 +608,97 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           }
           const result = ctx.updateEffect(id, body);
           if (!result.success) {
-            return new Response(result.error ?? "Update failed", { status: 400 });
+            return new Response(result.error ?? "Update failed", {
+              status: 400,
+            });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/youtube/logout": {
+        POST: async () => {
+          if (!ctx.youtubeLogout)
+            return new Response("Not available", { status: 503 });
+          const r = await ctx.youtubeLogout();
+          if (!r.success) {
+            return new Response(r.error ?? "Logout failed", { status: 400 });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/youtube/api-key": {
+        POST: async (req: Request) => {
+          if (!ctx.youtubeSetApiKey)
+            return new Response("Not available", { status: 503 });
+          let body: unknown;
+          try {
+            body = await req.json();
+          } catch {
+            return new Response("Invalid JSON", { status: 400 });
+          }
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
+            return new Response("Body must be an object", { status: 400 });
+          }
+          const rawKey = (body as Record<string, unknown>)["apiKey"];
+          if (typeof rawKey !== "string") {
+            return new Response("Missing 'apiKey' field", { status: 400 });
+          }
+          const r = await ctx.youtubeSetApiKey(rawKey);
+          if (!r.success) {
+            return new Response(r.error ?? "Failed to save API key", {
+              status: 400,
+            });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/youtube/reconnect": {
+        POST: async () => {
+          if (!ctx.youtubeReconnect)
+            return new Response("Not available", { status: 503 });
+          const r = await ctx.youtubeReconnect();
+          if (!r.success) {
+            return new Response(r.error ?? "Reconnect failed", {
+              status: 400,
+            });
+          }
+          return new Response("OK");
+        },
+      },
+
+      "/api/youtube/stream-url": {
+        POST: async (req: Request) => {
+          if (!ctx.youtubeSetStreamUrl)
+            return new Response("Not available", { status: 503 });
+          let body: unknown;
+          try {
+            body = await req.json();
+          } catch {
+            return new Response("Invalid JSON", { status: 400 });
+          }
+          if (
+            body === null ||
+            typeof body !== "object" ||
+            Array.isArray(body)
+          ) {
+            return new Response("Body must be an object", { status: 400 });
+          }
+          const rawUrl = (body as Record<string, unknown>)["url"];
+          if (typeof rawUrl !== "string") {
+            return new Response("Missing 'url' field", { status: 400 });
+          }
+          const r = await ctx.youtubeSetStreamUrl(rawUrl);
+          if (!r.success) {
+            return new Response(r.error ?? "Failed to save stream URL", {
+              status: 400,
+            });
           }
           return new Response("OK");
         },
@@ -353,7 +708,9 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
       "/mod/effects": () => Response.json(ctx.getEffectsResponse()),
       "/provider/donationalerts/success/": async (req: Request) => {
         if (!ctx.onDonationAlertsCode) {
-          return new Response("Donation provider not configured", { status: 503 });
+          return new Response("Donation provider not configured", {
+            status: 503,
+          });
         }
         const url = new URL(req.url);
         const code = url.searchParams.get("code");
@@ -367,7 +724,9 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
             headers: { "Content-Type": "text/html; charset=utf-8" },
           });
         }
-        return new Response(`Logged in as ${user.name}. You can close this tab.`);
+        return new Response(
+          `Logged in as ${user.name}. You can close this tab.`,
+        );
       },
 
       "/mod/activate-effect": {
@@ -375,12 +734,16 @@ export function startServer(ctx: ServerContext): ReturnType<typeof Bun.serve> {
           const url = new URL(req.url);
           const effectId = url.searchParams.get("effect");
           if (!effectId) {
-            return new Response("Missing 'effect' query parameter", { status: 400 });
+            return new Response("Missing 'effect' query parameter", {
+              status: 400,
+            });
           }
           const nickname = url.searchParams.get("nickname") ?? undefined;
           const result = ctx.activateEffect(nickname, effectId);
           if (!result.success) {
-            return new Response(result.error ?? "Not available", { status: 403 });
+            return new Response(result.error ?? "Not available", {
+              status: 403,
+            });
           }
           return new Response("OK");
         },

@@ -1,4 +1,245 @@
-[1.1.1]
+## [1.2.0]
+
+## New Services Support
+
+- Added Twitch Bits support for donation-triggered effects. [Experemental]
+- Added Twitch Channel Points support for donation-triggered effects. [Experemental]
+- Added Twitch Subs support: every N subs can trigger a random effect. [Experemental]
+- Added YouTube live chat support for voting and zombie nicknames using your own YouTube Data API key. [Experemental]
+- Added multi-currency support for DonationAlerts. Donations in configured currencies are converted into your main currency before triggering effects. [Experemental]
+
+## Meta Effects System
+
+- Added a new meta-effect system for effects that are triggered with new meta effects interval (15 minutes). Highly configurable.
+- `Total Chaos`: makes global effects timer faster
+- `Combo Time`: activates 2 or more effects instead of one
+
+### New Mod Features
+
+- Added a centered intro overlay: `ChaosMod v{version} Started / {n} effects`. It appears for 8 seconds when the mod starts, with a 1-second fade-out.
+- Added in-game mod/StreamerApp version mismatch modal and update notification modal.
+- When a mod update replaces `effects.json` with the shipped defaults, the previous file is now backed up as `effects.json.backup` in the same folder.
+- Explosions now damage vehicle parts and eject the player from cars.
+- Newly spawned vehicles now have randomized part conditions.
+- Added a Streamer Mode setting to disable the hidden `Random` vote option, making every vote choice visible.
+- OBS vote overlay now shows effect duration next to the effect name when available.
+- Added `INSTALL.txt` to release packages with Steam, manual install, and StreamerApp launch instructions.
+- Recent effects blocklist now persists between game sessions, preventing repeated effects right after restarting the game.
+- Added a recommended-values hint under the `Recent effects block buffer` setting in both the in-game settings window and StreamerApp dashboard.
+- Changing the effects interval or vote start time in the in-game settings now restarts the current iteration, so the progress bar reflects the new timing.
+- Export your prices, rewards, and effect tweaks as a shareable Chaos Mod Hub Web App config, so viewers can see exactly what is active on your stream.
+- Spawn NPC effects triggered by donations now use the donor’s nickname as the NPC nickname.
+- Enemy NPCs can now spawn inside the player’s car and will exit when the player exits.
+- NPCs now have a 40% chance to drop their weapon on death. They always drop it if they picked it up from the ground.
+- Friendly NPCs can now pick up bandages from the ground and heal themselves when out of combat.
+- Friendly NPCs occasionally gift a random item to the player when standing nearby and out of combat.
+- NPCs now panic and flee to a nearby spot when surrounded by zombies or when their health is low.
+- NPCs can now use handguns, rifles, and shotguns. They can aim, fire, reload, and pick up dropped firearms from the ground.
+- Animals can now open doors.
+- Explosions now damage every item in the player’s inventory and destroy one random item. Both behaviors can be toggled off in settings.
+- Long effect names in the OBS vote overlay now scroll to reveal the full name.
+- Added optional Fake and Hidden voting effects, which can disguise the winning effect under a decoy name or briefly hide it from the streamer before revealing it.
+- Added a `Hide Effect Names` setting that masks every effect name as `???` in the UI.
+
+### Mod Fixes and Improvements
+
+- Fixed localization issues across all language files, including typos, missing diacritics, and incorrect translations.
+- Fixed a Japanese translation bug.
+- Fixed an issue where players could not press the options button in some localizations or screen sizes.
+- Twitch viewers without a chat color now receive a stable color from the chat palette instead of plain white.
+- Fixed a crash that could happen when a vehicle carrying an NPC crashed.
+- Spawned zombies now respect the player's Sandbox settings and spawn with randomized health instead of always using `1.00`.
+- NPCs now have different health groups: weak, default, and strong.
+- Improved NPC AI against zombies.
+- Improved overall NPC and Zombie vs NPC AI behavior.
+- NPCs now deal more damage to zombies.
+- Friendly NPCs now consume 25% less stamina when attacking.
+- NPCs now close doors behind them after opening.
+- Removed the unused `Voting Type` setting from the in-game settings window and StreamerApp dashboard.
+- Removed debug keybinds that dropped weapons and changed the player’s clothes.
+- Updated the random item pool used by effects such as `Lootbox`, `Find Chest With Loot`, `Courier`, and similar effects.
+- Zombie chat lines now linger briefly after the zombie goes out of sight, so messages no longer vanish instantly.
+- Weapons spawned in lootboxes and other effects now spawn with full ammo.
+
+### Effect Fixes and Improvements
+
+- Fixed `Player Can't Stop Coughing` not ending after its duration.
+- `Hide Random Items` and `Hide Player Clothes` no longer hide bandages equipped on body parts.
+- Updated zombie AI for `Zombies Walk Away`.
+- Card-select, random-card, and dice-roll effects now keep the game paused during the reveal and only unpause after the window closes.
+- `Necromancy` now spawns zombies if no valid corpses can be found, instead of doing nothing.
+- `Player Can't Exit Car` duration changed from 100 seconds to 70 seconds.
+- `Toxic Rain` no longer damages the player inside a car if the window near the player’s seat is intact. It can now damage car parts.
+- `Vampire Weakness` now damages the player inside a car if the window near the player’s seat is open, broken, or missing.
+- `Break Nearby Windows` now also smashes nearby car windows.
+- `Give Katana` now equips the katana in both hands.
+- `Spawn Trees` now lasts 120 seconds, spawns more trees over a wider area, removes trees when the effect ends, and no longer damages the player from car crashes into spawned trees.
+- `Spawn Random L4D2 Companion` now gives the NPC a random melee weapon.
+- `Griefer Pig Turret` no longer follows zombies and instead wanders to random squares around the player.
+- `Griefer Pig Turret` now deals double damage to zombies.
+- `Player Falls` no longer makes the player fall while standing still or while inside a car. Duration changed to 40 seconds.
+- `Enable Snow` now sets the temperature to `-22 °C / -7.6 °F`.
+- `Lags` now lasts 50 seconds instead of 80 seconds.
+- `Launch Player Up` now makes zombies ignore the player for a short time.
+- `Spawn Explosive Spiffos`, `Explode Nearby Cars`, and `Blow Up Nearby Corpses` no longer spam explosion sounds when many objects explode at once.
+- `Spawn Griefer Santa` now gives the NPC an M9 pistol.
+- `NPC Duel` now gives revolvers to spawned NPCs.
+- `Spawn Griefer Wizard` now always applies clothes to the NPC. Weapon changed from hammer to long stick.
+- `Math Captcha` and `Remember Code` now reward a random item on success.
+- `Lootbox` and `Spawn Gift With Loot` now generate 5 items in the gift box.
+- Hide-item effects, including clothes, weapons, books, and random items, now show a hint line.
+- `Invisible Characters` now also hides zombie nicknames.
+- `Swap Mouse Buttons` behavior in combat has been fixed.
+- `Teleport To Nearest Basement` now falls back to the most recently scanned basement near the player if no basement is found nearby.
+- `Nearby Zombies Are Naked` no longer marks affected zombies as reanimated players.
+- `Spawn Stalker` now turns hostile and attacks the player after 90 seconds if left alone.
+- `Spinning Characters` now also disables AI for NPCs caught in the effect.
+- `Dark Souls Bonfire` sword now spawns broken.
+- Fixed the item pool used by effects such as `Spawn Items On Walk`.
+- `Give Random Item` has been renamed to `Give Random Items` and now gives 3 items.
+- `Disney Princess` no longer kills the spawned animals when it ends; instead you can press G to remove them.
+- Renamed "Shorter Effects Interval" to "Faster Effect Timer".
+- `Time Rewind`: changed time from 120s to 90s
+- `Remove Trees Nearby`: fixed effect
+- `Boots With Mines` no longer spawns new mines for 5 seconds after the player triggers an explosion.
+
+### New Effects
+
+- UFO Abduction
+- Supersonic
+- UFO Abducts Zombies
+- Roll Dice
+- Zombies Can Smell You
+- Spawn Orc Friend
+- Spawn Griefer Alien
+- Spawn Homer Simpson
+- Spawn Doctor
+- Spawn Carl Johnson
+- NPC Deathmatch
+- Rubber Duck Steps
+- Hurricane
+- The Magic Broom
+- Spawn Pirate Companion
+- Earthquake
+- Equip Bulletproof Vest
+- Give Military Backpack
+- Midas Touch
+- Spawn Fire Chickens
+- Zombie Fire Steps
+- Player Fire Steps
+- Ignite Recent Player Positions
+- Spawn Griefer Jesus
+- Spawn Griefer Cowboy
+- Spawn Cowboy Companion
+- Sack Over Head
+- Bandage Every Wound
+- All Zombies Are Crawlers
+- Spawn Mysterious Stranger
+- Better Call Saul
+- Spawn Agent 47
+- Player Can't Knock Down Zombies
+- Random Zombies Are Sprinters
+- Teleport From Zombies
+- Military Supply Drop
+- Zombies Magnet
+- Energy Shield
+- Tame a Caveman
+- Cow, the Zombie Killer
+- Every Room Has a Zombie
+- Female Zombies Spotted You
+- Spinning Characters
+- Steal Shoes From Every Zombie
+- Vertical Video
+- Cinema
+- Infinite Endurance
+- Serial Killer Hunt
+- Replace Food With Cat Food
+- Replace Food With Dead Rats
+- Teleport Into Random Building
+- Player Is a Rat
+- Repair Cars Nearby
+- Add Positive Trait
+- Add Negative Trait
+- Remove All Positive Traits
+- Remove All Negative Traits
+- Add Character Trait
+- Remove Character Trait
+- Need For Speed
+- Very Slow Cars
+- Player Rolls Effects
+- Cursed Clothes
+- Sword Aura
+- Shadow Clones
+- Teleport To Random Old Position
+- Spiffo Apocalypse
+- Teleport Malfunction
+- Reveal Full Map
+- Random Skill Max Level
+- All Zombies Look Like You
+- Grove Street Gang
+- Give Random Weapon
+- Give Random Melee Weapon
+- Give Random Firearm Weapon
+- Refuel Cars Nearby
+- Spawn Shaun of the Dead
+- Zombies Dead by Daylight
+- Zombies Have All Car Keys
+- Electric Zombies
+- Electric Weapons
+- Pet Cemetery
+- Lootbox Roll
+- Traveling Merchant
+- Wrath of the Gods
+- Spawn Race Car
+- Spawn Sports Car
+- Meteor Shower
+- Kill Zombies With Lightning
+- Short Circuit
+- Q to Spawn Items
+- Christmas
+- Medical Supplies Drop
+- Add Random Items to Containers
+- Explode Nearby Electronics
+- Player's Food Is Poisoned
+- Nearby Food Is Poisoned
+- Give Molotov Cocktails
+- Knockback Hits
+- Teleport To Last Death
+- Skip To Winter
+- Camera Pulse
+- Zombie Spawner Nearby
+- Skyrim Shout
+- Fake Teleport
+- Temporary Army
+- Zombie Hivemind
+- Spawn Jay's Employee
+- Kill Bill
+- Unlock Nearby Cars
+- Laser Vision
+- Hire Mercenaries
+- Battle Royale
+- Loot Magnet
+- Spawn Zombies In Trees
+- Ignite Trees
+- Remove Furniture Nearby
+- Player Is Walter White
+- Spawn Wizard Companion
+- Caveman Mode
+- Zombie Hydra
+- Replace Zombies With Aliens
+- Black Hole
+- Solar Flare
+- Player Is a Chicken
+- Blessed Ground
+- Scatter Random Items
+- Item Rain
+- Unstable Portals
+- Toxic Puddles
+- Slippery Oil Puddles
+- Spawn Treasure In World
+- Doomsday
+
+## [1.1.1]
 
 ### New Mod Features
 
@@ -49,8 +290,9 @@
 - Effect "Teleport To Nearest Basement": now finds better square to teleport
 - Effects "Launch Player Up" and "Launch Everyone Up" now do special actions with custom damage
 - Effects "Add Bomb To Player Inventory", "Random Item Bomb", and "Spawn Explosive Spiffos" now show a progress bar countdown to detonation via UI
+- Effect "Medieval Times" now shows a green "Modified N zombies" chat line on the player when it adds helmets
 
-[1.1.0]
+# [1.1.0]
 
 ### New mod features
 

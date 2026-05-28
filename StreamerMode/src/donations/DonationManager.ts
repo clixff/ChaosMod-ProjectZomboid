@@ -1,6 +1,8 @@
 import { logger } from "../utils/logger.ts";
 import type { DonationAlertsProvider } from "../donationalerts/DonationAlertsProvider.ts";
 import type { DonationAlertsDonation } from "../donationalerts/types.ts";
+import type { CurrenciesConfig } from "../config.ts";
+import { requiredPriceInDonationCurrency } from "../utils/currencies.ts";
 
 interface EffectEntry {
   id: number;
@@ -28,12 +30,13 @@ export type DonationActivationFailure =
       donation_amount: number;
     };
 
-function parseEffectTag(message: string): string | null {
+export function parseEffectTag(message: string): string | null {
   const hashMatch = message.match(/#(\w+)/);
   if (hashMatch && hashMatch[1]) return hashMatch[1];
 
   const prefixedNumberMatch = message.match(/(?:№|!)\s*(\d+)/);
-  if (prefixedNumberMatch && prefixedNumberMatch[1]) return prefixedNumberMatch[1];
+  if (prefixedNumberMatch && prefixedNumberMatch[1])
+    return prefixedNumberMatch[1];
 
   const bareNumberMatch = message.match(/(?:^|\s)(\d+)(?=\s|$|\D)/);
   if (bareNumberMatch && bareNumberMatch[1]) return bareNumberMatch[1];
@@ -46,7 +49,10 @@ export class DonationManager {
 
   onActivationFailed: ((info: DonationActivationFailure) => void) | null = null;
 
-  constructor(private readonly port: number) {}
+  constructor(
+    private readonly port: number,
+    private readonly getCurrencies: () => CurrenciesConfig,
+  ) {}
 
   addProvider(provider: DonationAlertsProvider): void {
     provider.onDonation = (donation) => {
@@ -66,23 +72,9 @@ export class DonationManager {
       `[DonationAlerts] Donation from ${donation.username}: amount=${donation.amount} ${donation.currency} message="${donation.message}"`,
     );
 
-    const creds = await provider.loadCredentials();
-    const configuredCurrency = creds?.currency?.toUpperCase() ?? null;
+    const currencies = this.getCurrencies();
+    const daFallback = provider.getCurrency();
     const donationCurrency = donation.currency.toUpperCase();
-
-    if (!configuredCurrency) {
-      logger.warn(
-        `[DonationAlerts] Donation ignored: no configured currency stored for provider.`,
-      );
-      return;
-    }
-
-    if (donationCurrency !== configuredCurrency) {
-      logger.debug(
-        `[DonationAlerts] Donation ignored: currency ${donationCurrency} does not match configured ${configuredCurrency}.`,
-      );
-      return;
-    }
 
     const effectTag = parseEffectTag(donation.message);
     if (!effectTag) return;
@@ -114,7 +106,7 @@ export class DonationManager {
 
     if (!effect.enabled_donate) {
       logger.debug(
-        `[DonationAlerts] Effect ${effect.effect_id} has donations disabled (donation amount ${donation.amount} from ${donation.username})`,
+        `[DonationAlerts] Effect ${effect.effect_id} has donations disabled (donation amount ${donation.amount} ${donationCurrency} from ${donation.username})`,
       );
       this.onActivationFailed?.({
         type: "donations_disabled",
@@ -127,16 +119,37 @@ export class DonationManager {
 
     if (effect.price_result == null) return;
 
-    if (donation.amount < effect.price_result) {
+    const required = requiredPriceInDonationCurrency(
+      effect.price_result,
+      donation.currency,
+      currencies,
+      daFallback,
+    );
+    if (!required) {
+      const mainConfigured = currencies.main.trim().toUpperCase();
+      const fallbackConfigured = (daFallback ?? "").trim().toUpperCase();
+      if (!mainConfigured && !fallbackConfigured) {
+        logger.warn(
+          `[DonationAlerts] Donation ignored: no main currency or DA fallback configured.`,
+        );
+      } else {
+        logger.debug(
+          `[DonationAlerts] Donation ignored: currency ${donationCurrency} has no conversion rate (main=${mainConfigured || fallbackConfigured}).`,
+        );
+      }
+      return;
+    }
+
+    if (donation.amount < required.amount) {
       logger.debug(
-        `[DonationAlerts] Donation amount ${donation.amount} < required ${effect.price_result} for effect ${effect.effect_id}`,
+        `[DonationAlerts] Donation ${donation.amount} ${donationCurrency} < required ${required.amount} ${required.currency} for effect ${effect.effect_id}`,
       );
       this.onActivationFailed?.({
         type: "price_too_low",
         effect_id: effect.effect_id,
         nickname: donation.username ?? "",
         donation_amount: donation.amount,
-        required_price: effect.price_result,
+        required_price: required.amount,
       });
       return;
     }

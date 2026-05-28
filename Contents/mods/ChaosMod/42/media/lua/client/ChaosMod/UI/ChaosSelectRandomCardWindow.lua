@@ -4,6 +4,7 @@ require "ISUI/ISButton"
 ---@class ChaosCardSelectEffect : ChaosEffectBase
 ---@field selectedCardIndex integer | nil
 ---@field onCardSelected fun(self: ChaosCardSelectEffect, cardIndex: integer)
+---@field tickRevealPhase fun(self: ChaosCardSelectEffect) | nil
 
 ---@class ChaosSelectRandomCardWindow : ISPanel
 ---@field effect ChaosCardSelectEffect
@@ -90,13 +91,17 @@ end
 function ChaosSelectRandomCardWindow:prerender()
     ISPanel.prerender(self)
 
+    if not self.resolved and self.effect and self.effect.tickRevealPhase then
+        self.effect:tickRevealPhase()
+    end
+
     local title = self.title or "Select a card"
     local titleX = math.floor((WINDOW_W - getTextManager():MeasureStringX(UIFont.Large, title)) / 2)
     self:drawText(title, titleX, 18, 1, 1, 1, 1, UIFont.Large)
 
     local listNames = self.listedLabels or self.listedEffectNames
     for i = 1, math.min(3, #listNames) do
-        local label = string.format("%d. %s", i, listNames[i] or "")
+        local label = string.format("?. %s", listNames[i] or "")
         self:drawText(label, PAD, 62 + (i - 1) * 38, 1, 1, 1, 1, UIFont.Medium)
     end
 
@@ -123,7 +128,8 @@ function ChaosSelectRandomCardWindow:drawCards()
         else
             effectText = "?????"
         end
-        local effectTextX = cardX + math.floor((cardW - getTextManager():MeasureStringX(UIFont.NewLarge, effectText)) / 2)
+        local effectTextX = cardX +
+            math.floor((cardW - getTextManager():MeasureStringX(UIFont.NewLarge, effectText)) / 2)
         local textR, textG, textB = 1.0, 1.0, 1.0
         if revealCards and self.effect.selectedCardIndex == i then
             textR, textG, textB = 0.2, 1.0, 0.2

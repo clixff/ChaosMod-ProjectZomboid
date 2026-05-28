@@ -18,7 +18,7 @@ function EffectSpawnFriendlyPriest:OnStart()
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
     npc:initializeHuman()
 
     npc.npcGroup = ChaosNPCGroupID.COMPANIONS

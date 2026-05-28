@@ -23,8 +23,9 @@ function EffectRemoveTreesNearby:OnStart()
 
         local tree = sq:getTree()
         if tree then
-            tree:removeFromWorld()
-            tree:removeFromSquare()
+            sq:RemoveTileObject(tree)
+            pcall(function() tree:removeFromWorld() end)
+            pcall(function() tree:removeFromSquare() end)
             -- tree:toppleTree()
             removed = removed + 1
         end

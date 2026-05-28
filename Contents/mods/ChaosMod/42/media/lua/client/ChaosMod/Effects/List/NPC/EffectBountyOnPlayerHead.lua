@@ -24,11 +24,17 @@ local function spawnAttacker(effect)
     local zombie = newZombies:getFirst()
     if not zombie then return end
 
-    local npc = ChaosNPC:new(zombie)
+    local nickname = (#effect.npcs == 0) and effect.effectNickname or nil
+    local npc = ChaosNPC:new(zombie, nickname)
     npc:initializeHuman()
     npc.npcGroup = ChaosNPCGroupID.RAIDERS
 
     npc:SetWeapon("Base.BaseballBat")
+
+    ChaosZombie.AddZombieClothes(zombie, "Base.Hat_Spiffo", nil, nil, false)
+    ChaosZombie.AddZombieClothes(zombie, "Base.SpiffoTail", nil, nil, true)
+
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.WEAK)
 
     table.insert(effect.npcs, npc)
 end

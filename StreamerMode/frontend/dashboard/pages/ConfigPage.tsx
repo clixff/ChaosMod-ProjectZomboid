@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Info } from "lucide-react";
 import { Section, FieldRow } from "../components/Section.tsx";
 import { TextInput, NumberInput } from "../components/Input.tsx";
 import { Checkbox } from "../components/Checkbox.tsx";
@@ -9,6 +10,7 @@ import {
   getLanguages,
   type ModConfig,
   type DonatePriceGroup,
+  type MetaEffectEntry,
 } from "../api.ts";
 import { formatLanguageLabel } from "../languageLabels.ts";
 
@@ -24,6 +26,25 @@ function formatPriceGroupName(name: string): string {
     .filter((part) => part.length > 0)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join(" ");
+}
+
+function formatSnakeCaseName(name: string): string {
+  return name
+    .split("_")
+    .filter((part) => part.length > 0)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+const META_VARIABLE_LABELS: Record<string, string> = {
+  min_time: "Min Time",
+  time_multipier: "Time Multiplier",
+  time_multiplier: "Time Multiplier",
+  effects_count: "Effects Count",
+};
+
+function formatMetaVariableLabel(key: string): string {
+  return META_VARIABLE_LABELS[key] ?? formatSnakeCaseName(key);
 }
 
 function parsePriceGroupName(name: string): {
@@ -152,6 +173,28 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
     void save({ ui: { [key]: value } });
   };
 
+  const setMeta = <K extends keyof ModConfig["meta_effects"]>(
+    key: K,
+    value: ModConfig["meta_effects"][K],
+  ) => {
+    setConfig((prev) =>
+      prev
+        ? { ...prev, meta_effects: { ...prev.meta_effects, [key]: value } }
+        : prev,
+    );
+    void save({ meta_effects: { [key]: value } });
+  };
+
+  // Meta effect entries live inside an array; the server's deep-merge overwrites
+  // arrays wholesale, so we always send the whole `list` when any entry field
+  // changes.
+  const setMetaList = (list: MetaEffectEntry[]) => {
+    setConfig((prev) =>
+      prev ? { ...prev, meta_effects: { ...prev.meta_effects, list } } : prev,
+    );
+    void save({ meta_effects: { list } });
+  };
+
   const setPriceGroups = (groups: DonatePriceGroup[]) => {
     setConfig((prev) =>
       prev
@@ -211,12 +254,23 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
         </FieldRow>
         <FieldRow
           label="Recent effects block buffer"
-          hint="How many of the most recently triggered effects are blocked from being picked again."
+          hint={
+            "How many of the most recently triggered effects are blocked from being picked again.\n\nRecommended:\nFor default Chaos - 30-100\nFor 4 options vote - 90-130\nFor 5+ options vote - 150+"
+          }
         >
           <NumberInput
             value={config.recent_effects_block_buffer}
             min={0}
             onChange={(v) => setField("recent_effects_block_buffer", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Persist recent effects"
+          hint="When enabled, the recent effects block buffer is loaded from previous sessions."
+        >
+          <Checkbox
+            checked={config.persist_recent_effects}
+            onChange={(v) => setField("persist_recent_effects", v)}
           />
         </FieldRow>
         <FieldRow label="Vote start time (seconds)">
@@ -238,10 +292,55 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setField("ignore_effect_chances", v)}
           />
         </FieldRow>
+        <FieldRow
+          label="Voicelines for NPCs"
+          hint="When off, NPCs and themed zombies stop playing their voicelines."
+        >
+          <Checkbox
+            checked={config.npc_voicelines_enabled}
+            onChange={(v) => setField("npc_voicelines_enabled", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Gifts from NPCs"
+          hint="When off, friendly NPCs will not gift items to the player."
+        >
+          <Checkbox
+            checked={config.npc_gifts_enabled}
+            onChange={(v) => setField("npc_gifts_enabled", v)}
+          />
+        </FieldRow>
         <FieldRow label="Hide progress bar">
           <Checkbox
             checked={config.hide_progress_bar}
             onChange={(v) => setField("hide_progress_bar", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Hide effect names"
+          hint="When on, all effect names are rendered as ??? for the player."
+        >
+          <Checkbox
+            checked={config.hide_effect_names}
+            onChange={(v) => setField("hide_effect_names", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Explosions damage items"
+          hint="When on, explosions damage every item in the player's inventory."
+        >
+          <Checkbox
+            checked={config.explosions_damage_items}
+            onChange={(v) => setField("explosions_damage_items", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Explosions destroy random item"
+          hint="When on, explosions destroy one random item from the player's inventory."
+        >
+          <Checkbox
+            checked={config.explosions_destroy_random_item}
+            onChange={(v) => setField("explosions_destroy_random_item", v)}
           />
         </FieldRow>
         <FieldRow label="Use voting progress bar color">
@@ -297,13 +396,6 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setStreamer("voting_options_number", Number(v))}
           />
         </FieldRow>
-        <FieldRow label="Provider type">
-          <Select
-            value={sm.type}
-            options={[{ value: "twitch", label: "Twitch" }]}
-            onChange={(v) => setStreamer("type", v)}
-          />
-        </FieldRow>
         <FieldRow label="Bind to localhost only">
           <Checkbox
             checked={sm.use_localhost_ip}
@@ -320,6 +412,69 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
           <Checkbox
             checked={sm.hide_votes}
             onChange={(v) => setStreamer("hide_votes", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="One effect in vote is hidden (Random)"
+          hint="When on, the last vote option is a hidden Random effect. When off, all options are visible and there is no Random slot."
+        >
+          <Checkbox
+            checked={sm.random_effect_in_vote}
+            onChange={(v) => setStreamer("random_effect_in_vote", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Voting fake effects enabled"
+          hint="Fake options are shown with [Fake]. When voted for, the fake effect is activated, but the streamer sees a different effect name."
+        >
+          <Checkbox
+            checked={sm.voting_fake_effects_enabled}
+            onChange={(v) => setStreamer("voting_fake_effects_enabled", v)}
+          />
+        </FieldRow>
+        <FieldRow label="Voting fake effects chance">
+          <NumberInput
+            value={sm.voting_fake_effects_chance}
+            min={0}
+            max={100}
+            step={0.5}
+            onChange={(v) => setStreamer("voting_fake_effects_chance", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Voting hidden effects enabled"
+          hint="Each vote option has a chance to become [Hidden]. If it wins, the effect is activated, but its name is hidden from the streamer for some time."
+        >
+          <Checkbox
+            checked={sm.voting_hidden_effects_enabled}
+            onChange={(v) => setStreamer("voting_hidden_effects_enabled", v)}
+          />
+        </FieldRow>
+        <FieldRow label="Voting hidden effects chance">
+          <NumberInput
+            value={sm.voting_hidden_effects_chance}
+            min={0}
+            max={100}
+            step={0.5}
+            onChange={(v) => setStreamer("voting_hidden_effects_chance", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Reveal hidden effect after delay"
+          hint="When on, a hidden effect's name is revealed in-game after the conceal delay. When off, it stays hidden the whole time."
+        >
+          <Checkbox
+            checked={sm.reveal_hidden_effect_after_delay}
+            onChange={(v) => setStreamer("reveal_hidden_effect_after_delay", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Reveal fake effect after delay"
+          hint="When on, a fake effect's real name is revealed in-game after the conceal delay. When off, it is never revealed."
+        >
+          <Checkbox
+            checked={sm.reveal_fake_effect_after_delay}
+            onChange={(v) => setStreamer("reveal_fake_effect_after_delay", v)}
           />
         </FieldRow>
         <FieldRow label="Use zombie nicknames">
@@ -366,12 +521,55 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
         title="Donation Price Groups"
         description="Each group sets the minimum donation amount required for effects assigned to it. Effects pick a group on the Effects page."
       >
+        <div
+          style={{
+            marginBottom: 12,
+            padding: "8px 10px",
+            border: "1px solid rgba(91, 158, 255, 0.4)",
+            borderRadius: 6,
+            background: "rgba(91, 158, 255, 0.08)",
+            color: "#7cb6ff",
+            lineHeight: 1.5,
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 8,
+            fontSize: 13,
+          }}
+        >
+          <Info
+            size={16}
+            aria-hidden="true"
+            style={{ marginTop: 2, flexShrink: 0 }}
+          />
+          <div>
+            Each effect is assigned to a price group. Here, you can configure
+            the price for each group. Prices are set in USD by default.
+            <br />
+            This only works for the specific donation services:
+            <br />
+            <code>- Twitch Bits (currency is ignored)</code>
+            <br />
+            <code>- DonationAlerts</code>
+            <br />
+            <code>- Twitch Rewards (prices and currency are ignored)</code>
+          </div>
+        </div>
         {sm.donate_price_groups.length > 0 && (
           <table className="price-groups-table">
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Price</th>
+                <th>
+                  Price
+                  {(() => {
+                    const main = sm.currencies.main.trim().toUpperCase();
+                    const fallback = sm.donation_systems.donationalerts.currency
+                      .trim()
+                      .toUpperCase();
+                    const c = main || fallback;
+                    return c ? ` (${c})` : "";
+                  })()}
+                </th>
                 <th aria-label="Actions" />
               </tr>
             </thead>
@@ -465,6 +663,68 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             </button>
           </div>
         </FieldRow>
+        {(() => {
+          const prices = sm.donate_price_groups
+            .map((g) => g.price)
+            .filter((p) => Number.isFinite(p) && p > 0);
+          if (prices.length === 0) return null;
+          const exampleN = Math.min(...prices);
+          const ccy = sm.currencies.main.trim().toUpperCase();
+          return (
+            <div
+              style={{
+                marginTop: 12,
+                padding: "8px 10px",
+                border: "1px solid rgba(245, 179, 1, 0.4)",
+                borderRadius: 6,
+                background: "rgba(245, 179, 1, 0.08)",
+                color: "#f5b301",
+                lineHeight: 1.5,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+                fontSize: 13,
+              }}
+            >
+              <Info
+                size={16}
+                aria-hidden="true"
+                style={{ marginTop: 2, flexShrink: 0 }}
+              />
+              <div>
+                Note: These are minimum prices. If an effect costs {exampleN}
+                {ccy ? ` ${ccy}` : ""}, any donation of {exampleN}
+                {ccy ? ` ${ccy}` : ""} or more can activate it.
+              </div>
+            </div>
+          );
+        })()}
+        <div
+          style={{
+            marginTop: 8,
+            padding: "8px 10px",
+            border: "1px solid rgba(245, 179, 1, 0.4)",
+            borderRadius: 6,
+            background: "rgba(245, 179, 1, 0.08)",
+            color: "#f5b301",
+            lineHeight: 1.5,
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 8,
+            fontSize: 13,
+          }}
+        >
+          <Info
+            size={16}
+            aria-hidden="true"
+            style={{ marginTop: 2, flexShrink: 0 }}
+          />
+          <div>
+            Also set currencies on the home tab if you use these services:
+            <br />
+            <code>DonationAlerts</code>
+          </div>
+        </div>
       </Section>
 
       <Section title="UI" description="HUD colors, sizes, and positions.">
@@ -544,6 +804,99 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setUI("vote_background_color", v)}
           />
         </FieldRow>
+      </Section>
+
+      <Section
+        title="Meta Effects"
+        description="Rare long-cooldown effects that warp how regular effects work (e.g. faster intervals, multiple effects per cycle)."
+      >
+        <FieldRow label="Meta effects enabled">
+          <Checkbox
+            checked={config.meta_effects.enabled}
+            onChange={(v) => setMeta("enabled", v)}
+          />
+        </FieldRow>
+        <FieldRow
+          label="Meta effects interval (seconds)"
+          hint="How often the mod rolls for a meta effect."
+        >
+          <NumberInput
+            value={config.meta_effects.interval_sec}
+            min={1}
+            onChange={(v) => setMeta("interval_sec", v)}
+          />
+        </FieldRow>
+      </Section>
+
+      <Section
+        title="Meta Effects List"
+        description="Per-effect tuning. Variables are hardcoded to each effect; you can change their numeric values but cannot add or remove them."
+      >
+        {config.meta_effects.list.length === 0 && (
+          <span className="field-hint">No meta effects configured.</span>
+        )}
+        {config.meta_effects.list.map((entry, index) => {
+          const variableKeys = Object.keys(entry.variables)
+            .filter((k) => typeof entry.variables[k] === "number")
+            .sort();
+          const updateEntry = (patch: Partial<MetaEffectEntry>) => {
+            const nextList = config.meta_effects.list.map((e, i) =>
+              i === index ? { ...e, ...patch } : e,
+            );
+            setMetaList(nextList);
+          };
+          const updateVariable = (key: string, value: number) => {
+            const nextVariables = { ...entry.variables, [key]: value };
+            const nextList = config.meta_effects.list.map((e, i) =>
+              i === index ? { ...e, variables: nextVariables } : e,
+            );
+            setMetaList(nextList);
+          };
+          return (
+            <div key={entry.id} style={{ marginBottom: 18 }}>
+              <h4 style={{ margin: "12px 0 8px 0", color: "#f5b301" }}>
+                [META] {formatSnakeCaseName(entry.id)}
+              </h4>
+              <FieldRow label="Enabled">
+                <Checkbox
+                  checked={entry.enabled}
+                  onChange={(v) => updateEntry({ enabled: v })}
+                />
+              </FieldRow>
+              <FieldRow label="Voting only">
+                <Checkbox
+                  checked={entry.voting_only}
+                  onChange={(v) => updateEntry({ voting_only: v })}
+                />
+              </FieldRow>
+              <FieldRow label="Duration (seconds)">
+                <NumberInput
+                  value={entry.duration}
+                  min={0}
+                  step={1}
+                  onChange={(v) => updateEntry({ duration: v })}
+                />
+              </FieldRow>
+              <FieldRow label="Chance">
+                <NumberInput
+                  value={entry.chance}
+                  min={0}
+                  step={0.1}
+                  onChange={(v) => updateEntry({ chance: v })}
+                />
+              </FieldRow>
+              {variableKeys.map((key) => (
+                <FieldRow key={key} label={formatMetaVariableLabel(key)}>
+                  <NumberInput
+                    value={Number(entry.variables[key] ?? 0)}
+                    step={0.1}
+                    onChange={(v) => updateVariable(key, v)}
+                  />
+                </FieldRow>
+              ))}
+            </div>
+          );
+        })}
       </Section>
     </>
   );

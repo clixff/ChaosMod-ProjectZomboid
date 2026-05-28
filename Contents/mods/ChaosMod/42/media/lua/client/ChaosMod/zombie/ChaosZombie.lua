@@ -1,6 +1,29 @@
 ChaosZombie = ChaosZombie or {}
 ChaosZombie.modDataChatLineKey = "ChaosModChatLine"
+ChaosZombie.modDataChatLineColorKey = "ChaosModChatLineColor"
 ChaosZombie.modDataChatLineTimestampKey = "ChaosModChatLineTimestampMs"
+ChaosZombie.lastSoundLineTimestampsByKey = {}
+
+local function getNaturalZombieHealth()
+    local toughness = SandboxVars.ZombieLore.Toughness
+
+    if toughness == 1 then
+        -- Tough
+        return 3.5 + ChaosUtils.RandFloat(0.0, 0.3)
+    elseif toughness == 2 then
+        -- Normal
+        return 1.5 + ChaosUtils.RandFloat(0.0, 0.3)
+    elseif toughness == 3 then
+        -- Fragile
+        return 0.5 + ChaosUtils.RandFloat(0.0, 0.3)
+    elseif toughness == 4 then
+        -- Random
+        return ChaosUtils.RandFloat(0.5, 3.5) + ChaosUtils.RandFloat(0.0, 0.3)
+    end
+
+    -- Fallback, should not normally happen
+    return 1.0
+end
 
 ---@param player IsoGameCharacter
 ---@param zombie IsoZombie
@@ -44,8 +67,9 @@ end
 
 ---@param zombie IsoZombie
 ---@param text string|nil
+---@param color table|nil
 ---@return boolean
-function ChaosZombie.AddNewChatLine(zombie, text)
+function ChaosZombie.AddNewChatLine(zombie, text, color)
     if not zombie then
         return false
     end
@@ -62,8 +86,28 @@ function ChaosZombie.AddNewChatLine(zombie, text)
     end
 
     md[ChaosZombie.modDataChatLineKey] = text
+    md[ChaosZombie.modDataChatLineColorKey] = color or { r = 0, g = 1, b = 0 }
     md[ChaosZombie.modDataChatLineTimestampKey] = getTimestampMs()
     return true
+end
+
+--- Assigns a specific nickname to the zombie with a dark-gold color. The name is
+--- NOT added to the nickname buffer. Rendering still respects the user's
+--- nickname visibility config.
+---@param zombie IsoZombie
+---@param name string|nil
+function ChaosZombie.SetSpecificNickname(zombie, name)
+    if not zombie or type(name) ~= "string" or name == "" then
+        return
+    end
+
+    local md = zombie:getModData()
+    if not md then
+        return
+    end
+
+    md[ChaosNicknames.modDataNameKey] = name
+    md[ChaosNicknames.modDataColorKey] = { r = 255 / 255, g = 173 / 255, b = 31 / 255 }
 end
 
 --- Spawns zombies at the given position
@@ -78,8 +122,20 @@ function ChaosZombie.SpawnZombieAt(x, y, z, totalZombies, outfit, femaleChance)
     local x1 = math.floor(x)
     local y1 = math.floor(y)
     local z1 = math.floor(z)
-    femaleChance = femaleChance or 50
-    local zombies = addZombiesInOutfit(x1, y1, z1, totalZombies, outfit, femaleChance)
+    if femaleChance == nil then
+        femaleChance = 50
+    end
+
+    local health = getNaturalZombieHealth()
+
+    local zombies = addZombiesInOutfit(x1, y1, z1, totalZombies, outfit, femaleChance, false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        health
+    )
     return zombies
 end
 
@@ -102,12 +158,22 @@ function ChaosZombie.CanPlayerSeeZombieLineTrace(player, zombie)
     return resultString == "Clear"
 end
 
+---@class ChaosZombieRGBTint
+---@field r number Red channel in 0..1, or 0..255 when `normalize = true`.
+---@field g number Green channel in 0..1, or 0..255 when `normalize = true`.
+---@field b number Blue channel in 0..1, or 0..255 when `normalize = true`.
+---@field normalize boolean? When true, treat `r`, `g`, and `b` as 0..255 and convert them to 0..1.
+
 ---@param zombie IsoZombie
 ---@param fullType string
----@param tint table?
+---@param tint ChaosZombieRGBTint?
 ---@param textureChoice integer?
+---@param updateVisuals boolean?
+---@param useAlternativeTintMethod boolean?
+---@param baseTexture integer?
 ---@return ItemVisual?
-function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice)
+function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice, updateVisuals, useAlternativeTintMethod,
+                                      baseTexture)
     if not zombie or not fullType or fullType == "" then return nil end
 
     local item = instanceItem(fullType)
@@ -125,18 +191,108 @@ function ChaosZombie.AddZombieClothes(zombie, fullType, tint, textureChoice)
         visual:setTextureChoice(textureChoice)
     end
 
-    if tint then
-        item:setColorRed(tint.r)
-        item:setColorGreen(tint.g)
-        item:setColorBlue(tint.b)
-        item:setCustomColor(true)
+    if baseTexture ~= nil then
+        visual:setBaseTexture(baseTexture)
     end
 
-    zombie:getWornItems():setFromItemVisuals(zombie:getItemVisuals())
-    zombie:resetModelNextFrame()
-    zombie:onWornItemsChanged()
+    local r, g, b = 0.0, 0.0, 0.0
+    if tint then
+        r, g, b = tint.r or 0, tint.g or 0, tint.b or 0
+        -- Opt-in 0..255 → 0..1 normalization, applied per-channel
+        if tint.normalize then
+            r = r / 255
+            g = g / 255
+            b = b / 255
+        end
+
+        if not useAlternativeTintMethod then
+            visual:setTint(ImmutableColor.new(r, g, b))
+        else
+            item:setColor(Color.new(r, g, b))
+            item:setColorRed(r)
+            item:setColorGreen(g)
+            item:setColorBlue(b)
+            item:setCustomColor(true)
+        end
+    end
+
+    local wornItems = zombie:getWornItems()
+    wornItems:setFromItemVisuals(zombie:getItemVisuals())
+
+    if tint and useAlternativeTintMethod then
+        local location = scriptItem:getBodyLocation()
+        if not location and item.getBodyLocation then
+            location = item:getBodyLocation()
+        end
+        if not location and item.canBeEquipped then
+            location = item:canBeEquipped()
+        end
+
+        local wornItem = location and wornItems:getItem(location) or nil
+        if wornItem then
+            wornItem:setColor(Color.new(r, g, b))
+            wornItem:setColorRed(r)
+            wornItem:setColorGreen(g)
+            wornItem:setColorBlue(b)
+            wornItem:setCustomColor(true)
+
+            local wornVisual = wornItem:getVisual()
+            if wornVisual then
+                wornVisual:setInventoryItem(wornItem)
+                wornVisual:setTint(ImmutableColor.new(r, g, b))
+                visual = wornVisual
+            end
+        end
+    end
+
+    if updateVisuals then
+        zombie:onWornItemsChanged()
+        zombie:resetModelNextFrame()
+    end
 
     return visual
+end
+
+---@class ChaosZombieClothesBatchEntry
+---@field type string Full item type, e.g. "Base.Jacket_WhiteTINT".
+---@field tint ChaosZombieRGBTint? RGB color table.
+---@field textureChoice integer? Texture variant index (0-based).
+---@field baseTexture integer? Base texture index (0-based).
+---@field alternativeTint boolean? Use the item's custom color instead of `ItemVisual:setTint`.
+
+--- Adds multiple clothing items to a zombie in one call and refreshes visuals
+--- once at the end. Prefer this over multiple `AddZombieClothes` calls when
+--- dressing a zombie head-to-toe.
+---@param zombie IsoZombie
+---@param entries ChaosZombieClothesBatchEntry[]
+---@return ItemVisual[] visuals Visuals successfully added (skipped entries are omitted).
+function ChaosZombie.AddZombieClothesBatch(zombie, entries)
+    ---@type ItemVisual[]
+    local visuals = {}
+    if not zombie or not entries then return visuals end
+
+    for i = 1, #entries do
+        local entry = entries[i]
+        if entry and entry.type then
+            local visual = ChaosZombie.AddZombieClothes(
+                zombie,
+                entry.type,
+                entry.tint,
+                entry.textureChoice,
+                false,
+                entry.alternativeTint,
+                entry.baseTexture
+            )
+            if visual then
+                visuals[#visuals + 1] = visual
+            end
+        end
+    end
+
+    zombie:onWornItemsChanged()
+    zombie:resetModelNextFrame()
+
+    return visuals
 end
 
 ---@param zombie IsoZombie
@@ -185,8 +341,12 @@ function ChaosZombie.HumanizeZombie(zombie)
     local humanVisual = zombie:getHumanVisual()
     if not humanVisual then return end
 
+    local textureName = zombie:isFemale() and "FemaleBody01" or "MaleBody01"
+
+    print("[ChaosZombie.HumanizeZombie] Setting skin texture name: " .. tostring(textureName))
+
     -- Base skin
-    humanVisual:setSkinTextureName(zombie:isFemale() and "FemaleBody03" or "MaleBody03")
+    humanVisual:setSkinTextureName(textureName)
 
     -- Remove attached knives / weapons / props
     zombie:clearAttachedItems()
@@ -597,4 +757,179 @@ function ChaosZombie.MoveToPlayerSpotted(zombie, player)
     zombie:setTurnAlertedValues(px, py)
     zombie:pathToCharacter(player)
     zombie:spotted(player, true)
+end
+
+---@param zombie IsoZombie
+---@param soundname string
+---@param key string
+---@param timeout integer Milliseconds to suppress repeats sharing the same key.
+---@return boolean played True when the sound actually played.
+function ChaosZombie.PlaySoundLine(zombie, soundname, key, timeout)
+    if not zombie or not soundname or not key then
+        return false
+    end
+    if ChaosConfig.npc_voicelines_enabled == false then
+        return false
+    end
+    local now = getTimestampMs()
+    local lastTime = ChaosZombie.lastSoundLineTimestampsByKey[key]
+    if lastTime and (now - lastTime) < timeout then
+        return false
+    end
+    ChaosZombie.lastSoundLineTimestampsByKey[key] = now
+    zombie:playSound(soundname)
+    return true
+end
+
+---@param char IsoPlayer|IsoZombie
+---@param zombie IsoZombie
+function ChaosZombie.CopyAppearanceToNormalZombie(char, zombie)
+    if not char or not zombie then return end
+
+    -- Keep it a normal zombie
+    zombie:setReanimatedPlayer(false)
+
+    -- Sex must match before visual/model refresh
+    zombie:setFemaleEtc(char:isFemale())
+
+    -- Copy body/face/hair/skin
+    zombie:getHumanVisual():copyFrom(char:getHumanVisual())
+
+    -- Clear current zombie clothing visuals
+    local zombieVisuals = zombie:getItemVisuals()
+    zombieVisuals:clear()
+
+    -- Optional but recommended: clear worn items too, so corpse/drop data matches
+    zombie:clearWornItems()
+
+    local inv = zombie:getInventory()
+    local playerWorn = char:getWornItems()
+
+    for i = 0, playerWorn:size() - 1 do
+        local wornItem = playerWorn:getItemByIndex(i)
+        if wornItem then
+            local location = playerWorn:getLocation(wornItem)
+
+            -- Make a real copy for zombie wornItems/inventory
+            local newItem = inv:AddItem(wornItem:getFullType())
+            if newItem then
+                if wornItem:getVisual() and newItem:getVisual() then
+                    newItem:getVisual():copyFrom(wornItem:getVisual())
+                end
+
+                if wornItem:isCustomColor() then
+                    newItem:setColor(wornItem:getColor())
+                    newItem:setCustomColor(true)
+                end
+
+                newItem:setCondition(wornItem:getCondition())
+
+                if location then
+                    zombie:setWornItem(location, newItem)
+                end
+
+                -- IMPORTANT: add/copy into normal zombie itemVisuals
+                local scriptItem = newItem:getScriptItem()
+                local zombieItemVisual =
+                    zombie:getHumanVisual():addClothingItem(zombieVisuals, scriptItem)
+                if zombieItemVisual and newItem:getVisual() then
+                    zombieItemVisual:copyFrom(newItem:getVisual())
+                    zombieItemVisual:setInventoryItem(newItem)
+                end
+            end
+        end
+    end
+
+    zombie:onWornItemsChanged()
+    zombie:resetModelNextFrame()
+end
+
+---@param zombie IsoZombie
+---@param damage number
+---@param damageDealer IsoGameCharacter?
+function ChaosZombie.DamageZombie(zombie, damage, damageDealer)
+    if not zombie or not damage then return end
+
+    local newHealth = zombie:getHealth() - damage
+    if newHealth < 0.0 then
+        newHealth = 0.0
+    end
+
+    zombie:setHealth(newHealth)
+
+    if newHealth <= 0.0 then
+        if not damageDealer then
+            damageDealer = getFakeAttacker()
+        end
+        zombie:Kill(damageDealer)
+    end
+end
+
+---@param zombie IsoZombie
+---@param hairTable ChaosHairstyleTable
+function ChaosZombie.SetHairstyleAndBeard(zombie, hairTable)
+    if not zombie then return end
+    local humanVisual = zombie:getHumanVisual()
+    if not humanVisual then return end
+
+    local hairstyleName = hairTable.hairModel
+    local beardName = hairTable.beardModel
+    local hairColor = hairTable.hairColor
+    local beardColor = hairTable.beardColor
+    local useHairColorForBeard = hairTable.useHairColorForBeard
+
+    if useHairColorForBeard == nil then
+        useHairColorForBeard = true
+    end
+
+    if useHairColorForBeard and beardColor == nil then
+        beardColor = hairColor
+    end
+    if type(hairstyleName) == "string" then
+        if hairstyleName == "None" then
+            hairstyleName = ""
+        end
+
+        print("[ChaosZombie.SetHairstyleAndBeard] Setting hairstyle: " .. tostring(hairstyleName))
+
+        humanVisual:setHairModel(hairstyleName)
+    end
+
+
+    if type(beardName) == "string" then
+        if beardName == "None" then
+            beardName = ""
+        end
+
+        humanVisual:setBeardModel(beardName)
+    end
+
+    if hairColor ~= nil then
+        local imColor = ImmutableColor.new(hairColor.r, hairColor.g, hairColor.b)
+        humanVisual:setHairColor(imColor)
+        humanVisual:setNaturalHairColor(imColor)
+    end
+
+    if beardColor ~= nil then
+        local imColor = ImmutableColor.new(beardColor.r, beardColor.g, beardColor.b)
+        humanVisual:setBeardColor(imColor)
+        humanVisual:setNaturalBeardColor(imColor)
+    end
+
+    zombie:resetModelNextFrame()
+end
+
+---@param zombie IsoZombie
+---@param x number|integer
+---@param y number|integer
+---@param z number|integer
+function ChaosZombie.MoveToSound(zombie, x, y, z)
+    if zombie and zombie:isAlive() then
+        x = math.floor(x)
+        y = math.floor(y)
+        z = math.floor(z)
+        zombie:pathToSound(x, y, z)
+
+        zombie:setLastHeardSound(x, y, z)
+    end
 end

@@ -28,7 +28,8 @@ function EffectDoppelganger:OnStart()
     if not zombie then return end
 
 
-    local npc = ChaosNPC:new(zombie)
+    local npc = ChaosNPC:new(zombie, self.effectNickname)
+    npc:SetHealthGroup(CHAOS_NPC_HEALTH_GROUP.STRONG)
     npc:initializeHuman()
 
     ChaosZombie.CopyCharacterVisualsAndClothes(player, zombie)
@@ -37,4 +38,5 @@ function EffectDoppelganger:OnStart()
 
     -- npc:SetWeapon("Base.PipeWrench")
     npc:SetWeapon("Base.RollingPin")
+    npc:EnterPlayerVehicle(player)
 end

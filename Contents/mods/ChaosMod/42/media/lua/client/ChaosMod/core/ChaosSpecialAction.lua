@@ -1,10 +1,12 @@
 ---@class ChaosSpecialActionInstance
 ---@field data table
----@field maxDuration number -- max duration in milliseconds
+---@field maxDuration number -- max duration in milliseconds (interval when loop is true)
 ---@field elapsedMs number
----@field tickFn fun(deltaMs: integer, data: table)
----@field endFn fun(data: table)
+---@field shouldFinish boolean
+---@field tickFn fun(deltaMs: integer, data: table)?
+---@field endFn fun(data: table): boolean?
 ---@field cancelFn (fun(data: table)) | nil
+---@field loop boolean
 
 ---@class ChaosSpecialAction
 ---@field actions table<integer, ChaosSpecialActionInstance>
@@ -14,20 +16,17 @@ ChaosSpecialAction = ChaosSpecialAction or {
 
 ---Register a new special action that runs every tick until its duration expires or the mod is disabled.
 ---@param data table -- arbitrary data object passed to all callbacks
----@param maxDuration number -- max action duration in milliseconds
----@param tickFn fun(deltaMs: integer, data: table) -- called every tick while active
----@param endFn fun(data: table) -- called once when duration expires naturally
+---@param maxDuration number -- max action duration in milliseconds (interval between endFn calls when loop is true)
+---@param tickFn fun(deltaMs: integer, data: table)? -- called every tick while active
+---@param endFn fun(data: table): boolean? -- called when duration expires; return true to stop forever even if loop is true
 ---@param cancelFn (fun(data: table)) | nil -- optional, called when action is cancelled on mod disable
-function ChaosSpecialAction.AddNewAction(data, maxDuration, tickFn, endFn, cancelFn)
+---@param loop boolean? -- when true, endFn runs at every interval and tickFn keeps running. Defaults to false.
+function ChaosSpecialAction.AddNewAction(data, maxDuration, tickFn, endFn, cancelFn, loop)
     if type(data) ~= "table" then
         data = {}
     end
     if type(maxDuration) ~= "number" or maxDuration <= 0 then
         print("[ChaosSpecialAction] Invalid maxDuration")
-        return
-    end
-    if type(tickFn) ~= "function" or type(endFn) ~= "function" then
-        print("[ChaosSpecialAction] tick and end callbacks are required")
         return
     end
 
@@ -38,7 +37,9 @@ function ChaosSpecialAction.AddNewAction(data, maxDuration, tickFn, endFn, cance
         elapsedMs = 0,
         tickFn = tickFn,
         endFn = endFn,
-        cancelFn = cancelFn
+        cancelFn = cancelFn,
+        loop = loop == true,
+        shouldFinish = false
     }
     table.insert(ChaosSpecialAction.actions, instance)
 end
@@ -50,11 +51,23 @@ function ChaosSpecialAction.OnTick(deltaMs)
         if not action then
             table.remove(ChaosSpecialAction.actions, i)
         else
-            action.tickFn(deltaMs, action.data)
+            if action.shouldFinish then
+                local stop = action.endFn(action.data)
+                if action.loop and stop ~= true then
+                    action.elapsedMs = action.elapsedMs - action.maxDuration
+                    action.shouldFinish = false
+                else
+                    table.remove(ChaosSpecialAction.actions, i)
+                end
+                return
+            end
+
+            if action.tickFn ~= nil and action.shouldFinish == false then
+                action.tickFn(deltaMs, action.data)
+            end
             action.elapsedMs = action.elapsedMs + deltaMs
             if action.elapsedMs >= action.maxDuration then
-                action.endFn(action.data)
-                table.remove(ChaosSpecialAction.actions, i)
+                action.shouldFinish = true
             end
         end
     end

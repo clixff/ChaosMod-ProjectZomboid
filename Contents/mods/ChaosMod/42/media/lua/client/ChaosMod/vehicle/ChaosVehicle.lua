@@ -46,6 +46,30 @@ VEHICLE_TIRES = {
     "TireRearRight"
 }
 
+---@type table<integer, string>
+VEHICLE_WINDOWS = {
+    "Windshield",
+    "WindshieldRear",
+    "WindowFrontLeft",
+    "WindowFrontRight",
+    "WindowMiddleLeft",
+    "WindowMiddleRight",
+    "WindowRearLeft",
+    "WindowRearRight",
+}
+
+---@type table<integer, string>
+VEHICLE_DOORS = {
+    "DoorFrontLeft",
+    "DoorFrontRight",
+    "DoorMiddleLeft",
+    "DoorMiddleRight",
+    "DoorRearLeft",
+    "DoorRearRight",
+    "TrunkDoor",
+    "EngineDoor",
+}
+
 ---@param x number
 ---@param y number
 ---@param z number
@@ -70,7 +94,8 @@ end
 ---@return BaseVehicle | nil
 ---@param addKey boolean
 ---@param setRandomFuel boolean
-function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKey, setRandomFuel)
+---@param setRandomCondition boolean | nil
+function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKey, setRandomFuel, setRandomCondition)
     local player = getPlayer()
     if not player then return nil end
     local x  = player:getX()
@@ -79,6 +104,9 @@ function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKe
 
     radius   = radius or 12
     maxTries = maxTries or 80
+    if setRandomCondition == nil then
+        setRandomCondition = true
+    end
 
 
     for i = 1, maxTries do
@@ -104,6 +132,9 @@ function ChaosVehicle.spawnVehicleNearPlayer(scriptName, radius, maxTries, addKe
                     end
                     if setRandomFuel then
                         ChaosVehicle.setRandomFuelPercent(vehicle, 0.1, 0.9)
+                    end
+                    if setRandomCondition then
+                        ChaosVehicle.SetRandomVehiclePartsCondition(vehicle)
                     end
                     return vehicle
                 end
@@ -148,6 +179,119 @@ function ChaosVehicle.setRandomFuelPercent(vehicle, min, max)
     if not vehicle then return end
     local percent = ZombRandFloat(min, max)
     ChaosVehicle.setFuelPercent(vehicle, percent)
+end
+
+---@param vehicle BaseVehicle
+---@param explosionX number
+---@param explosionY number
+---@param explosionZ number
+---@param strength number?
+function ChaosVehicle.AddVehicleImpulseAtExplosion(vehicle, explosionX, explosionY, explosionZ, strength)
+    if not vehicle then return end
+
+    if strength == nil then
+        strength = 1.0
+    end
+    local data = {
+        vehicle = vehicle,
+        explosionX = explosionX,
+        explosionY = explosionY,
+        explosionZ = explosionZ,
+        strength = strength
+    }
+
+    local vehicleX = vehicle:getX()
+    local vehicleY = vehicle:getY()
+
+    -- Direction from explosion to vehicle
+    local dx = vehicleX - explosionX
+    local dy = vehicleY - explosionY
+    local dz = 0.0
+
+    local len = math.sqrt(dx * dx + dy * dy)
+
+    -- Safety: explosion exactly at vehicle center
+    if len < 0.0001 then
+        -- dx = ChaosUtils.RandFloat(-1.0, 1.0)
+        dx = 0.0
+        dy = 0.0
+        dz = 1.0
+
+        -- dy = ChaosUtils.RandFloat(-1.0, 1.0)
+        -- len = math.sqrt(dx * dx + dy * dy)
+        len = 1
+    end
+
+    local nx = dx / len
+    local ny = dy / len
+    local nz = 0.1
+
+
+    local finalStrength = 15000000.0 * strength
+
+    -- Ground-plane impulse:
+    -- world X -> physics X
+    -- world Y -> physics Z
+    local impulse = Vector3f.new(
+        nx * finalStrength,
+        nz * finalStrength,
+        ny * finalStrength
+    )
+
+    print("Adding impulse: " .. tostring(impulse))
+
+    vehicle:setPhysicsActive(true)
+
+    local relPos = Vector3f.new(0, 0, 0)
+
+
+    vehicle:addImpulse(impulse, relPos)
+
+    ChaosSpecialAction.AddNewAction(data, 1000, function(_deltaMs, d)
+        ---@type BaseVehicle
+        local v = d.vehicle
+        if not v then return end
+
+        -- ---@type number
+        -- local strength = d.strength
+
+        v:setPhysicsActive(true)
+
+        -- local dx = v:getX() - d.explosionX
+        -- local dy = v:getY() - d.explosionY
+        -- local len = math.sqrt(dx * dx + dy * dy)
+        -- if len < 0.001 then
+        --     dx, dy, len = 0, 1, 1
+        -- end
+        -- dx = dx / len
+        -- dy = dy / len
+
+        -- local baseStrength = 800000.0 * 0.01
+
+        -- local finalStrength = baseStrength * strength
+        -- local impulse = Vector3f.new(dx * finalStrength, dy * finalStrength, 0)
+        -- local relPos = Vector3f.new(0, 0, 0)
+        -- v:addImpulse(impulse, relPos)
+    end, function(_d) end)
+end
+
+---@param vehicle BaseVehicle
+---@param minCondition integer | nil defaults to 0
+---@param maxCondition integer | nil defaults to 100
+function ChaosVehicle.SetRandomVehiclePartsCondition(vehicle, minCondition, maxCondition)
+    if not vehicle then return end
+
+    minCondition = minCondition or 0
+    maxCondition = maxCondition or 100
+
+    for i = 0, vehicle:getPartCount() - 1 do
+        local part = vehicle:getPartByIndex(i)
+        if part then
+            local condition = ChaosUtils.RandIntegerRange(minCondition, maxCondition + 1)
+            part:setCondition(condition)
+            vehicle:transmitPartCondition(part)
+        end
+    end
 end
 
 ---@param square IsoGridSquare
@@ -198,6 +342,83 @@ function ChaosVehicle.ExitVehicle(character)
     vehicle:exit(character)
 end
 
+---@param vehicle BaseVehicle
+function ChaosVehicle.DamageVehicleFromExplosion(vehicle)
+    if not vehicle then return end
+
+    local damageMultiplier = 0.25
+
+    for _, windowName in ipairs(VEHICLE_WINDOWS) do
+        local part = vehicle:getPartById(windowName)
+        if part and part:getInventoryItem() then
+            if ChaosUtils.RandInteger(3) == 0 then
+                ---@diagnostic disable-next-line: param-type-mismatch
+                part:setInventoryItem(nil, 10)
+                vehicle:transmitPartItem(part)
+            end
+        end
+    end
+
+    for _, wheelName in ipairs(VEHICLE_TIRES) do
+        local part = vehicle:getPartById(wheelName)
+        if part and part:getInventoryItem() then
+            if ChaosUtils.RandInteger(4) == 0 then
+                local wheelId = part:getWheelIndex()
+                if wheelId then
+                    vehicle:setTireRemoved(wheelId, true)
+                end
+                ---@diagnostic disable-next-line: param-type-mismatch
+                part:setInventoryItem(nil, 10)
+                vehicle:transmitPartItem(part)
+            end
+        end
+    end
+
+    for _, doorName in ipairs(VEHICLE_DOORS) do
+        local part = vehicle:getPartById(doorName)
+        if part and part:getInventoryItem() then
+            if ChaosUtils.RandInteger(3) == 0 then
+                ---@diagnostic disable-next-line: param-type-mismatch
+                part:setInventoryItem(nil, 10)
+                vehicle:transmitPartItem(part)
+            end
+        end
+    end
+
+    local enginePart = vehicle:getPartById("Engine")
+    if enginePart then
+        -- enginePart:damage(math.floor(50 * damageMultiplier))
+        vehicle:transmitEngine()
+    end
+
+    local gasTankPart = vehicle:getPartById("GasTank")
+    if gasTankPart then
+        -- gasTankPart:damage(math.floor(50 * damageMultiplier))
+        vehicle:transmitPartItem(gasTankPart)
+    end
+
+    local batteryPart = vehicle:getPartById("Battery")
+    if batteryPart then
+        -- batteryPart:damage(math.floor(50 * damageMultiplier))
+        vehicle:transmitPartItem(batteryPart)
+    end
+
+    -- vehicle:crash(50 * damageMultiplier, true)
+
+    for i = 0, vehicle:getPartCount() - 1 do
+        local part = vehicle:getPartByIndex(i)
+        if part then
+            local base = part:getCondition()
+            local damage = ChaosUtils.RandIntegerRange(20, 33)
+            part:setCondition(math.max(0, base - damage))
+            vehicle:transmitPartCondition(part)
+        end
+    end
+
+
+    vehicle:updatePartStats()
+end
+
 ---@return string
 function ChaosVehicle.GetRandomVehicleName()
     local randomIndex = ChaosUtils.RandArrayIndex(VEHICLES_RANDOM_1)
@@ -213,4 +434,71 @@ function ChaosVehicle.SetRandomVehicleColors(vehicle)
     local color = VEHICLE_COLORS[randomIndex]
     if not color then return end
     vehicle:setColorHSV(color.hue, color.sat, color.val)
+end
+
+---@param part VehiclePart?
+---@return boolean
+function ChaosVehicle.IsWindowPartOpenMissingOrDestroyed(part)
+    if not part then
+        return true
+    end
+
+    local window = part:getWindow()
+    if not window then
+        return true
+    end
+
+    if part:getInventoryItem() == nil then
+        return true
+    end
+
+    return window:isOpen() or window:isDestroyed()
+end
+
+---@param chr IsoGameCharacter?
+---@return boolean
+function ChaosVehicle.IsAnySeatWindowOpenMissingOrDestroyed(chr)
+    if not chr then return false end
+    local vehicle = chr:getVehicle()
+    if not vehicle then
+        return false
+    end
+
+    local seat = vehicle:getSeat(chr)
+    if seat < 0 then
+        return false
+    end
+
+    local door1 = vehicle:getPassengerDoor(seat)
+    if not door1 then
+        return true
+    end
+    local sideWindow1 = door1:getChildWindow()
+    if ChaosVehicle.IsWindowPartOpenMissingOrDestroyed(sideWindow1) then
+        return true
+    end
+
+    local door2 = vehicle:getPassengerDoor2(seat)
+    if door2 then
+        local sideWindow2 = door2:getChildWindow()
+        if ChaosVehicle.IsWindowPartOpenMissingOrDestroyed(sideWindow2) then
+            return true
+        end
+    end
+
+
+    local areaId = vehicle:getPassengerArea(seat)
+    if areaId then
+        if string.find(areaId, "SeatFront", 1, true) then
+            if ChaosVehicle.IsWindowPartOpenMissingOrDestroyed(vehicle:getPartById("Windshield")) then
+                return true
+            end
+        elseif string.find(areaId, "SeatRear", 1, true) then
+            if ChaosVehicle.IsWindowPartOpenMissingOrDestroyed(vehicle:getPartById("WindshieldRear")) then
+                return true
+            end
+        end
+    end
+
+    return false
 end

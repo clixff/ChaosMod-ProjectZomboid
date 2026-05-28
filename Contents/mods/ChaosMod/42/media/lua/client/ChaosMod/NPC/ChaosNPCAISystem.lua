@@ -18,9 +18,24 @@ function ChaosNPC:update(deltaMs)
 
     self:DisableZombieVoice()
 
+    if self:HasAnyDisableAiEffect() then
+        if self.isAttacking then
+            self:CancelAttackState("disable_ai_effect")
+        end
+        if self.moving then
+            self:StopMoving(true, "disable_ai_effect")
+        end
+        zombie:setUseless(true)
+        ChaosNPC.SetTargetInner(zombie, nil)
+        return
+    end
+
     if self.isAttacking then
         self:OnAttackTick(deltaMs)
     end
+
+    self:UpdatePanic(deltaMs)
+    local isPanicking = self:IsPanicking()
 
     if self.findEnemyTimeoutMs < CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS then
         self.findEnemyTimeoutMs = self.findEnemyTimeoutMs + deltaMs
@@ -62,6 +77,55 @@ function ChaosNPC:update(deltaMs)
     end
 
     local actionState = zombie:getActionStateName()
+
+    if self.lastZombieBiteTimeMs then
+        local timeSinceBiteMs = timestampMs - self.lastZombieBiteTimeMs
+        local shouldRecoverFromBite = timeSinceBiteMs > 250 and actionState == "idle"
+        local forceRecoverFromBite = timeSinceBiteMs > 1200 and
+            (actionState == "staggerback" or actionState == "hitreaction" or
+                tostring(actionState):find("^hitreaction") ~= nil or tostring(actionState):find("^staggerback") ~= nil)
+
+        if shouldRecoverFromBite or forceRecoverFromBite then
+            self:DebugLog(
+                "recover_from_zombie_bite elapsed=" ..
+                tostring(timeSinceBiteMs) .. " force=" .. tostring(forceRecoverFromBite), true)
+
+            zombie:setStaggerBack(false)
+            zombie:setHitReaction("")
+            zombie:setBumpType("")
+            zombie:clearVariable("hitreaction")
+            zombie:clearVariable("BumpType")
+            zombie:clearVariable("bStaggerBack")
+            self:CancelAttackState("recover_from_zombie_bite")
+            self:StopMoving(true, "recover_from_zombie_bite")
+
+            if forceRecoverFromBite then
+                pcall(function()
+                    zombie:changeState(ZombieIdleState.instance())
+                end)
+            end
+
+            local biteEnemy = self.lastZombieThatAttackedNPC
+            if biteEnemy and biteEnemy:isAlive() then
+                self.enemy = biteEnemy
+                self.moveTargetCharacter = nil
+                self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
+                self.findEnemyTimeoutMs = CHAOS_NPC_MAX_FIND_ENEMY_TIMEOUT_MS
+                self:SetAsTargetEnemy(biteEnemy)
+            elseif self.enemy and self.enemy:isAlive() then
+                self.moveTargetCharacter = nil
+                self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
+                self:SetAsTargetEnemy(self.enemy)
+            end
+
+            self.lastZombieBiteTimeMs = nil
+            actionState = zombie:getActionStateName()
+        elseif timeSinceBiteMs > 5000 then
+            self:DebugLog("clear_expired_bite_recovery", false)
+            self.lastZombieBiteTimeMs = nil
+        end
+    end
+
     if actionState == "lunge" then
         zombie:setUseless(true)
         zombie:clearAggroList()
@@ -91,12 +155,22 @@ function ChaosNPC:update(deltaMs)
         self.enemy = nil
     end
 
-    local shouldFindNewEnemy = self.enemy == nil and not self.isAttacking
+    if self.enemy and not self.enemy:isZombie() and instanceof(self.enemy, "IsoPlayer") and
+        ChaosNPCUtils.IsNPCIgnorePlayerActive() then
+        if self.enemy == self.moveTargetCharacter then
+            self.moveTargetCharacter = nil
+            self:StopMoving(true, "ignore_player_effect_active")
+        end
+        self:CancelAttackState("ignore_player_effect_active")
+        self.enemy = nil
+    end
+
+    local shouldFindNewEnemy = self.enemy == nil and not self.isAttacking and not isPanicking
     if shouldFindNewEnemy and canFindNewEnemyThisFrame then
         self:UpdateNextEnemyTarget()
     end
 
-    if self.enemy then
+    if self.enemy and not isPanicking then
         local followTarget = self:GetFollowTarget()
         if followTarget then
             local enemyDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), self.enemy:getX(), self.enemy:getY())
@@ -106,14 +180,18 @@ function ChaosNPC:update(deltaMs)
         end
     end
 
-    if self.enemy then
+    if self.enemy and not isPanicking then
         local wasPickingGroundWeapon = self.actionType == "pickup_ground_weapon"
+        local wasPickingBandage = self.actionType == "pickup_bandage"
         local shouldSwitchToEnemyPath = self.moveTargetCharacter ~= self.enemy or
             wasPickingGroundWeapon or
+            wasPickingBandage or
             not self.moving
 
         if wasPickingGroundWeapon then
             self:StopMoving(true, "pickup_ground_weapon_enemy_override")
+        elseif wasPickingBandage then
+            self:StopMoving(true, "pickup_bandage_enemy_override")
         end
         self:ClearAction()
         self.moveTargetCharacter = self.enemy
@@ -122,9 +200,29 @@ function ChaosNPC:update(deltaMs)
         end
     end
 
+    if isPanicking then
+        local targetSquare = self.panicTargetSquare
+        local zombieSquare = zombie:getSquare()
+        local isOnTargetSquare = targetSquare and zombieSquare and
+            zombieSquare:getX() == targetSquare:getX() and
+            zombieSquare:getY() == targetSquare:getY() and
+            zombieSquare:getZ() == targetSquare:getZ()
+
+        if self.moveTargetCharacter then
+            self.moveTargetCharacter = nil
+            shouldUpdatePathfind = true
+        end
+
+        if not isOnTargetSquare and targetSquare and (shouldUpdatePathfind or not self.moving) then
+            self.walkType = self.canRun and "Run" or "Walk"
+            self:MoveToLocation(targetSquare)
+            shouldUpdatePathfind = false
+        end
+    end
+
     if self.actionType == "pickup_ground_weapon" then
         local actionWorldObj = self.actionWorldObjectTarget
-        if not actionWorldObj or not self:IsGroundMeleeWeaponWorldObject(actionWorldObj) then
+        if not actionWorldObj or not self:IsGroundUsableWeaponWorldObject(actionWorldObj) then
             self:StopMoving(true, "pickup_ground_weapon_invalid")
             self:ClearAction()
         else
@@ -151,7 +249,37 @@ function ChaosNPC:update(deltaMs)
         end
     end
 
-    if not self.isAttacking and self.actionType == nil and self:HasTag("effect_move_to_square") then
+    if self.actionType == "pickup_bandage" then
+        local actionWorldObj = self.actionWorldObjectTarget
+        if not actionWorldObj or not self:IsGroundBandageWorldObject(actionWorldObj) or not self:NeedsHealing() then
+            self:StopMoving(true, "pickup_bandage_invalid")
+            self:ClearAction()
+        else
+            local actionSquare = actionWorldObj:getSquare()
+            if not actionSquare or actionSquare:getZ() ~= zombie:getZ() then
+                self:StopMoving(true, "pickup_bandage_square_invalid")
+                self:ClearAction()
+            else
+                local zombieSquare = zombie:getSquare()
+                local isOnActionSquare = zombieSquare and
+                    zombieSquare:getX() == actionSquare:getX() and
+                    zombieSquare:getY() == actionSquare:getY() and
+                    zombieSquare:getZ() == actionSquare:getZ()
+
+                if isOnActionSquare then
+                    self:pickGroundBandage(actionWorldObj)
+                    self:StopMoving(true, "pickup_bandage")
+                    self:ClearAction()
+                    shouldUpdatePathfind = false
+                elseif shouldUpdatePathfind then
+                    self:MoveToLocation(actionSquare)
+                end
+            end
+        end
+    end
+
+    if not self.isAttacking and self.actionType == nil and not isPanicking and
+        self:HasTag("effect_move_to_square") then
         local targetSquare = self.effectMoveTargetLocation
         local zombieSquare = zombie:getSquare()
         local isOnTargetSquare = targetSquare and zombieSquare and
@@ -173,19 +301,91 @@ function ChaosNPC:update(deltaMs)
     end
 
     if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil and
-        not self:HasTag("effect_move_to_square") then
+        not isPanicking and not self:HasTag("effect_move_to_square") then
         self:UpdateNextTargetMoveCharacter()
         shouldUpdatePathfind = true
     end
 
-    if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil and self:HasTag("item_robber") then
+    if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil and
+        not isPanicking and self:HasTag("item_robber") then
         if not self.moving then
             self:UpdateWanderTarget()
         end
     end
 
+    if not self.moveTargetCharacter and not self.isAttacking and self.actionType == nil and
+        not isPanicking and not self:HasTag("effect_move_to_square") and
+        self.npcGroup == ChaosNPCGroupID.PEDESTRIAN then
+        if not self.moving and timestampMs >= (self.pedestrianPauseEndMs or 0) then
+            self:UpdateWanderTarget()
+        end
+    end
+
+    local isFriendly = self:IsFriendlyToPlayer()
+    local needsHealing = isFriendly and self:NeedsHealing()
+    local shouldFindBandage = needsHealing and self.enemy == nil and self.actionType == nil and
+        not isPanicking and not self:HasTag("effect_move_to_square") and zombie:getVehicle() == nil
+    if shouldFindBandage and canFindGroundWeaponThisFrame then
+        self.findGroundWeaponTimeoutMs = 0
+
+        local px = math.floor(zombie:getX())
+        local py = math.floor(zombie:getY())
+        local pz = math.floor(zombie:getZ())
+
+        ChaosUtils.SquareRingSearchTile_2D(px, py, function(square)
+            local foundWorldObj = nil
+            local hasBandage = ChaosUtils.ForAllWorldObjectsOnSquare(square, function(worldObj)
+                if self:CanUseGroundBandageWorldObject(worldObj) then
+                    foundWorldObj = worldObj
+                    return true
+                end
+                return false
+            end)
+
+            if hasBandage and foundWorldObj then
+                self:StartPickupBandageAction(foundWorldObj)
+                return self.actionType == "pickup_bandage" and self.actionWorldObjectTarget == foundWorldObj
+            end
+
+            return false
+        end, 0, 3, false, false, true, pz, pz)
+    end
+
+    if isFriendly and self.canGiftItems and self.enemy == nil and not self.isAttacking and not isPanicking then
+        local timeSinceGiftMs = timestampMs - (self.lastGiftItemTimeMs or 0)
+        local timeSinceGlobalGiftMs = timestampMs - (ChaosNPCUtils.lastGiftItemTimeMs or 0)
+        if timeSinceGiftMs >= CHAOS_NPC_GIFT_ITEM_COOLDOWN_MS and
+            timeSinceGlobalGiftMs >= CHAOS_NPC_GIFT_ITEM_COOLDOWN_MS then
+            local followTarget = self:GetFollowTarget()
+            if followTarget and instanceof(followTarget, "IsoPlayer") and
+                zombie:getZ() == followTarget:getZ() then
+                local distToFollow = ChaosUtils.distTo(
+                    zombie:getX(), zombie:getY(),
+                    followTarget:getX(), followTarget:getY()
+                )
+                if distToFollow < CHAOS_NPC_GIFT_ITEM_MAX_DIST then
+                    ---@cast followTarget IsoPlayer
+                    self:TryGiftRandomItem(followTarget)
+                end
+            end
+        end
+    end
+
+    if isFriendly and needsHealing and self.enemy == nil and not self.isAttacking and not isPanicking then
+        local timeSinceLineMs = timestampMs - (self.lastNeedHealLineMs or 0)
+        if timeSinceLineMs >= CHAOS_NPC_NEED_HEAL_LINE_COOLDOWN_MS then
+            ChaosZombie.AddNewChatLine(zombie, ChaosLocalization.GetString("misc", "npc_need_heal"),
+                CHAOS_NPC_BANDAGE_CHAT_COLOR)
+            self.lastNeedHealLineMs = timestampMs
+
+            local soundName = zombie:isFemale() and "chaos_npc_need_bandages_female" or "chaos_npc_need_bandages_male"
+
+            ChaosZombie.PlaySoundLine(zombie, soundName, "need_heal", 80000)
+        end
+    end
+
     local shouldFindGroundWeapon = self.enemy == nil and self.actionType == nil and not self:HasEquippedWeapon() and
-        not self:HasTag("effect_move_to_square")
+        not isPanicking and not self:HasTag("effect_move_to_square")
     if shouldFindGroundWeapon and canFindGroundWeaponThisFrame and zombie:getVehicle() == nil then
         self.findGroundWeaponTimeoutMs = 0
 
@@ -196,7 +396,7 @@ function ChaosNPC:update(deltaMs)
         ChaosUtils.SquareRingSearchTile_2D(px, py, function(square)
             local foundWorldObj = nil
             local hasWeapon = ChaosUtils.ForAllWorldObjectsOnSquare(square, function(worldObj)
-                if self:CanUseGroundMeleeWeaponWorldObject(worldObj) then
+                if self:CanUseGroundUsableWeaponWorldObject(worldObj) then
                     foundWorldObj = worldObj
                     return true
                 end
@@ -269,10 +469,19 @@ function ChaosNPC:update(deltaMs)
                 self:StopMoving(true, "nearby_finished")
             elseif self.actionType == "pickup_ground_weapon" then
                 self:StopMoving(true, "pickup_ground_weapon_reached")
+            elseif self.actionType == "pickup_bandage" then
+                self:StopMoving(true, "pickup_bandage_reached")
+            elseif not self.moveTargetCharacter and isPanicking then
+                self:StopMoving(true, "panic_path_finished")
             elseif not self.moveTargetCharacter and self:HasTag("effect_move_to_square") then
                 self:StopMoving(true, "effect_move_to_square_finished")
             elseif not self.moveTargetCharacter and self:HasTag("item_robber") then
                 self:StopMoving(true, "wander_reached")
+            elseif not self.moveTargetCharacter and self.npcGroup == ChaosNPCGroupID.PEDESTRIAN then
+                self:StopMoving(true, "pedestrian_wander_reached")
+                self.pedestrianPauseEndMs = timestampMs +
+                    ChaosUtils.RandIntegerRange(CHAOS_NPC_PEDESTRIAN_PAUSE_MIN_MS,
+                        CHAOS_NPC_PEDESTRIAN_PAUSE_MAX_MS + 1)
             end
             self.pathfindUpdateMs = CHAOS_NPC_MAX_PATHFIND_UPDATE_MS
         elseif moveResult == BehaviorResult.Working then

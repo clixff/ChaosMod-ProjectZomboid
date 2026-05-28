@@ -15,6 +15,7 @@ W.ROW_HEIGHT         = 22
 W.ROW_GAP            = 8
 W.SECTION_GAP        = 14
 W.SECTION_HEADER_H   = 24
+W.HINT_LINE_HEIGHT   = 16
 
 ---@param value any
 ---@return number | nil
@@ -41,6 +42,29 @@ function W.MakeLabel(parent, x, y, w, text)
     label:instantiate()
     parent:addChild(label)
     return label
+end
+
+---Creates a muted multi-line hint placed below a setting row. The input
+---string is split on `\n` and rendered as one ISLabel per line so it stacks
+---vertically without word-wrap.
+---@param parent ISPanel
+---@param x number
+---@param y number
+---@param text string
+---@return table<integer, ISLabel> labels, number totalHeight
+function W.MakeHint(parent, x, y, text)
+    local labels = {}
+    local lineH = ChaosUIManager.GetScaledWidth(W.HINT_LINE_HEIGHT)
+    local i = 0
+    for line in (tostring(text or "") .. "\n"):gmatch("([^\n]*)\n") do
+        local label = ISLabel:new(x, y + i * lineH, lineH, line, 0.7, 0.7, 0.7, 1, UIFont.Small, true)
+        label:initialise()
+        label:instantiate()
+        parent:addChild(label)
+        table.insert(labels, label)
+        i = i + 1
+    end
+    return labels, i * lineH
 end
 
 ---@param parent ISPanel
