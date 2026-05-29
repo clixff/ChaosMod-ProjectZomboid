@@ -26,7 +26,7 @@ Chaos Mod also supports Twitch and YouTube integration. Viewers can vote for the
 2. Download the mod from the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142).
 3. Enable the mod in the game.
 
-### Method 2 — Manual Installation
+### Method 2 — Manual Installation (Skip this unless you really need it)
 
 1. Set Project Zomboid to the **unstable** branch in Steam.
 2. Download the latest release from [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
@@ -78,10 +78,10 @@ Both `<number>` and `!vote <number>` formats are supported. The option numbers a
 
 ### StreamerApp Installation
 
-1. Launch the game with the mod enabled at least once. You need to load a game world and activate the mod once.
-2. Download the latest release from [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
-3. Extract **ZomboidStreamerApp.exe** to any folder.
-4. Launch **ZomboidStreamerApp.exe** — the dashboard opens in your browser.
+1. Install the mod first.
+2. Download the latest release from [Chaos Mod Hub](https://chaos-zomboid.com/download) or [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
+3. Extract **ZomboidStreamerApp.exe** to any folder and launch it.
+4. Wait until the dashboard opens in your browser or open it manually: [Local Dashboard](http://127.0.0.1:3959/dashboard)
 5. Connect Twitch and/or YouTube in the dashboard (see sub-sections below).
 
 ### Twitch

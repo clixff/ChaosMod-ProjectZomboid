@@ -53,7 +53,8 @@ Full list of effects: [url=https://chaos-zomboid.com/effects]Chaos Mod Hub[/url]
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_youtube.png[/img]
 
 Viewers can vote for the next effect, and Twitch or YouTube nicknames can appear above zombies.
-To enable Twitch or YouTube support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
+To enable Twitch or YouTube support, you need to install the StreamerApp from [url=http://chaos-zomboid.com/download]Chaos Mod Hub[/url] or [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url].
+Just install the mod first, then extract ZomboidStreamerApp.exe to any folder and launch it.
 
 You can also activate effects with donations through [b]Twitch Bits[/b], [b]Twitch Channel Point Rewards[/b], [b]Twitch Subs[/b] or [b]DonationAlerts[/b]. Viewers cheer or donate with an effect ID in the message to trigger that specific effect.
 
@@ -168,5 +169,6 @@ This mod will likely not work with mods that change zombie AI or add NPCs to the
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_11.png[/img]
 
+[url=https://chaos-zomboid.com/download]Download StreamerApp[/url]
 [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Repository[/url]
 [url=https://chaos-zomboid.com/effects]Effects List[/url]

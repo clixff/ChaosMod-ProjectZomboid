@@ -28,6 +28,16 @@ const effectsRoute = createRoute({
   component: EffectsPage,
 });
 
+// /download → landing page with ?download, which triggers the zip download.
+const downloadRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/download",
+  beforeLoad: () => {
+    throw redirect({ to: "/", search: { download: "1" } });
+  },
+  component: () => null,
+});
+
 // /e/:name → /effects?c=:name, preserving every other query param.
 const sharedConfigRedirectRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -59,6 +69,7 @@ const notFoundRoute = createRoute({
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   effectsRoute,
+  downloadRoute,
   sharedConfigRedirectRoute,
   notFoundRoute,
 ]);
