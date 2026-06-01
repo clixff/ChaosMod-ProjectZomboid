@@ -1467,9 +1467,6 @@ async function main(): Promise<void> {
         );
         try {
           await rewardsManager.createAll(rows);
-          if (!modEnabled) {
-            await rewardsManager.setVisible(false);
-          }
           return { success: true };
         } catch (err) {
           if (err instanceof TwitchRewardsError) {
