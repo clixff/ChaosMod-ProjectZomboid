@@ -25,7 +25,7 @@ local EXPLOSION_RADIUS = 2
 local METEOR_ITEM_ID = "Base.LargeMeteorite"
 local MARKER_LEAD_SECONDS = 1.0
 local MARKER_SCALE = 2.5
-local PLAYER_DAMAGE_COOLDOWN_MS = 1500
+local PLAYER_DAMAGE_COOLDOWN_MS = 15000
 
 ---@param worldItem IsoWorldInventoryObject
 ---@param visualZ number absolute world Z (square Z + offset)

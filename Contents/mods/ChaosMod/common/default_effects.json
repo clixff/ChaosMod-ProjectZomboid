@@ -2811,7 +2811,7 @@
             "enabled": true,
             "chance": 0.7,
             "withDuration": true,
-            "duration": 60,
+            "duration": 30,
             "disable_effects": [
                 "pig_turret",
                 "zombies_turret"
@@ -3339,7 +3339,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 45,
+            "duration": 25,
             "disable_effects": [
                 "spinning_characters"
             ],
@@ -4238,7 +4238,7 @@
             "enabled": true,
             "chance": 0.8,
             "withDuration": true,
-            "duration": 45,
+            "duration": 30,
             "disable_effects": [
                 "doomsday"
             ],

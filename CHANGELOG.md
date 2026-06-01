@@ -1,3 +1,17 @@
+## [1.2.1]
+
+### Mod Fixes and Improvements
+
+- Player model now returns back on mod start if player was playing as animal model before a crash
+
+### Effect Fixes and Improvements
+
+- `Temporary Army`: removed debug red line
+- `Meteor Shower`: updated cooldown between player damage from 1.5s to 15s
+- `Doomsday`: updated cooldown between player damage from 5s to 15s, duration changed from 45s to 30s
+- `Griefer Pig Turret`: duration changed from 60s to 30s
+- `Spinning Characters`: duration changed from 45s to 25s
+
 ## [1.2.0]
 
 ## New Services Support

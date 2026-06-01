@@ -59,7 +59,7 @@ local METEOR_MARKER_LEAD_SECONDS = 1.0
 local METEOR_MARKER_SCALE = 2.5
 
 -- Global cooldown shared by meteors and lightning strikes
-local GLOBAL_COOLDOWN_MS = 5000
+local GLOBAL_COOLDOWN_MS = 15000
 local LIGHTNING_NEAR_PLAYER_DIST = 2
 
 -- Alarms
