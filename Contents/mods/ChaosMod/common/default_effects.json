@@ -3032,7 +3032,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 35,
+            "duration": 25,
             "disable_effects": [
                 "hurricane"
             ],
@@ -3044,7 +3044,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 60,
+            "duration": 30,
             "disable_effects": [
                 "the_magic_broom"
             ],

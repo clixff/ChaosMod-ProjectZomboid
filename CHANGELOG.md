@@ -3,6 +3,7 @@
 ### Mod Fixes and Improvements
 
 - Player model now returns back on mod start if player was playing as animal model before a crash
+- Compatible Streamer App and mod version combinations no longer show the version mismatch or update notification
 
 ### Effect Fixes and Improvements
 
@@ -12,6 +13,8 @@
 - `Griefer Pig Turret`: duration changed from 60s to 30s
 - `Spinning Characters`: duration changed from 45s to 25s
 - `Break All Items`: renamed to `Break Random Items` and now only breaks some items at random instead of everything
+- `The Magic Broom`:` duration changed from 60s to 30s
+- `Hurricane`: duration changed from 35s to 25s
 
 ## [1.2.0]
 

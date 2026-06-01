@@ -1,177 +1,348 @@
 version=1
 id=3717082142
 title=Chaos Mod + Twitch/YouTube [B42/SP]
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_01.png[/img]
-description=
-description=[b]A single-player Chaos Mod v1.1.1 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
-description=
-description=This mod triggers a random effect every 45 seconds. There are currently [b]450+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
-description=
-description=[b]Twitch and YouTube integration[/b] is optional and allows your viewers to vote for the next effect. You can play without it.
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_02.png[/img]
-description=
-description=[h3]v1.2.0[/h3]
-description=
-description=[list]
-description=[*] Bug fixes for many effects and crashes
-description=[*] YouTube Live Integration (Experimental)
-description=[*] Twitch Bits Donation System (Experimental)
-description=[*] Twitch Channel Point Rewards (Experimental)
-description=[*] Twitch Subs Integration (Experimental)
-description=[*] DonationAlerts multicurrency support (Experemental)
-description=[*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
-description=[*] Recent Effects Blocklist preserves between sessions
-description=[*] NPCs update: smarter, stronger, and with firearms
-description=[*] 135+ new effects!
-description=[*] Meta Effects system that trigger every 15 minutes
-description=[*] And many other improvements
-description=[/list]
-description=
-description=[url=https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest]Full changelog[/url]
-description=
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_03.png[/img]
-description=
-description=[quote]This mod requires the [b]B42 version[/b] of Project Zomboid.
-description=To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
-description=Latest tested version: [b]42.18.0[/b]
-description=This mod [b]will not[/b] work in multiplayer[/quote]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_04.png[/img]
-description=
-description=[h2]Examples of effects[/h2]
-description=
-description=[list]
-description=[*]Spawn Zombie Nearby
-description=[*]Give Random Tool
-description=[*]Enable Rain
-description=[*]Spawn Vehicle Nearby
-description=[*]Turn Power Off
-description=[/list]
-description=
-description=Full list of effects: [url=https://chaos-zomboid.com/effects]Chaos Mod Hub[/url]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_twitch.png[/img]
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_youtube.png[/img]
-description=
-description=Viewers can vote for the next effect, and Twitch or YouTube nicknames can appear above zombies.
-description=To enable Twitch or YouTube support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
-description=
-description=You can also activate effects with donations through [b]Twitch Bits[/b], [b]Twitch Channel Point Rewards[/b], [b]Twitch Subs[/b] or [b]DonationAlerts[/b]. Viewers cheer or donate with an effect ID in the message to trigger that specific effect.
-description=
-description=You can read more about Twitch, YouTube, and donation integration on the mod's GitHub page.
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_06.png[/img]
-description=
-description=You can edit the mod settings (effect interval time, vote start time, effect settings, language) in mod settings. You can open mod settings window by pressing button with gear icon in game (bottom-left corner). Also settings are available in StreamerApp dashboard.
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_05.png[/img]
-description=
-description=[b]Q: Mod does not work. What should I do?[/b]
-description=A: Make sure you are using the unstable branch of Project Zomboid on Steam.
-description=
-description=
-description=[b]Q: How to disable some effect or change effect settings?[/b]
-description=A: You can edit settings of every effect in the mod settings windows (bottom-left corner)
-description=
-description=[b]Q: I only want to display Twitch or YouTube nicknames above zombies, without random effects and without voting. How can I do this?[/b]
-description=A: In StreamerApp dashboard set these settings:
-description=[list]
-description=[*]Effects interval enabled: [b]false[/b]
-description=[*]Streamer mode enabled: [b]true[/b]
-description=[*]Voting enabled: [b]false[/b]
-description=[*]Donations enabled: [b]false[/b]
-description=[*]Use zombie nicknames: [b]true[/b]
-description=[/list]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_07.png[/img]
-description=
-description=The mod supports [b]11 languages[/b]
-description=[list]
-description=[*]English
-description=[*]Russian
-description=[*]French
-description=[*]German
-description=[*]Spanish
-description=[*]Portuguese
-description=[*]Polish
-description=[*]Turkish
-description=[*]Simplified Chinese
-description=[*]Korean
-description=[*]Japanese
-description=[/list]
-description=
-description=You can change language on the mod settings window or in StreamerApp dashboard.
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_08.png[/img]
-description=
-description=This mod does [b]not[/b] support multiplayer.
-description=It is designed for single-player only.
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_09.png[/img]
-description=
-description=
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_0_1.png[/img]
-description=
-description=[list]
-description=[*]Initial Release
-description=[/list]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_0_2.png[/img]
-description=
-description=[list]
-description=[*]New Effects
-description=[/list]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_0.png[/img]
-description=
-description=[list]
-description=[*]Dashboard system for StreamerApp
-description=[*]In-Game Settings
-description=[*]New Effects
-description=[/list]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_1.png[/img]
-description=
-description=[list]
-description=[*]Update to game version 42.18.0
-description=[*]Bug Fixes
-description=[*]Korean and Japanese translation
-description=[*]Updated effect chances
-description=[/list]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_2_0_current.png[/img]
-description=
-description=[list]
-description=[*] Bug fixes for many effects and crashes
-description=[*] YouTube Live Integration (Experimental)
-description=[*] Twitch Bits Donation System (Experimental)
-description=[*] Twitch Channel Point Rewards (Experimental)
-description=[*] Twitch Subs Integration (Experimental)
-description=[*] DonationAlerts multicurrency support (Experemental)
-description=[*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
-description=[*] Recent Effects Blocklist preserves between sessions
-description=[*] NPCs update: smarter, stronger, and with firearms
-description=[*] 135+ new effects!
-description=[*] And many other improvements
-description=[/list]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/future_versions.png[/img]
-description=
-description=[list]
-description=[*] Context aware system for effects
-description=[*] New effects
-description=[*] Multiplayer support (?)
-description=[/list]
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_10.png[/img]
-description=
-description=This mod will likely not work with mods that change zombie AI or add NPCs to the game.
-description=
-description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_11.png[/img]
-description=
-description=[url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Repository[/url]
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_01.png[/img]
+
+description=
+
+description=[b]A single-player Chaos Mod v1.1.1 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
+
+description=
+
+description=This mod triggers a random effect every 45 seconds. There are currently [b]450+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
+
+description=
+
+description=[b]Twitch and YouTube integration[/b] is optional and allows your viewers to vote for the next effect. You can play without it.
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_02.png[/img]
+
+description=
+
+description=[h3]v1.2.0[/h3]
+
+description=
+
+description=[list]
+
+description=[*] Bug fixes for many effects and crashes
+
+description=[*] YouTube Live Integration (Experimental)
+
+description=[*] Twitch Bits Donation System (Experimental)
+
+description=[*] Twitch Channel Point Rewards (Experimental)
+
+description=[*] Twitch Subs Integration (Experimental)
+
+description=[*] DonationAlerts multicurrency support (Experemental)
+
+description=[*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
+
+description=[*] Recent Effects Blocklist preserves between sessions
+
+description=[*] NPCs update: smarter, stronger, and with firearms
+
+description=[*] 135+ new effects!
+
+description=[*] Meta Effects system that trigger every 15 minutes
+
+description=[*] And many other improvements
+
+description=[/list]
+
+description=
+
+description=[url=https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest]Full changelog[/url]
+
+description=
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_03.png[/img]
+
+description=
+
+description=[quote]This mod requires the [b]B42 version[/b] of Project Zomboid.
+
+description=To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
+
+description=Latest tested version: [b]42.19.0[/b]
+
+description=This mod [b]will not[/b] work in multiplayer[/quote]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_04.png[/img]
+
+description=
+
+description=[h2]Examples of effects[/h2]
+
+description=
+
+description=[list]
+
+description=[*]Spawn Zombie Nearby
+
+description=[*]Give Random Tool
+
+description=[*]Enable Rain
+
+description=[*]Spawn Vehicle Nearby
+
+description=[*]Turn Power Off
+
+description=[/list]
+
+description=
+
+description=Full list of effects: [url=https://chaos-zomboid.com/effects]Chaos Mod Hub[/url]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_twitch.png[/img]
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_youtube.png[/img]
+
+description=
+
+description=Viewers can vote for the next effect, and Twitch or YouTube nicknames can appear above zombies.
+
+description=To enable Twitch or YouTube support, you need to install StreamerApp from [url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Page[/url] of the mod.
+
+description=
+
+description=You can also activate effects with donations through [b]Twitch Bits[/b], [b]Twitch Channel Point Rewards[/b], [b]Twitch Subs[/b] or [b]DonationAlerts[/b]. Viewers cheer or donate with an effect ID in the message to trigger that specific effect.
+
+description=
+
+description=You can read more about Twitch, YouTube, and donation integration on the mod's GitHub page.
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_06.png[/img]
+
+description=
+
+description=You can edit the mod settings (effect interval time, vote start time, effect settings, language) in mod settings. You can open mod settings window by pressing button with gear icon in game (bottom-left corner). Also settings are available in StreamerApp dashboard.
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_05.png[/img]
+
+description=
+
+description=[b]Q: Mod does not work. What should I do?[/b]
+
+description=A: Make sure you are using the unstable branch of Project Zomboid on Steam.
+
+description=
+
+description=
+
+description=[b]Q: How to disable some effect or change effect settings?[/b]
+
+description=A: You can edit settings of every effect in the mod settings windows (bottom-left corner)
+
+description=
+
+description=[b]Q: I only want to display Twitch or YouTube nicknames above zombies, without random effects and without voting. How can I do this?[/b]
+
+description=A: In StreamerApp dashboard set these settings:
+
+description=[list]
+
+description=[*]Effects interval enabled: [b]false[/b]
+
+description=[*]Streamer mode enabled: [b]true[/b]
+
+description=[*]Voting enabled: [b]false[/b]
+
+description=[*]Donations enabled: [b]false[/b]
+
+description=[*]Use zombie nicknames: [b]true[/b]
+
+description=[/list]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_07.png[/img]
+
+description=
+
+description=The mod supports [b]11 languages[/b]
+
+description=[list]
+
+description=[*]English
+
+description=[*]Russian
+
+description=[*]French
+
+description=[*]German
+
+description=[*]Spanish
+
+description=[*]Portuguese
+
+description=[*]Polish
+
+description=[*]Turkish
+
+description=[*]Simplified Chinese
+
+description=[*]Korean
+
+description=[*]Japanese
+
+description=[/list]
+
+description=
+
+description=You can change language on the mod settings window or in StreamerApp dashboard.
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_08.png[/img]
+
+description=
+
+description=This mod does [b]not[/b] support multiplayer.
+
+description=It is designed for single-player only.
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_09.png[/img]
+
+description=
+
+description=
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_0_1.png[/img]
+
+description=
+
+description=[list]
+
+description=[*]Initial Release
+
+description=[/list]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_0_2.png[/img]
+
+description=
+
+description=[list]
+
+description=[*]New Effects
+
+description=[/list]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_0.png[/img]
+
+description=
+
+description=[list]
+
+description=[*]Dashboard system for StreamerApp
+
+description=[*]In-Game Settings
+
+description=[*]New Effects
+
+description=[/list]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_1_1.png[/img]
+
+description=
+
+description=[list]
+
+description=[*]Update to game version 42.18.0
+
+description=[*]Bug Fixes
+
+description=[*]Korean and Japanese translation
+
+description=[*]Updated effect chances
+
+description=[/list]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_2_0_current.png[/img]
+
+description=
+
+description=[list]
+
+description=[*] Bug fixes for many effects and crashes
+
+description=[*] YouTube Live Integration (Experimental)
+
+description=[*] Twitch Bits Donation System (Experimental)
+
+description=[*] Twitch Channel Point Rewards (Experimental)
+
+description=[*] Twitch Subs Integration (Experimental)
+
+description=[*] DonationAlerts multicurrency support (Experemental)
+
+description=[*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
+
+description=[*] Recent Effects Blocklist preserves between sessions
+
+description=[*] NPCs update: smarter, stronger, and with firearms
+
+description=[*] 135+ new effects!
+
+description=[*] And many other improvements
+
+description=[/list]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/future_versions.png[/img]
+
+description=
+
+description=[list]
+
+description=[*] Context aware system for effects
+
+description=[*] New effects
+
+description=[*] Multiplayer support (?)
+
+description=[/list]
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_10.png[/img]
+
+description=
+
+description=This mod will likely not work with mods that change zombie AI or add NPCs to the game.
+
+description=
+
+description=[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_11.png[/img]
+
+description=
+
+description=[url=https://github.com/clixff/ChaosMod-ProjectZomboid]GitHub Repository[/url]
+
 description=[url=https://chaos-zomboid.com/effects]Effects List[/url]
 tags=Build 42;Misc
 visibility=public

@@ -1,6 +1,6 @@
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_01.png[/img]
 
-[b]A single-player Chaos Mod v1.2.0 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
+[b]A single-player Chaos Mod v1.2.1 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
 
 This mod triggers a random effect every 45 seconds. There are currently [b]450+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
 
@@ -32,7 +32,7 @@ This mod triggers a random effect every 45 seconds. There are currently [b]450+ 
 
 [quote]This mod requires the [b]B42 version[/b] of Project Zomboid.
 To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
-Latest tested version: [b]42.18.0[/b]
+Latest tested version: [b]42.19.0[/b]
 This mod [b]will not[/b] work in multiplayer[/quote]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_04.png[/img]
