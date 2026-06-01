@@ -2002,7 +2002,7 @@
             "chance": 0.6,
             "withDuration": false,
             "enabled_donate": true,
-            "price_group": "positive_6"
+            "price_group": "positive_5"
         },
         {
             "id": "enable_alarm_nearby",
@@ -3755,7 +3755,7 @@
             "enabled": true,
             "chance": 1,
             "withDuration": true,
-            "duration": 45,
+            "duration": 30,
             "disable_effects": [
                 "wrath_of_the_gods"
             ],

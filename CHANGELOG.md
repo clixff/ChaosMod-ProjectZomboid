@@ -15,6 +15,8 @@
 - `Break All Items`: renamed to `Break Random Items` and now only breaks some items at random instead of everything
 - `The Magic Broom`:` duration changed from 60s to 30s
 - `Hurricane`: duration changed from 35s to 25s
+- `Zombie Magnet`: now shows a red marker on the player
+- `Wrath of the Gods`: duration changed from 45s to 30s
 
 ## [1.2.0]
 

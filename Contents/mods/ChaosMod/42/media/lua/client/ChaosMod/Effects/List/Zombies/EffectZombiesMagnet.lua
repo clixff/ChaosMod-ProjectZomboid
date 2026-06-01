@@ -78,15 +78,20 @@ function EffectZombiesMagnet:OnStart()
 
     local playerSquare = player:getSquare()
 
-    -- self.marker = getWorldMarkers():addGridSquareMarker(
-    --     playerSquare,
-    --     0.68, 0.90, 1.0,
-    --     true, -- fading alpha
-    --     6.0
-    -- )
-
-    if self.marker then
-        self.marker:setScaleCircleTexture(false)
+    if playerSquare then
+        local markers = getWorldMarkers()
+        if markers then
+            self.marker = markers:addGridSquareMarker(
+                playerSquare,
+                1.0, 0.0, 0.0,
+                true, -- fading alpha
+                1.0
+            )
+            if self.marker then
+                self.marker:setScaleCircleTexture(false)
+                self.marker:setSize(ORBIT_RADIUS * math.sqrt(2.0))
+            end
+        end
     end
 end
 
