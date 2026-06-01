@@ -1471,7 +1471,7 @@
             "price_group": "negative_3"
         },
         {
-            "id": "break_all_items",
+            "id": "break_random_items",
             "enabled": true,
             "chance": 0.8,
             "withDuration": false,

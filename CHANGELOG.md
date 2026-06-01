@@ -11,6 +11,7 @@
 - `Doomsday`: updated cooldown between player damage from 5s to 15s, duration changed from 45s to 30s
 - `Griefer Pig Turret`: duration changed from 60s to 30s
 - `Spinning Characters`: duration changed from 45s to 25s
+- `Break All Items`: renamed to `Break Random Items` and now only breaks some items at random instead of everything
 
 ## [1.2.0]
 
