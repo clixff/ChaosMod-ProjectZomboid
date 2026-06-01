@@ -2,8 +2,9 @@
 
 ### Mod Fixes and Improvements
 
-- Player model now returns back on mod start if player was playing as animal model before a crash
-- Compatible Streamer App and mod version combinations no longer show the version mismatch or update notification
+- Player model now returns back on mod start if player was playing as animal model before a crash.
+- Compatible Streamer App and mod version combinations no longer show the version mismatch or update notification.
+  — Updated firearms for NPCs: they do not add wounds to the player, but temporarily reduce his overall health.
 
 ### Effect Fixes and Improvements
 

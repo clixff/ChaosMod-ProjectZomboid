@@ -25,6 +25,7 @@ ChaosNPCFirearms.DEFAULT_MAX_AMMO = 8
 ChaosNPCFirearms.POST_ENGAGE_MS = 600
 ChaosNPCFirearms.DEFAULT_ACCURACY_ZOMBIES = 1.0
 ChaosNPCFirearms.DEFAULT_ACCURACY_PLAYERS = 0.25
+ChaosNPCFirearms.PLAYER_GENERAL_HEALTH_DMG = 8.0
 
 ChaosNPCFirearms.FIREARM_LUT = {
     ["Base.JS3T_Shotgun"] = "shotgun",
@@ -414,16 +415,38 @@ function ChaosNPCFirearms.ApplyShotHit(npc, weapon, enemy)
             tostring(zEnemy:isAlive())
         ))
     else
-        enemy:Hit(weapon, zombie, damage, false, 1.0)
-        if enemy.splatBlood then
+        -- Player target: do not use :Hit. Mirror the melee-vs-player handling
+        -- (blood, knockdown / hit reaction) but apply a fixed general-health
+        -- hit instead, and without adding wounds.
+        local splatCount = (weapon.getSplatNumber and weapon:getSplatNumber()) or 0
+        for _ = 0, splatCount do
             enemy:splatBlood(2, 0.25)
         end
+
         if enemy.playBloodSplatterSound then
             enemy:playBloodSplatterSound()
         end
+
+        local bodyDamage = enemy:getBodyDamage()
+
+        local timeNowMs = ChaosMod.lastTimeTickMs
+        local timeSinceLastHitMs = timeNowMs - (ChaosPlayer.hitStunLastTimeMs or 0)
+        if timeSinceLastHitMs >= 0 then
+            local isBehind = zombie:isBehind(enemy)
+            enemy:setHitFromBehind(isBehind)
+            enemy:setVariable("hitpvp", true)
+            enemy:setHitReaction("")
+            enemy:setHitReaction("HitReaction")
+            enemy:reportEvent("washitpvp")
+            ChaosPlayer.hitStunLastTimeMs = timeNowMs
+        end
+
+        bodyDamage:ReduceGeneralHealth(ChaosNPCFirearms.PLAYER_GENERAL_HEALTH_DMG)
+
         debugLog(string.format(
-            "[ChaosNPCFirearms][npc=%s pEnemy=%s] hit dmg=%.2f",
-            tostring(zombie:getID()), tostring(enemy:getID()), damage
+            "[ChaosNPCFirearms][npc=%s pEnemy=%s] reduceGeneralHealth=%.2f",
+            tostring(zombie:getID()), tostring(enemy:getID()),
+            ChaosNPCFirearms.PLAYER_GENERAL_HEALTH_DMG
         ))
     end
 end
