@@ -247,6 +247,13 @@ local function syncMetaEffectsForModVersion(configData, defaultConfig)
     end
     if storedVersion == currentVersion then return false end
 
+    -- If VERSION.txt is newer than the current mod version (the user downgraded
+    -- the mod), keep the user's config.json untouched. Only an upgrade (or an
+    -- unparseable/missing stored version) replaces meta_effects.list with defaults.
+    if ChaosUtils.CompareVersions(storedVersion, currentVersion) > 0 then
+        return false
+    end
+
     if type(configData.meta_effects) ~= "table" then
         configData.meta_effects = {}
     end

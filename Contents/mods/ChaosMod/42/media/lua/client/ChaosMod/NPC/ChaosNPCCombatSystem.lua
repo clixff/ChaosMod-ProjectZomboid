@@ -491,7 +491,10 @@ function ChaosNPC:OnAttackEnemyHit()
 
         bodyDamage:ReduceGeneralHealth(damage)
         if self.CanAddWounds then
-            ChaosPlayer.SetRandomBodyDamageByMeleeWeapon(enemy, damage, self.weaponItemCached)
+            local woundChance = self:HasEquippedWeapon() and 10.0 or 2.5
+            if ChaosUtils.RandFloat(0, 100) < woundChance then
+                ChaosPlayer.SetRandomBodyDamageByMeleeWeapon(enemy, damage, self.weaponItemCached)
+            end
         end
     end
 end

@@ -5,19 +5,23 @@
 - Player model now returns back on mod start if player was playing as animal model before a crash.
 - Compatible Streamer App and mod version combinations no longer show the version mismatch or update notification.
   — Updated firearms for NPCs: they do not add wounds to the player, but temporarily reduce his overall health.
+- NPC melee hits now rarely cause a wound on the player instead of always wounding.
+- Downgrading to an older mod version no longer resets your config and effects settings.
 
 ### Effect Fixes and Improvements
 
 - `Temporary Army`: removed debug red line
 - `Meteor Shower`: updated cooldown between player damage from 1.5s to 15s
 - `Doomsday`: updated cooldown between player damage from 5s to 15s, duration changed from 45s to 30s
-- `Griefer Pig Turret`: duration changed from 60s to 30s
+- `Griefer Pig Turret`: duration changed from 60s to 30s; now temporarily reduces the player's health instead of adding wounds when it hits them
 - `Spinning Characters`: duration changed from 45s to 25s
 - `Break All Items`: renamed to `Break Random Items` and now only breaks some items at random instead of everything
 - `The Magic Broom`:` duration changed from 60s to 30s
 - `Hurricane`: duration changed from 35s to 25s
 - `Zombie Magnet`: now shows a red marker on the player
 - `Wrath of the Gods`: duration changed from 45s to 30s
+- `Doomsday`: removed the earthquake phase
+- `Earthquake`: player is now set back on the ground when the effect ends, so they no longer take fall damage
 
 ## [1.2.0]
 

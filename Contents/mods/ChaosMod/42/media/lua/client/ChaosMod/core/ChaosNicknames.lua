@@ -30,7 +30,7 @@ ChaosNicknames = ChaosNicknames or {
     modDataColorKey = "ChaosModNicknameColor"
 }
 
-local DEBUG_NICKNAMES_TEXT = false
+local DEBUG_NICKNAMES_TEXT = true
 
 local NICKNAME_CHAT_MESSAGE_MAX_AGE_MS = 30000
 local NICKNAME_CHAT_MESSAGE_RENDER_MS = 7000
@@ -586,42 +586,49 @@ function ChaosNicknames.GetDebugNicknamesText(zombie)
 
     if isNPC then
         local npc = ChaosNPCUtils.GetNPCFromZombie(zombie)
-        if not npc then
-            return string.format("NPC id=%s hp=%.2f state=%s bump=%s hit=%s", id, health, actionState, bumpType,
-                hitReaction)
+        -- if not npc then
+        --     return string.format("NPC id=%s hp=%.2f state=%s bump=%s hit=%s", id, health, actionState, bumpType,
+        --         hitReaction)
+        -- end
+
+        -- local enemyId = "nil"
+        -- local enemyDist = -1.0
+        -- if npc.enemy then
+        --     enemyId = tostring(npc.enemy:getID())
+        --     enemyDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), npc.enemy:getX(), npc.enemy:getY())
+        -- end
+
+        -- local attackProgress = 0.0
+        -- if npc.attackAnimWindowMs and npc.attackAnimWindowMs > 0 then
+        --     attackProgress = (npc.attackAnimTimeMs or 0) / npc.attackAnimWindowMs
+        -- end
+
+        -- return string.format(
+        --     "NPC id=%s hp=%.2f state=%s bump=%s hit=%s\nAtk=%s %d/%d %.0f%% hitDone=%s last=%d\nmove=%s enemy=%s dist=%.2f pf=%d end=%.0f",
+        --     id,
+        --     health,
+        --     actionState,
+        --     bumpType,
+        --     hitReaction,
+        --     tostring(npc.attackAnimName or "nil"),
+        --     npc.attackAnimTimeMs or 0,
+        --     npc.attackAnimWindowMs or 0,
+        --     attackProgress * 100.0,
+        --     tostring(npc.attackHitPassed),
+        --     npc.attackLastTimeMs or 0,
+        --     tostring(npc.moving),
+        --     enemyId,
+        --     enemyDist,
+        --     npc.pathfindUpdateMs or 0,
+        --     npc.endurance or 0
+        -- )
+
+        local maxHealth = (npc and npc.maxHealth) or 1.0
+        if maxHealth <= 0 then
+            maxHealth = 1.0
         end
 
-        local enemyId = "nil"
-        local enemyDist = -1.0
-        if npc.enemy then
-            enemyId = tostring(npc.enemy:getID())
-            enemyDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), npc.enemy:getX(), npc.enemy:getY())
-        end
-
-        local attackProgress = 0.0
-        if npc.attackAnimWindowMs and npc.attackAnimWindowMs > 0 then
-            attackProgress = (npc.attackAnimTimeMs or 0) / npc.attackAnimWindowMs
-        end
-
-        return string.format(
-            "NPC id=%s hp=%.2f state=%s bump=%s hit=%s\nAtk=%s %d/%d %.0f%% hitDone=%s last=%d\nmove=%s enemy=%s dist=%.2f pf=%d end=%.0f",
-            id,
-            health,
-            actionState,
-            bumpType,
-            hitReaction,
-            tostring(npc.attackAnimName or "nil"),
-            npc.attackAnimTimeMs or 0,
-            npc.attackAnimWindowMs or 0,
-            attackProgress * 100.0,
-            tostring(npc.attackHitPassed),
-            npc.attackLastTimeMs or 0,
-            tostring(npc.moving),
-            enemyId,
-            enemyDist,
-            npc.pathfindUpdateMs or 0,
-            npc.endurance or 0
-        )
+        return string.format("Health: %.0f%%", health / maxHealth * 100)
     end
 
     local modData = zombie:getModData()
@@ -638,20 +645,22 @@ function ChaosNicknames.GetDebugNicknamesText(zombie)
                 biteData.target.zombie:getY())
         end
 
-        return string.format(
-            "Z id=%s hp=%.2f state=%s bump=%s hit=%s\nBite %d/%d cancel<=%d cancelled=%s\ntarget=%s dist=%.2f",
-            id,
-            health,
-            actionState,
-            bumpType,
-            hitReaction,
-            elapsedMs,
-            delayMs,
-            cancelWindowMs,
-            tostring(biteData.cancelled),
-            targetId,
-            targetDist
-        )
+        return ""
+
+        -- return string.format(
+        --     "Z id=%s hp=%.2f state=%s bump=%s hit=%s\nBite %d/%d cancel<=%d cancelled=%s\ntarget=%s dist=%.2f",
+        --     id,
+        --     health,
+        --     actionState,
+        --     bumpType,
+        --     hitReaction,
+        --     elapsedMs,
+        --     delayMs,
+        --     cancelWindowMs,
+        --     tostring(biteData.cancelled),
+        --     targetId,
+        --     targetDist
+        -- )
     end
 
     local target = zombie:getTarget()
@@ -662,10 +671,12 @@ function ChaosNicknames.GetDebugNicknamesText(zombie)
         targetDist = ChaosUtils.distTo(zombie:getX(), zombie:getY(), target:getX(), target:getY())
     end
 
-    return string.format("Z id=%s hp=%.2f state=%s bump=%s hit=%s\ntarget=%s dist=%.2f reanim=%s", id, health,
-        actionState,
-        bumpType,
-        hitReaction, targetId, targetDist, tostring(zombie:isReanimatedPlayer()))
+    return ""
+
+    -- return string.format("Z id=%s hp=%.2f state=%s bump=%s hit=%s\ntarget=%s dist=%.2f reanim=%s", id, health,
+    --     actionState,
+    --     bumpType,
+    --     hitReaction, targetId, targetDist, tostring(zombie:isReanimatedPlayer()))
 end
 
 ---@param zombie IsoZombie

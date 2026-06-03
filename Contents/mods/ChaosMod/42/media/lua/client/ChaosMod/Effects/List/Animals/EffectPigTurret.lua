@@ -40,6 +40,8 @@ local SHOT_COOLDOWN_MS = 800
 local ZOMBIE_MISS_CHANCE = 0.3
 ---@type number
 local PLAYER_MISS_CHANCE = 0.8
+---@type number
+local PLAYER_GENERAL_HEALTH_DMG = 8.0
 ---@param dist number
 ---@return number
 local function getPlayerHitChanceForDist(dist)
@@ -356,20 +358,54 @@ local function createFakeAttacker(pigSquare, target)
     return attacker
 end
 
+---@param player IsoPlayer
+---@param weapon HandWeapon
+---@param attacker IsoGameCharacter
+local function applyShotDamageToPlayer(player, weapon, attacker)
+    -- Player target: do not use :Hit. Mirror the NPC firearm handling
+    -- (blood, PvP hit reaction) but apply a fixed general-health hit instead,
+    -- and without adding wounds.
+    local splatCount = (weapon.getSplatNumber and weapon:getSplatNumber()) or 0
+    for _ = 0, splatCount do
+        player:splatBlood(2, 0.25)
+    end
+
+    if player.playBloodSplatterSound then
+        player:playBloodSplatterSound()
+    end
+
+    local bodyDamage = player:getBodyDamage()
+
+    local timeNowMs = ChaosMod.lastTimeTickMs
+    local timeSinceLastHitMs = timeNowMs - (ChaosPlayer.hitStunLastTimeMs or 0)
+    if timeSinceLastHitMs >= 0 then
+        local isBehind = attacker:isBehind(player)
+        player:setHitFromBehind(isBehind)
+        player:setVariable("hitpvp", true)
+        player:setHitReaction("")
+        player:setHitReaction("HitReaction")
+        player:reportEvent("washitpvp")
+        ChaosPlayer.hitStunLastTimeMs = timeNowMs
+    end
+
+    bodyDamage:ReduceGeneralHealth(PLAYER_GENERAL_HEALTH_DMG)
+end
+
 ---@param target IsoGameCharacter
 ---@param weapon HandWeapon
 ---@param attacker IsoGameCharacter
 local function applyShotDamage(target, weapon, attacker)
+    if instanceof(target, "IsoPlayer") then
+        ---@type IsoPlayer
+        local player = target
+        applyShotDamageToPlayer(player, weapon, attacker)
+        return
+    end
+
     local minDamage = weapon.getMinDamage and weapon:getMinDamage() or 0.8
     local maxDamage = weapon.getMaxDamage and weapon:getMaxDamage() or 1.2
     local damage = ChaosUtils.RandFloat(minDamage, maxDamage)
-
-
-    if instanceof(target, "IsoPlayer") then
-        damage = damage * 0.5
-    else
-        damage = damage * 2.0
-    end
+    damage = damage * 2.0
 
     target:Hit(weapon, attacker, damage, false, 1.0, false)
 

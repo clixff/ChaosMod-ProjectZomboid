@@ -129,6 +129,16 @@ function ChaosEffectsRegistry.SyncEffectsForModVersion()
         return
     end
 
+    -- If VERSION.txt is newer than the current mod version (the user downgraded
+    -- the mod), keep the user's effects.json untouched and leave VERSION.txt as
+    -- the newer marker. Only an upgrade (or unparseable/missing stored version)
+    -- resets effects.json to the shipped defaults.
+    if ChaosUtils.CompareVersions(storedVersion, currentVersion) > 0 then
+        print(string.format("[ChaosEffectsRegistry] Stored version '%s' is newer than current '%s'; keeping effects.json (downgrade)",
+            storedVersion, currentVersion))
+        return
+    end
+
     print(string.format("[ChaosEffectsRegistry] Mod version changed ('%s' -> '%s'); replacing effects.json with defaults",
         storedVersion, currentVersion))
 
