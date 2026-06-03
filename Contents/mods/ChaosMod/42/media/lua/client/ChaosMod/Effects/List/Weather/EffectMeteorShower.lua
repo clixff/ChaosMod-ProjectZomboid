@@ -280,6 +280,11 @@ end
 function EffectMeteorShower:OnEnd()
     ChaosEffectBase:OnEnd()
 
+    local bar = UIManager.getProgressBar(0)
+    if bar then
+        bar:setValue(0)
+    end
+
     if self.activeMeteors then
         clearAllMeteors(self)
     end

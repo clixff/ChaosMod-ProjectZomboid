@@ -519,6 +519,11 @@ function EffectDoomsday:OnEnd()
 
     ChaosUtils.EFFECT_DOOMSDAY_ENABLED = false
 
+    local bar = UIManager.getProgressBar(0)
+    if bar then
+        bar:setValue(0)
+    end
+
     local cm = ClimateManager.getInstance()
     if cm then
         cm:setPrecipitationIsSnow(self.previousPrecipitationIsSnow or false)
