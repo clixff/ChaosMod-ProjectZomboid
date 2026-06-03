@@ -1,17 +1,23 @@
 ---@class EffectKamikazeZombies : ChaosEffectBase
 ---@field explodedZombies table<IsoZombie, boolean>
+---@field soundCooldownTimer ChaosManualTimer
 EffectKamikazeZombies = ChaosEffectBase:derive("EffectKamikazeZombies", "kamikaze_zombies")
 
 local TRIGGER_RADIUS = 2
 local EXPLOSION_RADIUS = 3
+local SOUND_COOLDOWN_MS = 2500
 
 function EffectKamikazeZombies:OnStart()
     ChaosEffectBase:OnStart()
     self.explodedZombies = {}
+    self.soundCooldownTimer = ChaosManualTimer.new(SOUND_COOLDOWN_MS)
+    self.soundCooldownTimer:add(SOUND_COOLDOWN_MS) -- first explosion always plays the sound
 end
 
----@param _deltaMs integer
-function EffectKamikazeZombies:OnTick(_deltaMs)
+---@param deltaMs integer
+function EffectKamikazeZombies:OnTick(deltaMs)
+    self.soundCooldownTimer:add(deltaMs)
+
     local player = getPlayer()
     if not player then return end
 
@@ -35,7 +41,12 @@ function EffectKamikazeZombies:OnTick(_deltaMs)
         if math.abs(zombie:getZ() - pz) > 0.5 then return end
 
         self.explodedZombies[zombie] = true
-        ChaosUtils.TriggerExplosionAt(zombieSquare, EXPLOSION_RADIUS)
+
+        local playSound = self.soundCooldownTimer:isEnded()
+        if playSound then
+            self.soundCooldownTimer:reset()
+        end
+        ChaosUtils.TriggerExplosionAt(zombieSquare, EXPLOSION_RADIUS, true, not playSound)
     end, true, nil)
 end
 

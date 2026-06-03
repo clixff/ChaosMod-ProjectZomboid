@@ -354,6 +354,11 @@
             "chance": 0.75,
             "withDuration": false,
             "enabled_donate": true,
+            "disable_effects": [
+                "player_is_a_rat",
+                "player_is_a_chicken",
+                "earthquake"
+            ],
             "price_group": "negative_4"
         },
         {
@@ -362,6 +367,11 @@
             "chance": 0.75,
             "withDuration": false,
             "enabled_donate": true,
+            "disable_effects": [
+                "player_is_a_rat",
+                "player_is_a_chicken",
+                "earthquake"
+            ],
             "price_group": "negative_4"
         },
         {
@@ -3429,7 +3439,11 @@
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
-                "player_is_a_rat"
+                "player_is_a_rat",
+                "player_is_a_chicken",
+                "earthquake",
+                "launch_player_up",
+                "launch_everyone_up"
             ],
             "enabled_donate": true,
             "price_group": "neutral_4"
@@ -4150,7 +4164,11 @@
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
-                "player_is_a_chicken"
+                "player_is_a_chicken",
+                "player_is_a_rat",
+                "earthquake",
+                "launch_player_up",
+                "launch_everyone_up"
             ],
             "enabled_donate": true,
             "price_group": "neutral_4"

@@ -22,6 +22,10 @@
 - `Wrath of the Gods`: duration changed from 45s to 30s
 - `Doomsday`: removed the earthquake phase
 - `Earthquake`: player is now set back on the ground when the effect ends, so they no longer take fall damage
+- `Spawn Explosive Chickens`: explosion sound now plays only once instead of overlapping for every chicken
+- `Zombies Explode On Damage`: explosion sounds no longer overlap when zombies explode in quick succession
+- `Kamikaze Zombies`: explosion sounds no longer overlap when zombies explode in quick succession
+- `Player Falls`: the player no longer falls during the first 3 seconds of the effect
 
 ## [1.2.0]
 

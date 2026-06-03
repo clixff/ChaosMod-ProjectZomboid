@@ -30,7 +30,7 @@ ChaosNicknames = ChaosNicknames or {
     modDataColorKey = "ChaosModNicknameColor"
 }
 
-local DEBUG_NICKNAMES_TEXT = true
+local DEBUG_NICKNAMES_TEXT = false
 
 local NICKNAME_CHAT_MESSAGE_MAX_AGE_MS = 30000
 local NICKNAME_CHAT_MESSAGE_RENDER_MS = 7000

@@ -1,9 +1,11 @@
 ---@class EffectPlayerFalls : ChaosEffectBase
 ---@field lastFallTimeMs integer | nil
+---@field startTimeMs integer | nil
 ---@field onPlayerUpdate fun(player: IsoPlayer) | nil
 EffectPlayerFalls = ChaosEffectBase:derive("EffectPlayerFalls", "player_falls")
 
 local FALL_COOLDOWN_MS = 12000
+local INITIAL_GRACE_MS = 3000
 
 local function triggerFall(player)
     player:clearVariable("BumpFallType")
@@ -19,6 +21,9 @@ function EffectPlayerFalls:HandlePlayerUpdate(player)
     if not player:isPlayerMoving() then return end
 
     local now = getTimestampMs()
+    if self.startTimeMs and now - self.startTimeMs < INITIAL_GRACE_MS then
+        return
+    end
     if self.lastFallTimeMs and now - self.lastFallTimeMs < FALL_COOLDOWN_MS then
         return
     end
@@ -31,6 +36,7 @@ function EffectPlayerFalls:OnStart()
     ChaosEffectBase:OnStart()
 
     self.lastFallTimeMs = nil
+    self.startTimeMs = getTimestampMs()
 
     self.onPlayerUpdate = function(player)
         self:HandlePlayerUpdate(player)
