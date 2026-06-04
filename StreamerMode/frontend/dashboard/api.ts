@@ -114,6 +114,7 @@ export interface ModConfig {
   ignore_effect_chances: boolean;
   npc_voicelines_enabled: boolean;
   npc_gifts_enabled: boolean;
+  context_aware_system: boolean;
   meta_effects: MetaEffectsConfig;
   streamer_mode: StreamerModeConfig;
 }

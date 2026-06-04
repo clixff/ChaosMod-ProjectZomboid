@@ -166,7 +166,7 @@
         "food_is_poisoned": "Yemek Zehirli",
         "give_metal_armor": "Metal Zırh Ver",
         "zombies_low_render_distance": "Zombiler İçin Düşük Görüş Mesafesi",
-        "break_all_items": "Tüm Eşyaları Kır",
+        "break_random_items": "Rastgele Eşyaları Kır",
         "pop_tires_vehicles_nearby": "Yakındaki Araçların Lastiklerini Patlat",
         "make_player_unhappy": "Oyuncuyu Mutsuz Et",
         "temporary_night": "Geçici Gece",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Dünyada Hazine Oluştur",
         "doomsday": "Kıyamet Günü",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Robot Yoldaş Oluştur",
+        "spawn_chef_companion": "Aşçı Yoldaş Oluştur",
+        "thors_hammer": "Thor'un Çekici"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Bağlama Duyarlı Efektler (beta)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Oyuncuyu korumak için bir yoldaş",
@@ -677,7 +681,7 @@
         "panic_mode": "Panik, stres ve mutsuzluk maksimumda",
         "food_is_poisoned": "Geçici etki: oyuncu yerse zehirlenir",
         "zombies_low_render_distance": "Oyuncu yakındaki zombileri göremez",
-        "break_all_items": "Envanterdeki eşyalar bozulur",
+        "break_random_items": "Envanterdeki rastgele eşyalar bozulur",
         "make_player_unhappy": "Oyuncunun mutsuzluğuna +25 ekler",
         "zombies_move_to_random_point": "60 yarıçapındaki her zombi rastgele bir noktaya gider",
         "zombies_move_to_specific_point": "60 yarıçapındaki tüm zombiler tek bir noktaya gider",

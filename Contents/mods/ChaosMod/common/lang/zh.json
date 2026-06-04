@@ -166,7 +166,7 @@
         "food_is_poisoned": "食物中毒",
         "give_metal_armor": "给予金属护甲",
         "zombies_low_render_distance": "僵尸低渲染距离",
-        "break_all_items": "损坏所有物品",
+        "break_random_items": "随机损坏物品",
         "pop_tires_vehicles_nearby": "扎破附近车辆的所有轮胎",
         "make_player_unhappy": "让玩家不开心",
         "temporary_night": "临时黑夜",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "在世界中生成宝藏",
         "doomsday": "末日审判",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "生成机器人伙伴",
+        "spawn_chef_companion": "生成厨师同伴",
+        "thors_hammer": "雷神之锤"
     },
     "core": {
         "start_mod": "启动混乱模式",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "情境感知效果（测试版）"
     },
     "descriptions": {
         "spawn_friendly_npc": "保护玩家的同伴",
@@ -677,7 +681,7 @@
         "panic_mode": "恐慌、压力、不悦全部拉满",
         "food_is_poisoned": "临时效果:玩家进食会中毒",
         "zombies_low_render_distance": "玩家看不到附近的僵尸",
-        "break_all_items": "背包中的物品损坏",
+        "break_random_items": "背包中的随机物品损坏",
         "make_player_unhappy": "为玩家不悦+25",
         "zombies_move_to_random_point": "60范围内的每个僵尸选择随机点前往",
         "zombies_move_to_specific_point": "60范围内的所有僵尸前往同一个点",

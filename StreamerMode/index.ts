@@ -114,7 +114,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.2.0";
+const VERSION = "1.2.1";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -1467,9 +1467,6 @@ async function main(): Promise<void> {
         );
         try {
           await rewardsManager.createAll(rows);
-          if (!modEnabled) {
-            await rewardsManager.setVisible(false);
-          }
           return { success: true };
         } catch (err) {
           if (err instanceof TwitchRewardsError) {

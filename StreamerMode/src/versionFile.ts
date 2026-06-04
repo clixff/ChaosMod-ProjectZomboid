@@ -1,6 +1,7 @@
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { logger } from "./utils/logger.ts";
+import { compareVersions } from "./versionCheck.ts";
 
 function readStoredVersion(versionPath: string): string {
   if (!existsSync(versionPath)) return "";
@@ -28,6 +29,17 @@ export function syncEffectsForModVersion(
   const storedVersion = readStoredVersion(versionPath);
 
   if (storedVersion === currentVersion) {
+    return;
+  }
+
+  // If VERSION.txt is newer than the current version (the user downgraded the
+  // mod/app), keep the user's effects.json untouched and leave VERSION.txt as
+  // the newer marker. Only an upgrade (or unparseable/missing stored version)
+  // resets effects.json to the shipped defaults.
+  if (compareVersions(storedVersion, currentVersion) > 0) {
+    logger.info(
+      `Stored version '${storedVersion}' is newer than current '${currentVersion}'; keeping effects.json (downgrade)`,
+    );
     return;
   }
 

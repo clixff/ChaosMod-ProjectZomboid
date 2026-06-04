@@ -166,7 +166,7 @@
         "food_is_poisoned": "Food Is Poisoned",
         "give_metal_armor": "Give Metal Armor",
         "zombies_low_render_distance": "Low Render Distance Zombies",
-        "break_all_items": "Break All Items",
+        "break_random_items": "Break Random Items",
         "pop_tires_vehicles_nearby": "Pop Tires of Nearby Vehicles",
         "make_player_unhappy": "Make Player Unhappy",
         "temporary_night": "Temporary Night",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Spawn Treasure In World",
         "doomsday": "Doomsday",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Spawn Robot Companion",
+        "spawn_chef_companion": "Spawn Chef Companion",
+        "thors_hammer": "Thor's Hammer"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Context-Aware Effects (beta)"
     },
     "export": {
         "title": "Chaos Mod Project Zomboid",
@@ -694,7 +698,7 @@
         "panic_mode": "Maxes out panic, stress, and unhappiness",
         "food_is_poisoned": "Temporary effect: the player gets poisoned if they eat",
         "zombies_low_render_distance": "The player can't see nearby zombies",
-        "break_all_items": "Items in the player's inventory will break",
+        "break_random_items": "Random items in the player's inventory will break",
         "make_player_unhappy": "Adds +25 to the player's unhappiness",
         "zombies_move_to_random_point": "Each zombie within a 60 tile radius picks a random point and walks to it",
         "zombies_move_to_specific_point": "All zombies within a 60 tile radius walk to a single point",

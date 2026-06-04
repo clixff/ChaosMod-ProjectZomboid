@@ -1,5 +1,8 @@
 EffectTeleportInSmallRadius = ChaosEffectBase:derive("EffectTeleportInSmallRadius", "teleport_in_small_radius")
 
+local RADIUS = 30
+local MAX_DURATION = 4000
+
 function EffectTeleportInSmallRadius:OnStart()
     ChaosEffectBase:OnStart()
     local player = getPlayer()
@@ -14,4 +17,6 @@ function EffectTeleportInSmallRadius:OnStart()
     if not randomSquare then return end
 
     player:teleportTo(randomSquare:getX(), randomSquare:getY(), randomSquare:getZ())
+
+    ChaosZombie.PacifyZombiesAroundPlayer(RADIUS, MAX_DURATION, "teleport_in_small_radius", true)
 end

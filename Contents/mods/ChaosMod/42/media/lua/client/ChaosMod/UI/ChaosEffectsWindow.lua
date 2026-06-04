@@ -31,6 +31,9 @@ function ChaosEffectsWindow:new(x, y, w, h)
     o.effects = {}
     o.selectedEffect = nil
     o.searchText = ""
+    o.lastEffectClickTime = 0
+    o.lastEffectClickIndex = -1
+    o.lastEffectClickId = nil
 
     return o
 end
@@ -71,6 +74,10 @@ function ChaosEffectsWindow:createChildren()
     self.list.target = self
     self.list.onmousedown = ChaosEffectsWindow.onListMouseDown
     self.list.onmousedblclick = ChaosEffectsWindow.onEffectListDoubleClick
+    -- B42 Java checks rawget("onMouseDoubleClick") before dispatching, so inherited
+    -- ISScrollingListBox:onMouseDoubleClick can be skipped. Put a direct handler on
+    -- this list and resolve the clicked row ourselves.
+    self.list.onMouseDoubleClick = ChaosEffectsWindow.onListMouseDoubleClick
 
     self:addChild(self.list)
 
@@ -93,15 +100,57 @@ function ChaosEffectsWindow.onSearchTextChange(box)
     end
 end
 
+---@param list ISScrollingListBox
+---@param x number
+---@param y number
+function ChaosEffectsWindow.onListMouseDoubleClick(list, x, y)
+    if list:isMouseOverScrollBar() then
+        return list.vscroll:onMouseDoubleClick(x - list.vscroll.x, y + list:getYScroll() - list.vscroll.y)
+    end
+
+    local row = list:rowAt(x, y)
+    if row > #list.items then row = #list.items end
+    if row < 1 then return true end
+
+    list.selected = row
+
+    local window = list.target
+    if window and list.items[row] then
+        window.lastEffectClickTime = 0
+        window.lastEffectClickIndex = -1
+        window.lastEffectClickId = nil
+        window:onEffectListDoubleClick(list.items[row].item, nil)
+    end
+
+    return true
+end
+
 -- Called by ISScrollingListBox when you click an item.
--- In vanilla usage, listbox calls: onmousedown(target, clickedItemData, listbox)
---- @param target ChaosEffectDataEntry
---- @param item unknown
+-- In vanilla usage, listbox calls: onmousedown(target, clickedItemData).
+-- This also has a manual double-click fallback in case the engine double-click
+-- dispatch is skipped.
+---@param target ChaosEffectsWindowItem | ChaosEffectDataEntry
+---@param item unknown
 function ChaosEffectsWindow:onListMouseDown(target, item)
+    local now = getTimestampMs()
+    local selectedIndex = self.list and self.list.selected or -1
+    local effectId = target and target.id or nil
+    local isDoubleClick = effectId ~= nil
+            and self.lastEffectClickId == effectId
+            and self.lastEffectClickIndex == selectedIndex
+            and now - (self.lastEffectClickTime or 0) <= 500
+
     self.selectedEffect = target
-    print("[ChaosMod] Selected effect: " .. tostring(self.selectedEffect))
-    print("[ChaosMod] Target: " .. tostring(target))
-    print("[ChaosMod] Item: " .. tostring(item))
+    self.lastEffectClickTime = now
+    self.lastEffectClickIndex = selectedIndex
+    self.lastEffectClickId = effectId
+
+    if isDoubleClick then
+        self.lastEffectClickTime = 0
+        self.lastEffectClickIndex = -1
+        self.lastEffectClickId = nil
+        self:onActivateClicked()
+    end
 end
 
 local RANDOM_EFFECT_ITEM = { kind = "random", id = "__random__", name = "Random Effect" }
@@ -164,6 +213,9 @@ function ChaosEffectsWindow:fillWithEffects()
     end
 
     self.selectedEffect = firstItem
+    self.lastEffectClickTime = 0
+    self.lastEffectClickIndex = -1
+    self.lastEffectClickId = nil
 end
 
 function ChaosEffectsWindow:onActivateClicked()
@@ -189,12 +241,9 @@ function ChaosEffectsWindow:onActivateClicked()
     ChaosEffectsManager.StartEffect(self.selectedEffect.id, nil, ChaosEffectActivationType.CHEAT)
 end
 
---- @param target ChaosEffectDataEntry
+--- @param target ChaosEffectsWindowItem | ChaosEffectDataEntry
 --- @param item unknown
 function ChaosEffectsWindow:onEffectListDoubleClick(target, item)
     self.selectedEffect = target
-    print("[ChaosMod] Double clicked effect: " .. tostring(self.selectedEffect))
-    print("[ChaosMod] Double clicked Target: " .. tostring(target))
-    print("[ChaosMod] Double clicked Item: " .. tostring(item))
     self:onActivateClicked()
 end

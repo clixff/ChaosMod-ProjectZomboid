@@ -2,6 +2,9 @@
 EffectTeleportToRandomOldPosition = ChaosEffectBase:derive("EffectTeleportToRandomOldPosition",
     "teleport_to_random_old_position")
 
+local RADIUS = 30
+local MAX_DURATION = 8000
+
 function EffectTeleportToRandomOldPosition:OnStart()
     ChaosEffectBase:OnStart()
 
@@ -31,6 +34,8 @@ function EffectTeleportToRandomOldPosition:OnStart()
 
     print(string.format("[EffectTeleportToRandomOldPosition] Teleported to %.1f, %.1f, %.1f (index %d of %d)",
         loc.x, loc.y, loc.z, idx, n))
+
+    ChaosZombie.PacifyZombiesAroundPlayer(RADIUS, MAX_DURATION, "teleport_to_random_old_position", true)
 end
 
 function EffectTeleportToRandomOldPosition:OnEnd()

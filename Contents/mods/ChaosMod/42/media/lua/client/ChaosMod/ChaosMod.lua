@@ -91,6 +91,8 @@ function ChaosMod.StartMod()
     if player then
         getPlayer():setVariable("ChaosModSuperSonic", false)
     end
+
+    getCore():setDisplayPlayerModel(true)
 end
 
 function ChaosMod.StopMod()

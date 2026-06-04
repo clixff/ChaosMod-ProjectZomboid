@@ -13,6 +13,31 @@ local PRIORITY_FAILED = 2
 
 local WATCHDOG_TIMEOUT_MS = 15000
 
+--- StreamerApp version -> list of Lua mod versions considered compatible with it.
+--- When the current (StreamerApp, Lua) pair is listed here, the versions are
+--- treated as compatible: neither the Version Mismatch nor the New Update modal
+--- is shown, even if a newer version exists on GitHub.
+---@type table<string, string[]>
+local ALLOWED_VERSIONS = {
+    ["1.2.0"] = { "1.2.1" },
+}
+
+--- Returns true when running `streamerVersion` of the StreamerApp together with
+--- `modVersion` of the Lua mod is an explicitly allowed (compatible) combination.
+---@param streamerVersion string
+---@param modVersion string
+---@return boolean
+local function isAllowedPair(streamerVersion, modVersion)
+    local allowed = ALLOWED_VERSIONS[streamerVersion]
+    if not allowed then return false end
+    for _, v in ipairs(allowed) do
+        if ChaosUtils.CompareVersions(v, modVersion) == 0 then
+            return true
+        end
+    end
+    return false
+end
+
 -- Per-StartMod state, reset on Bridge.Init
 ChaosBridgeHandshake.shown = {} ---@type table<string, boolean>
 ChaosBridgeHandshake.watchdogActive = false
@@ -161,11 +186,16 @@ local function evaluate()
     local modVersion = getModVersion()
     local streamerVersion, hasNewUpdate, newUpdateVersion = parseHandshakePayload(handshake)
 
+    -- An explicitly allowed (StreamerApp, Lua) combination is treated as fully
+    -- compatible: it suppresses both the mismatch and the new-update modal.
+    local allowedPair = streamerVersion ~= "" and isAllowedPair(streamerVersion, modVersion)
+
     -- Decide category from current state.
     local category = nil ---@type string?
-    if streamerVersion ~= "" and ChaosUtils.CompareVersions(modVersion, streamerVersion) ~= 0 then
+    if streamerVersion ~= "" and not allowedPair
+        and ChaosUtils.CompareVersions(modVersion, streamerVersion) ~= 0 then
         category = CATEGORY_MISMATCH
-    elseif hasNewUpdate and newUpdateVersion ~= ""
+    elseif not allowedPair and hasNewUpdate and newUpdateVersion ~= ""
         and ChaosUtils.CompareVersions(modVersion, newUpdateVersion) < 0 then
         category = CATEGORY_UPDATE
     end

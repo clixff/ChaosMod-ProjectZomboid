@@ -60,7 +60,7 @@ function EffectTemporaryArmy:OnTick(deltaMs)
     local py = player:getY()
     local pz = player:getZ()
 
-    renderLine(px, py, pz + 0.5, px, py + 3, pz + 0.2, 1.0, 0.0, 0.0, 1.0)
+    -- renderLine(px, py, pz + 0.5, px, py + 3, pz + 0.2, 1.0, 0.0, 0.0, 1.0)
 
     if not self.npcs then return end
 

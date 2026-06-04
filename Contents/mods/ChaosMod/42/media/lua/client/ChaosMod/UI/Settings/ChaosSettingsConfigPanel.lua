@@ -245,6 +245,14 @@ function ChaosSettingsConfigPanel:rebuild()
     table.insert(children, self.controls.npc_gifts_enabled)
     y = y + rowH + rowGap
 
+    addLabelled("context_aware_system")
+    self.controls.context_aware_system = W.MakeCheckbox(self, controlX, y, "", cfg.context_aware_system ~= false,
+        function(checked)
+            cfg.context_aware_system = checked
+        end)
+    table.insert(children, self.controls.context_aware_system)
+    y = y + rowH + rowGap
+
     -- ---------- Streamer Mode ----------
     local sm = getSection(cfg, "streamer_mode")
     addHeader("section_streamer_mode")

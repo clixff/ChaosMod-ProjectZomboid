@@ -90,7 +90,7 @@ function EffectGameBattleRoyale:OnStart()
             self.marker:setSize(self.zoneRadius * math.sqrt(2.0))
         end
 
-        self.homingPoint = markers:addPlayerHomingPoint(player, self.centerX, self.centerY)
+        self.homingPoint = markers:addPlayerHomingPoint(player, self.centerX, self.centerY, 1.0, 0.0, 0.0, 1.0)
     end
 
     local groupId = EnsureBattleRoyaleGroup()

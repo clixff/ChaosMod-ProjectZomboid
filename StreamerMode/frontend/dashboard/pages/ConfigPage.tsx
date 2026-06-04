@@ -310,6 +310,15 @@ export function ConfigPage({ onNotify, scrollTarget }: ConfigPageProps) {
             onChange={(v) => setField("npc_gifts_enabled", v)}
           />
         </FieldRow>
+        <FieldRow
+          label="Context-Aware Effects (beta)"
+          hint="Enables the Context-Aware Effects system (beta)."
+        >
+          <Checkbox
+            checked={config.context_aware_system}
+            onChange={(v) => setField("context_aware_system", v)}
+          />
+        </FieldRow>
         <FieldRow label="Hide progress bar">
           <Checkbox
             checked={config.hide_progress_bar}

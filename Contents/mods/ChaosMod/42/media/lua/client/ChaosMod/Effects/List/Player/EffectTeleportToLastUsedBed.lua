@@ -1,6 +1,9 @@
 ---@class EffectTeleportToLastUsedBed : ChaosEffectBase
 EffectTeleportToLastUsedBed = ChaosEffectBase:derive("EffectTeleportToLastUsedBed", "teleport_to_last_used_bed")
 
+local RADIUS = 30
+local MAX_DURATION = 8000
+
 function EffectTeleportToLastUsedBed:OnStart()
     ChaosEffectBase:OnStart()
     print("[EffectTeleportToLastUsedBed] OnStart")
@@ -24,4 +27,6 @@ function EffectTeleportToLastUsedBed:OnStart()
     player:teleportTo(x, y, z)
 
     print(string.format("[EffectTeleportToLastUsedBed] Teleported to %.1f, %.1f, %.1f", loc.x, loc.y, loc.z))
+
+    ChaosZombie.PacifyZombiesAroundPlayer(RADIUS, MAX_DURATION, "teleport_to_last_used_bed", true)
 end

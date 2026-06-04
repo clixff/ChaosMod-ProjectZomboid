@@ -44,4 +44,9 @@ function EffectZombiesCantSeeYou:OnEnd()
         end
         self.affectedZombies = nil
     end
+
+    local player = getPlayer()
+    if player then
+        player:setTargetAlpha(1)
+    end
 end

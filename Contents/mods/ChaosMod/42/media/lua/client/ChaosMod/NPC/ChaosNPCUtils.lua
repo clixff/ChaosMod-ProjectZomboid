@@ -353,7 +353,7 @@ local function FinishZombieBiteNPCAttack(data)
     -- Apply bite damage directly and let ChaosNPC AI decide how to react.
     local biteDamage = ChaosUtils.RandFloat(0.25, 0.45)
     local oldHealth = targetZombie:getHealth()
-    targetZombie:setAttackedBy(attacker)
+    -- targetZombie:setAttackedBy(attacker)
     targetZombie:applyDamage(biteDamage)
     if targetZombie:getHealth() >= oldHealth then
         targetZombie:setHealth(math.max(0.0, oldHealth - biteDamage))
@@ -421,6 +421,28 @@ local function StartZombieBiteNPCSpecialAction(attacker, target)
             cancelData.cancelled = true
         end)
 end
+
+---@param zombie IsoZombie
+local function DefuseVanillaAttackAgainstChaosNPC(zombie)
+    local target = zombie:getTarget()
+    if target and target.isZombie and target:isZombie() and ChaosNPCUtils.IsNPC(target) then
+        ---@diagnostic disable-next-line: param-type-mismatch
+        zombie:setTarget(nil)
+        zombie:setBumpType("")
+        zombie:clearVariable("BumpType")
+        zombie:clearVariable("AttackType")
+        zombie:clearVariable("PlayerHitReaction")
+        zombie:clearVariable("AttackDidDamage")
+        zombie:clearVariable("ZombieBiteDone")
+        zombie:setAttackOutcome("interrupted")
+        pcall(function()
+            zombie:changeState(ZombieIdleState.instance())
+        end)
+        return true
+    end
+    return false
+end
+
 
 ---@param zombie IsoZombie
 function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
@@ -492,6 +514,8 @@ function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
 
     if ChaosNPCUtils.npcList:size() == 0 then return end
 
+    DefuseVanillaAttackAgainstChaosNPC(zombie)
+
     local bumpType = zombie:getBumpType()
     if bumpType == "ZombieBite" or actionState == "attack" then
         LogZombieNPCDebug(zombie, "skip_already_attacking_or_biting", 1000)
@@ -556,8 +580,8 @@ function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
 
     zombie:spottedNew(player, true)
     zombie:addAggro(zombieNPC, 1)
-    zombie:setTarget(zombieNPC)
-    zombie:setAttackedBy(zombieNPC)
+    -- zombie:setTarget(zombieNPC)
+    -- zombieNPC:setAttackedBy(zombie)
     LogZombieNPCDebug(zombie,
         string.format("engage_close_npc target=%s dist=%.2f canSee=%s facing=%s", tostring(zombieNPC:getID()), distToNPC,
             tostring(zombie:CanSee(zombieNPC)), tostring(zombie:isFacingObject(zombieNPC, 0.3))), 800)
@@ -583,7 +607,7 @@ function ChaosNPCUtils.OnZombieUpdateForNPC(zombie)
             local pendingBite = modData["ZombieAttackBiteData"] ~= nil
             if newBumpType ~= "ZombieBite" and not pendingBite then
                 zombie:setBumpType("ZombieBite")
-                zombie:setTarget(zombieNPC)
+                -- zombie:setTarget(zombieNPC)
                 -- zombie:changeState(AttackState.instance())
                 -- zombie:setVariable("AttackType", "bite")
                 StartZombieBiteNPCSpecialAction(zombie, nearestNPC)

@@ -20,13 +20,6 @@
 ---@field globalCooldownMs number suppresses new meteors and lightning after fire lands near player or a meteor damages the player
 ---@field alarmTimer ChaosManualTimer
 ---@field carAlarmTimer ChaosManualTimer
----@field earthquakeOffTimer ChaosManualTimer
----@field earthquakeOnTimer ChaosManualTimer
----@field earthquakePhaseTimer ChaosManualTimer
----@field earthquakeIsUpPhase boolean
----@field earthquakeKnockdownTimer ChaosManualTimer
----@field earthquakeActive boolean
----@field affectedZombies table<IsoZombie, boolean>
 EffectDoomsday = ChaosEffectBase:derive("EffectDoomsday", "doomsday")
 
 -- Flying-cars physics
@@ -52,14 +45,14 @@ local METEOR_SPAWN_DELAY_MAX_MS = 1300
 local METEOR_SPAWN_RADIUS_MIN = 3.0
 local METEOR_SPAWN_RADIUS_MAX = 10
 local METEOR_FALL_START_Z_OFFSET = 15.0
-local METEOR_SPEED_Z = 10.0
+local METEOR_SPEED_Z = 8.0
 local METEOR_EXPLOSION_RADIUS = 2
 local METEOR_ITEM_ID = "Base.LargeMeteorite"
 local METEOR_MARKER_LEAD_SECONDS = 1.0
-local METEOR_MARKER_SCALE = 2.5
+local METEOR_MARKER_SCALE = 2 * math.sqrt(2)
 
 -- Global cooldown shared by meteors and lightning strikes
-local GLOBAL_COOLDOWN_MS = 5000
+local GLOBAL_COOLDOWN_MS = 15000
 local LIGHTNING_NEAR_PLAYER_DIST = 2
 
 -- Alarms
@@ -67,24 +60,6 @@ local ALARM_INTERVAL_MS = 5000
 local ALARM_MAX_RADIUS = 80
 local CAR_ALARM_INTERVAL_MS = 8000
 local CAR_ALARM_RADIUS = 60
-
--- Earthquake
-local EARTHQUAKE_OFF_MS = 10000
-local EARTHQUAKE_ON_MS = 5000
-local EARTHQUAKE_PHASE_MIN_MS = 250
-local EARTHQUAKE_PHASE_MAX_MS = 500
-local EARTHQUAKE_SHAKE_AMPLITUDE = 1
-local EARTHQUAKE_CHAR_XY_NUDGE = 3.0
-local EARTHQUAKE_MULT_MIN = 5.5
-local EARTHQUAKE_MULT_MAX = 10.5
-local EARTHQUAKE_VEHICLE_UP_IMPULSE = 100000 * 5
-local EARTHQUAKE_VEHICLE_UP_MULT = 1.0
-local EARTHQUAKE_VEHICLE_DOWN_MULT = -2
-local EARTHQUAKE_VEHICLE_XY_IMPULSE = EARTHQUAKE_VEHICLE_UP_IMPULSE * 0.8
-local EARTHQUAKE_VEHICLE_RANGE = 40
-local EARTHQUAKE_CHARACTER_RANGE = 30
-local EARTHQUAKE_CHAR_DOWN_MULT = 2
-local EARTHQUAKE_KNOCKDOWN_COOLDOWN_MS = 3200
 
 -- Lights
 local LIGHTS_RADIUS = 90
@@ -256,125 +231,6 @@ local function clearAllMeteors(self)
         end
     end
     self.activeMeteors = {}
-end
-
----@param c IsoGameCharacter
-local function lockFallPhysics(c)
-    c:setbClimbing(true)
-    c:setbFalling(false)
-    c:setFallTime(0)
-    c:setLastFallSpeed(0)
-    c:setLastZ(c:getZ())
-end
-
----@param c IsoGameCharacter
-local function unlockFallPhysics(c)
-    c:setbClimbing(false)
-    c:setbFalling(false)
-    c:setFallTime(0)
-    c:setLastFallSpeed(0)
-    c:setLastZ(c:getZ())
-    c:setCurrentSquareFromPosition()
-end
-
----@param character IsoGameCharacter
----@param isUp boolean
----@param multiplier number
----@param dirX number
----@param dirY number
-local function shakeCharacter(character, isUp, multiplier, dirX, dirY)
-    if not character or not character:isAlive() then return end
-    if character:getVehicle() then return end
-
-    local zOffset = EARTHQUAKE_SHAKE_AMPLITUDE * multiplier
-    if isUp then
-        character:setZ(character:getZ() + zOffset)
-    else
-        local newZ = character:getZ() - zOffset * EARTHQUAKE_CHAR_DOWN_MULT
-        if newZ >= 0 then
-            character:setZ(newZ)
-        end
-    end
-
-    local nudge = EARTHQUAKE_CHAR_XY_NUDGE * multiplier
-    character:setX(character:getX() + dirX * nudge)
-    character:setY(character:getY() + dirY * nudge)
-end
-
----@param self EffectDoomsday
----@param deltaMs integer
-local function tickEarthquake(self, deltaMs)
-    local player = getPlayer()
-    if not player then return end
-
-    lockFallPhysics(player)
-
-    self.earthquakePhaseTimer:add(deltaMs)
-    if self.earthquakePhaseTimer:isEnded() then
-        self.earthquakePhaseTimer:reset()
-        self.earthquakePhaseTimer:setMax(
-            ChaosUtils.RandIntegerRange(EARTHQUAKE_PHASE_MIN_MS, EARTHQUAKE_PHASE_MAX_MS)
-        )
-        self.earthquakeIsUpPhase = not self.earthquakeIsUpPhase
-    end
-
-    local multiplier = ChaosUtils.RandFloat(EARTHQUAKE_MULT_MIN, EARTHQUAKE_MULT_MAX) * (deltaMs / 1000)
-    local angle = ChaosUtils.RandFloat(0, math.pi * 2)
-    local dirX = math.cos(angle)
-    local dirY = math.sin(angle)
-
-    local vehicles = ChaosVehicle.GetVehiclesNearby(player:getSquare(), EARTHQUAKE_VEHICLE_RANGE)
-    for i = 0, vehicles:size() - 1 do
-        local vehicle = vehicles:get(i)
-        if vehicle then
-            vehicle:setPhysicsActive(true)
-            local upStrength = EARTHQUAKE_VEHICLE_UP_IMPULSE * multiplier
-            if not self.earthquakeIsUpPhase then
-                upStrength = upStrength * EARTHQUAKE_VEHICLE_DOWN_MULT
-            else
-                upStrength = upStrength * EARTHQUAKE_VEHICLE_UP_MULT
-            end
-            local xyStrength = EARTHQUAKE_VEHICLE_XY_IMPULSE * multiplier
-            local impulse = Vector3f.new(dirX * xyStrength, upStrength, dirY * xyStrength)
-            local relPos = Vector3f.new(0, 0, 0)
-            vehicle:addImpulse(impulse, relPos)
-        end
-    end
-
-    shakeCharacter(player, self.earthquakeIsUpPhase, multiplier, dirX, dirY)
-
-    self.earthquakeKnockdownTimer:add(deltaMs)
-    if self.earthquakeKnockdownTimer:isEnded() and not player:getVehicle() then
-        player:setKnockedDown(true)
-        self.earthquakeKnockdownTimer:reset()
-    end
-
-    local px, py = player:getX(), player:getY()
-    local isUp = self.earthquakeIsUpPhase
-    local affectedZombies = self.affectedZombies
-    ChaosZombie.ForEachZombieInRange(px, py, EARTHQUAKE_CHARACTER_RANGE, function(zombie)
-        if affectedZombies[zombie] == nil then
-            affectedZombies[zombie] = zombie:isUseless()
-            zombie:setUseless(true)
-        end
-        shakeCharacter(zombie, isUp, multiplier, dirX, dirY)
-        zombie:setKnockedDown(true)
-    end, false, nil)
-end
-
----@param self EffectDoomsday
-local function stopEarthquakePhase(self)
-    self.earthquakeActive = false
-    local player = getPlayer()
-    if player then
-        unlockFallPhysics(player)
-    end
-    for zombie, wasUselessBefore in pairs(self.affectedZombies) do
-        if zombie and zombie:isAlive() then
-            zombie:setUseless(wasUselessBefore)
-        end
-    end
-    self.affectedZombies = {}
 end
 
 ---@param square IsoGridSquare
@@ -617,16 +473,6 @@ function EffectDoomsday:OnStart()
 
     self.alarmTimer = ChaosManualTimer.new(ALARM_INTERVAL_MS)
     self.carAlarmTimer = ChaosManualTimer.new(CAR_ALARM_INTERVAL_MS)
-
-    self.earthquakeOffTimer = ChaosManualTimer.new(EARTHQUAKE_OFF_MS)
-    self.earthquakeOnTimer = ChaosManualTimer.new(EARTHQUAKE_ON_MS)
-    self.earthquakePhaseTimer = ChaosManualTimer.new(
-        ChaosUtils.RandIntegerRange(EARTHQUAKE_PHASE_MIN_MS, EARTHQUAKE_PHASE_MAX_MS)
-    )
-    self.earthquakeKnockdownTimer = ChaosManualTimer.new(EARTHQUAKE_KNOCKDOWN_COOLDOWN_MS)
-    self.earthquakeIsUpPhase = false
-    self.earthquakeActive = false
-    self.affectedZombies = {}
 end
 
 ---@param deltaMs integer
@@ -643,35 +489,17 @@ function EffectDoomsday:OnTick(deltaMs)
 
     if self.globalCooldownMs > 0 then
         self.globalCooldownMs = math.max(0, self.globalCooldownMs - deltaMs)
+        local bar = UIManager.getProgressBar(0)
+        if bar then
+            local progress = 1.0 - (self.globalCooldownMs / GLOBAL_COOLDOWN_MS)
+            bar:setValue(progress)
+        end
     end
 
     tickFlyingCars(self, player, deltaMs)
     tickLightning(self, player, deltaMs)
     tickZombieBurn(self, player, deltaMs)
-
-    if self.earthquakeActive then
-        tickEarthquake(self, deltaMs)
-        self.earthquakeOnTimer:add(deltaMs)
-        if self.earthquakeOnTimer:isEnded() then
-            self.earthquakeOnTimer:reset()
-            stopEarthquakePhase(self)
-            self.earthquakeOffTimer:reset()
-        end
-    else
-        tickMeteors(self, deltaMs)
-        self.earthquakeOffTimer:add(deltaMs)
-        if self.earthquakeOffTimer:isEnded() then
-            self.earthquakeOffTimer:reset()
-            self.earthquakeActive = true
-            self.earthquakeIsUpPhase = false
-            self.earthquakePhaseTimer:reset()
-            self.earthquakePhaseTimer:setMax(
-                ChaosUtils.RandIntegerRange(EARTHQUAKE_PHASE_MIN_MS, EARTHQUAKE_PHASE_MAX_MS)
-            )
-            self.earthquakeKnockdownTimer:reset()
-            ChaosVehicle.ExitVehicle(player)
-        end
-    end
+    tickMeteors(self, deltaMs)
 
     self.alarmTimer:add(deltaMs)
     if self.alarmTimer:isEnded() then
@@ -691,15 +519,16 @@ function EffectDoomsday:OnEnd()
 
     ChaosUtils.EFFECT_DOOMSDAY_ENABLED = false
 
+    local bar = UIManager.getProgressBar(0)
+    if bar then
+        bar:setValue(0)
+    end
+
     local cm = ClimateManager.getInstance()
     if cm then
         cm:setPrecipitationIsSnow(self.previousPrecipitationIsSnow or false)
         ChaosUtils.SetClimateFloatOverride(cm, ClimateManager.FLOAT_PRECIPITATION_INTENSITY, false, 0.0)
         cm:stopWeatherAndThunder()
-    end
-
-    if self.earthquakeActive then
-        stopEarthquakePhase(self)
     end
 
     if self.activeMeteors then

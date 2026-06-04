@@ -166,7 +166,7 @@
         "food_is_poisoned": "Comida Está Envenenada",
         "give_metal_armor": "Dar Armadura de Metal",
         "zombies_low_render_distance": "Zumbis com Baixa Distância de Visão",
-        "break_all_items": "Quebrar Todos os Itens",
+        "break_random_items": "Quebrar Itens Aleatórios",
         "pop_tires_vehicles_nearby": "Estourar Pneus de Veículos Próximos",
         "make_player_unhappy": "Deixar Jogador Infeliz",
         "temporary_night": "Noite Temporária",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Gerar Tesouro No Mundo",
         "doomsday": "Apocalipse",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Gerar Companheiro Robô",
+        "spawn_chef_companion": "Gerar Cozinheiro Companheiro",
+        "thors_hammer": "Martelo de Thor"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Efeitos Contextuais (beta)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Um companheiro para proteger o jogador",
@@ -677,7 +681,7 @@
         "panic_mode": "Pânico, estresse e infelicidade no máximo",
         "food_is_poisoned": "Efeito temporário: o jogador será envenenado se comer",
         "zombies_low_render_distance": "O jogador não vê zumbis próximos",
-        "break_all_items": "Itens do inventário quebram",
+        "break_random_items": "Itens aleatórios do inventário quebram",
         "make_player_unhappy": "Adiciona +25 à infelicidade do jogador",
         "zombies_move_to_random_point": "Cada zumbi num raio de 60 escolhe um ponto aleatório e vai até ele",
         "zombies_move_to_specific_point": "Todos os zumbis num raio de 60 vão para um único ponto",

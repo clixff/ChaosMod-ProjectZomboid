@@ -3,6 +3,7 @@
 ---@field knockdownTimer ChaosManualTimer
 ---@field isUpPhase boolean
 ---@field affectedZombies table<IsoZombie, boolean>
+---@field groundZ number? floor level the player started on, used to settle them back down on effect end
 EffectEarthquake = ChaosEffectBase:derive("EffectEarthquake", "earthquake")
 
 local PHASE_MIN_MS = 250
@@ -72,7 +73,12 @@ function EffectEarthquake:OnStart()
 
     ChaosUtils.EFFECT_EARTHQUAKE_ENABLED = true
 
-    ChaosVehicle.ExitVehicle(getPlayer())
+    local player = getPlayer()
+    if player then
+        self.groundZ = math.floor(player:getZ())
+    end
+
+    ChaosVehicle.ExitVehicle(player)
 end
 
 ---@param deltaMs integer
@@ -84,20 +90,12 @@ function EffectEarthquake:OnTick(deltaMs)
 
     lockFallPhysics(player)
 
-    local isPhaseTick = false
-
-    print("[EffectEarthquake] OnTick. Phase time #1: " .. self.phaseTimer.currentMs .. " / " .. self.phaseTimer.maxMs)
     self.phaseTimer:add(deltaMs)
-    print("[EffectEarthquake] OnTick. Phase time #2: " .. self.phaseTimer.currentMs .. " / " .. self.phaseTimer.maxMs)
     if self.phaseTimer:isEnded() then
         self.phaseTimer:reset()
         self.phaseTimer:setMax(ChaosUtils.RandIntegerRange(PHASE_MIN_MS, PHASE_MAX_MS))
-        print("[EffectEarthquake] OnTick. Phase time #3: " .. self.phaseTimer.currentMs .. " / " .. self.phaseTimer
-            .maxMs)
         self.isUpPhase = not self.isUpPhase
-        isPhaseTick = true
     end
-
 
     local multiplier = ChaosUtils.RandFloat(MULT_MIN, MULT_MAX) * (deltaMs / 1000)
 
@@ -150,6 +148,12 @@ function EffectEarthquake:OnEnd()
 
     local player = getPlayer()
     if player then
+        -- Settle the player back onto solid ground while fall physics are still
+        -- locked, so releasing the lock doesn't register a fall from the shake height.
+        if self.groundZ and not player:getVehicle() then
+            player:setZ(self.groundZ)
+            lockFallPhysics(player)
+        end
         unlockFallPhysics(player)
     end
 

@@ -39,11 +39,26 @@ function EffectSpawnManyExplosiveChickens:OnEnd()
 
     if not self.chickens then return end
 
+    local player = getPlayer()
+
+    -- Play the explosion sound only for the chicken nearest to the player
+    local nearestChicken = nil
+    local nearestDist = math.huge
+    for _, chicken in ipairs(self.chickens) do
+        if chicken and chicken:isAlive() and chicken:getSquare() then
+            local dist = player and ChaosUtils.distTo(player:getX(), player:getY(), chicken:getX(), chicken:getY()) or 0
+            if dist < nearestDist then
+                nearestDist = dist
+                nearestChicken = chicken
+            end
+        end
+    end
+
     for _, chicken in ipairs(self.chickens) do
         if chicken and chicken:isAlive() then
             local square = chicken:getSquare()
             if square then
-                ChaosUtils.TriggerExplosionAt(square, 5)
+                ChaosUtils.TriggerExplosionAt(square, 5, true, chicken ~= nearestChicken)
             end
         end
     end

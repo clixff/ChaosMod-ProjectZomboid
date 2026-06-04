@@ -1288,8 +1288,6 @@ function ChaosUtils.IsItemBandageOnBodyPart(item)
 
     local itemName = item:getDisplayName()
 
-    print(string.format("Testing item name: %s (%s)", itemName, item:getID()))
-
     return startsWith(itemName, "Base.Bandage_")
         or startsWith(itemName, "Base.Wound_")
 end

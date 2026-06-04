@@ -166,7 +166,7 @@
         "food_is_poisoned": "La nourriture est empoisonnée",
         "give_metal_armor": "Donner une armure en métal",
         "zombies_low_render_distance": "Zombies : Distance d'affichage réduite",
-        "break_all_items": "Briser tous les objets",
+        "break_random_items": "Briser des objets aléatoires",
         "pop_tires_vehicles_nearby": "Crever les pneus des véhicules à proximité",
         "make_player_unhappy": "Rendre le joueur malheureux",
         "temporary_night": "Nuit temporaire",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Faire apparaître un trésor dans le monde",
         "doomsday": "Apocalypse",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Faire apparaître un compagnon robot",
+        "spawn_chef_companion": "Faire apparaître un cuisinier compagnon",
+        "thors_hammer": "Marteau de Thor"
     },
     "core": {
         "start_mod": "Lancer ChaosMod",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Effets contextuels (bêta)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Un compagnon pour protéger le joueur",
@@ -677,7 +681,7 @@
         "panic_mode": "Panique, stress et mécontentement au maximum",
         "food_is_poisoned": "Effet temporaire : le joueur sera empoisonné s'il mange",
         "zombies_low_render_distance": "Le joueur ne voit pas les zombies proches",
-        "break_all_items": "Les objets de l'inventaire se cassent",
+        "break_random_items": "Des objets aléatoires de l'inventaire se cassent",
         "make_player_unhappy": "Ajoute +25 au mécontentement du joueur",
         "zombies_move_to_random_point": "Chaque zombie dans un rayon de 60 choisit un point aléatoire et s'y dirige",
         "zombies_move_to_specific_point": "Tous les zombies dans un rayon de 60 vont vers un seul point",

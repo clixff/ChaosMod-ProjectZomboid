@@ -166,7 +166,7 @@
         "food_is_poisoned": "Essen ist vergiftet",
         "give_metal_armor": "Metallrüstung geben",
         "zombies_low_render_distance": "Niedrige Sichtweite für Zombies",
-        "break_all_items": "Alle Gegenstände zerbrechen",
+        "break_random_items": "Zufällige Gegenstände zerbrechen",
         "pop_tires_vehicles_nearby": "Reifen von Fahrzeugen in der Nähe platzen lassen",
         "make_player_unhappy": "Spieler unglücklich machen",
         "temporary_night": "Vorübergehende Nacht",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Schatz in der Welt spawnen",
         "doomsday": "Weltuntergang",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Roboter-Begleiter spawnen",
+        "spawn_chef_companion": "Koch-Begleiter spawnen",
+        "thors_hammer": "Thors Hammer"
     },
     "core": {
         "start_mod": "ChaosMod starten",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Kontextabhängige Effekte (Beta)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Ein Begleiter zum Schutz des Spielers",
@@ -677,7 +681,7 @@
         "panic_mode": "Panik, Stress und Unzufriedenheit auf Maximum",
         "food_is_poisoned": "Temporärer Effekt: Der Spieler wird vergiftet, wenn er isst",
         "zombies_low_render_distance": "Der Spieler kann nahe Zombies nicht sehen",
-        "break_all_items": "Gegenstände im Inventar gehen kaputt",
+        "break_random_items": "Zufällige Gegenstände im Inventar gehen kaputt",
         "make_player_unhappy": "Fügt +25 zur Unzufriedenheit des Spielers hinzu",
         "zombies_move_to_random_point": "Jeder Zombie im Umkreis von 60 wählt einen zufälligen Punkt und geht dorthin",
         "zombies_move_to_specific_point": "Alle Zombies im Umkreis von 60 gehen zu einem einzigen Punkt",

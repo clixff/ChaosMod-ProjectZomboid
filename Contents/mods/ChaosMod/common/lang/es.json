@@ -166,7 +166,7 @@
         "food_is_poisoned": "La comida está envenenada",
         "give_metal_armor": "Dar armadura de metal",
         "zombies_low_render_distance": "Zombis con baja distancia de renderizado",
-        "break_all_items": "Romper todos los objetos",
+        "break_random_items": "Romper objetos al azar",
         "pop_tires_vehicles_nearby": "Reventar neumáticos cercanos",
         "make_player_unhappy": "Poner triste al jugador",
         "temporary_night": "Noche temporal",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Generar tesoro en el mundo",
         "doomsday": "Fin del mundo",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Generar compañero robot",
+        "spawn_chef_companion": "Generar cocinero compañero",
+        "thors_hammer": "Martillo de Thor"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Efectos contextuales (beta)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Un compañero para proteger al jugador",
@@ -677,7 +681,7 @@
         "panic_mode": "Pánico, estrés y descontento al máximo",
         "food_is_poisoned": "Efecto temporal: el jugador se envenena si come",
         "zombies_low_render_distance": "El jugador no puede ver zombis cercanos",
-        "break_all_items": "Los objetos del inventario se romperán",
+        "break_random_items": "Algunos objetos al azar del inventario se romperán",
         "make_player_unhappy": "Añade +25 a la infelicidad del jugador",
         "zombies_move_to_random_point": "Cada zombi en un radio de 60 elige un punto aleatorio y va hacia él",
         "zombies_move_to_specific_point": "Todos los zombis en un radio de 60 van a un único punto",

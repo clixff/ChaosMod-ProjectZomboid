@@ -78,6 +78,7 @@
 ---@field ignore_effect_chances boolean -- If true, all effects have equal chance 1 during selection
 ---@field npc_voicelines_enabled boolean -- If false, NPC/zombie voicelines (ChaosZombie.PlaySoundLine) are suppressed
 ---@field npc_gifts_enabled boolean -- If false, friendly NPCs will not gift items to the player
+---@field context_aware_system boolean -- If true, the Context-Aware Effects system (beta) is enabled
 ---@field meta_effects ChaosMetaEffectsConfig
 ---@field streamer_mode ChaosConfigStreamerMode
 ChaosConfig = ChaosConfig or {
@@ -117,6 +118,7 @@ ChaosConfig = ChaosConfig or {
     ignore_effect_chances = false,
     npc_voicelines_enabled = true,
     npc_gifts_enabled = true,
+    context_aware_system = true,
     meta_effects = {
         enabled = true,
         interval_sec = 900,
@@ -246,6 +248,13 @@ local function syncMetaEffectsForModVersion(configData, defaultConfig)
         storedVersion = storedRaw:match("^%s*(.-)%s*$") or ""
     end
     if storedVersion == currentVersion then return false end
+
+    -- If VERSION.txt is newer than the current mod version (the user downgraded
+    -- the mod), keep the user's config.json untouched. Only an upgrade (or an
+    -- unparseable/missing stored version) replaces meta_effects.list with defaults.
+    if ChaosUtils.CompareVersions(storedVersion, currentVersion) > 0 then
+        return false
+    end
 
     if type(configData.meta_effects) ~= "table" then
         configData.meta_effects = {}
@@ -427,6 +436,10 @@ function ChaosConfig.LoadConfigFromDisk()
 
     if type(configData.npc_gifts_enabled) == "boolean" then
         ChaosConfig.npc_gifts_enabled = configData.npc_gifts_enabled
+    end
+
+    if type(configData.context_aware_system) == "boolean" then
+        ChaosConfig.context_aware_system = configData.context_aware_system
     end
 
     if type(configData.meta_effects) == "table" then
@@ -687,6 +700,7 @@ function ChaosConfig.BuildJsonSnapshot()
         ignore_effect_chances = ChaosConfig.ignore_effect_chances,
         npc_voicelines_enabled = ChaosConfig.npc_voicelines_enabled,
         npc_gifts_enabled = ChaosConfig.npc_gifts_enabled,
+        context_aware_system = ChaosConfig.context_aware_system,
         meta_effects = (function()
             local m = ChaosConfig.meta_effects or {}
             local list = {}

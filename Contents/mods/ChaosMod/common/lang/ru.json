@@ -165,7 +165,7 @@
         "food_is_poisoned": "Еда отравлена",
         "give_metal_armor": "Дать металлическую броню",
         "zombies_low_render_distance": "Низкая дальность прорисовки зомби",
-        "break_all_items": "Сломать все предметы",
+        "break_random_items": "Сломать случайные предметы",
         "pop_tires_vehicles_nearby": "Проколоть шины ближайшего транспорта",
         "make_player_unhappy": "Сделать игрока несчастным",
         "temporary_night": "Временная ночь",
@@ -445,7 +445,7 @@
         "ignite_trees": "Поджечь деревья",
         "remove_furniture_nearby": "Удалить мебель поблизости",
         "player_is_walter_white": "Игрок — Уолтер Уайт",
-        "spawn_wizard_companion": "Призвать мага-компаньона",
+        "spawn_wizard_companion": "Заспавнить мага-компаньона",
         "caveman_mode": "Режим пещерного человека",
         "zombie_hydra": "Зомби-гидра",
         "replace_zombies_with_aliens": "Заменить зомби на пришельцев",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Заспавнить сокровище в мире",
         "doomsday": "Конец света",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Заспавнить робота-компаньона",
+        "spawn_chef_companion": "Заспавнить повара-компаньона",
+        "thors_hammer": "Молот Тора"
     },
     "core": {
         "start_mod": "Запуск ChaosMod",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Контекстные эффекты (бета)"
     },
     "export": {
         "title": "Chaos Mod Project Zomboid",
@@ -694,7 +698,7 @@
         "panic_mode": "Паника, стресс, дискомфорт на максимум",
         "food_is_poisoned": "Временный эффект: игрок отравится, если поест",
         "zombies_low_render_distance": "Игрок не видит зомби поблизости",
-        "break_all_items": "Вещи в инвентаре игрока сломаются",
+        "break_random_items": "Случайные вещи в инвентаре игрока сломаются",
         "make_player_unhappy": "Добавить +25 к несчастью игрока",
         "zombies_move_to_random_point": "Каждый зомби в радиусе 60 выбирает случайную точку для себя и идет к ней",
         "zombies_move_to_specific_point": "Все зомби в радиусе 60 идут к одной точке",

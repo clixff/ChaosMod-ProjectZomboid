@@ -13,19 +13,19 @@
 ---@field playerDamageCooldownMs number remaining cooldown before a meteor can damage the player again
 EffectMeteorShower = ChaosEffectBase:derive("EffectMeteorShower", "meteor_shower")
 
-local SPAWN_COOLDOWN_MS = 400
+local SPAWN_COOLDOWN_MS = 850
 local METEORS_PER_BURST = 1
 local SPAWN_DELAY_MIN_MS = 250
 local SPAWN_DELAY_MAX_MS = 1300
-local SPAWN_RADIUS_MIN = 0
-local SPAWN_RADIUS_MAX = 10
+local SPAWN_RADIUS_MIN = 1
+local SPAWN_RADIUS_MAX = 14
 local FALL_START_Z_OFFSET = 15.0
-local SPEED_Z = 10.0
+local SPEED_Z = 8.0
 local EXPLOSION_RADIUS = 2
 local METEOR_ITEM_ID = "Base.LargeMeteorite"
 local MARKER_LEAD_SECONDS = 1.0
-local MARKER_SCALE = 2.5
-local PLAYER_DAMAGE_COOLDOWN_MS = 1500
+local MARKER_SCALE = 2 * math.sqrt(2)
+local PLAYER_DAMAGE_COOLDOWN_MS = 15000
 
 ---@param worldItem IsoWorldInventoryObject
 ---@param visualZ number absolute world Z (square Z + offset)
@@ -234,6 +234,11 @@ function EffectMeteorShower:OnTick(deltaMs)
 
     if self.playerDamageCooldownMs > 0 then
         self.playerDamageCooldownMs = self.playerDamageCooldownMs - deltaMs
+        local bar = UIManager.getProgressBar(0)
+        if bar then
+            local progress = 1.0 - (math.max(0, self.playerDamageCooldownMs) / PLAYER_DAMAGE_COOLDOWN_MS)
+            bar:setValue(progress)
+        end
     end
 
     self.spawnCooldown:add(deltaMs)
@@ -274,6 +279,11 @@ end
 
 function EffectMeteorShower:OnEnd()
     ChaosEffectBase:OnEnd()
+
+    local bar = UIManager.getProgressBar(0)
+    if bar then
+        bar:setValue(0)
+    end
 
     if self.activeMeteors then
         clearAllMeteors(self)

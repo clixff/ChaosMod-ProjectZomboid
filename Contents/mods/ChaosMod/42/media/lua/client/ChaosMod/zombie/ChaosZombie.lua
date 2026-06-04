@@ -933,3 +933,93 @@ function ChaosZombie.MoveToSound(zombie, x, y, z)
         zombie:setLastHeardSound(x, y, z)
     end
 end
+
+---@class ChaosPacifyZombieData
+---@field wasUseless boolean
+
+---@param deltaMs integer
+---@param data { elapsedMs: integer, durationMs: integer, radius: number, disableAiId: string, showProgressBar: boolean, affectedZombies: table<IsoZombie, ChaosPacifyZombieData>, affectedNPCs: table<IsoZombie, boolean> }
+local function PacifyZombiesTick(deltaMs, data)
+    data.elapsedMs = data.elapsedMs + deltaMs
+
+    if data.showProgressBar then
+        local bar = UIManager.getProgressBar(0)
+        if bar then
+            bar:setValue(data.elapsedMs / data.durationMs)
+        end
+    end
+
+    local player = getPlayer()
+    if not player then return end
+
+    local px = player:getX()
+    local py = player:getY()
+
+    ChaosZombie.ForEachZombieInRange(px, py, data.radius, function(zombie)
+        if not zombie or zombie:isDead() then return end
+
+        if ChaosNPCUtils.IsNPC(zombie) then
+            if data.affectedNPCs[zombie] == nil then
+                local npc = ChaosNPCUtils.GetNPCFromZombie(zombie)
+                if npc then
+                    npc:AddDisableAiEffect(data.disableAiId)
+                    data.affectedNPCs[zombie] = true
+                end
+            end
+        else
+            if data.affectedZombies[zombie] == nil then
+                data.affectedZombies[zombie] = { wasUseless = zombie:isUseless() }
+            end
+            zombie:setUseless(true)
+        end
+    end, false, nil)
+end
+
+---@param data { disableAiId: string, onFinish: (fun(data: table))?, affectedZombies: table<IsoZombie, ChaosPacifyZombieData>, affectedNPCs: table<IsoZombie, boolean> }
+local function PacifyZombiesRestore(data)
+    for zombie, zdata in pairs(data.affectedZombies) do
+        if zombie and zombie:isAlive() then
+            zombie:setUseless(zdata.wasUseless)
+        end
+    end
+
+    for zombie in pairs(data.affectedNPCs) do
+        if zombie and zombie:isAlive() then
+            local npc = ChaosNPCUtils.GetNPCFromZombie(zombie)
+            if npc then
+                npc:RemoveDisableAiEffect(data.disableAiId)
+            end
+        end
+    end
+
+    if data.onFinish then
+        data.onFinish(data)
+    end
+end
+
+---Keeps every zombie within `radius` of the player asleep (useless) and disables nearby NPC AI for `durationMs`,
+---re-checking each tick so newly approaching zombies are also pacified, then restores their original state when
+---the timer expires (or the mod is disabled). Used by teleport effects to give the player a grace period on arrival.
+---@param radius number -- search radius in tiles around the player
+---@param durationMs integer -- how long to keep nearby zombies and NPCs pacified
+---@param disableAiId string -- unique id for the NPC disable-AI effect (use the effect id)
+---@param showProgressBar boolean? -- when true, drives the in-game progress bar (index 0) over the duration
+---@param onFinish (fun(data: table))? -- optional callback run after zombies are restored, on both normal end and cancel
+function ChaosZombie.PacifyZombiesAroundPlayer(radius, durationMs, disableAiId, showProgressBar, onFinish)
+    ChaosSpecialAction.AddNewAction(
+        {
+            elapsedMs = 0,
+            durationMs = durationMs,
+            radius = radius,
+            disableAiId = disableAiId,
+            showProgressBar = showProgressBar == true,
+            affectedZombies = {},
+            affectedNPCs = {},
+            onFinish = onFinish,
+        },
+        durationMs,
+        PacifyZombiesTick,
+        PacifyZombiesRestore,
+        PacifyZombiesRestore
+    )
+end

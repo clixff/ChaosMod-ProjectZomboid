@@ -117,6 +117,7 @@ export interface ModConfig {
   ignore_effect_chances: boolean;
   npc_voicelines_enabled: boolean;
   npc_gifts_enabled: boolean;
+  context_aware_system: boolean;
   meta_effects: MetaEffectsConfig;
   streamer_mode: StreamerModeConfig;
 }
@@ -253,6 +254,7 @@ const DEFAULT_CONFIG: ModConfig = {
   ignore_effect_chances: false,
   npc_voicelines_enabled: true,
   npc_gifts_enabled: true,
+  context_aware_system: true,
   meta_effects: DEFAULT_META_EFFECTS,
   streamer_mode: DEFAULT_STREAMER_MODE,
 };
@@ -657,6 +659,10 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
       d.npc_voicelines_enabled,
     ),
     npc_gifts_enabled: bool(raw["npc_gifts_enabled"], d.npc_gifts_enabled),
+    context_aware_system: bool(
+      raw["context_aware_system"],
+      d.context_aware_system,
+    ),
     meta_effects: parseMetaEffects(obj(raw["meta_effects"])),
     streamer_mode: parseStreamerMode(obj(raw["streamer_mode"])),
   };

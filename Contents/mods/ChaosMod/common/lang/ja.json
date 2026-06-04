@@ -166,7 +166,7 @@
         "food_is_poisoned": "食べ物に毒が盛られる",
         "give_metal_armor": "金属の鎧を与える",
         "zombies_low_render_distance": "ゾンビの描画距離低下",
-        "break_all_items": "すべてのアイテムを壊す",
+        "break_random_items": "ランダムなアイテムを壊す",
         "pop_tires_vehicles_nearby": "近くの車のタイヤをパンクさせる",
         "make_player_unhappy": "プレイヤーを不幸にする",
         "temporary_night": "一時的な夜",
@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "宝物を世界にスポーン",
         "doomsday": "終末の日",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "ロボットの仲間をスポーン",
+        "spawn_chef_companion": "シェフの仲間をスポーン",
+        "thors_hammer": "トールのハンマー"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "コンテキスト認識エフェクト（ベータ）"
     },
     "export": {
         "title": "Chaos Mod Project Zomboid",
@@ -694,7 +698,7 @@
         "panic_mode": "パニック、ストレス、不幸を最大値にします",
         "food_is_poisoned": "一時的効果: 食事をすると食中毒になります",
         "zombies_low_render_distance": "プレイヤーから近くのゾンビが見えなくなります",
-        "break_all_items": "プレイヤーのインベントリ内のアイテムが壊れます",
+        "break_random_items": "プレイヤーのインベントリ内のランダムなアイテムが壊れます",
         "make_player_unhappy": "プレイヤーの不幸に+25を追加します",
         "zombies_move_to_random_point": "半径60タイル以内の各ゾンビがランダムな地点を選んで歩き出します",
         "zombies_move_to_specific_point": "半径60タイル以内の全ゾンビが同じ一点に向かって歩き出します",
