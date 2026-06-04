@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "在世界中生成宝藏",
         "doomsday": "末日审判",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "生成机器人伙伴",
+        "spawn_chef_companion": "生成厨师同伴",
+        "thors_hammer": "雷神之锤"
     },
     "core": {
         "start_mod": "启动混乱模式",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "情境感知效果（测试版）"
     },
     "descriptions": {
         "spawn_friendly_npc": "保护玩家的同伴",

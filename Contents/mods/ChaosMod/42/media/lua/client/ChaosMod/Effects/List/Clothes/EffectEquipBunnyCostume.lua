@@ -14,6 +14,7 @@ function EffectEquipBunnyCostume:OnStart()
         inventory:AddItem("Base.Hat_BunnyEarsBlack"),
         inventory:AddItem("Base.BunnyTail"),
         inventory:AddItem("Base.BunnySuitBlack"),
+        inventory:AddItem("Base.Shoes_WorkBoots"),
     }
 
     for _, item in ipairs(items) do

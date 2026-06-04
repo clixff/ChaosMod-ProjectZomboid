@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "宝物を世界にスポーン",
         "doomsday": "終末の日",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "ロボットの仲間をスポーン",
+        "spawn_chef_companion": "シェフの仲間をスポーン",
+        "thors_hammer": "トールのハンマー"
     },
     "core": {
         "start_mod": "ChaosModを開始",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "コンテキスト認識エフェクト（ベータ）"
     },
     "export": {
         "title": "Chaos Mod Project Zomboid",

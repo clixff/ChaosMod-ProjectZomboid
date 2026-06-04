@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Schatz in der Welt spawnen",
         "doomsday": "Weltuntergang",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Roboter-Begleiter spawnen",
+        "spawn_chef_companion": "Koch-Begleiter spawnen",
+        "thors_hammer": "Thors Hammer"
     },
     "core": {
         "start_mod": "ChaosMod starten",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Kontextabhängige Effekte (Beta)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Ein Begleiter zum Schutz des Spielers",

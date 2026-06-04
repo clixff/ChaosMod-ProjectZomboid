@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "세계에 보물 소환",
         "doomsday": "최후의 날",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "로봇 동료 생성",
+        "spawn_chef_companion": "요리사 동료 소환",
+        "thors_hammer": "토르의 망치"
     },
     "core": {
         "start_mod": "ChaosMod 시작",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "상황 인식 효과 (베타)"
     },
     "export": {
         "title": "Chaos Mod Project Zomboid",

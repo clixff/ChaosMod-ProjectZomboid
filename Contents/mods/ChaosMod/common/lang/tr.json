@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Dünyada Hazine Oluştur",
         "doomsday": "Kıyamet Günü",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Robot Yoldaş Oluştur",
+        "spawn_chef_companion": "Aşçı Yoldaş Oluştur",
+        "thors_hammer": "Thor'un Çekici"
     },
     "core": {
         "start_mod": "ChaosMod'u Başlat",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Bağlama Duyarlı Efektler (beta)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Oyuncuyu korumak için bir yoldaş",

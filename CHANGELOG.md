@@ -1,12 +1,21 @@
 ## [1.2.1]
 
+### New Mod Features
+
+- Added a new Context-Aware Effects system (beta) with a setting to turn it on or off.
+
 ### Mod Fixes and Improvements
 
 - Player model now returns back on mod start if player was playing as animal model before a crash.
 - Compatible Streamer App and mod version combinations no longer show the version mismatch or update notification.
-  — Updated firearms for NPCs: they do not add wounds to the player, but temporarily reduce his overall health.
+- Updated firearms for NPCs: they do not add wounds to the player, but temporarily reduce his overall health.
 - NPC melee hits now rarely cause a wound on the player instead of always wounding.
 - Downgrading to an older mod version no longer resets your config and effects settings.
+
+### New Effects
+
+- `Spawn Chef Companion`: spawns a friendly chef who hands you free food from time to time.
+- `Thor's Hammer`: press Q to hurl a flaming hammer that knocks down and burns enemies in its path.
 
 ### Effect Fixes and Improvements
 
@@ -26,6 +35,7 @@
 - `Zombies Explode On Damage`: explosion sounds no longer overlap when zombies explode in quick succession
 - `Kamikaze Zombies`: explosion sounds no longer overlap when zombies explode in quick succession
 - `Player Falls`: the player no longer falls during the first 3 seconds of the effect
+- Teleport effects now keep nearby zombies asleep for a short grace period after you arrive
 
 ## [1.2.0]
 

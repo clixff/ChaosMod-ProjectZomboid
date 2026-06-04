@@ -1,4 +1,4 @@
-export const VERSION = "1.2.0";
+export const VERSION = "1.2.1";
 
 export const GITHUB_REPO_URL =
   "https://github.com/clixff/ChaosMod-ProjectZomboid";

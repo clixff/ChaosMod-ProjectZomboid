@@ -28,6 +28,7 @@
     "ignore_effect_chances": false,
     "npc_voicelines_enabled": true,
     "npc_gifts_enabled": true,
+    "context_aware_system": true,
     "streamer_mode": {
         "streamer_mode_enabled": true,
         "voting_enabled": false,

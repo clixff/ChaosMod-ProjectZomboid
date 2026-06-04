@@ -2,6 +2,9 @@
 EffectTeleportToPreviousLocation = ChaosEffectBase:derive("EffectTeleportToPreviousLocation",
     "teleport_to_previous_location")
 
+local RADIUS = 30
+local MAX_DURATION = 8000
+
 function EffectTeleportToPreviousLocation:OnStart()
     ChaosEffectBase:OnStart()
 
@@ -18,4 +21,6 @@ function EffectTeleportToPreviousLocation:OnStart()
     player:teleportTo(math.floor(loc.x), math.floor(loc.y), math.floor(loc.z))
 
     print(string.format("[EffectTeleportToPreviousLocation] Teleported to %.1f, %.1f, %.1f", loc.x, loc.y, loc.z))
+
+    ChaosZombie.PacifyZombiesAroundPlayer(RADIUS, MAX_DURATION, "teleport_to_previous_location", true)
 end

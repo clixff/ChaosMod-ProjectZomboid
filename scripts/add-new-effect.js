@@ -6,7 +6,7 @@ const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
 const RESET = "\x1b[0m";
 
-const USAGE = "Usage: bun scripts/add-new-effect.js <effect_id> [--duration N] [--chance F] [--group G] [--path Subdir]";
+const USAGE = "Usage: bun scripts/add-new-effect.js <effect_id> [--duration N] [--chance F] [--group G] [--path Subdir] [--tags a,b,c]";
 
 function fail(message) {
     console.error(`${RED}${message}${RESET}`);
@@ -26,11 +26,11 @@ function writeJson(path, data) {
 }
 
 function parseArgs(argv) {
-    const args = { id: null, duration: null, chance: null, group: null, path: null };
+    const args = { id: null, duration: null, chance: null, group: null, path: null, tags: null };
     const positional = [];
     for (let i = 0; i < argv.length; i++) {
         const a = argv[i];
-        if (a === "--duration" || a === "--chance" || a === "--group" || a === "--path") {
+        if (a === "--duration" || a === "--chance" || a === "--group" || a === "--path" || a === "--tags") {
             const v = argv[++i];
             if (v === undefined) fail(`Missing value for ${a}\n${USAGE}`);
             args[a.slice(2)] = v;
@@ -90,6 +90,21 @@ if (args.chance !== null) {
     }
     chance = n;
     chanceProvided = true;
+}
+
+let tags = [];
+if (args.tags !== null) {
+    const seen = new Set();
+    for (const rawTag of args.tags.split(",")) {
+        const tag = rawTag.trim().toLowerCase();
+        if (tag !== "" && !seen.has(tag)) {
+            seen.add(tag);
+            tags.push(tag);
+        }
+    }
+    if (tags.length === 0) {
+        fail(`--tags must be a comma-separated list of non-empty tags, got "${args.tags}".`);
+    }
 }
 
 const rootDir = join(import.meta.dir, "..");
@@ -185,6 +200,9 @@ if (duration !== null) {
 }
 newEntry.enabled_donate = true;
 newEntry.price_group = group;
+if (tags.length > 0) {
+    newEntry.tags = tags;
+}
 
 effectsJson.effects.push(newEntry);
 writeJson(effectsPath, effectsJson);
@@ -205,7 +223,8 @@ for (const file of langFiles) {
 const relLuaPath = luaFilePath.replace(rootDir + "\\", "").replace(rootDir + "/", "");
 const durationReportPart = duration !== null ? `duration ${duration}, ` : "";
 console.log(`${GREEN}Added effect ID ${args.id} to file ${relLuaPath}${RESET}`);
-console.log(`${GREEN}Added effect ID ${args.id} to default_effects.json with ${durationReportPart}chance ${chance}, price group "${group}"${RESET}`);
+const tagsReportPart = tags.length > 0 ? `, tags [${tags.join(", ")}]` : "";
+console.log(`${GREEN}Added effect ID ${args.id} to default_effects.json with ${durationReportPart}chance ${chance}, price group "${group}"${tagsReportPart}${RESET}`);
 console.log(`${GREEN}Added localization key "effects.${args.id}" with value "${locValue}" to folder ${langDir.replace(rootDir + "\\", "").replace(rootDir + "/", "")} in files ${langFiles.join(", ")}${RESET}`);
 
 if (!groupProvided && !chanceProvided) {

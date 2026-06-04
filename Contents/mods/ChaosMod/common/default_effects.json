@@ -184,6 +184,10 @@
             "chance": 0.75,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "price_group": "positive_3"
         },
         {
@@ -461,8 +465,10 @@
             "withDuration": true,
             "duration": 45,
             "disable_effects": [
-                "flying_cars",
-                "player_god_mod"
+                "flying_cars"
+            ],
+            "tags": [
+                "cars_nearby"
             ],
             "enabled_donate": true,
             "price_group": "negative_5"
@@ -528,6 +534,9 @@
             "duration": 60,
             "disable_effects": [
                 "jumping_cars"
+            ],
+            "tags": [
+                "cars_nearby"
             ],
             "enabled_donate": true,
             "price_group": "negative_3"
@@ -682,6 +691,10 @@
             "chance": 0.5,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "price_group": "negative_3"
         },
         {
@@ -698,6 +711,10 @@
             "chance": 0.75,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "price_group": "negative_4"
         },
         {
@@ -726,6 +743,10 @@
             "chance": 0.8,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "price_group": "neutral_3"
         },
         {
@@ -763,8 +784,10 @@
             "withDuration": true,
             "duration": 80,
             "disable_effects": [
-                "player_god_mod",
-                "flying_cars"
+                "player_god_mod"
+            ],
+            "tags": [
+                "heal"
             ],
             "enabled_donate": true,
             "price_group": "positive_6"
@@ -779,6 +802,9 @@
                 "player_cant_open_doors",
                 "player_can_open_any_door"
             ],
+            "tags": [
+                "building"
+            ],
             "enabled_donate": true,
             "price_group": "negative_3"
         },
@@ -788,6 +814,10 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "price_group": "negative_3"
         },
         {
@@ -892,6 +922,9 @@
             "chance": 0.75,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "heal"
+            ],
             "price_group": "positive_5"
         },
         {
@@ -910,6 +943,9 @@
             "duration": 40,
             "disable_effects": [
                 "player_falls"
+            ],
+            "tags": [
+                "not_inside_car"
             ],
             "enabled_donate": true,
             "price_group": "negative_5"
@@ -1039,6 +1075,10 @@
             "disable_effects": [
                 "disable_vehicle_engine"
             ],
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "enabled_donate": true,
             "price_group": "negative_3"
         },
@@ -1048,6 +1088,10 @@
             "chance": 0.5,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "price_group": "negative_2"
         },
         {
@@ -1092,6 +1136,9 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "heal_wounds"
+            ],
             "price_group": "positive_3"
         },
         {
@@ -1384,6 +1431,9 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_4"
         },
         {
@@ -1564,6 +1614,10 @@
             "withDuration": true,
             "duration": 70,
             "enabled_donate": true,
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "price_group": "negative_3"
         },
         {
@@ -1625,6 +1679,9 @@
             "enabled": true,
             "chance": 0.75,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_2"
         },
         {
@@ -1704,6 +1761,9 @@
             "chance": 0.75,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_3"
         },
         {
@@ -1717,7 +1777,7 @@
         {
             "id": "open_doors_nearby",
             "enabled": true,
-            "chance": 0.5,
+            "chance": 0.9,
             "withDuration": false,
             "enabled_donate": true,
             "price_group": "negative_2"
@@ -1753,6 +1813,9 @@
             "chance": 0.5,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_3"
         },
         {
@@ -2170,6 +2233,9 @@
             "chance": 0.8,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_2"
         },
         {
@@ -2275,6 +2341,9 @@
             "chance": 0.8,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "cars_nearby"
+            ],
             "price_group": "negative_6"
         },
         {
@@ -2293,6 +2362,9 @@
             "duration": 60,
             "disable_effects": [
                 "rainbow_cars"
+            ],
+            "tags": [
+                "cars_nearby"
             ],
             "enabled_donate": true,
             "price_group": "neutral_1"
@@ -2433,6 +2505,9 @@
             "chance": 0.9,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_4"
         },
         {
@@ -2538,6 +2613,9 @@
             "chance": 0.75,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_5"
         },
         {
@@ -2606,6 +2684,9 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "heal_wounds"
+            ],
             "price_group": "positive_3"
         },
         {
@@ -2745,6 +2826,9 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "cars_nearby"
+            ],
             "price_group": "negative_4"
         },
         {
@@ -2926,6 +3010,9 @@
             "disable_effects": [
                 "ufo_abduction"
             ],
+            "tags": [
+                "heal"
+            ],
             "enabled_donate": true,
             "price_group": "negative_5"
         },
@@ -2937,6 +3024,9 @@
             "duration": 80,
             "disable_effects": [
                 "supersonic"
+            ],
+            "tags": [
+                "not_inside_car"
             ],
             "enabled_donate": true,
             "price_group": "positive_5"
@@ -3007,6 +3097,10 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "heal",
+                "heal_wounds"
+            ],
             "price_group": "positive_5"
         },
         {
@@ -3199,6 +3293,10 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "heal",
+                "heal_wounds"
+            ],
             "price_group": "positive_4"
         },
         {
@@ -3454,6 +3552,9 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "cars_nearby"
+            ],
             "price_group": "positive_5"
         },
         {
@@ -3513,6 +3614,10 @@
             "disable_effects": [
                 "need_for_speed"
             ],
+            "tags": [
+                "car",
+                "inside_car"
+            ],
             "enabled_donate": true,
             "price_group": "positive_5"
         },
@@ -3524,6 +3629,10 @@
             "duration": 90,
             "disable_effects": [
                 "very_slow_cars"
+            ],
+            "tags": [
+                "car",
+                "inside_car"
             ],
             "enabled_donate": true,
             "price_group": "negative_4"
@@ -3674,6 +3783,9 @@
             "chance": 0.95,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "cars_nearby"
+            ],
             "price_group": "positive_4"
         },
         {
@@ -3818,6 +3930,9 @@
             "chance": 0.8,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_5"
         },
         {
@@ -3851,6 +3966,9 @@
             "chance": 0.9,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "heal"
+            ],
             "price_group": "positive_5"
         },
         {
@@ -3867,6 +3985,9 @@
             "chance": 0.8,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_5"
         },
         {
@@ -4019,6 +4140,9 @@
             "chance": 1,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "cars_nearby"
+            ],
             "price_group": "positive_5"
         },
         {
@@ -4091,6 +4215,9 @@
             "chance": 0.85,
             "withDuration": false,
             "enabled_donate": true,
+            "tags": [
+                "building"
+            ],
             "price_group": "negative_3"
         },
         {
@@ -4182,6 +4309,10 @@
             "disable_effects": [
                 "blessed_ground"
             ],
+            "tags": [
+                "heal",
+                "heal_wounds"
+            ],
             "enabled_donate": true,
             "price_group": "positive_5"
         },
@@ -4262,6 +4393,26 @@
             ],
             "enabled_donate": true,
             "price_group": "negative_6"
+        },
+        {
+            "id": "spawn_chef_companion",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": false,
+            "enabled_donate": true,
+            "price_group": "positive_3"
+        },
+        {
+            "id": "thors_hammer",
+            "enabled": true,
+            "chance": 1,
+            "withDuration": true,
+            "duration": 45,
+            "disable_effects": [
+                "thors_hammer"
+            ],
+            "enabled_donate": true,
+            "price_group": "positive_5"
         }
     ]
 }

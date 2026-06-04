@@ -162,22 +162,27 @@ function ChaosHUD:RenderIntro()
 
     local introFont = UIFont.Intro
     local textManager = getTextManager()
-    local line1 = string.format("Chaos Mod v%s Started", self.introModVersion or "0")
-    local line2 = string.format("%d effects", self.introEffectsCount or 0)
+    local lines = { string.format("Chaos Mod v%s Started", self.introModVersion or "0") }
+    if ChaosConfig.context_aware_system == true then
+        table.insert(lines, "Context-Aware System (Beta v0.1)")
+    end
+    table.insert(lines, string.format("%d effects", self.introEffectsCount or 0))
     local fontHeight = textManager:getFontHeight(introFont)
-    local line1Width = textManager:MeasureStringX(introFont, line1)
-    local line2Width = textManager:MeasureStringX(introFont, line2)
+    local lineWidths = {}
+    local maxTextWidth = 0
+    for i, line in ipairs(lines) do
+        lineWidths[i] = textManager:MeasureStringX(introFont, line)
+        maxTextWidth = math.max(maxTextWidth, lineWidths[i])
+    end
 
     local screenW = getCore():getScreenWidth()
     local screenH = getCore():getScreenHeight()
     local centerX = screenW / 2 - self:getX()
     local centerY = screenH / 2 - self:getY() + ChaosUIManager.GetScaledHeight(INTRO_BOTTOM_OFFSET)
 
-    local totalHeight = fontHeight * 2
+    local totalHeight = fontHeight * #lines
     local line1Y = centerY - math.floor(totalHeight / 2)
-    local line2Y = line1Y + fontHeight
 
-    local maxTextWidth = math.max(line1Width, line2Width)
     local padX = ChaosUIManager.GetScaledWidth(INTRO_BG_PAD_X)
     local padY = ChaosUIManager.GetScaledHeight(INTRO_BG_PAD_Y)
     local bgWidth = maxTextWidth + padX * 2
@@ -186,8 +191,10 @@ function ChaosHUD:RenderIntro()
     local bgY = line1Y - padY
     self:drawRect(bgX, bgY, bgWidth, bgHeight, INTRO_BG_OPACITY * alpha, 0.1, 0.1, 0.1)
 
-    self:drawText(line1, centerX - math.floor(line1Width / 2), line1Y, 1, 1, 1, alpha, introFont)
-    self:drawText(line2, centerX - math.floor(line2Width / 2), line2Y, 1, 1, 1, alpha, introFont)
+    for i, line in ipairs(lines) do
+        local lineY = line1Y + fontHeight * (i - 1)
+        self:drawText(line, centerX - math.floor(lineWidths[i] / 2), lineY, 1, 1, 1, alpha, introFont)
+    end
 end
 
 function ChaosHUD:prerender()

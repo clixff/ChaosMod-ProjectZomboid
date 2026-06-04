@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Spawn Treasure In World",
         "doomsday": "Doomsday",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Spawn Robot Companion",
+        "spawn_chef_companion": "Spawn Chef Companion",
+        "thors_hammer": "Thor's Hammer"
     },
     "core": {
         "start_mod": "Start ChaosMod",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Context-Aware Effects (beta)"
     },
     "export": {
         "title": "Chaos Mod Project Zomboid",

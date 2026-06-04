@@ -461,7 +461,10 @@
         "spawn_treasure_in_world": "Generar tesoro en el mundo",
         "doomsday": "Fin del mundo",
         "total_chaos": "Total Chaos",
-        "combo_time": "Combo Time"
+        "combo_time": "Combo Time",
+        "spawn_robot_companion": "Generar compañero robot",
+        "spawn_chef_companion": "Generar cocinero compañero",
+        "thors_hammer": "Martillo de Thor"
     },
     "core": {
         "start_mod": "Iniciar ChaosMod",
@@ -620,7 +623,8 @@
         "meta_effect_chance": "Chance",
         "meta_effect_var_min_time": "Min Time",
         "meta_effect_var_time_multipier": "Time Multiplier",
-        "meta_effect_var_effects_count": "Effects Count"
+        "meta_effect_var_effects_count": "Effects Count",
+        "context_aware_system": "Efectos contextuales (beta)"
     },
     "descriptions": {
         "spawn_friendly_npc": "Un compañero para proteger al jugador",
