@@ -217,7 +217,6 @@ function EffectTheMagicBroom:OnEnd()
         player:setBumpDone(true)
         player:setBumpStaggered(false)
         player:setBumpFall(false)
-        player:postAnimationFinishing()
         local square = getFloorSquareUnderPlayer(player)
         local groundZ = square and square:getZ() or 0
         player:setZ(groundZ)

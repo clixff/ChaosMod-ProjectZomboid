@@ -162,8 +162,8 @@ function ChaosSettingsWindow:OnSaveClicked()
     local prevEffectsIntervalEnabled = ChaosConfig.effects_interval_enabled
 
     -- Persist working config snapshot to disk, then reload to repopulate ChaosConfig.
-    if not ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", self.workingConfig) then
-        print("[ChaosSettingsWindow] Failed to write config.json")
+    if not ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_CONFIG_FILE, self.workingConfig) then
+        print("[ChaosSettingsWindow] Failed to write config.json.cfg")
     else
         ChaosConfig.LoadConfigFromDisk()
     end
@@ -182,8 +182,8 @@ function ChaosSettingsWindow:OnSaveClicked()
 
     -- Persist working effects snapshot
     local effectsSnapshot = self:BuildEffectsSnapshot()
-    if not ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", effectsSnapshot) then
-        print("[ChaosSettingsWindow] Failed to write effects.json")
+    if not ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_EFFECTS_FILE, effectsSnapshot) then
+        print("[ChaosSettingsWindow] Failed to write effects.json.cfg")
     else
         ChaosEffectsRegistry.Initialize()
     end

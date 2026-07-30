@@ -1,6 +1,6 @@
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_01.png[/img]
 
-[b]A single-player Chaos Mod v1.2.1 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
+[b]A single-player Chaos Mod v1.2.2 for Project Zomboid B42 with Twitch and Youtube Live integration.[/b]
 
 This mod triggers a random effect every 45 seconds. There are currently [b]450+ effects[/b], and they can be helpful, dangerous, weird, or completely random.
 
@@ -8,37 +8,17 @@ This mod triggers a random effect every 45 seconds. There are currently [b]450+ 
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_02.png[/img]
 
-[h3]v1.2.1[/h3]
+[h3]v1.2.2[/h3]
 
 [list]
-[*] Bug fixes for many effects and crashes
-[*] Context-Aware effects system (beta)
-[*] NPCs balance improvements
-[*] 2 new effects
-[/list]
-
-[h3]v1.2.0[/h3]
-
-[list]
-[*] Bug fixes for many effects and crashes
-[*] YouTube Live Integration (Experimental)
-[*] Twitch Bits Donation System (Experimental)
-[*] Twitch Channel Point Rewards (Experimental)
-[*] Twitch Subs Integration (Experimental)
-[*] DonationAlerts multicurrency support (Experimental)
-[*] New [url=https://chaos-zomboid.com/effects]Chaos Mod Hub WebApp[/url] with effects list and shared configs by streamers
-[*] Recent Effects Blocklist preserves between sessions
-[*] NPCs update: smarter, stronger, and with firearms
-[*] 135+ new effects!
-[*] Meta Effects system that trigger every 15 minutes
-[*] And many other improvements
+[*] Update to game version 42.20.0
+[*] Bug fixes
 [/list]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_03.png[/img]
 
 [quote]This mod requires the [b]B42 version[/b] of Project Zomboid.
-To use it, enable the [b]unstable branch[/b] in the game's Steam properties.
-Latest tested version: [b]42.19.0[/b]
+Latest tested version: [b]42.20.0[/b]
 This mod [b]will not[/b] work in multiplayer[/quote]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/steam_preview_04.png[/img]
@@ -161,13 +141,20 @@ It is designed for single-player only.
 [*] And many other improvements
 [/list]
 
-[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_2_1_current.png[/img]
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_2_1.png[/img]
 
 [list]
 [*] Bug fixes for many effects and crashes
 [*] Context-Aware effects system (beta)
 [*] NPCs balance improvements
 [*] 2 new effects
+[/list]
+
+[img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/1_2_2_current.png[/img]
+
+[list]
+[*] Update to game version 42.20.0
+[*] Bug fixes
 [/list]
 
 [img]https://raw.githubusercontent.com/clixff/ChaosMod-ProjectZomboid/refs/heads/master/assets/steam_v2/versions/future_versions.png[/img]

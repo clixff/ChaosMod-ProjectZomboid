@@ -114,7 +114,7 @@ function getBestLocalIPv4(): {
   );
 }
 
-const VERSION = "1.2.1";
+const VERSION = "1.2.2";
 const DEFAULT_PORT = 3959;
 
 type EffectResponseEntry = Omit<EffectEntry, "id"> & {
@@ -1087,7 +1087,7 @@ async function main(): Promise<void> {
     );
     effects.splice(0, effects.length, ...nextEffects);
     logger.info(
-      `Reloaded ${colors.cyan("config.json")} and ${colors.cyan("effects.json")} (${colors.cyan(String(effects.length))} effects).`,
+      `Reloaded ${colors.cyan("config.json.cfg")} and ${colors.cyan("effects.json.cfg")} (${colors.cyan(String(effects.length))} effects).`,
     );
     return true;
   }
@@ -1886,7 +1886,7 @@ async function main(): Promise<void> {
         bridge?.emit("reload_config");
       }
     },
-    "Reload config and effects from config.json and effects.json",
+    "Reload config and effects from config.json.cfg and effects.json.cfg",
   );
 
   app.registerCommand(
@@ -1914,7 +1914,7 @@ async function main(): Promise<void> {
         `Config reset to defaults, backup saved as ${colors.cyan("config_backup.json")}. Unknown custom fields were preserved.`,
       );
     },
-    "Reset config.json to typed defaults and create config_backup.json",
+    "Reset config.json.cfg to typed defaults and create config_backup.json.txt",
   );
 
   app.registerCommand(

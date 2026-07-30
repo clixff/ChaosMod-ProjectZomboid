@@ -2,6 +2,12 @@ local json = require("ChaosMod/thirdparty/Json")
 
 ChaosFileReader = ChaosFileReader or {}
 
+ChaosFileReader.USER_CONFIG_FILE = "ChaosMod/config.json.cfg"
+ChaosFileReader.USER_EFFECTS_FILE = "ChaosMod/effects.json.cfg"
+ChaosFileReader.USER_EFFECTS_BACKUP_FILE = "ChaosMod/effects.json.backup.txt"
+ChaosFileReader.LEGACY_USER_CONFIG_FILE = "ChaosMod/config.json"
+ChaosFileReader.LEGACY_USER_EFFECTS_FILE = "ChaosMod/effects.json"
+
 ---@param filename string
 ---@return string | nil
 function ChaosFileReader.ReadFileAllLines(filename)
@@ -99,6 +105,29 @@ function ChaosFileReader.ReadJsonFromCache(filename)
     end
 
     return data
+end
+
+---@param legacyFilename string
+---@param filename string
+---@return boolean
+function ChaosFileReader.MigrateLegacyCacheFile(legacyFilename, filename)
+    local currentReader = getFileReader(filename, false)
+    if currentReader then
+        currentReader:close()
+        return true
+    end
+
+    local content = ChaosFileReader.ReadFileFromCacheAllLines(legacyFilename)
+    if not content then
+        return false
+    end
+
+    if not ChaosFileReader.WriteTextToCache(filename, content) then
+        return false
+    end
+
+    print("[ChaosMod] Migrated " .. tostring(legacyFilename) .. " to " .. tostring(filename))
+    return true
 end
 
 ---@param value any

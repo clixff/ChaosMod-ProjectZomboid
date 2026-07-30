@@ -1,3 +1,14 @@
+## [1.2.2]
+
+### Mod Fixes and Improvements
+
+- Updated game version compatibility to 42.20.0
+- Fixed json file writing (now saves as .txt or .cfg files)
+
+### Effect Fixes and Improvements
+
+- `The Magic Broom`: fixed a bug when the effect ends
+
 ## [1.2.1]
 
 ### New Mod Features

@@ -9,10 +9,10 @@ local POLL_INTERVAL_MS = 1000
 local SESSION_ID_LEN = 16
 local SESSION_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-local LUA_FILE = "ChaosMod/events/chaos-bridge-lua.jsonl"
-local LUA_FILE_BACKUP = "ChaosMod/events/chaos-bridge-lua.jsonl.backup"
-local NODE_FILE = "ChaosMod/events/chaos-bridge-node.jsonl"
-local NODE_FILE_BACKUP = "ChaosMod/events/chaos-bridge-node.jsonl.backup"
+local LUA_FILE = "ChaosMod/events/chaos-bridge-lua.jsonl.txt"
+local LUA_FILE_BACKUP = "ChaosMod/events/chaos-bridge-lua.jsonl.backup.txt"
+local NODE_FILE = "ChaosMod/events/chaos-bridge-node.jsonl.txt"
+local NODE_FILE_BACKUP = "ChaosMod/events/chaos-bridge-node.jsonl.backup.txt"
 
 -- Outbound state (we write LUA_FILE)
 ChaosBridge.outSessionId = nil ---@type string | nil
@@ -261,7 +261,7 @@ function ChaosBridge.On(eventName, handler)
     ChaosBridge.handlers[eventName] = handler
 end
 
---- Tells the Node bridge that config.json and/or effects.json on disk have changed
+--- Tells the Node bridge that config.json.cfg and/or effects.json.cfg on disk have changed
 --- and should be reloaded. Safe to call when the bridge is disabled (no-op).
 function ChaosBridge.NotifyConfigReloaded()
     ChaosBridge.Emit("reload_config", nil)
