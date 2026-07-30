@@ -430,9 +430,10 @@ function ChaosZombie.OnZombieDead(zombie)
     end
 
     -- If setting for saying killed zombie name is enabled
-    if ChaosConfig.IsKilledZombieNameEnabled() then
-        local name, color = ChaosNicknames.ensureZombieNicknameAndColor(zombie)
-        if name and instanceof(killer, "IsoPlayer") then
+    if ChaosConfig.IsKilledZombieNameEnabled() and instanceof(killer, "IsoPlayer") then
+        local md = zombie:getModData()
+        local name = md and md[ChaosNicknames.modDataNameKey]
+        if type(name) == "string" and name ~= "" then
             local stringToSay = string.format(ChaosLocalization.GetString("misc", "killed_zombie"), name)
             ChaosPlayer.SayLineByColor(killer, stringToSay, ChaosPlayerChatColors.removedItem)
         end
