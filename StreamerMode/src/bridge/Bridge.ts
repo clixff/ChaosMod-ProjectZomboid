@@ -9,6 +9,12 @@ import {
   appendFileSync,
 } from "fs";
 import { dirname, join } from "path";
+import {
+  LUA_BRIDGE_BACKUP_FILE_NAME,
+  LUA_BRIDGE_FILE_NAME,
+  NODE_BRIDGE_BACKUP_FILE_NAME,
+  NODE_BRIDGE_FILE_NAME,
+} from "../runtimeFiles.ts";
 import { logger } from "../utils/logger.ts";
 
 const PROTOCOL_VERSION = 1;
@@ -19,10 +25,6 @@ const SESSION_ID_ALPHABET =
   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 const EVENTS_SUBDIR = "events";
-const NODE_FILE_NAME = "chaos-bridge-node.jsonl";
-const LUA_FILE_NAME = "chaos-bridge-lua.jsonl";
-const NODE_BACKUP_NAME = `${NODE_FILE_NAME}.backup`;
-const LUA_BACKUP_NAME = `${LUA_FILE_NAME}.backup`;
 
 interface HeaderLine {
   sessionId: string;
@@ -104,10 +106,10 @@ export class Bridge {
 
   constructor(private readonly luaFolder: string) {
     this.eventsDir = join(luaFolder, EVENTS_SUBDIR);
-    this.outFile = join(this.eventsDir, NODE_FILE_NAME);
-    this.outBackup = join(this.eventsDir, NODE_BACKUP_NAME);
-    this.inFile = join(this.eventsDir, LUA_FILE_NAME);
-    this.inBackup = join(this.eventsDir, LUA_BACKUP_NAME);
+    this.outFile = join(this.eventsDir, NODE_BRIDGE_FILE_NAME);
+    this.outBackup = join(this.eventsDir, NODE_BRIDGE_BACKUP_FILE_NAME);
+    this.inFile = join(this.eventsDir, LUA_BRIDGE_FILE_NAME);
+    this.inBackup = join(this.eventsDir, LUA_BRIDGE_BACKUP_FILE_NAME);
   }
 
   on(eventName: string, handler: BridgeHandler): void {

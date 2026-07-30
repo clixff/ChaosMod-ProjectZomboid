@@ -250,7 +250,7 @@ local function syncMetaEffectsForModVersion(configData, defaultConfig)
     if storedVersion == currentVersion then return false end
 
     -- If VERSION.txt is newer than the current mod version (the user downgraded
-    -- the mod), keep the user's config.json untouched. Only an upgrade (or an
+    -- the mod), keep the user's config.json.cfg untouched. Only an upgrade (or an
     -- unparseable/missing stored version) replaces meta_effects.list with defaults.
     if ChaosUtils.CompareVersions(storedVersion, currentVersion) > 0 then
         return false
@@ -278,6 +278,11 @@ local function syncMetaEffectsForModVersion(configData, defaultConfig)
 end
 
 function ChaosConfig.LoadConfigFromDisk()
+    ChaosFileReader.MigrateLegacyCacheFile(
+        ChaosFileReader.LEGACY_USER_CONFIG_FILE,
+        ChaosFileReader.USER_CONFIG_FILE
+    )
+
     ---@type table | nil
     local defaultConfig = ChaosFileReader.ReadJsonFile("default_config.json")
     if not defaultConfig then
@@ -285,19 +290,19 @@ function ChaosConfig.LoadConfigFromDisk()
     end
 
     ---@type ChaosConfig | nil
-    local configData = ChaosFileReader.ReadJsonFromCache("ChaosMod/config.json")
+    local configData = ChaosFileReader.ReadJsonFromCache(ChaosFileReader.USER_CONFIG_FILE)
     if not configData then
         if defaultConfig then
-            print("[ChaosConfig] config.json not found in user folder; copying default_config.json")
-            ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", defaultConfig)
+            print("[ChaosConfig] config.json.cfg not found in user folder; copying default_config.json")
+            ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_CONFIG_FILE, defaultConfig)
             configData = defaultConfig
         end
     elseif defaultConfig then
         local metaChanged = syncMetaEffectsForModVersion(configData, defaultConfig)
         local _, changed = mergeMissingKeys(configData, defaultConfig)
         if changed or metaChanged then
-            print("[ChaosConfig] Updating config.json on disk")
-            ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", configData)
+            print("[ChaosConfig] Updating config.json.cfg on disk")
+            ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_CONFIG_FILE, configData)
         end
     end
 
@@ -755,11 +760,11 @@ end
 ---@return boolean
 function ChaosConfig.SaveConfigToDisk()
     local snapshot = ChaosConfig.BuildJsonSnapshot()
-    local ok = ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", snapshot)
+    local ok = ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_CONFIG_FILE, snapshot)
     if ok then
-        print("[ChaosConfig] Saved config.json")
+        print("[ChaosConfig] Saved config.json.cfg")
     else
-        print("[ChaosConfig] Failed to save config.json")
+        print("[ChaosConfig] Failed to save config.json.cfg")
     end
     return ok
 end
@@ -771,8 +776,8 @@ function ChaosConfig.ResetToDefaults()
         print("[ChaosConfig] Cannot reset: default_config.json not found")
         return false
     end
-    if not ChaosFileReader.WriteJsonToCache("ChaosMod/config.json", defaults) then
-        print("[ChaosConfig] Failed to write defaults to user config.json")
+    if not ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_CONFIG_FILE, defaults) then
+        print("[ChaosConfig] Failed to write defaults to user config.json.cfg")
         return false
     end
     ChaosConfig.LoadConfigFromDisk()

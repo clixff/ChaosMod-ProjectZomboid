@@ -31,12 +31,12 @@ function ChaosMod.StartMod()
     end
     -- Update internal mod data such as ID and version from mod.info file
     ChaosUtils.updateModId()
-    -- Load config.json file from disk
+    -- Load config.json.cfg file from disk
     ChaosConfig.LoadConfigFromDisk()
     -- Reload localization files for configured language
     ChaosLocalization.ReloadLanguages()
     ChaosUIManager:OnLanguageLoaded()
-    -- Load effects.json file from disk
+    -- Load effects.json.cfg file from disk
     ChaosEffectsRegistry.Initialize()
     -- Load meta effects registry from ChaosConfig.meta_effects.list
     ChaosMetaEffectsRegistry.Initialize()
@@ -188,12 +188,12 @@ function ChaosMod.OnGameStart()
     ChaosUIManager:Init()
     -- Updates internal mod data such as ID, version from mod.info file
     ChaosUtils.updateModId()
-    -- Load config.json file from disk
+    -- Load config.json.cfg file from disk
     ChaosConfig.LoadConfigFromDisk()
     -- Reload localization files for configured language
     ChaosLocalization.ReloadLanguages()
     ChaosUIManager:OnLanguageLoaded()
-    -- Load effects.json file from disk
+    -- Load effects.json.cfg file from disk
     ChaosEffectsRegistry.Initialize()
     -- Load meta effects from ChaosConfig.meta_effects.list
     ChaosMetaEffectsRegistry.Initialize()

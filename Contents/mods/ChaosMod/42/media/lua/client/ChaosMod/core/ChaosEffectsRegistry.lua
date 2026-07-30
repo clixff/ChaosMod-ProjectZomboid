@@ -32,7 +32,7 @@ ChaosEffectsRegistry = ChaosEffectsRegistry or {}
 ---@type table<string, ChaosEffectBase>
 ChaosEffectsClassMap = ChaosEffectsClassMap or {}
 
---- Stable order of effect ids as loaded from effects.json (used to preserve file order on save).
+--- Stable order of effect ids as loaded from effects.json.cfg (used to preserve file order on save).
 ---@type string[]
 ChaosEffectsRegistry.effectOrder = ChaosEffectsRegistry.effectOrder or {}
 
@@ -40,7 +40,7 @@ ChaosEffectsRegistry.effectOrder = ChaosEffectsRegistry.effectOrder or {}
 local DEBUG_LOGS_CONTEXT_AWARE_SYSTEM = false
 
 --- Tags are mod-owned: read from default_effects.json only, never from the user's
---- effects.json (and intentionally not written back by BuildJsonSnapshot).
+--- effects.json.cfg (and intentionally not written back by BuildJsonSnapshot).
 ---@type table<string, {tags: string[], set: table<string, true>}>
 local defaultEffectTags = {}
 
@@ -72,6 +72,10 @@ function ChaosEffectsRegistry.Initialize()
     local enabledEffects = 0;
     local totalEffects = 0;
 
+    ChaosFileReader.MigrateLegacyCacheFile(
+        ChaosFileReader.LEGACY_USER_EFFECTS_FILE,
+        ChaosFileReader.USER_EFFECTS_FILE
+    )
     ChaosEffectsRegistry.SyncEffectsForModVersion()
 
     ---@type table | nil
@@ -90,11 +94,11 @@ function ChaosEffectsRegistry.Initialize()
     end
 
     ---@type table | nil
-    local effectsData = ChaosFileReader.ReadJsonFromCache("ChaosMod/effects.json")
+    local effectsData = ChaosFileReader.ReadJsonFromCache(ChaosFileReader.USER_EFFECTS_FILE)
     if not effectsData then
         if defaultEffectsData then
-            print("[ChaosEffectsRegistry] effects.json not found in user folder; copying default_effects.json")
-            ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", defaultEffectsData)
+            print("[ChaosEffectsRegistry] effects.json.cfg not found in user folder; copying default_effects.json")
+            ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_EFFECTS_FILE, defaultEffectsData)
             effectsData = defaultEffectsData
         end
     elseif defaultEffectsData and type(defaultEffectsData.effects) == "table" then
@@ -117,8 +121,8 @@ function ChaosEffectsRegistry.Initialize()
         end
         if addedCount > 0 then
             print("[ChaosEffectsRegistry] Added " ..
-                tostring(addedCount) .. " missing effect(s) from default_effects.json; saving effects.json")
-            ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", effectsData)
+                tostring(addedCount) .. " missing effect(s) from default_effects.json; saving effects.json.cfg")
+            ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_EFFECTS_FILE, effectsData)
         end
     end
 
@@ -155,8 +159,8 @@ function ChaosEffectsRegistry.Initialize()
 end
 
 --- If VERSION.txt is missing, empty or different from the current mod version,
---- overwrite the user's effects.json with the shipped default_effects.json
---- and rewrite VERSION.txt. Must run before effects.json is loaded into memory.
+--- overwrite the user's effects.json.cfg with the shipped default_effects.json
+--- and rewrite VERSION.txt. Must run before effects.json.cfg is loaded into memory.
 function ChaosEffectsRegistry.SyncEffectsForModVersion()
     local currentVersion = ""
     if ChaosMod.modData then
@@ -174,31 +178,31 @@ function ChaosEffectsRegistry.SyncEffectsForModVersion()
     end
 
     -- If VERSION.txt is newer than the current mod version (the user downgraded
-    -- the mod), keep the user's effects.json untouched and leave VERSION.txt as
+    -- the mod), keep the user's effects.json.cfg untouched and leave VERSION.txt as
     -- the newer marker. Only an upgrade (or unparseable/missing stored version)
-    -- resets effects.json to the shipped defaults.
+    -- resets effects.json.cfg to the shipped defaults.
     if ChaosUtils.CompareVersions(storedVersion, currentVersion) > 0 then
         print(string.format(
-            "[ChaosEffectsRegistry] Stored version '%s' is newer than current '%s'; keeping effects.json (downgrade)",
+            "[ChaosEffectsRegistry] Stored version '%s' is newer than current '%s'; keeping effects.json.cfg (downgrade)",
             storedVersion, currentVersion))
         return
     end
 
     print(string.format(
-        "[ChaosEffectsRegistry] Mod version changed ('%s' -> '%s'); replacing effects.json with defaults",
+        "[ChaosEffectsRegistry] Mod version changed ('%s' -> '%s'); replacing effects.json.cfg with defaults",
         storedVersion, currentVersion))
 
     local defaults = ChaosFileReader.ReadJsonFile("default_effects.json")
     if defaults then
-        local existingRaw = ChaosFileReader.ReadFileFromCacheAllLines("ChaosMod/effects.json")
+        local existingRaw = ChaosFileReader.ReadFileFromCacheAllLines(ChaosFileReader.USER_EFFECTS_FILE)
         if existingRaw then
-            if ChaosFileReader.WriteTextToCache("ChaosMod/effects.json.backup", existingRaw) then
-                print("[ChaosEffectsRegistry] Backed up effects.json to effects.json.backup")
+            if ChaosFileReader.WriteTextToCache(ChaosFileReader.USER_EFFECTS_BACKUP_FILE, existingRaw) then
+                print("[ChaosEffectsRegistry] Backed up effects.json.cfg to effects.json.backup.txt")
             else
-                print("[ChaosEffectsRegistry] Failed to write effects.json.backup; proceeding with overwrite")
+                print("[ChaosEffectsRegistry] Failed to write effects.json.backup.txt; proceeding with overwrite")
             end
         end
-        ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", defaults)
+        ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_EFFECTS_FILE, defaults)
     else
         print("[ChaosEffectsRegistry] default_effects.json not found; cannot replace effects.json")
     end
@@ -782,11 +786,11 @@ end
 ---@return boolean
 function ChaosEffectsRegistry.SaveEffectsToDisk()
     local snapshot = ChaosEffectsRegistry.BuildJsonSnapshot()
-    local ok = ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", snapshot)
+    local ok = ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_EFFECTS_FILE, snapshot)
     if ok then
-        print("[ChaosEffectsRegistry] Saved effects.json")
+        print("[ChaosEffectsRegistry] Saved effects.json.cfg")
     else
-        print("[ChaosEffectsRegistry] Failed to save effects.json")
+        print("[ChaosEffectsRegistry] Failed to save effects.json.cfg")
     end
     return ok
 end
@@ -798,8 +802,8 @@ function ChaosEffectsRegistry.ResetToDefaults()
         print("[ChaosEffectsRegistry] Cannot reset: default_effects.json not found")
         return false
     end
-    if not ChaosFileReader.WriteJsonToCache("ChaosMod/effects.json", defaults) then
-        print("[ChaosEffectsRegistry] Failed to write defaults to user effects.json")
+    if not ChaosFileReader.WriteJsonToCache(ChaosFileReader.USER_EFFECTS_FILE, defaults) then
+        print("[ChaosEffectsRegistry] Failed to write defaults to user effects.json.cfg")
         return false
     end
     ChaosEffectsRegistry.Initialize()

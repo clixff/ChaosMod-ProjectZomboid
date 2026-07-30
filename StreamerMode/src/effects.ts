@@ -1,5 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
+import {
+  LEGACY_USER_EFFECTS_FILE_NAME,
+  migrateLegacyRuntimeFile,
+  USER_EFFECTS_FILE_NAME,
+} from "./runtimeFiles.ts";
 import { logger } from "./utils/logger.ts";
 
 export interface EffectEntry {
@@ -55,7 +60,12 @@ function readEffectsRoot(path: string): EffectsRoot | null {
 }
 
 export function loadEffects(modFolder: string, luaFolder: string): EffectEntry[] {
-  const userPath = join(luaFolder, "effects.json");
+  migrateLegacyRuntimeFile(
+    luaFolder,
+    LEGACY_USER_EFFECTS_FILE_NAME,
+    USER_EFFECTS_FILE_NAME,
+  );
+  const userPath = join(luaFolder, USER_EFFECTS_FILE_NAME);
   const defaultPath = join(modFolder, "common", "default_effects.json");
 
   const defaultRoot = readEffectsRoot(defaultPath);
@@ -64,7 +74,7 @@ export function loadEffects(modFolder: string, luaFolder: string): EffectEntry[]
   if (!userRoot) {
     if (defaultRoot) {
       logger.info(
-        `effects.json not found at ${userPath}; copying default_effects.json`,
+        `effects.json.cfg not found at ${userPath}; copying default_effects.json`,
       );
       try {
         writeFileSync(
@@ -74,12 +84,12 @@ export function loadEffects(modFolder: string, luaFolder: string): EffectEntry[]
         );
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        logger.error(`Failed to write effects.json: ${msg}`);
+        logger.error(`Failed to write effects.json.cfg: ${msg}`);
       }
       userRoot = defaultRoot;
     } else {
       logger.warn(
-        `effects.json not found at ${userPath} and default_effects.json missing`,
+        `effects.json.cfg not found at ${userPath} and default_effects.json missing`,
       );
       return [];
     }
@@ -104,7 +114,7 @@ export function loadEffects(modFolder: string, luaFolder: string): EffectEntry[]
     }
     if (added > 0) {
       logger.info(
-        `Added ${added} missing effect(s) from default_effects.json; saving effects.json`,
+        `Added ${added} missing effect(s) from default_effects.json; saving effects.json.cfg`,
       );
       try {
         writeFileSync(
@@ -114,7 +124,7 @@ export function loadEffects(modFolder: string, luaFolder: string): EffectEntry[]
         );
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        logger.error(`Failed to save merged effects.json: ${msg}`);
+        logger.error(`Failed to save merged effects.json.cfg: ${msg}`);
       }
     }
   }
@@ -129,7 +139,12 @@ export function loadEffects(modFolder: string, luaFolder: string): EffectEntry[]
 }
 
 export function saveEffects(luaFolder: string, effects: EffectEntry[]): void {
-  const userPath = join(luaFolder, "effects.json");
+  migrateLegacyRuntimeFile(
+    luaFolder,
+    LEGACY_USER_EFFECTS_FILE_NAME,
+    USER_EFFECTS_FILE_NAME,
+  );
+  const userPath = join(luaFolder, USER_EFFECTS_FILE_NAME);
   let root: Record<string, unknown> = { effects: [] };
   let existingEffects: unknown[] = [];
   if (existsSync(userPath)) {
@@ -141,7 +156,7 @@ export function saveEffects(luaFolder: string, effects: EffectEntry[]): void {
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      logger.warn(`saveEffects: could not read existing effects.json: ${msg}`);
+      logger.warn(`saveEffects: could not read existing effects.json.cfg: ${msg}`);
     }
   }
   const byId = new Map<string, Record<string, unknown>>();
@@ -173,6 +188,6 @@ export function saveEffects(luaFolder: string, effects: EffectEntry[]): void {
     logger.debug(`Saved ${effects.length} effects to ${userPath}`);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    logger.error(`Failed to save effects.json: ${msg}`);
+    logger.error(`Failed to save effects.json.cfg: ${msg}`);
   }
 }

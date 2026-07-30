@@ -1,5 +1,11 @@
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
+import {
+  LEGACY_USER_CONFIG_FILE_NAME,
+  migrateLegacyRuntimeFile,
+  USER_CONFIG_BACKUP_FILE_NAME,
+  USER_CONFIG_FILE_NAME,
+} from "./runtimeFiles.ts";
 import { logger } from "./utils/logger.ts";
 
 export interface UIConfig {
@@ -503,7 +509,7 @@ function parseStreamerMode(raw: Record<string, unknown>): StreamerModeConfig {
 }
 
 function userConfigPath(luaFolder: string): string {
-  return join(luaFolder, "config.json");
+  return join(luaFolder, USER_CONFIG_FILE_NAME);
 }
 
 function defaultConfigPath(modFolder: string): string {
@@ -551,6 +557,11 @@ function addMissingKeysDeep(
 }
 
 export function saveConfig(luaFolder: string, config: ModConfig): void {
+  migrateLegacyRuntimeFile(
+    luaFolder,
+    LEGACY_USER_CONFIG_FILE_NAME,
+    USER_CONFIG_FILE_NAME,
+  );
   const configPath = userConfigPath(luaFolder);
   try {
     let existingRaw: Record<string, unknown> = {};
@@ -569,11 +580,16 @@ export function saveConfig(luaFolder: string, config: ModConfig): void {
     logger.debug(`Config saved to ${configPath}`);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    logger.error(`Failed to save config.json: ${msg}`);
+    logger.error(`Failed to save config.json.cfg: ${msg}`);
   }
 }
 
 export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
+  migrateLegacyRuntimeFile(
+    luaFolder,
+    LEGACY_USER_CONFIG_FILE_NAME,
+    USER_CONFIG_FILE_NAME,
+  );
   const configPath = userConfigPath(luaFolder);
   const defaultPath = defaultConfigPath(modFolder);
 
@@ -583,31 +599,31 @@ export function loadConfig(modFolder: string, luaFolder: string): ModConfig {
   if (!raw) {
     if (defaultRaw) {
       logger.info(
-        `config.json not found at ${configPath}; copying default_config.json`,
+        `config.json.cfg not found at ${configPath}; copying default_config.json`,
       );
       try {
         writeFileSync(configPath, JSON.stringify(defaultRaw, null, 4), "utf-8");
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        logger.error(`Failed to write config.json: ${msg}`);
+        logger.error(`Failed to write config.json.cfg: ${msg}`);
       }
       raw = defaultRaw;
     } else {
       logger.warn(
-        `config.json not found at ${configPath} and default_config.json missing; using built-in defaults`,
+        `config.json.cfg not found at ${configPath} and default_config.json missing; using built-in defaults`,
       );
       raw = {};
     }
   } else if (defaultRaw) {
     if (addMissingKeysDeep(raw, defaultRaw)) {
       logger.info(
-        `Added missing keys from default_config.json; saving config.json`,
+        `Added missing keys from default_config.json; saving config.json.cfg`,
       );
       try {
         writeFileSync(configPath, JSON.stringify(raw, null, 4), "utf-8");
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        logger.error(`Failed to save merged config.json: ${msg}`);
+        logger.error(`Failed to save merged config.json.cfg: ${msg}`);
       }
     }
   }
@@ -672,8 +688,13 @@ export function resetConfigToDefaultsPreservingUnknowns(
   modFolder: string,
   luaFolder: string,
 ): ModConfig | null {
+  migrateLegacyRuntimeFile(
+    luaFolder,
+    LEGACY_USER_CONFIG_FILE_NAME,
+    USER_CONFIG_FILE_NAME,
+  );
   const configPath = userConfigPath(luaFolder);
-  const backupPath = join(luaFolder, "config_backup.json");
+  const backupPath = join(luaFolder, USER_CONFIG_BACKUP_FILE_NAME);
 
   let existingRaw: Record<string, unknown> = {};
   if (existsSync(configPath)) {
@@ -683,7 +704,7 @@ export function resetConfigToDefaultsPreservingUnknowns(
       logger.debug(`Config backup saved to ${backupPath}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      logger.error(`Failed to backup config.json: ${msg}`);
+      logger.error(`Failed to backup config.json.cfg: ${msg}`);
       return null;
     }
   } else {
@@ -696,7 +717,7 @@ export function resetConfigToDefaultsPreservingUnknowns(
       logger.debug(`Config backup saved to ${backupPath}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      logger.error(`Failed to create config_backup.json: ${msg}`);
+      logger.error(`Failed to create config_backup.json.txt: ${msg}`);
       return null;
     }
   }
@@ -715,7 +736,7 @@ export function resetConfigToDefaultsPreservingUnknowns(
     logger.debug(`Default config saved to ${configPath}`);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    logger.error(`Failed to save default config.json: ${msg}`);
+    logger.error(`Failed to save default config.json.cfg: ${msg}`);
     return null;
   }
 

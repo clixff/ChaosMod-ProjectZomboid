@@ -113,7 +113,7 @@ function ChaosSettingsEffectsPanel:RefillList()
         needle = string.lower(self.searchText)
     end
 
-    -- Iterate in the original effects.json order; items are labelled "<index>. <name> (<id>)".
+    -- Iterate in the original effects.json.cfg order; items are labelled "<index>. <name> (<id>)".
     local firstId = nil
     for index, id in ipairs(self.parentWindow.workingEffectOrder) do
         local effect = self.parentWindow.workingEffects[id]

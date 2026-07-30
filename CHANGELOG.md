@@ -1,3 +1,10 @@
+## [1.2.2]
+
+### Mod Fixes and Improvements
+
+- Updated game version compatibility to 42.20.0
+- Fixed json file writing (now saves as .txt or .cfg files)
+
 ## [1.2.1]
 
 ### New Mod Features
