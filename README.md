@@ -22,15 +22,13 @@ Chaos Mod also supports Twitch and YouTube integration. Viewers can vote for the
 
 ### Method 1 — Steam Workshop
 
-1. Set Project Zomboid to the **unstable** branch in Steam.
-2. Download the mod from the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142).
-3. Enable the mod in the game.
+1. Download the mod from the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3717082142).
+2. Enable the mod in the game.
 
 ### Method 2 — Manual Installation (Skip this unless you really need it)
 
-1. Set Project Zomboid to the **unstable** branch in Steam.
-2. Download the latest release from [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
-3. Extract the **ChaosModPZ** folder to:
+1. Download the latest release from [GitHub](https://github.com/clixff/ChaosMod-ProjectZomboid/releases/latest).
+2. Extract the **ChaosModPZ** folder to:
 
    ```txt
    %UserProfile%/Zomboid/Workshop
@@ -45,10 +43,7 @@ Chaos Mod also supports Twitch and YouTube integration. Viewers can vote for the
 ---
 
 > [!IMPORTANT]
-> This mod requires the **unstable** branch of Project Zomboid on Steam.  
-> It has been tested on version **42.19.0**.
->
-> To enable the unstable branch, open Project Zomboid properties in Steam, go to **Game Versions & Betas**, and select the **unstable** branch.
+> It has been tested on version **42.20.0**.
 
 ---
 
@@ -258,10 +253,6 @@ Supported languages:
 - Japanese (`ja`)
 
 ## FAQ
-
-### Mod does not work. What should I do?
-
-Make sure you are using the **unstable** branch of Project Zomboid on Steam.
 
 ### I want to use only donation effects, without random effects every 45 seconds and without voting. How can I do this?
 
